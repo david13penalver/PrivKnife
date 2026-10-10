@@ -63,6 +63,26 @@ export const routes: Routes = [
       import('./tools/privacy/exif-stripper').then((m) => m.ExifStripperComponent),
   },
   {
+    path: 'tools/crypto-hash-uuid',
+    title: 'Cryptographic Hash & UUID Batch Generator — PrivKnife',
+    data: {
+      description:
+        'Generate RFC 4122 UUIDv4 identifiers and calculate SHA-256, SHA-512, SHA-1, or MD5 digests in bulk. 100% in-browser with zero server roundtrips.',
+      keywords: [
+        'uuid generator',
+        'uuidv4 batch',
+        'hash generator',
+        'sha256 online',
+        'sha512 generator',
+        'md5 bulk',
+        'client side hashing',
+      ],
+      url: '/tools/crypto-hash-uuid',
+    },
+    loadComponent: () =>
+      import('./tools/privacy/crypto-hash-uuid').then((m) => m.CryptoHashUuidComponent),
+  },
+  {
     path: '**',
     title: 'Page Not Found — PrivKnife',
     data: {

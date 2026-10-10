@@ -23,9 +23,18 @@ describe('ToolRegistry (Seam 3: Catalog & Architecture Verification)', () => {
     expect(tool?.category).toBe('privacy');
   });
 
+  it('should find crypto-hash-uuid tool by id', () => {
+    const tool = getToolById('crypto-hash-uuid');
+    expect(tool).toBeDefined();
+    expect(tool?.name).toBe('Cryptographic Hash & UUID Batch Generator');
+    expect(tool?.category).toBe('privacy');
+    expect(tool?.isFullyClientSide).toBe(true);
+  });
+
   it('should find tools by category', () => {
     const privacyTools = getToolsByCategory('privacy');
     expect(privacyTools.length).toBeGreaterThan(0);
     expect(privacyTools.some((t) => t.id === 'exif-stripper')).toBe(true);
+    expect(privacyTools.some((t) => t.id === 'crypto-hash-uuid')).toBe(true);
   });
 });
