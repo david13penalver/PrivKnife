@@ -1,10 +1,12 @@
 import { ToolCategory, ToolDefinition } from '../core/models/tool.model';
+import { csvConverterTool } from './dev/csv-converter';
 import { cryptoHashUuidTool } from './privacy/crypto-hash-uuid';
 import { exifStripperTool } from './privacy/exif-stripper';
 
 export const TOOL_REGISTRY: ToolDefinition[] = [
   exifStripperTool,
   cryptoHashUuidTool,
+  csvConverterTool,
 ];
 
 export function getToolById(id: string): ToolDefinition | undefined {

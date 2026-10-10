@@ -83,6 +83,25 @@ export const routes: Routes = [
       import('./tools/privacy/crypto-hash-uuid').then((m) => m.CryptoHashUuidComponent),
   },
   {
+    path: 'tools/csv-to-sql-json',
+    title: 'CSV / Excel to JSON, SQL & Markdown Converter — PrivKnife',
+    data: {
+      description:
+        'Convert spreadsheets into structured JSON, SQL INSERT scripts, or Markdown tables offline with zero server roundtrips.',
+      keywords: [
+        'csv to json',
+        'csv to sql',
+        'excel to json',
+        'csv to markdown',
+        'excel to sql insert',
+        'client side csv converter',
+      ],
+      url: '/tools/csv-to-sql-json',
+    },
+    loadComponent: () =>
+      import('./tools/dev/csv-converter').then((m) => m.CsvConverterComponent),
+  },
+  {
     path: '**',
     title: 'Page Not Found — PrivKnife',
     data: {

@@ -51,8 +51,9 @@ const CATALOG_TOOLS: CatalogTool[] = [
     categoryLabel: 'Dev / Data',
     description: 'Convert spreadsheets and CSV data into structured JSON, SQL INSERT scripts, or Markdown tables offline.',
     keywords: ['csv', 'json', 'sql', 'markdown', 'excel', 'table', 'convert'],
-    status: 'roadmap',
-    techStack: 'PapaParse • Client Streaming',
+    status: 'ready',
+    route: '/tools/csv-to-sql-json',
+    techStack: 'PapaParse • SheetJS',
     icon: '📊',
   },
   {

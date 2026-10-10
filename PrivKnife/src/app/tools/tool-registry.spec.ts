@@ -31,10 +31,22 @@ describe('ToolRegistry (Seam 3: Catalog & Architecture Verification)', () => {
     expect(tool?.isFullyClientSide).toBe(true);
   });
 
+  it('should find csv-to-sql-json tool by id', () => {
+    const tool = getToolById('csv-to-sql-json');
+    expect(tool).toBeDefined();
+    expect(tool?.name).toBe('CSV / Excel to JSON, SQL & Markdown');
+    expect(tool?.category).toBe('dev');
+    expect(tool?.isFullyClientSide).toBe(true);
+  });
+
   it('should find tools by category', () => {
     const privacyTools = getToolsByCategory('privacy');
     expect(privacyTools.length).toBeGreaterThan(0);
     expect(privacyTools.some((t) => t.id === 'exif-stripper')).toBe(true);
     expect(privacyTools.some((t) => t.id === 'crypto-hash-uuid')).toBe(true);
+
+    const devTools = getToolsByCategory('dev');
+    expect(devTools.length).toBeGreaterThan(0);
+    expect(devTools.some((t) => t.id === 'csv-to-sql-json')).toBe(true);
   });
 });
