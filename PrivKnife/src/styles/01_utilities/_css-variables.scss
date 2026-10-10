@@ -1,0 +1,116 @@
+/* ==========================================================================
+   01_UTILITIES: CSS Custom Properties (Native CSS Variables)
+   ========================================================================== */
+
+:root {
+  /* Color Palette - Neutral / Canvas */
+  --color-bg-base: #f8fafc;
+  --color-bg-surface: #ffffff;
+  --color-bg-elevated: #ffffff;
+  --color-bg-subtle: #f1f5f9;
+
+  /* Color Palette - Text & Content */
+  --color-text-primary: #0f172a;
+  --color-text-secondary: #475569;
+  --color-text-muted: #94a3b8;
+  --color-text-inverse: #ffffff;
+
+  /* Color Palette - Borders & Dividers */
+  --color-border-subtle: #f1f5f9;
+  --color-border-default: #e2e8f0;
+  --color-border-strong: #cbd5e1;
+
+  /* Color Palette - Brand / Swiss Primary */
+  --color-primary: #e11d48;
+  --color-primary-hover: #be123c;
+  --color-primary-active: #9f1239;
+  --color-primary-subtle: #ffe4e6;
+  --color-primary-contrast: #ffffff;
+
+  /* Color Palette - Secondary / Slate */
+  --color-secondary: #0f172a;
+  --color-secondary-hover: #1e293b;
+  --color-secondary-subtle: #e2e8f0;
+
+  /* Color Palette - Semantic States */
+  --color-success: #16a34a;
+  --color-success-hover: #15803d;
+  --color-success-subtle: #dcfce7;
+  --color-success-contrast: #ffffff;
+
+  --color-warning: #d97706;
+  --color-warning-hover: #b45309;
+  --color-warning-subtle: #fef3c7;
+  --color-warning-contrast: #ffffff;
+
+  --color-danger: #dc2626;
+  --color-danger-hover: #b91c1c;
+  --color-danger-subtle: #fee2e2;
+  --color-danger-contrast: #ffffff;
+
+  --color-info: #0284c7;
+  --color-info-hover: #0369a1;
+  --color-info-subtle: #e0f2fe;
+  --color-info-contrast: #ffffff;
+
+  /* Privacy Badge Colors */
+  --color-privacy: #059669;
+  --color-privacy-subtle: #d1fae5;
+  --color-privacy-contrast: #ffffff;
+
+  /* Interactive & Focus */
+  --color-focus-ring: rgba(225, 29, 72, 0.4);
+
+  /* Shadows */
+  --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.1);
+  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -4px rgba(0, 0, 0, 0.1);
+  --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
+
+  /* Radii */
+  --radius-xs: 2px;
+  --radius-sm: 4px;
+  --radius-md: 8px;
+  --radius-lg: 12px;
+  --radius-xl: 16px;
+  --radius-full: 9999px;
+
+  /* Transitions */
+  --transition-fast: 150ms cubic-bezier(0.4, 0, 0.2, 1);
+  --transition-normal: 200ms cubic-bezier(0.4, 0, 0.2, 1);
+  --transition-slow: 300ms cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Dark Theme Overrides */
+[data-theme="dark"],
+body.c-body--dark {
+  --color-bg-base: #0b0f17;
+  --color-bg-surface: #131b28;
+  --color-bg-elevated: #1a2436;
+  --color-bg-subtle: #1e293b;
+
+  --color-text-primary: #f8fafc;
+  --color-text-secondary: #94a3b8;
+  --color-text-muted: #64748b;
+  --color-text-inverse: #0f172a;
+
+  --color-border-subtle: #1e293b;
+  --color-border-default: #334155;
+  --color-border-strong: #475569;
+
+  --color-primary-subtle: rgba(225, 29, 72, 0.15);
+  --color-secondary: #f8fafc;
+  --color-secondary-hover: #e2e8f0;
+  --color-secondary-subtle: #334155;
+
+  --color-success-subtle: rgba(22, 163, 74, 0.15);
+  --color-warning-subtle: rgba(217, 119, 6, 0.15);
+  --color-danger-subtle: rgba(220, 38, 38, 0.15);
+  --color-info-subtle: rgba(2, 132, 199, 0.15);
+  --color-privacy-subtle: rgba(5, 150, 105, 0.15);
+
+  --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.4);
+  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.4);
+  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.4);
+  --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.5);
+}

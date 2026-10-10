@@ -1,0 +1,60 @@
+/* ==========================================================================
+   01_UTILITIES: SASS Functions
+   ========================================================================== */
+
+@use "sass:map";
+@use "sass:math";
+@use "sass-variables" as vars;
+
+/// Calculate border size based on multiplier
+/// Conforms to DAW-2 Theory specification
+/// @param {Number} $size - Multiplier
+/// @return {Number} Calculated border size in px
+@function getBorderSize($size) {
+  @return 1px * $size;
+}
+
+/// Calculate spacing based on 4px grid unit
+/// @param {Number} $multiplier - Grid unit factor
+/// @return {Number} Calculated spacing in px
+@function spacing($multiplier) {
+  @return 4px * $multiplier;
+}
+
+/// Convert pixel value to rem
+/// @param {Number} $px - Pixel value (unitless or with px)
+/// @return {Number} Value in rem
+@function rem($px) {
+  @if not math.is-unitless($px) {
+    $px: math.div($px, 1px);
+  }
+  @return math.div($px, 16) * 1rem;
+}
+
+/// Convert pixel value to em
+/// @param {Number} $px - Pixel value
+/// @param {Number} $context - Context font size (default: 16px)
+/// @return {Number} Value in em
+@function em($px, $context: 16px) {
+  @if not math.is-unitless($px) {
+    $px: math.div($px, 1px);
+  }
+  @if not math.is-unitless($context) {
+    $context: math.div($context, 1px);
+  }
+  @return math.div($px, $context) * 1em;
+}
+
+/// Retrieve z-index value from map
+/// @param {String} $layer - Name of z-index layer
+/// @return {Number} Z-index integer
+@function getZIndex($layer) {
+  @return map.get(vars.$z-indices, $layer);
+}
+
+/// Retrieve responsive breakpoint width from map
+/// @param {String} $name - Breakpoint name (xs, sm, md, lg, xl, 2xl)
+/// @return {Number} Breakpoint width in px
+@function getBreakpoint($name) {
+  @return map.get(vars.$breakpoints, $name);
+}

@@ -1,0 +1,106 @@
+/* ==========================================================================
+   02_BASE: Typography
+   ========================================================================== */
+
+@use "../01_utilities/sass-variables" as vars;
+@use "../01_utilities/functions" as fn;
+
+body {
+  font-family: vars.$font-main;
+  font-size: 1rem;
+  font-weight: 400;
+  color: var(--color-text-primary);
+  background-color: var(--color-bg-base);
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  font-family: vars.$font-main;
+  color: var(--color-text-primary);
+  font-weight: 700;
+  line-height: 1.25;
+  letter-spacing: -0.02em;
+}
+
+h1 {
+  font-size: fn.rem(36px);
+}
+
+h2 {
+  font-size: fn.rem(28px);
+}
+
+h3 {
+  font-size: fn.rem(22px);
+}
+
+h4 {
+  font-size: fn.rem(18px);
+}
+
+h5 {
+  font-size: fn.rem(16px);
+}
+
+h6 {
+  font-size: fn.rem(14px);
+}
+
+p {
+  color: var(--color-text-secondary);
+  line-height: 1.6;
+}
+
+small {
+  font-size: fn.rem(12px);
+  color: var(--color-text-muted);
+}
+
+strong,
+b {
+  font-weight: 600;
+  color: var(--color-text-primary);
+}
+
+code,
+kbd,
+samp,
+pre {
+  font-family: vars.$font-mono;
+  font-size: 0.875em;
+}
+
+code {
+  padding: 0.15em 0.35em;
+  border-radius: var(--radius-sm);
+  background-color: var(--color-bg-subtle);
+  color: var(--color-primary);
+  border: 1px solid var(--color-border-subtle);
+}
+
+pre {
+  padding: fn.spacing(3);
+  border-radius: var(--radius-md);
+  background-color: var(--color-bg-subtle);
+  overflow-x: auto;
+
+  code {
+    padding: 0;
+    border: none;
+    background: transparent;
+    color: inherit;
+  }
+}
+
+kbd {
+  padding: 0.1em 0.4em;
+  border-radius: var(--radius-sm);
+  background-color: var(--color-bg-surface);
+  border: 1px solid var(--color-border-strong);
+  box-shadow: 0 1px 0 var(--color-border-strong);
+  font-size: 0.8em;
+}

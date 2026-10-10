@@ -1,0 +1,38 @@
+/* ==========================================================================
+   06_GLOBAL: Padding Utility Modifiers
+   Nomenclature: .g--padding-* (Generated via SASS @each loop)
+   ========================================================================== */
+
+@use "../01_utilities/sass-variables" as vars;
+
+@each $key, $val in vars.$spacings {
+  .g--padding-#{$key} {
+    padding: $val !important;
+  }
+
+  .g--padding-top-#{$key} {
+    padding-top: $val !important;
+  }
+
+  .g--padding-bottom-#{$key} {
+    padding-bottom: $val !important;
+  }
+
+  .g--padding-left-#{$key} {
+    padding-left: $val !important;
+  }
+
+  .g--padding-right-#{$key} {
+    padding-right: $val !important;
+  }
+
+  .g--padding-x-#{$key} {
+    padding-left: $val !important;
+    padding-right: $val !important;
+  }
+
+  .g--padding-y-#{$key} {
+    padding-top: $val !important;
+    padding-bottom: $val !important;
+  }
+}

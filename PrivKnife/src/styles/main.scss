@@ -1,0 +1,39 @@
+/* ==========================================================================
+   PrivKnife: Master SASS Stylesheet
+   Architecture: 6-Layer SASS & BEM Methodology
+   Reference: DAW-2 Web Interface Design Theory / logongas.es DIW
+   ========================================================================== */
+
+/* --------------------------------------------------------------------------
+   01_UTILITIES: Design tokens, CSS variables, SASS variables, functions & mixins
+   -------------------------------------------------------------------------- */
+@use "01_utilities/css-variables";
+@use "01_utilities/sass-variables";
+@use "01_utilities/functions";
+@use "01_utilities/mixins";
+
+/* --------------------------------------------------------------------------
+   02_BASE: Reset, base typography & library overrides
+   -------------------------------------------------------------------------- */
+@use "02_base/reset";
+@use "02_base/typography";
+@use "02_base/override";
+
+/* --------------------------------------------------------------------------
+   03_LAYOUT: Layout blocks (.l-*) - Implemented in Step 2
+   -------------------------------------------------------------------------- */
+
+/* --------------------------------------------------------------------------
+   04_COMPONENTS: Visual component blocks (.c-*) - Implemented in Step 2
+   -------------------------------------------------------------------------- */
+
+/* --------------------------------------------------------------------------
+   05_PAGES: Page-specific styles (kept empty by architectural convention)
+   -------------------------------------------------------------------------- */
+
+/* --------------------------------------------------------------------------
+   06_GLOBAL: Global helper modifiers (.g--*)
+   -------------------------------------------------------------------------- */
+@use "06_global/g--margin";
+@use "06_global/g--padding";
+@use "06_global/g--display";

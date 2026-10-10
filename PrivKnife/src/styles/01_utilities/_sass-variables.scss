@@ -1,0 +1,63 @@
+/* ==========================================================================
+   01_UTILITIES: SASS Variables, Maps & Lists
+   ========================================================================== */
+
+/* Typography Stacks */
+$font-main: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+$font-mono: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Monaco, Consolas, "Liberation Mono", monospace;
+
+/* Font Weights Array (Accessed via nth() per theory) */
+$font-weights: (300, 400, 500, 600, 700);
+
+/* Spacing Map (Keyed multipliers based on 4px base) */
+$spacings: (
+  0: 0,
+  1: 4px,
+  2: 8px,
+  3: 12px,
+  4: 16px,
+  5: 20px,
+  6: 24px,
+  8: 32px,
+  10: 40px,
+  12: 48px,
+  16: 64px,
+  20: 80px
+);
+
+/* Responsive Breakpoints Map */
+$breakpoints: (
+  "xs": 480px,
+  "sm": 640px,
+  "md": 768px,
+  "lg": 1024px,
+  "xl": 1280px,
+  "2xl": 1536px
+);
+
+/* Radii Map */
+$radii: (
+  "none": 0,
+  "xs": 2px,
+  "sm": 4px,
+  "md": 8px,
+  "lg": 12px,
+  "xl": 16px,
+  "full": 9999px
+);
+
+/* Z-Index Hierarchy Map */
+$z-indices: (
+  "base": 0,
+  "dropdown": 100,
+  "sticky": 200,
+  "header": 300,
+  "modal-backdrop": 900,
+  "modal": 1000,
+  "toast": 1100
+);
+
+/* Static Brand Palette (SASS level) */
+$color-swiss-red: #e11d48;
+$color-dark-slate: #0f172a;
+$color-privacy-green: #059669;

@@ -1,0 +1,47 @@
+/* ==========================================================================
+   06_GLOBAL: Margin Utility Modifiers
+   Nomenclature: .g--margin-* (Generated via SASS @each loop)
+   ========================================================================== */
+
+@use "../01_utilities/sass-variables" as vars;
+
+@each $key, $val in vars.$spacings {
+  .g--margin-#{$key} {
+    margin: $val !important;
+  }
+
+  .g--margin-top-#{$key} {
+    margin-top: $val !important;
+  }
+
+  .g--margin-bottom-#{$key} {
+    margin-bottom: $val !important;
+  }
+
+  .g--margin-left-#{$key} {
+    margin-left: $val !important;
+  }
+
+  .g--margin-right-#{$key} {
+    margin-right: $val !important;
+  }
+
+  .g--margin-x-#{$key} {
+    margin-left: $val !important;
+    margin-right: $val !important;
+  }
+
+  .g--margin-y-#{$key} {
+    margin-top: $val !important;
+    margin-bottom: $val !important;
+  }
+}
+
+.g--margin-auto {
+  margin: auto !important;
+}
+
+.g--margin-x-auto {
+  margin-left: auto !important;
+  margin-right: auto !important;
+}
