@@ -63,8 +63,9 @@ const CATALOG_TOOLS: CatalogTool[] = [
     categoryLabel: 'Documents',
     description: 'Combine multiple PDF files, delete sensitive pages, or extract custom page ranges in browser memory.',
     keywords: ['pdf', 'merge', 'split', 'organize', 'pages', 'documents'],
-    status: 'roadmap',
-    techStack: 'pdf-lib • Client WASM',
+    status: 'ready',
+    route: '/tools/pdf-merger-splitter',
+    techStack: 'pdf-lib • Canvas API',
     icon: '📑',
   },
   {

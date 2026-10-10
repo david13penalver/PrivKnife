@@ -102,6 +102,25 @@ export const routes: Routes = [
       import('./tools/dev/csv-converter').then((m) => m.CsvConverterComponent),
   },
   {
+    path: 'tools/pdf-merger-splitter',
+    title: 'PDF Merger, Splitter & Page Organizer — PrivKnife',
+    data: {
+      description:
+        'Combine multiple PDF files, delete sensitive pages, or rotate sheets 100% locally in browser memory with zero upload limits.',
+      keywords: [
+        'merge pdf',
+        'combine pdf',
+        'split pdf',
+        'organize pdf pages',
+        'rotate pdf',
+        'client side pdf merger',
+      ],
+      url: '/tools/pdf-merger-splitter',
+    },
+    loadComponent: () =>
+      import('./tools/documents/pdf-merger').then((m) => m.PdfMergerComponent),
+  },
+  {
     path: '**',
     title: 'Page Not Found — PrivKnife',
     data: {

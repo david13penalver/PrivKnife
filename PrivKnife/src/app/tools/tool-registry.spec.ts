@@ -39,6 +39,14 @@ describe('ToolRegistry (Seam 3: Catalog & Architecture Verification)', () => {
     expect(tool?.isFullyClientSide).toBe(true);
   });
 
+  it('should find pdf-merger-splitter tool by id', () => {
+    const tool = getToolById('pdf-merger-splitter');
+    expect(tool).toBeDefined();
+    expect(tool?.name).toBe('PDF Merger, Splitter & Page Organizer');
+    expect(tool?.category).toBe('documents');
+    expect(tool?.isFullyClientSide).toBe(true);
+  });
+
   it('should find tools by category', () => {
     const privacyTools = getToolsByCategory('privacy');
     expect(privacyTools.length).toBeGreaterThan(0);
@@ -48,5 +56,9 @@ describe('ToolRegistry (Seam 3: Catalog & Architecture Verification)', () => {
     const devTools = getToolsByCategory('dev');
     expect(devTools.length).toBeGreaterThan(0);
     expect(devTools.some((t) => t.id === 'csv-to-sql-json')).toBe(true);
+
+    const docTools = getToolsByCategory('documents');
+    expect(docTools.length).toBeGreaterThan(0);
+    expect(docTools.some((t) => t.id === 'pdf-merger-splitter')).toBe(true);
   });
 });
