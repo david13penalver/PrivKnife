@@ -1,0 +1,14 @@
+import { ToolCategory, ToolDefinition } from '../core/models/tool.model';
+import { exifStripperTool } from './privacy/exif-stripper';
+
+export const TOOL_REGISTRY: ToolDefinition[] = [
+  exifStripperTool,
+];
+
+export function getToolById(id: string): ToolDefinition | undefined {
+  return TOOL_REGISTRY.find((tool) => tool.id === id);
+}
+
+export function getToolsByCategory(category: ToolCategory): ToolDefinition[] {
+  return TOOL_REGISTRY.filter((tool) => tool.category === category);
+}

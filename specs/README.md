@@ -58,7 +58,7 @@ gantt
 
 | # | Spec Folder | Category | Deliverable | Client-Side Tech Stack | Status |
 | **00** | [00 - Platform, SEO & Production Readiness](00%20-%20Platform,%20SEO%20&%20Production%20Readiness/spec.md) | Core / SEO | 404, Meta/OG, Sitemap, Legal | Angular Services, WCAG 2.1 AA | [x] |
-| **01** | [01 - EXIF & Privacy Metadata Stripper](01%20-%20EXIF%20&%20Privacy%20Metadata%20Stripper/spec.md) | Privacy | Metadata-free `.jpg` / `.png` | `piexifjs`, Canvas API, File API | [ ] |
+| **01** | [01 - EXIF & Privacy Metadata Stripper](01%20-%20EXIF%20&%20Privacy%20Metadata%20Stripper/spec.md) | Privacy | Metadata-free `.jpg` / `.png` | `piexifjs`, Canvas API, File API | [x] |
 | **02** | [02 - Cryptographic Hash & UUID Batch Generator](02%20-%20Cryptographic%20Hash%20&%20UUID%20Batch%20Generator/spec.md) | Privacy / Dev | Bulk SHA-256, MD5, UUIDv4 | Native `crypto.subtle` (Web Crypto) | [ ] |
 | **03** | [03 - CSV - Excel to JSON, SQL & Markdown Converter](03%20-%20CSV%20-%20Excel%20to%20JSON,%20SQL%20&%20Markdown%20Converter/spec.md) | Dev / Data | `.sql`, `.json`, `.md` exports | `PapaParse`, pure JavaScript | [ ] |
 | **04** | [04 - PDF Merger, Splitter & Page Organizer](04%20-%20PDF%20Merger,%20Splitter%20&%20Page%20Organizer/spec.md) | Documents | Reordered / merged `.pdf` | `pdf-lib`, `PDF.js` | [ ] |

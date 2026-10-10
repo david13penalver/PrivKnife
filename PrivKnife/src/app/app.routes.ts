@@ -35,6 +35,24 @@ export const routes: Routes = [
     loadComponent: () => import('./pages/terms/terms').then((m) => m.Terms),
   },
   {
+    path: 'tools/exif-stripper',
+    title: 'EXIF Metadata Stripper & Privacy Cleaner — PrivKnife',
+    data: {
+      description:
+        'Strip GPS location, camera model, and device timestamps from your photos online for free. 100% in-browser with zero file uploads.',
+      keywords: [
+        'remove exif data',
+        'exif stripper',
+        'photo metadata cleaner',
+        'remove gps from photo',
+        'privacy photo stripper',
+      ],
+      url: '/tools/exif-stripper',
+    },
+    loadComponent: () =>
+      import('./tools/privacy/exif-stripper').then((m) => m.ExifStripperComponent),
+  },
+  {
     path: '**',
     title: 'Page Not Found — PrivKnife',
     data: {
