@@ -1,0 +1,22 @@
+{
+  "name": "PrivKnife — Private In-Browser Swiss Army Knife",
+  "short_name": "PrivKnife",
+  "description": "Zero servers. Zero telemetry. 100% in-browser private utilities.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#e11d48",
+  "icons": [
+    {
+      "src": "/favicon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/apple-touch-icon.png",
+      "sizes": "180x180",
+      "type": "image/png"
+    }
+  ]
+}

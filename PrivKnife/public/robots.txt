@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://privknife.com/sitemap.xml
