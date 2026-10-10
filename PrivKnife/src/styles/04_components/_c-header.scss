@@ -1,0 +1,84 @@
+/* ==========================================================================
+   04_COMPONENTS: Site Header Component
+   Nomenclature: .c-header & elements (BEM)
+   ========================================================================== */
+
+@use "../01_utilities/functions" as fn;
+@use "../01_utilities/mixins" as mx;
+
+.c-header {
+  width: 100%;
+  background-color: var(--color-bg-surface);
+  border-bottom: 1px solid var(--color-border-default);
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  backdrop-filter: blur(8px);
+
+  &__inner {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    max-width: 1280px;
+    margin-left: auto;
+    margin-right: auto;
+    padding: fn.spacing(3) fn.spacing(6);
+  }
+
+  &__brand {
+    display: flex;
+    align-items: center;
+    gap: fn.spacing(3);
+    text-decoration: none;
+    cursor: pointer;
+  }
+
+  &__logo {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 36px;
+    height: 36px;
+    background-color: var(--color-primary);
+    color: #ffffff;
+    border-radius: var(--radius-md);
+    font-size: fn.rem(20px);
+    font-weight: 700;
+  }
+
+  &__title {
+    font-size: fn.rem(18px);
+    font-weight: 700;
+    color: var(--color-text-primary);
+    letter-spacing: -0.02em;
+  }
+
+  &__tagline {
+    font-size: fn.rem(12px);
+    color: var(--color-text-muted);
+  }
+
+  &__nav {
+    display: flex;
+    align-items: center;
+    gap: fn.spacing(4);
+  }
+
+  &__link {
+    font-size: fn.rem(14px);
+    font-weight: 500;
+    color: var(--color-text-secondary);
+    @include mx.transition(color, 150ms, ease);
+
+    &:hover,
+    &--active {
+      color: var(--color-primary);
+    }
+  }
+
+  &__actions {
+    display: flex;
+    align-items: center;
+    gap: fn.spacing(2.5);
+  }
+}

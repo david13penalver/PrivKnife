@@ -1,0 +1,55 @@
+/* ==========================================================================
+   04_COMPONENTS: Site Footer Component
+   Nomenclature: .c-footer & elements (BEM)
+   ========================================================================== */
+
+@use "../01_utilities/functions" as fn;
+
+.c-footer {
+  width: 100%;
+  border-top: 1px solid var(--color-border-default);
+  background-color: var(--color-bg-surface);
+  margin-top: auto;
+
+  &__inner {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: space-between;
+    gap: fn.spacing(4);
+    max-width: 1280px;
+    margin-left: auto;
+    margin-right: auto;
+    padding: fn.spacing(8) fn.spacing(6);
+
+    @media (min-width: 768px) {
+      flex-direction: row;
+    }
+  }
+
+  &__copy {
+    font-size: fn.rem(13px);
+    color: var(--color-text-muted);
+  }
+
+  &__privacy-note {
+    display: flex;
+    align-items: center;
+    gap: fn.spacing(2);
+    font-size: fn.rem(13px);
+    font-weight: 500;
+    color: var(--color-privacy);
+  }
+
+  &__links {
+    display: flex;
+    align-items: center;
+    gap: fn.spacing(4);
+    font-size: fn.rem(13px);
+    color: var(--color-text-secondary);
+
+    a:hover {
+      color: var(--color-primary);
+    }
+  }
+}

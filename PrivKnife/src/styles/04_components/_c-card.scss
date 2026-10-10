@@ -1,0 +1,44 @@
+/* ==========================================================================
+   04_COMPONENTS: Card Component
+   Nomenclature: .c-card & elements (BEM)
+   ========================================================================== */
+
+@use "../01_utilities/functions" as fn;
+@use "../01_utilities/mixins" as mx;
+
+.c-card {
+  display: flex;
+  flex-direction: column;
+  background-color: var(--color-bg-surface);
+  border: 1px solid var(--color-border-default);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-sm);
+  overflow: hidden;
+  @include mx.transition(all, 200ms, ease);
+
+  &--interactive {
+    cursor: pointer;
+
+    &:hover {
+      border-color: var(--color-border-strong);
+      box-shadow: var(--shadow-md);
+      transform: translateY(-2px);
+    }
+  }
+
+  &__header {
+    padding: fn.spacing(5);
+    border-bottom: 1px solid var(--color-border-subtle);
+  }
+
+  &__body {
+    padding: fn.spacing(5);
+    flex: 1 1 auto;
+  }
+
+  &__footer {
+    padding: fn.spacing(4) fn.spacing(5);
+    border-top: 1px solid var(--color-border-subtle);
+    background-color: var(--color-bg-subtle);
+  }
+}

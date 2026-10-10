@@ -1,0 +1,70 @@
+/* ==========================================================================
+   03_LAYOUT: Flexbox Layout Container
+   Nomenclature: .l-flex & modifiers (DAW-2 Theory)
+   Rule: Positioning only; arrange areas using flexbox
+   ========================================================================== */
+
+.l-flex {
+  display: flex;
+  width: 100%;
+
+  /* Direction Modifiers */
+  &--direction-row {
+    flex-direction: row;
+  }
+
+  &--direction-column {
+    flex-direction: column;
+  }
+
+  /* Wrap Modifiers */
+  &--wrap {
+    flex-wrap: wrap;
+  }
+
+  &--nowrap {
+    flex-wrap: nowrap;
+  }
+
+  /* Justify Content Modifiers */
+  &--justify-center {
+    justify-content: center;
+  }
+
+  &--justify-between {
+    justify-content: space-between;
+  }
+
+  &--justify-start {
+    justify-content: flex-start;
+  }
+
+  &--justify-end {
+    justify-content: flex-end;
+  }
+
+  /* Align Items Modifiers */
+  &--align-center {
+    align-items: center;
+  }
+
+  &--align-start {
+    align-items: flex-start;
+  }
+
+  &--align-end {
+    align-items: flex-end;
+  }
+
+  /* Child Area Elements */
+  &__area {
+    min-width: 0;
+
+    /* Flex grow modifiers: .l-flex__area--grow-1 to 5 */
+    @for $i from 1 through 5 {
+      &--grow-#{$i} {
+        flex-grow: $i;
+      }
+    }
+  }
+}

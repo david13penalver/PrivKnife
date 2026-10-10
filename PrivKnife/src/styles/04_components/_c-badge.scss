@@ -1,0 +1,54 @@
+/* ==========================================================================
+   04_COMPONENTS: Badge Component
+   Nomenclature: .c-badge & modifiers (BEM)
+   ========================================================================== */
+
+@use "../01_utilities/functions" as fn;
+
+.c-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: fn.spacing(1.5);
+  padding: fn.spacing(0.75) fn.spacing(2.5);
+  font-size: fn.rem(12px);
+  font-weight: 500;
+  line-height: 1.2;
+  border-radius: var(--radius-full);
+  background-color: var(--color-bg-subtle);
+  color: var(--color-text-secondary);
+  border: 1px solid var(--color-border-subtle);
+
+  /* Element: Dot Indicator */
+  &__dot {
+    width: 6px;
+    height: 6px;
+    border-radius: var(--radius-full);
+    background-color: currentColor;
+  }
+
+  /* Modifiers */
+  &--privacy {
+    background-color: var(--color-privacy-subtle);
+    color: var(--color-privacy);
+    border-color: transparent;
+    font-weight: 600;
+  }
+
+  &--success {
+    background-color: var(--color-success-subtle);
+    color: var(--color-success);
+    border-color: transparent;
+  }
+
+  &--warning {
+    background-color: var(--color-warning-subtle);
+    color: var(--color-warning);
+    border-color: transparent;
+  }
+
+  &--danger {
+    background-color: var(--color-danger-subtle);
+    color: var(--color-danger);
+    border-color: transparent;
+  }
+}

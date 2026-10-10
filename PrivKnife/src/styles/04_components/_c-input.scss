@@ -1,0 +1,159 @@
+/* ==========================================================================
+   04_COMPONENTS: Form Input & Control Component
+   Nomenclature: .c-input & elements (BEM)
+   ========================================================================== */
+
+@use "../01_utilities/functions" as fn;
+@use "../01_utilities/mixins" as mx;
+
+.c-input {
+  display: flex;
+  flex-direction: column;
+  gap: fn.spacing(1.5);
+  width: 100%;
+
+  /* Label */
+  &__label {
+    font-size: fn.rem(13px);
+    font-weight: 500;
+    color: var(--color-text-primary);
+  }
+
+  /* Base Text, Number, & Select Controls */
+  &__control {
+    width: 100%;
+    padding: fn.spacing(2) fn.spacing(3);
+    font-size: fn.rem(14px);
+    color: var(--color-text-primary);
+    background-color: var(--color-bg-surface);
+    border: 1px solid var(--color-border-default);
+    border-radius: var(--radius-md);
+    box-shadow: var(--shadow-sm);
+    @include mx.transition(all, 150ms, ease);
+
+    &::placeholder {
+      color: var(--color-text-muted);
+    }
+
+    &:focus {
+      border-color: var(--color-primary);
+      @include mx.focus-ring;
+    }
+
+    &:disabled {
+      opacity: 0.6;
+      background-color: var(--color-bg-subtle);
+      cursor: not-allowed;
+    }
+  }
+
+  /* Textarea modifier */
+  &__control--textarea {
+    min-height: 80px;
+    resize: vertical;
+  }
+
+  /* Range Slider */
+  &__slider {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 100%;
+    height: 6px;
+    border-radius: var(--radius-full);
+    background: var(--color-border-default);
+    outline: none;
+
+    &::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      appearance: none;
+      width: 18px;
+      height: 18px;
+      border-radius: 50%;
+      background: var(--color-primary);
+      cursor: pointer;
+      box-shadow: var(--shadow-sm);
+      @include mx.transition(transform, 150ms, ease);
+
+      &:hover {
+        transform: scale(1.15);
+      }
+    }
+
+    &::-moz-range-thumb {
+      width: 18px;
+      height: 18px;
+      border-radius: 50%;
+      background: var(--color-primary);
+      cursor: pointer;
+      border: none;
+      box-shadow: var(--shadow-sm);
+    }
+  }
+
+  /* Toggle Switch */
+  &__switch {
+    display: inline-flex;
+    align-items: center;
+    gap: fn.spacing(2);
+    cursor: pointer;
+    user-select: none;
+
+    input[type="checkbox"] {
+      position: absolute;
+      opacity: 0;
+      width: 0;
+      height: 0;
+    }
+
+    &-track {
+      width: 38px;
+      height: 22px;
+      background-color: var(--color-border-strong);
+      border-radius: var(--radius-full);
+      position: relative;
+      @include mx.transition(background-color, 200ms, ease);
+
+      &::after {
+        content: "";
+        position: absolute;
+        top: 2px;
+        left: 2px;
+        width: 18px;
+        height: 18px;
+        background-color: #ffffff;
+        border-radius: 50%;
+        box-shadow: var(--shadow-sm);
+        @include mx.transition(transform, 200ms, ease);
+      }
+    }
+
+    input:checked + &-track {
+      background-color: var(--color-primary);
+
+      &::after {
+        transform: translateX(16px);
+      }
+    }
+  }
+
+  /* Hint and Error text */
+  &__hint {
+    font-size: fn.rem(12px);
+    color: var(--color-text-muted);
+  }
+
+  &__error {
+    font-size: fn.rem(12px);
+    color: var(--color-danger);
+    font-weight: 500;
+  }
+
+  /* Modifiers */
+  &--invalid &__control {
+    border-color: var(--color-danger);
+
+    &:focus {
+      @include mx.focus-ring(rgba(220, 38, 38, 0.3));
+    }
+  }
+}

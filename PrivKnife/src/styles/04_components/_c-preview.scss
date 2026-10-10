@@ -1,0 +1,119 @@
+/* ==========================================================================
+   04_COMPONENTS: Preview & Split Comparison Component
+   Nomenclature: .c-preview & elements (BEM)
+   ========================================================================== */
+
+@use "../01_utilities/functions" as fn;
+@use "../01_utilities/mixins" as mx;
+
+.c-preview {
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  width: 100%;
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--color-border-default);
+  background-color: var(--color-bg-surface);
+  overflow: hidden;
+
+  /* Toolbar */
+  &__toolbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: fn.spacing(3) fn.spacing(4);
+    background-color: var(--color-bg-subtle);
+    border-bottom: 1px solid var(--color-border-subtle);
+  }
+
+  /* Viewport Area */
+  &__viewport {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 320px;
+    max-height: 600px;
+    background-color: var(--color-bg-base);
+    overflow: hidden;
+  }
+
+  /* Canvas element */
+  &__canvas {
+    max-width: 100%;
+    max-height: 100%;
+    object-fit: contain;
+    box-shadow: var(--shadow-sm);
+  }
+
+  /* Split Comparison View */
+  &__split {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    user-select: none;
+    overflow: hidden;
+  }
+
+  &__before,
+  &__after {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  &__after {
+    overflow: hidden;
+  }
+
+  /* Draggable Split Handle */
+  &__handle {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    width: 4px;
+    background-color: var(--color-primary);
+    cursor: ew-resize;
+    z-index: 10;
+
+    &::after {
+      content: "";
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      background-color: var(--color-primary);
+      border: 2px solid #ffffff;
+      box-shadow: var(--shadow-md);
+    }
+  }
+
+  /* Preview Floating Labels */
+  &__label {
+    position: absolute;
+    bottom: fn.spacing(3);
+    padding: fn.spacing(1) fn.spacing(2.5);
+    font-size: fn.rem(12px);
+    font-weight: 600;
+    border-radius: var(--radius-sm);
+    background-color: rgba(0, 0, 0, 0.75);
+    color: #ffffff;
+    z-index: 5;
+
+    &--left {
+      left: fn.spacing(3);
+    }
+
+    &--right {
+      right: fn.spacing(3);
+    }
+  }
+}

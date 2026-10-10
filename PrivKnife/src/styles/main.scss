@@ -20,16 +20,31 @@
 @use "02_base/override";
 
 /* --------------------------------------------------------------------------
-   03_LAYOUT: Layout blocks (.l-*) - Implemented in Step 2
+   03_LAYOUT: Layout blocks (.l-*) following the Area Pattern
    -------------------------------------------------------------------------- */
+@use "03_layout/l-page";
+@use "03_layout/l-columns";
+@use "03_layout/l-extremo";
+@use "03_layout/l-flex";
 
 /* --------------------------------------------------------------------------
-   04_COMPONENTS: Visual component blocks (.c-*) - Implemented in Step 2
+   04_COMPONENTS: Visual reusable components (.c-*)
    -------------------------------------------------------------------------- */
+@use "04_components/c-button";
+@use "04_components/c-badge";
+@use "04_components/c-card";
+@use "04_components/c-dropzone";
+@use "04_components/c-progress";
+@use "04_components/c-preview";
+@use "04_components/c-input";
+@use "04_components/c-header";
+@use "04_components/c-footer";
+@use "04_components/c-modal";
 
 /* --------------------------------------------------------------------------
    05_PAGES: Page-specific styles (kept empty by architectural convention)
    -------------------------------------------------------------------------- */
+@use "05_pages/pages";
 
 /* --------------------------------------------------------------------------
    06_GLOBAL: Global helper modifiers (.g--*)
