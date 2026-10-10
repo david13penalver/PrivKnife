@@ -20,6 +20,7 @@ import { RouterLink } from '@angular/router';
         <div class="c-footer__links">
           <a routerLink="/privacy">Privacy</a>
           <a routerLink="/terms">Terms</a>
+          <a routerLink="/ui-kit">UI Kit</a>
           <a
             href="https://github.com/david13penalver/PrivKnife"
             target="_blank"

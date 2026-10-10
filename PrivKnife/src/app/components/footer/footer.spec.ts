@@ -28,5 +28,6 @@ describe('Footer Component', () => {
     expect(text).toContain('Zero Cookies');
     expect(text).toContain('Privacy');
     expect(text).toContain('Terms');
+    expect(text).toContain('UI Kit');
   });
 });

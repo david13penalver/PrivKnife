@@ -1,15 +1,16 @@
 import { ChangeDetectionStrategy, Component, signal } from '@angular/core';
+import { RouterLink } from '@angular/router';
 import { Badge } from '../badge/badge';
 import { Button } from '../button/button';
 
 @Component({
   selector: 'app-header',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [Badge, Button],
+  imports: [RouterLink, Badge, Button],
   template: `
     <header class="c-header">
       <div class="c-header__inner">
-        <a class="c-header__brand" href="/">
+        <a class="c-header__brand" routerLink="/">
           <div class="c-header__logo" aria-hidden="true">🇨🇭</div>
           <div>
             <div class="c-header__title">PrivKnife</div>

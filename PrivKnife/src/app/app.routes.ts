@@ -10,6 +10,16 @@ export const routes: Routes = [
       keywords: ['privacy', 'swiss army knife', 'client-side tools', 'wasm', 'browser tools'],
       url: '/',
     },
+    loadComponent: () => import('./pages/home/home').then((m) => m.Home),
+  },
+  {
+    path: 'ui-kit',
+    title: 'UI Kit & Design System — PrivKnife',
+    data: {
+      description: 'Explore the 6-layer SASS and BEM visual component system powering PrivKnife.',
+      keywords: ['design system', 'ui kit', 'bem', 'components', 'sass'],
+      url: '/ui-kit',
+    },
     loadComponent: () => import('./pages/showcase/showcase').then((m) => m.Showcase),
   },
   {
