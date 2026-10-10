@@ -136,6 +136,12 @@ function parseJpegMetadata(buffer: Uint8Array, fileName: string): ParsedMetadata
       continue;
     }
 
+    // Skip consecutive 0xFF fill bytes
+    while (offset < buffer.length - 1 && buffer[offset + 1] === 0xff) {
+      offset++;
+    }
+    if (offset >= buffer.length - 1) break;
+
     const marker = buffer[offset + 1];
 
     // EOI (End of Image) or SOS (Start of Scan)
@@ -311,11 +317,17 @@ function stripJpegMetadata(buffer: Uint8Array): Uint8Array {
   parts.push(new Uint8Array([0xff, 0xd8]));
   let offset = 2;
 
-  while (offset < buffer.length) {
+  while (offset < buffer.length - 1) {
     if (buffer[offset] !== 0xff) {
       offset++;
       continue;
     }
+
+    // Skip consecutive 0xFF fill bytes
+    while (offset < buffer.length - 1 && buffer[offset + 1] === 0xff) {
+      offset++;
+    }
+    if (offset >= buffer.length - 1) break;
 
     const marker = buffer[offset + 1];
 

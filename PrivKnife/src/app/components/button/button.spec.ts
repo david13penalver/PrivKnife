@@ -39,4 +39,17 @@ describe('Button Component', () => {
     const spinner = fixture.nativeElement.querySelector('.c-button__spinner');
     expect(spinner).toBeTruthy();
   });
+
+  it('should emit clicked and buttonClick events when clicked', () => {
+    const clickedSpy = vi.fn();
+    const buttonClickSpy = vi.fn();
+    component.clicked.subscribe(clickedSpy);
+    component.buttonClick.subscribe(buttonClickSpy);
+
+    const buttonElement = fixture.nativeElement.querySelector('button');
+    buttonElement.click();
+
+    expect(clickedSpy).toHaveBeenCalledTimes(1);
+    expect(buttonClickSpy).toHaveBeenCalledTimes(1);
+  });
 });

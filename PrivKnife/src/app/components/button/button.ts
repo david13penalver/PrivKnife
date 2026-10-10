@@ -29,6 +29,7 @@ export class Button {
   readonly customClass = input<string>('');
 
   readonly clicked = output<MouseEvent>();
+  readonly buttonClick = output<MouseEvent>();
 
   protected readonly buttonClasses = computed(() => {
     const classes = ['c-button', `c-button--${this.variant()}`];
@@ -42,8 +43,12 @@ export class Button {
   });
 
   protected onClick(event: MouseEvent): void {
-    if (!this.disabled() && !this.loading()) {
-      this.clicked.emit(event);
+    if (this.disabled() || this.loading()) {
+      event.preventDefault();
+      event.stopPropagation();
+      return;
     }
+    this.clicked.emit(event);
+    this.buttonClick.emit(event);
   }
 }

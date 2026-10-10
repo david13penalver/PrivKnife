@@ -68,8 +68,11 @@ describe('ExifStripperComponent (Seam 2: UI & Privacy Boundary)', () => {
     await component.onFileSelected(mockFile);
     fixture.detectChanges();
 
-    // Trigger Strip & Download
-    await component.stripAndDownload();
+    // Click the actual DOM button to exercise template event binding
+    const stripButton = fixture.nativeElement.querySelector('app-button[variant="primary"] button') as HTMLButtonElement;
+    expect(stripButton).toBeTruthy();
+    stripButton.click();
+    await fixture.whenStable();
     fixture.detectChanges();
 
     expect(component.strippedResult()).toBeTruthy();
@@ -87,11 +90,16 @@ describe('ExifStripperComponent (Seam 2: UI & Privacy Boundary)', () => {
 
     await component.onFileSelected(mockFile);
     await component.stripAndDownload();
+    fixture.detectChanges();
 
     expect(createObjectURLSpy).toHaveBeenCalled();
 
-    // Reset component
-    component.reset();
+    // Click the actual Reset DOM button
+    const resetButton = fixture.nativeElement.querySelector('app-button[variant="outline"] button') as HTMLButtonElement;
+    expect(resetButton).toBeTruthy();
+    resetButton.click();
+    fixture.detectChanges();
+
     expect(revokeObjectURLSpy).toHaveBeenCalled();
     expect(component.selectedFile()).toBeNull();
     expect(component.metadata()).toBeNull();

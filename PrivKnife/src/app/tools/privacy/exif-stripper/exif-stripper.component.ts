@@ -141,7 +141,7 @@ import { ParsedMetadata, StrippedResult } from './types';
               class="l-extremo g--margin-top-4 g--padding-top-4"
               style="border-top: 1px solid var(--color-border-default); align-items: center; gap: 12px; flex-wrap: wrap;">
               <div>
-                <app-button variant="outline" (buttonClick)="reset()">
+                <app-button variant="outline" (clicked)="reset()">
                   &larr; Choose Another Photo
                 </app-button>
               </div>
@@ -158,7 +158,7 @@ import { ParsedMetadata, StrippedResult } from './types';
                   <app-button
                     variant="primary"
                     [loading]="isProcessing()"
-                    (buttonClick)="stripAndDownload()">
+                    (clicked)="stripAndDownload()">
                     Strip Metadata &amp; Download
                   </app-button>
                 }
@@ -250,7 +250,9 @@ export class ExifStripperComponent implements OnDestroy {
       const anchor = document.createElement('a');
       anchor.href = downloadUrl;
       anchor.download = cleanName;
+      document.body.appendChild(anchor);
       anchor.click();
+      document.body.removeChild(anchor);
     } catch (err: any) {
       this.errorMessage.set(err.message || 'Failed to strip metadata.');
     } finally {
