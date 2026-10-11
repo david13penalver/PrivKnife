@@ -183,8 +183,9 @@ const CATALOG_TOOLS: CatalogTool[] = [
     categoryLabel: 'Dev / Design',
     description: 'Craft fluid multi-point mesh gradients and copy production-ready CSS or Tailwind CSS utility code.',
     keywords: ['mesh gradient', 'css', 'tailwind', 'glassmorphism', 'backdrop-filter'],
-    status: 'roadmap',
-    techStack: 'Canvas Shaders • Pure CSS',
+    status: 'ready',
+    route: '/tools/css-mesh-gradient-maker',
+    techStack: 'Canvas 2D • Pure CSS & Tailwind',
     icon: '🌈',
   },
   {

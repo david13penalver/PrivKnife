@@ -119,6 +119,14 @@ describe('ToolRegistry (Seam 3: Catalog & Architecture Verification)', () => {
     expect(tool?.isFullyClientSide).toBe(true);
   });
 
+  it('should find css-mesh-gradient-maker tool by id', () => {
+    const tool = getToolById('css-mesh-gradient-maker');
+    expect(tool).toBeDefined();
+    expect(tool?.name).toBe('CSS Mesh Gradient & Glassmorphism Code Maker');
+    expect(tool?.category).toBe('dev');
+    expect(tool?.isFullyClientSide).toBe(true);
+  });
+
   it('should find tools by category', () => {
     const privacyTools = getToolsByCategory('privacy');
     expect(privacyTools.length).toBeGreaterThan(0);
@@ -130,6 +138,7 @@ describe('ToolRegistry (Seam 3: Catalog & Architecture Verification)', () => {
     expect(devTools.length).toBeGreaterThan(0);
     expect(devTools.some((t) => t.id === 'csv-to-sql-json')).toBe(true);
     expect(devTools.some((t) => t.id === 'color-palette-extractor')).toBe(true);
+    expect(devTools.some((t) => t.id === 'css-mesh-gradient-maker')).toBe(true);
 
     const docTools = getToolsByCategory('documents');
     expect(docTools.length).toBeGreaterThan(0);

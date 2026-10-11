@@ -1,6 +1,7 @@
 import { ToolCategory, ToolDefinition } from '../core/models/tool.model';
 import { colorPaletteExtractorTool } from './dev/color-palette-extractor';
 import { csvConverterTool } from './dev/csv-converter';
+import { cssMeshGradientMakerTool } from './dev/mesh-gradient-maker';
 import { averyBarcodeSheetTool } from './documents/barcode-labels';
 import { gridPaperTool } from './documents/grid-paper';
 import { invoiceMakerTool } from './documents/invoice-maker';
@@ -18,6 +19,7 @@ export const TOOL_REGISTRY: ToolDefinition[] = [
   cryptoHashUuidTool,
   csvConverterTool,
   colorPaletteExtractorTool,
+  cssMeshGradientMakerTool,
   pdfMergerTool,
   pdfRedactionTool,
   invoiceMakerTool,

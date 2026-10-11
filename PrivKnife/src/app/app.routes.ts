@@ -344,6 +344,33 @@ export const routes: Routes = [
     pathMatch: 'full',
   },
   {
+    path: 'tools/css-mesh-gradient-maker',
+    title: 'CSS Mesh Gradient & Glassmorphism Code Maker — PrivKnife',
+    data: {
+      description:
+        'Design fluid multi-point radial mesh gradients and frosted glassmorphism UI cards with copy-ready Pure CSS, Tailwind classes, and 1200x800 PNG download.',
+      keywords: [
+        'css mesh gradient generator',
+        'glassmorphism generator',
+        'css backdrop-filter blur tool',
+        'tailwind glassmorphism classes',
+        'mesh gradient to png export',
+        'fluid gradient maker offline',
+        'client side css gradient designer',
+      ],
+      url: '/tools/css-mesh-gradient-maker',
+    },
+    loadComponent: () =>
+      import('./tools/dev/mesh-gradient-maker').then(
+        (m) => m.MeshGradientMakerComponent
+      ),
+  },
+  {
+    path: 'tools/mesh-gradient',
+    redirectTo: 'tools/css-mesh-gradient-maker',
+    pathMatch: 'full',
+  },
+  {
     path: '**',
     title: 'Page Not Found — PrivKnife',
     data: {
