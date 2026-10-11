@@ -11,7 +11,13 @@ import { Badge } from '../../../components/badge/badge';
 import { Button } from '../../../components/button/button';
 import { Card } from '../../../components/card/card';
 import { Dropzone } from '../../../components/dropzone/dropzone';
-import { burnRedactions, loadPdfForRedaction } from './engine';
+import {
+  burnRedactions,
+  flattenPdfPages,
+  loadPdfForRedaction,
+  renderPagePreview,
+  sanitizePdf,
+} from './engine';
 import {
   PageRedaction,
   RedactionBox,
@@ -81,6 +87,31 @@ import {
                     Next ▶
                   </button>
                 </div>
+
+                <!-- Zoom Controls -->
+                <div style="display: inline-flex; align-items: center; gap: 4px; border: 1px solid var(--color-border-default); border-radius: var(--radius-sm); padding: 2px 6px;">
+                  <button
+                    type="button"
+                    class="c-button c-button--ghost c-button--small"
+                    style="padding: 2px 6px; min-height: 24px;"
+                    title="Zoom out"
+                    [disabled]="zoomLevel() <= 0.5"
+                    (click)="zoomOut()">
+                    -
+                  </button>
+                  <span style="font-size: 0.8125rem; font-family: monospace; min-width: 42px; text-align: center;">
+                    {{ Math.round(zoomLevel() * 100) }}%
+                  </span>
+                  <button
+                    type="button"
+                    class="c-button c-button--ghost c-button--small"
+                    style="padding: 2px 6px; min-height: 24px;"
+                    title="Zoom in"
+                    [disabled]="zoomLevel() >= 2.0"
+                    (click)="zoomIn()">
+                    +
+                  </button>
+                </div>
               </div>
 
               <!-- Tools & Actions -->
@@ -139,33 +170,75 @@ import {
               </div>
             </div>
 
+            <!-- Redaction Options Toolbar -->
+            <div
+              class="g--margin-bottom-3"
+              style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 8px; font-size: 0.875rem;">
+              <label style="display: inline-flex; align-items: center; gap: 8px; cursor: pointer; user-select: none;">
+                <input
+                  type="checkbox"
+                  [checked]="flattenRaster()"
+                  (change)="toggleFlattenRaster()"
+                  style="cursor: pointer;" />
+                <span>
+                  <strong>Raster Flattening</strong> (Re-encodes pages to permanently destroy underlying text stream)
+                </span>
+              </label>
+
+              @if (isRenderingPreview()) {
+                <span style="color: var(--color-text-muted); font-size: 0.8125rem;">
+                  ⏳ Rendering crisp page preview...
+                </span>
+              }
+            </div>
+
             <!-- Redaction Canvas Stage -->
             <div
               style="display: flex; flex-direction: column; align-items: center; justify-content: center; background: var(--color-bg-subtle); padding: 24px; border-radius: var(--radius-md); min-height: 480px; overflow: auto; user-select: none;">
               
               <div
                 #canvasContainer
-                style="position: relative; background: #ffffff; box-shadow: 0 4px 16px rgba(0,0,0,0.12); cursor: crosshair; display: inline-block;"
+                style="position: relative; background: #ffffff; box-shadow: 0 4px 16px rgba(0,0,0,0.12); cursor: crosshair; display: inline-block; overflow: hidden;"
                 [style.width.px]="currentPageDimensions().displayWidth"
                 [style.height.px]="currentPageDimensions().displayHeight"
                 (mousedown)="onMouseDown($event)">
                 
-                <!-- Page Content Simulation / Indicator -->
-                <div
-                  style="width: 100%; height: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center; color: #475569; pointer-events: none; padding: 24px; text-align: center;">
-                  <span style="font-size: 2.5rem; margin-bottom: 8px;">📑</span>
-                  <strong style="font-size: 1.125rem; color: #1e293b;">
-                    {{ loadedDocument()?.name }}
-                  </strong>
-                  <span style="font-size: 0.875rem; color: #64748b; margin-top: 4px;">
-                    Page {{ currentPageIndex() + 1 }} &bull; Click and drag anywhere to draw a {{ activeTool() === 'black' ? 'blackout' : 'whiteout' }} redaction
-                  </span>
-                </div>
+                <!-- Rendered PDF Page Preview Image (if available) -->
+                @if (currentPagePreview()) {
+                  <img
+                    [src]="currentPagePreview()"
+                    alt="PDF Page Preview"
+                    style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: fill; pointer-events: none; user-select: none;" />
+                } @else {
+                  <!-- Fallback / Page Simulation Indicator -->
+                  <div
+                    style="width: 100%; height: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center; color: #475569; pointer-events: none; padding: 24px; text-align: center;">
+                    <span style="font-size: 2.5rem; margin-bottom: 8px;">📑</span>
+                    <strong style="font-size: 1.125rem; color: #1e293b;">
+                      {{ loadedDocument()?.name }}
+                    </strong>
+                    <span style="font-size: 0.875rem; color: #64748b; margin-top: 4px;">
+                      Page {{ currentPageIndex() + 1 }} &bull; Click and drag anywhere to draw a {{ activeTool() === 'black' ? 'blackout' : 'whiteout' }} redaction
+                    </span>
+                  </div>
+                }
+
+                <!-- Active Dragging Rectangle Preview -->
+                @if (activeDragBox(); as drag) {
+                  <div
+                    style="position: absolute; pointer-events: none; border: 2px dashed #3b82f6; z-index: 10;"
+                    [style.left.px]="drag.x"
+                    [style.top.px]="drag.y"
+                    [style.width.px]="drag.width"
+                    [style.height.px]="drag.height"
+                    [style.background]="activeTool() === 'white' ? 'rgba(255,255,255,0.7)' : 'rgba(0,0,0,0.7)'">
+                  </div>
+                }
 
                 <!-- Rendered Redactions for Current Page -->
                 @for (box of currentPageRedactions(); track box.id) {
                   <div
-                    style="position: absolute; border-radius: 1px; pointer-events: none;"
+                    style="position: absolute; border-radius: 1px; pointer-events: none; z-index: 5;"
                     [style.left.px]="box.x * displayScale()"
                     [style.top.px]="(currentPageDimensions().pdfHeight - box.y - box.height) * displayScale()"
                     [style.width.px]="box.width * displayScale()"
@@ -197,13 +270,19 @@ import {
   `,
 })
 export class PdfRedactionComponent implements OnDestroy {
+  readonly Math = Math;
   readonly canvasContainer = viewChild<ElementRef<HTMLDivElement>>('canvasContainer');
 
   readonly loadedDocument = signal<RedactionDocument | null>(null);
   readonly currentPageIndex = signal<number>(0);
   readonly redactionsByPage = signal<Map<number, RedactionBox[]>>(new Map());
   readonly activeTool = signal<RedactionColor>('black');
+  readonly zoomLevel = signal<number>(1.0);
+  readonly flattenRaster = signal<boolean>(true);
   readonly isProcessing = signal<boolean>(false);
+  readonly isRenderingPreview = signal<boolean>(false);
+  readonly currentPagePreview = signal<string | null>(null);
+  readonly activeDragBox = signal<{ x: number; y: number; width: number; height: number } | null>(null);
 
   private activeBlobUrls: string[] = [];
   private isDrawing = false;
@@ -227,12 +306,13 @@ export class PdfRedactionComponent implements OnDestroy {
   readonly currentPageDimensions = computed(() => {
     const doc = this.loadedDocument();
     const idx = this.currentPageIndex();
+    const zoom = this.zoomLevel();
     if (!doc || !doc.pages[idx]) {
-      return { pdfWidth: 600, pdfHeight: 800, displayWidth: 500, displayHeight: 666 };
+      return { pdfWidth: 600, pdfHeight: 800, displayWidth: 500 * zoom, displayHeight: 666 * zoom };
     }
     const page = doc.pages[idx];
-    const maxDisplayWidth = 560;
-    const scale = Math.min(1, maxDisplayWidth / page.width);
+    const maxDisplayWidth = 560 * zoom;
+    const scale = Math.min(zoom * 1.5, maxDisplayWidth / page.width);
     return {
       pdfWidth: page.width,
       pdfHeight: page.height,
@@ -260,6 +340,8 @@ export class PdfRedactionComponent implements OnDestroy {
       this.loadedDocument.set(doc);
       this.currentPageIndex.set(0);
       this.redactionsByPage.set(new Map());
+      this.zoomLevel.set(1.0);
+      await this.loadActivePagePreview();
     } finally {
       this.isProcessing.set(false);
     }
@@ -269,10 +351,40 @@ export class PdfRedactionComponent implements OnDestroy {
     this.activeTool.set(tool);
   }
 
-  goToPage(index: number): void {
+  toggleFlattenRaster(): void {
+    this.flattenRaster.update((v) => !v);
+  }
+
+  zoomIn(): void {
+    this.zoomLevel.update((z) => Math.min(2.0, +(z + 0.25).toFixed(2)));
+  }
+
+  zoomOut(): void {
+    this.zoomLevel.update((z) => Math.max(0.5, +(z - 0.25).toFixed(2)));
+  }
+
+  async goToPage(index: number): Promise<void> {
     const doc = this.loadedDocument();
     if (doc && index >= 0 && index < doc.pageCount) {
       this.currentPageIndex.set(index);
+      await this.loadActivePagePreview();
+    }
+  }
+
+  private async loadActivePagePreview(): Promise<void> {
+    const doc = this.loadedDocument();
+    if (!doc) {
+      this.currentPagePreview.set(null);
+      return;
+    }
+    this.isRenderingPreview.set(true);
+    try {
+      const preview = await renderPagePreview(doc.buffer, this.currentPageIndex(), 700);
+      this.currentPagePreview.set(preview || null);
+    } catch {
+      this.currentPagePreview.set(null);
+    } finally {
+      this.isRenderingPreview.set(false);
     }
   }
 
@@ -311,6 +423,9 @@ export class PdfRedactionComponent implements OnDestroy {
     this.loadedDocument.set(null);
     this.currentPageIndex.set(0);
     this.redactionsByPage.set(new Map());
+    this.currentPagePreview.set(null);
+    this.zoomLevel.set(1.0);
+    this.activeDragBox.set(null);
     this.cleanBlobUrls();
   }
 
@@ -325,12 +440,26 @@ export class PdfRedactionComponent implements OnDestroy {
 
     const onMouseMove = (moveEvent: MouseEvent) => {
       if (!this.isDrawing) return;
-      // In interactive drawing, updates could be previewed
+      const currentX = moveEvent.clientX - rect.left;
+      const currentY = moveEvent.clientY - rect.top;
+
+      const minX = Math.max(0, Math.min(this.startX, currentX));
+      const maxX = Math.min(rect.width, Math.max(this.startX, currentX));
+      const minY = Math.max(0, Math.min(this.startY, currentY));
+      const maxY = Math.min(rect.height, Math.max(this.startY, currentY));
+
+      this.activeDragBox.set({
+        x: minX,
+        y: minY,
+        width: maxX - minX,
+        height: maxY - minY,
+      });
     };
 
     const onMouseUp = (upEvent: MouseEvent) => {
       if (!this.isDrawing) return;
       this.isDrawing = false;
+      this.activeDragBox.set(null);
       window.removeEventListener('mousemove', onMouseMove);
       window.removeEventListener('mouseup', onMouseUp);
 
@@ -386,8 +515,9 @@ export class PdfRedactionComponent implements OnDestroy {
         });
       }
 
-      const sanitizedBytes = await burnRedactions(doc.buffer, pageRedactions, {
+      const sanitizedBytes = await sanitizePdf(doc.buffer, pageRedactions, {
         stripMetadata: true,
+        flattenRaster: this.flattenRaster(),
       });
 
       const blob = new Blob([sanitizedBytes as BlobPart], { type: 'application/pdf' });

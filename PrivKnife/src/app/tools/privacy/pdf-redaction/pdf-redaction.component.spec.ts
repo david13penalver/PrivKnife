@@ -140,6 +140,34 @@ describe('PdfRedactionComponent (Seam 2: UI, Signals, Redactions & Privacy Bound
     expect(revokeObjectURLSpy).toHaveBeenCalled();
   });
 
+  it('should adjust zoom levels within boundaries', () => {
+    expect(component.zoomLevel()).toBe(1.0);
+    component.zoomIn();
+    expect(component.zoomLevel()).toBe(1.25);
+    component.zoomIn();
+    expect(component.zoomLevel()).toBe(1.5);
+    component.zoomOut();
+    expect(component.zoomLevel()).toBe(1.25);
+  });
+
+  it('should toggle raster flattening mode', () => {
+    expect(component.flattenRaster()).toBe(true);
+    component.toggleFlattenRaster();
+    expect(component.flattenRaster()).toBe(false);
+    component.toggleFlattenRaster();
+    expect(component.flattenRaster()).toBe(true);
+  });
+
+  it('should navigate between document pages safely', async () => {
+    const buffer = await createSensitiveTestPdfBuffer();
+    const mockFile = new File([buffer], 'tax-form.pdf', { type: 'application/pdf' });
+    await component.onFileDropped(mockFile);
+
+    expect(component.currentPageIndex()).toBe(0);
+    await component.goToPage(1); // Page 1 is out of bounds for 1-page doc
+    expect(component.currentPageIndex()).toBe(0);
+  });
+
   it('should execute processing with ZERO network calls (Privacy Verification)', async () => {
     const fetchSpy = vi.spyOn(window, 'fetch');
     const xhrSpy = vi.spyOn(XMLHttpRequest.prototype, 'open');
@@ -147,7 +175,7 @@ describe('PdfRedactionComponent (Seam 2: UI, Signals, Redactions & Privacy Bound
     const buffer = await createSensitiveTestPdfBuffer();
     const mockFile = new File([buffer], 'secret.pdf', { type: 'application/pdf' });
 
-    await component.onFileDropped(mockFile);
+    await component.onFilesSelected([mockFile]);
     component.addRedactionBox({ x: 10, y: 10, width: 100, height: 50, color: 'black' });
     await component.downloadSanitizedPdf();
 

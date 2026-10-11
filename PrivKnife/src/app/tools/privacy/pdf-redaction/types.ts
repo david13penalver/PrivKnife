@@ -19,6 +19,7 @@ export interface RedactionPageInfo {
   displayNumber: number;
   width: number;
   height: number;
+  previewUrl?: string;
 }
 
 export interface RedactionDocument {
@@ -30,5 +31,6 @@ export interface RedactionDocument {
 }
 
 export interface SanitizationOptions {
-  stripMetadata: boolean;
+  stripMetadata?: boolean;
+  flattenRaster?: boolean;
 }

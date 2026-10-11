@@ -47,11 +47,20 @@ describe('ToolRegistry (Seam 3: Catalog & Architecture Verification)', () => {
     expect(tool?.isFullyClientSide).toBe(true);
   });
 
+  it('should find pdf-redaction tool by id', () => {
+    const tool = getToolById('pdf-redaction');
+    expect(tool).toBeDefined();
+    expect(tool?.name).toBe('PDF Redaction & Anonymizer');
+    expect(tool?.category).toBe('privacy');
+    expect(tool?.isFullyClientSide).toBe(true);
+  });
+
   it('should find tools by category', () => {
     const privacyTools = getToolsByCategory('privacy');
     expect(privacyTools.length).toBeGreaterThan(0);
     expect(privacyTools.some((t) => t.id === 'exif-stripper')).toBe(true);
     expect(privacyTools.some((t) => t.id === 'crypto-hash-uuid')).toBe(true);
+    expect(privacyTools.some((t) => t.id === 'pdf-redaction')).toBe(true);
 
     const devTools = getToolsByCategory('dev');
     expect(devTools.length).toBeGreaterThan(0);

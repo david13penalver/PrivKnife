@@ -121,6 +121,25 @@ export const routes: Routes = [
       import('./tools/documents/pdf-merger').then((m) => m.PdfMergerComponent),
   },
   {
+    path: 'tools/pdf-redaction',
+    title: 'PDF Redaction & Anonymizer — PrivKnife',
+    data: {
+      description:
+        'Permanently black out or white out sensitive information, numbers, and names from PDFs. 100% in-browser flattening destroys un-rendered text layers permanently.',
+      keywords: [
+        'redact pdf',
+        'pdf redaction',
+        'anonymize pdf',
+        'black out pdf',
+        'redact pdf online safe',
+        'sanitize pdf',
+      ],
+      url: '/tools/pdf-redaction',
+    },
+    loadComponent: () =>
+      import('./tools/privacy/pdf-redaction').then((m) => m.PdfRedactionComponent),
+  },
+  {
     path: '**',
     title: 'Page Not Found — PrivKnife',
     data: {
