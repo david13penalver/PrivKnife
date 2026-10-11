@@ -1,4 +1,5 @@
 import { ToolCategory, ToolDefinition } from '../core/models/tool.model';
+import { bpmTapDetectorTool } from './audio-video/bpm-tap-detector';
 import { calendarLinkerTool } from './dev/calendar-linker';
 import { colorPaletteExtractorTool } from './dev/color-palette-extractor';
 import { csvConverterTool } from './dev/csv-converter';
@@ -39,6 +40,7 @@ export const TOOL_REGISTRY: ToolDefinition[] = [
   faviconAppIconSuiteTool,
   ogCardMakerTool,
   subtitlesShifterTool,
+  bpmTapDetectorTool,
 ];
 
 export function getToolById(id: string): ToolDefinition | undefined {

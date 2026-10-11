@@ -522,6 +522,39 @@ export const routes: Routes = [
     pathMatch: 'full',
   },
   {
+    path: 'tools/audio-bpm-detector',
+    title: 'Audio BPM, Pitch & Key Tap Detector — PrivKnife',
+    data: {
+      description:
+        'Detect audio tempo (BPM), musical key, and pitch tuning directly in your browser. Client-side audio file analyzer and interactive tap metronome with zero server uploads.',
+      keywords: [
+        'find bpm of song online',
+        'tap tempo online',
+        'detect key of song online',
+        'free bpm analyzer no upload',
+        'audio pitch detector web',
+        'camelot wheel key detector',
+        'online metronome tap tempo',
+        'client side audio bpm',
+      ],
+      url: '/tools/audio-bpm-detector',
+    },
+    loadComponent: () =>
+      import('./tools/audio-video/bpm-tap-detector').then(
+        (m) => m.BpmTapDetectorComponent
+      ),
+  },
+  {
+    path: 'tools/bpm-tap-detector',
+    redirectTo: 'tools/audio-bpm-detector',
+    pathMatch: 'full',
+  },
+  {
+    path: 'tools/tap-tempo',
+    redirectTo: 'tools/audio-bpm-detector',
+    pathMatch: 'full',
+  },
+  {
     path: '**',
     title: 'Page Not Found — PrivKnife',
     data: {

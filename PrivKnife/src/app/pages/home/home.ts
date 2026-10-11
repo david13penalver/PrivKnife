@@ -249,6 +249,18 @@ const CATALOG_TOOLS: CatalogTool[] = [
     icon: '📝',
   },
   {
+    id: 'audio-bpm-detector',
+    name: 'Audio BPM, Pitch & Key Tap Detector',
+    category: 'audio-video',
+    categoryLabel: 'Audio / Video',
+    description: 'Detect tempo, musical key, and pitch in real time from audio tracks offline or tap along with an audible synthesized metronome.',
+    keywords: ['bpm detector', 'tap tempo', 'key detection', 'pitch detector', 'metronome', 'camelot wheel', 'audio'],
+    status: 'ready',
+    route: '/tools/audio-bpm-detector',
+    techStack: 'Web Audio API • Onset Autocorrelation • Canvas',
+    icon: '🎵',
+  },
+  {
     id: '3d-qr-stand',
     name: '3D QR Stand & Keychain Generator',
     category: '3d',

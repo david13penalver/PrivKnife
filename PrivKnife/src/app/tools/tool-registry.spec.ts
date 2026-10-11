@@ -199,4 +199,15 @@ describe('ToolRegistry (Seam 3: Catalog & Architecture Verification)', () => {
     expect(tool?.category).toBe('documents');
     expect(tool?.isFullyClientSide).toBe(true);
   });
+
+  it('should find audio-bpm-detector tool by id and category', () => {
+    const tool = getToolById('audio-bpm-detector');
+    expect(tool).toBeDefined();
+    expect(tool?.name).toBe('Audio BPM, Pitch & Key Tap Detector');
+    expect(tool?.category).toBe('audio-video');
+    expect(tool?.isFullyClientSide).toBe(true);
+
+    const audioTools = getToolsByCategory('audio-video');
+    expect(audioTools.some((t) => t.id === 'audio-bpm-detector')).toBe(true);
+  });
 });
