@@ -463,6 +463,38 @@ export const routes: Routes = [
     pathMatch: 'full',
   },
   {
+    path: 'tools/robots-sitemap-builder',
+    title: 'Robots.txt & XML Sitemap Builder — PrivKnife',
+    data: {
+      description:
+        'Generate valid search crawler directives (robots.txt) and valid XML sitemaps client-side with AI bot blocking, bulk URL parsing, and instant export.',
+      keywords: [
+        'robots txt generator tool',
+        'xml sitemap builder free',
+        'bulk sitemap generator',
+        'block ai scrapers robots txt',
+        'gptbot claudebot robots txt',
+        'sitemap xml validator',
+        'client side robots txt maker',
+      ],
+      url: '/tools/robots-sitemap-builder',
+    },
+    loadComponent: () =>
+      import('./tools/dev/robots-sitemap-builder').then(
+        (m) => m.RobotsSitemapBuilderComponent
+      ),
+  },
+  {
+    path: 'tools/robots-txt-generator',
+    redirectTo: 'tools/robots-sitemap-builder',
+    pathMatch: 'full',
+  },
+  {
+    path: 'tools/xml-sitemap-builder',
+    redirectTo: 'tools/robots-sitemap-builder',
+    pathMatch: 'full',
+  },
+  {
     path: '**',
     title: 'Page Not Found — PrivKnife',
     data: {

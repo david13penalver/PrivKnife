@@ -4,6 +4,7 @@ import { colorPaletteExtractorTool } from './dev/color-palette-extractor';
 import { csvConverterTool } from './dev/csv-converter';
 import { emailSignatureGeneratorTool } from './dev/email-signature-generator';
 import { cssMeshGradientMakerTool } from './dev/mesh-gradient-maker';
+import { robotsSitemapBuilderTool } from './dev/robots-sitemap-builder';
 import { averyBarcodeSheetTool } from './documents/barcode-labels';
 import { gridPaperTool } from './documents/grid-paper';
 import { invoiceMakerTool } from './documents/invoice-maker';
@@ -25,6 +26,7 @@ export const TOOL_REGISTRY: ToolDefinition[] = [
   cssMeshGradientMakerTool,
   calendarLinkerTool,
   emailSignatureGeneratorTool,
+  robotsSitemapBuilderTool,
   pdfMergerTool,
   pdfRedactionTool,
   invoiceMakerTool,

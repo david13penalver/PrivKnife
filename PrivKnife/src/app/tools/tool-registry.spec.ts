@@ -157,6 +157,7 @@ describe('ToolRegistry (Seam 3: Catalog & Architecture Verification)', () => {
     expect(devTools.some((t) => t.id === 'css-mesh-gradient-maker')).toBe(true);
     expect(devTools.some((t) => t.id === 'calendar-linker')).toBe(true);
     expect(devTools.some((t) => t.id === 'email-signature-generator')).toBe(true);
+    expect(devTools.some((t) => t.id === 'robots-sitemap-builder')).toBe(true);
 
     const docTools = getToolsByCategory('documents');
     expect(docTools.length).toBeGreaterThan(0);
@@ -178,6 +179,14 @@ describe('ToolRegistry (Seam 3: Catalog & Architecture Verification)', () => {
     const tool = getToolById('email-signature-generator');
     expect(tool).toBeDefined();
     expect(tool?.name).toBe('HTML Email Signature Generator');
+    expect(tool?.category).toBe('dev');
+    expect(tool?.isFullyClientSide).toBe(true);
+  });
+
+  it('should find robots-sitemap-builder tool by id', () => {
+    const tool = getToolById('robots-sitemap-builder');
+    expect(tool).toBeDefined();
+    expect(tool?.name).toBe('Robots.txt & XML Sitemap Builder');
     expect(tool?.category).toBe('dev');
     expect(tool?.isFullyClientSide).toBe(true);
   });

@@ -225,6 +225,18 @@ const CATALOG_TOOLS: CatalogTool[] = [
     icon: '✉️',
   },
   {
+    id: 'robots-sitemap-builder',
+    name: 'Robots.txt & XML Sitemap Builder',
+    category: 'dev',
+    categoryLabel: 'Dev / Productivity',
+    description: 'Generate standard search crawler directives (robots.txt) and valid XML sitemaps with AI bot blocking and bulk URL import.',
+    keywords: ['robots.txt', 'sitemap.xml', 'seo', 'crawlers', 'xml sitemap', 'block ai'],
+    status: 'ready',
+    route: '/tools/robots-sitemap-builder',
+    techStack: 'DOMParser • XMLSerializer',
+    icon: '🤖',
+  },
+  {
     id: '3d-qr-stand',
     name: '3D QR Stand & Keychain Generator',
     category: '3d',
