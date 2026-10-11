@@ -237,6 +237,18 @@ const CATALOG_TOOLS: CatalogTool[] = [
     icon: '🤖',
   },
   {
+    id: 'markdown-cheatsheet',
+    name: 'Markdown to Academic / Tech PDF Cheatsheet',
+    category: 'documents',
+    categoryLabel: 'Documents',
+    description: 'Transform markdown notes into high-density 2, 3, or 4-column academic and tech reference cheat sheets with live preview.',
+    keywords: ['markdown cheatsheet', 'markdown to pdf', 'cheatsheet maker', 'multi-column pdf', 'cheat sheet generator', 'print cheatsheet'],
+    status: 'ready',
+    route: '/tools/markdown-cheatsheet',
+    techStack: 'marked • jsPDF Vector • DOMPurify',
+    icon: '📝',
+  },
+  {
     id: '3d-qr-stand',
     name: '3D QR Stand & Keychain Generator',
     category: '3d',

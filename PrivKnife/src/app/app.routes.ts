@@ -490,8 +490,35 @@ export const routes: Routes = [
     pathMatch: 'full',
   },
   {
-    path: 'tools/xml-sitemap-builder',
-    redirectTo: 'tools/robots-sitemap-builder',
+    path: 'tools/markdown-cheatsheet',
+    title: 'Markdown to Academic / Tech PDF Cheatsheet — PrivKnife',
+    data: {
+      description:
+        'Transform markdown notes into high-density 2, 3, or 4-column academic and tech reference cheat sheets. 100% in-browser vector PDF generator with zero server uploads.',
+      keywords: [
+        'markdown cheatsheet maker',
+        'markdown to pdf cheatsheet',
+        'academic cheatsheet generator',
+        'multi column markdown pdf',
+        'developer cheatsheet maker',
+        'quick reference sheet generator',
+        'client side markdown to pdf',
+      ],
+      url: '/tools/markdown-cheatsheet',
+    },
+    loadComponent: () =>
+      import('./tools/documents/markdown-cheatsheet').then(
+        (m) => m.MarkdownCheatsheetComponent
+      ),
+  },
+  {
+    path: 'tools/markdown-to-pdf',
+    redirectTo: 'tools/markdown-cheatsheet',
+    pathMatch: 'full',
+  },
+  {
+    path: 'tools/cheatsheet-maker',
+    redirectTo: 'tools/markdown-cheatsheet',
     pathMatch: 'full',
   },
   {

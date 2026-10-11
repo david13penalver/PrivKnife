@@ -166,6 +166,7 @@ describe('ToolRegistry (Seam 3: Catalog & Architecture Verification)', () => {
     expect(docTools.some((t) => t.id === 'graph-dot-grid-paper')).toBe(true);
     expect(docTools.some((t) => t.id === 'avery-barcode-sheet')).toBe(true);
     expect(docTools.some((t) => t.id === 'table-tent-maker')).toBe(true);
+    expect(docTools.some((t) => t.id === 'markdown-cheatsheet')).toBe(true);
 
     const mediaTools = getToolsByCategory('media');
     expect(mediaTools.length).toBeGreaterThan(0);
@@ -188,6 +189,14 @@ describe('ToolRegistry (Seam 3: Catalog & Architecture Verification)', () => {
     expect(tool).toBeDefined();
     expect(tool?.name).toBe('Robots.txt & XML Sitemap Builder');
     expect(tool?.category).toBe('dev');
+    expect(tool?.isFullyClientSide).toBe(true);
+  });
+
+  it('should find markdown-cheatsheet tool by id', () => {
+    const tool = getToolById('markdown-cheatsheet');
+    expect(tool).toBeDefined();
+    expect(tool?.name).toBe('Markdown to Academic & Tech PDF Cheatsheet');
+    expect(tool?.category).toBe('documents');
     expect(tool?.isFullyClientSide).toBe(true);
   });
 });

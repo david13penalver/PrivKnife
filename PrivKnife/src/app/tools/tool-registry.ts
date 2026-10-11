@@ -8,6 +8,7 @@ import { robotsSitemapBuilderTool } from './dev/robots-sitemap-builder';
 import { averyBarcodeSheetTool } from './documents/barcode-labels';
 import { gridPaperTool } from './documents/grid-paper';
 import { invoiceMakerTool } from './documents/invoice-maker';
+import { markdownCheatsheetTool } from './documents/markdown-cheatsheet';
 import { pdfMergerTool } from './documents/pdf-merger';
 import { tableTentMakerTool } from './documents/table-tent-maker';
 import { batchImageCompressorTool } from './media/batch-compressor';
@@ -33,6 +34,7 @@ export const TOOL_REGISTRY: ToolDefinition[] = [
   gridPaperTool,
   averyBarcodeSheetTool,
   tableTentMakerTool,
+  markdownCheatsheetTool,
   batchImageCompressorTool,
   faviconAppIconSuiteTool,
   ogCardMakerTool,

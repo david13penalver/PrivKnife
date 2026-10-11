@@ -76,7 +76,7 @@ gantt
 | **16** | [16 - Universal Event & .ics Calendar Linker](16%20-%20Universal%20Event%20&%20.ics%20Calendar%20Linker/spec.md) | Dev | `.ics` file + calendar URLs | RFC 5545 format, Blob API | [x] |
 | **17** | [17 - HTML Email Signature Generator](17%20-%20HTML%20Email%20Signature%20Generator/spec.md) | Dev | Raw HTML + Rich-text copy | DOM Table renderer, Clipboard API | [x] |
 | **18** | [18 - Robots.txt & XML Sitemap Builder](18%20-%20Robots.txt%20&%20XML%20Sitemap%20Builder/spec.md) | Dev | `robots.txt` / `sitemap.xml` | `DOMParser`, `XMLSerializer` | [x] |
-| **19** | [19 - Markdown to Academic - Tech PDF Cheatsheet](19%20-%20Markdown%20to%20Academic%20-%20Tech%20PDF%20Cheatsheet/spec.md) | Documents | Multi-column cheatsheet `.pdf` | `marked.js`, `highlight.js`, `jspdf` | [ ] |
+| **19** | [19 - Markdown to Academic - Tech PDF Cheatsheet](19%20-%20Markdown%20to%20Academic%20-%20Tech%20PDF%20Cheatsheet/spec.md) | Documents | Multi-column cheatsheet `.pdf` | `marked.js`, `highlight.js`, `jspdf` | [x] |
 | **20** | [20 - Audio BPM, Pitch & Key Tap Detector](20%20-%20Audio%20BPM,%20Pitch%20&%20Key%20Tap%20Detector/spec.md) | Audio | Real-time BPM readout | Web Audio API (`AudioContext`) | [ ] |
 | **21** | [21 - Spotify Code & Soundwave Art Maker](21%20-%20Spotify%20Code%20&%20Soundwave%20Art%20Maker/spec.md) | Audio | Scalable `.svg` / `.pdf` | Web Audio API, SVG rendering | [ ] |
 | **22** | [22 - Video to GIF & Clip Trimmer](22%20-%20Video%20to%20GIF%20&%20Clip%20Trimmer/spec.md) | Video | Animated `.gif` / `.mp4` | `ffmpeg.wasm`, Web Workers | [ ] |
