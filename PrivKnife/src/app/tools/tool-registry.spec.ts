@@ -55,6 +55,14 @@ describe('ToolRegistry (Seam 3: Catalog & Architecture Verification)', () => {
     expect(tool?.isFullyClientSide).toBe(true);
   });
 
+  it('should find invoice-receipt-maker tool by id', () => {
+    const tool = getToolById('invoice-receipt-maker');
+    expect(tool).toBeDefined();
+    expect(tool?.name).toBe('Instant Client-Side Invoice & Receipt Maker');
+    expect(tool?.category).toBe('documents');
+    expect(tool?.isFullyClientSide).toBe(true);
+  });
+
   it('should find tools by category', () => {
     const privacyTools = getToolsByCategory('privacy');
     expect(privacyTools.length).toBeGreaterThan(0);
@@ -69,5 +77,6 @@ describe('ToolRegistry (Seam 3: Catalog & Architecture Verification)', () => {
     const docTools = getToolsByCategory('documents');
     expect(docTools.length).toBeGreaterThan(0);
     expect(docTools.some((t) => t.id === 'pdf-merger-splitter')).toBe(true);
+    expect(docTools.some((t) => t.id === 'invoice-receipt-maker')).toBe(true);
   });
 });

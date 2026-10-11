@@ -140,6 +140,31 @@ export const routes: Routes = [
       import('./tools/privacy/pdf-redaction').then((m) => m.PdfRedactionComponent),
   },
   {
+    path: 'tools/invoice-maker',
+    title: 'Instant Client-Side Invoice & Receipt Maker — PrivKnife',
+    data: {
+      description:
+        'Free invoice generator with no sign up. Generate professional vector PDF invoices and printable receipts offline. 100% in-browser with zero server tracking.',
+      keywords: [
+        'free invoice generator no sign up',
+        'invoice generator',
+        'receipt maker',
+        'client side invoice generator',
+        'instant invoice maker',
+        'private invoice generator',
+        'offline invoice pdf',
+      ],
+      url: '/tools/invoice-maker',
+    },
+    loadComponent: () =>
+      import('./tools/documents/invoice-maker').then((m) => m.InvoiceMakerComponent),
+  },
+  {
+    path: 'tools/invoice-receipt-maker',
+    redirectTo: 'tools/invoice-maker',
+    pathMatch: 'full',
+  },
+  {
     path: '**',
     title: 'Page Not Found — PrivKnife',
     data: {

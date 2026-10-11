@@ -63,7 +63,7 @@ gantt
 | **03** | [03 - CSV - Excel to JSON, SQL & Markdown Converter](03%20-%20CSV%20-%20Excel%20to%20JSON,%20SQL%20&%20Markdown%20Converter/spec.md) | Dev / Data | `.sql`, `.json`, `.md` exports | `PapaParse`, pure JavaScript | [x] |
 | **04** | [04 - PDF Merger, Splitter & Page Organizer](04%20-%20PDF%20Merger,%20Splitter%20&%20Page%20Organizer/spec.md) | Documents | Reordered / merged `.pdf` | `pdf-lib`, `PDF.js` | [x] |
 | **05** | [05 - PDF Redaction & Anonymizer](05%20-%20PDF%20Redaction%20&%20Anonymizer/spec.md) | Privacy | Flattened sanitized `.pdf` | `PDF.js`, Canvas 2D Redaction | [x] |
-| **06** | [06 - Instant Client-Side Invoice & Receipt Maker](06%20-%20Instant%20Client-Side%20Invoice%20&%20Receipt%20Maker/spec.md) | Documents | Clean vector `.pdf` | `jspdf`, `localStorage` | [ ] |
+| **06** | [06 - Instant Client-Side Invoice & Receipt Maker](06%20-%20Instant%20Client-Side%20Invoice%20&%20Receipt%20Maker/spec.md) | Documents | Clean vector `.pdf` | `jspdf`, `localStorage` | [x] |
 | **07** | [07 - Custom Printable Graph & Dot Grid Paper](07%20-%20Custom%20Printable%20Graph%20&%20Dot%20Grid%20Paper/spec.md) | Documents | Precision vector grid `.pdf` | `jspdf` vector lines | [ ] |
 | **08** | [08 - Avery Barcode & Label Sheet Generator](08%20-%20Avery%20Barcode%20&%20Label%20Sheet%20Generator/spec.md) | Documents | Grid sticker sheet `.pdf` | `JsBarcode`, `jspdf` | [ ] |
 | **09** | [09 - Foldable Table Tent & Counter Sign Maker](09%20-%20Foldable%20Table%20Tent%20&%20Counter%20Sign%20Maker/spec.md) | Documents | Foldable A4/Letter `.pdf` | `jspdf`, SVG DOM rendering | [ ] |

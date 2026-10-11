@@ -1,5 +1,6 @@
 import { ToolCategory, ToolDefinition } from '../core/models/tool.model';
 import { csvConverterTool } from './dev/csv-converter';
+import { invoiceMakerTool } from './documents/invoice-maker';
 import { pdfMergerTool } from './documents/pdf-merger';
 import { cryptoHashUuidTool } from './privacy/crypto-hash-uuid';
 import { exifStripperTool } from './privacy/exif-stripper';
@@ -11,6 +12,7 @@ export const TOOL_REGISTRY: ToolDefinition[] = [
   csvConverterTool,
   pdfMergerTool,
   pdfRedactionTool,
+  invoiceMakerTool,
 ];
 
 export function getToolById(id: string): ToolDefinition | undefined {
