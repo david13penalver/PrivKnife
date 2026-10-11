@@ -217,6 +217,31 @@ export const routes: Routes = [
     pathMatch: 'full',
   },
   {
+    path: 'tools/table-tent-maker',
+    title: 'Foldable Table Tent & Counter Sign Maker — PrivKnife',
+    data: {
+      description:
+        'Create print-ready foldable triangular table signs with menus, QR codes, or Wi-Fi login badges with millimeter crease fold lines. 100% in-browser.',
+      keywords: [
+        'printable table tent generator',
+        'free table tent template pdf',
+        'qr code counter sign maker',
+        'printable desk nameplate tent',
+        'a4 table tent maker with fold lines',
+        'restaurant menu table tent',
+        'wedding table number tent card',
+      ],
+      url: '/tools/table-tent-maker',
+    },
+    loadComponent: () =>
+      import('./tools/documents/table-tent-maker').then((m) => m.TableTentMakerComponent),
+  },
+  {
+    path: 'tools/table-tent',
+    redirectTo: 'tools/table-tent-maker',
+    pathMatch: 'full',
+  },
+  {
     path: '**',
     title: 'Page Not Found — PrivKnife',
     data: {

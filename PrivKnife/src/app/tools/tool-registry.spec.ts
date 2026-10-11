@@ -79,6 +79,14 @@ describe('ToolRegistry (Seam 3: Catalog & Architecture Verification)', () => {
     expect(tool?.isFullyClientSide).toBe(true);
   });
 
+  it('should find table-tent-maker tool by id', () => {
+    const tool = getToolById('table-tent-maker');
+    expect(tool).toBeDefined();
+    expect(tool?.name).toBe('Foldable Table Tent & Counter Sign Maker');
+    expect(tool?.category).toBe('documents');
+    expect(tool?.isFullyClientSide).toBe(true);
+  });
+
   it('should find tools by category', () => {
     const privacyTools = getToolsByCategory('privacy');
     expect(privacyTools.length).toBeGreaterThan(0);
@@ -96,5 +104,6 @@ describe('ToolRegistry (Seam 3: Catalog & Architecture Verification)', () => {
     expect(docTools.some((t) => t.id === 'invoice-receipt-maker')).toBe(true);
     expect(docTools.some((t) => t.id === 'graph-dot-grid-paper')).toBe(true);
     expect(docTools.some((t) => t.id === 'avery-barcode-sheet')).toBe(true);
+    expect(docTools.some((t) => t.id === 'table-tent-maker')).toBe(true);
   });
 });

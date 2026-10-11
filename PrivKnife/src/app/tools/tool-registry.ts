@@ -4,6 +4,7 @@ import { averyBarcodeSheetTool } from './documents/barcode-labels';
 import { gridPaperTool } from './documents/grid-paper';
 import { invoiceMakerTool } from './documents/invoice-maker';
 import { pdfMergerTool } from './documents/pdf-merger';
+import { tableTentMakerTool } from './documents/table-tent-maker';
 import { cryptoHashUuidTool } from './privacy/crypto-hash-uuid';
 import { exifStripperTool } from './privacy/exif-stripper';
 import { pdfRedactionTool } from './privacy/pdf-redaction';
@@ -17,6 +18,7 @@ export const TOOL_REGISTRY: ToolDefinition[] = [
   invoiceMakerTool,
   gridPaperTool,
   averyBarcodeSheetTool,
+  tableTentMakerTool,
 ];
 
 export function getToolById(id: string): ToolDefinition | undefined {
