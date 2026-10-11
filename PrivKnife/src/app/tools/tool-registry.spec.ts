@@ -111,6 +111,14 @@ describe('ToolRegistry (Seam 3: Catalog & Architecture Verification)', () => {
     expect(tool?.isFullyClientSide).toBe(true);
   });
 
+  it('should find color-palette-extractor tool by id', () => {
+    const tool = getToolById('color-palette-extractor');
+    expect(tool).toBeDefined();
+    expect(tool?.name).toBe('Color Palette Extractor & Contrast Checker');
+    expect(tool?.category).toBe('dev');
+    expect(tool?.isFullyClientSide).toBe(true);
+  });
+
   it('should find tools by category', () => {
     const privacyTools = getToolsByCategory('privacy');
     expect(privacyTools.length).toBeGreaterThan(0);
@@ -121,6 +129,7 @@ describe('ToolRegistry (Seam 3: Catalog & Architecture Verification)', () => {
     const devTools = getToolsByCategory('dev');
     expect(devTools.length).toBeGreaterThan(0);
     expect(devTools.some((t) => t.id === 'csv-to-sql-json')).toBe(true);
+    expect(devTools.some((t) => t.id === 'color-palette-extractor')).toBe(true);
 
     const docTools = getToolsByCategory('documents');
     expect(docTools.length).toBeGreaterThan(0);

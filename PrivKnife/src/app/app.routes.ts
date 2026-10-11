@@ -317,6 +317,33 @@ export const routes: Routes = [
     pathMatch: 'full',
   },
   {
+    path: 'tools/color-palette-extractor',
+    title: 'Color Palette Extractor & Contrast Checker — PrivKnife',
+    data: {
+      description:
+        'Extract dominant color palettes from any photo and verify WCAG 2.1 AA text readability ratios instantly. 100% in-browser with zero telemetry.',
+      keywords: [
+        'extract palette from image',
+        'wcag color matrix generator',
+        'extract color palette to ase',
+        'image color accessibility checker',
+        'bulk contrast ratio check',
+        'color contrast matrix',
+        'client side palette extractor',
+      ],
+      url: '/tools/color-palette-extractor',
+    },
+    loadComponent: () =>
+      import('./tools/dev/color-palette-extractor').then(
+        (m) => m.ColorPaletteExtractorComponent
+      ),
+  },
+  {
+    path: 'tools/palette-contrast',
+    redirectTo: 'tools/color-palette-extractor',
+    pathMatch: 'full',
+  },
+  {
     path: '**',
     title: 'Page Not Found — PrivKnife',
     data: {

@@ -1,4 +1,5 @@
 import { ToolCategory, ToolDefinition } from '../core/models/tool.model';
+import { colorPaletteExtractorTool } from './dev/color-palette-extractor';
 import { csvConverterTool } from './dev/csv-converter';
 import { averyBarcodeSheetTool } from './documents/barcode-labels';
 import { gridPaperTool } from './documents/grid-paper';
@@ -16,6 +17,7 @@ export const TOOL_REGISTRY: ToolDefinition[] = [
   exifStripperTool,
   cryptoHashUuidTool,
   csvConverterTool,
+  colorPaletteExtractorTool,
   pdfMergerTool,
   pdfRedactionTool,
   invoiceMakerTool,
