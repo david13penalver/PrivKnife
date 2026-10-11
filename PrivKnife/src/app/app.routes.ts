@@ -165,6 +165,32 @@ export const routes: Routes = [
     pathMatch: 'full',
   },
   {
+    path: 'tools/grid-paper',
+    title: 'Custom Printable Graph & Dot Grid Paper — PrivKnife',
+    data: {
+      description:
+        'Printable dot grid paper PDF generator. Custom dot grid, square graph, isometric, hexagonal, and ruled paper templates with millimeter precision. 100% in-browser.',
+      keywords: [
+        'printable dot grid paper pdf',
+        'custom graph paper generator',
+        'a4 dot grid pdf download',
+        'printable isometric paper 5mm',
+        'bullet journal refill printable pdf',
+        'hexagonal grid printable',
+        'ruled paper pdf',
+        'client side grid generator',
+      ],
+      url: '/tools/grid-paper',
+    },
+    loadComponent: () =>
+      import('./tools/documents/grid-paper').then((m) => m.GridPaperComponent),
+  },
+  {
+    path: 'tools/graph-dot-grid-paper',
+    redirectTo: 'tools/grid-paper',
+    pathMatch: 'full',
+  },
+  {
     path: '**',
     title: 'Page Not Found — PrivKnife',
     data: {

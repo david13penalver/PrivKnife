@@ -1,5 +1,6 @@
 import { ToolCategory, ToolDefinition } from '../core/models/tool.model';
 import { csvConverterTool } from './dev/csv-converter';
+import { gridPaperTool } from './documents/grid-paper';
 import { invoiceMakerTool } from './documents/invoice-maker';
 import { pdfMergerTool } from './documents/pdf-merger';
 import { cryptoHashUuidTool } from './privacy/crypto-hash-uuid';
@@ -13,6 +14,7 @@ export const TOOL_REGISTRY: ToolDefinition[] = [
   pdfMergerTool,
   pdfRedactionTool,
   invoiceMakerTool,
+  gridPaperTool,
 ];
 
 export function getToolById(id: string): ToolDefinition | undefined {

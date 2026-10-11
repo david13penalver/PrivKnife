@@ -63,6 +63,14 @@ describe('ToolRegistry (Seam 3: Catalog & Architecture Verification)', () => {
     expect(tool?.isFullyClientSide).toBe(true);
   });
 
+  it('should find graph-dot-grid-paper tool by id', () => {
+    const tool = getToolById('graph-dot-grid-paper');
+    expect(tool).toBeDefined();
+    expect(tool?.name).toBe('Custom Printable Graph & Dot Grid Paper');
+    expect(tool?.category).toBe('documents');
+    expect(tool?.isFullyClientSide).toBe(true);
+  });
+
   it('should find tools by category', () => {
     const privacyTools = getToolsByCategory('privacy');
     expect(privacyTools.length).toBeGreaterThan(0);
@@ -78,5 +86,6 @@ describe('ToolRegistry (Seam 3: Catalog & Architecture Verification)', () => {
     expect(docTools.length).toBeGreaterThan(0);
     expect(docTools.some((t) => t.id === 'pdf-merger-splitter')).toBe(true);
     expect(docTools.some((t) => t.id === 'invoice-receipt-maker')).toBe(true);
+    expect(docTools.some((t) => t.id === 'graph-dot-grid-paper')).toBe(true);
   });
 });
