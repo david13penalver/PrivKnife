@@ -267,6 +267,31 @@ export const routes: Routes = [
     pathMatch: 'full',
   },
   {
+    path: 'tools/favicon-app-icon-suite',
+    title: 'App Icon & Favicon Suite Generator — PrivKnife',
+    data: {
+      description:
+        'Transform any logo into a complete package of multi-resolution favicon.ico, Apple touch icons, Android Chrome PWAs, and web manifests. 100% client-side with zero telemetry.',
+      keywords: [
+        'favicon generator',
+        'app icon generator',
+        'favicon.ico maker',
+        'apple-touch-icon generator',
+        'pwa icons',
+        'site.webmanifest generator',
+        'offline favicon suite generator',
+      ],
+      url: '/tools/favicon-app-icon-suite',
+    },
+    loadComponent: () =>
+      import('./tools/media/favicon-generator').then((m) => m.FaviconGeneratorComponent),
+  },
+  {
+    path: 'tools/favicon-generator',
+    redirectTo: 'tools/favicon-app-icon-suite',
+    pathMatch: 'full',
+  },
+  {
     path: '**',
     title: 'Page Not Found — PrivKnife',
     data: {

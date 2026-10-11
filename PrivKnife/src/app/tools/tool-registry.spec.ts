@@ -95,6 +95,14 @@ describe('ToolRegistry (Seam 3: Catalog & Architecture Verification)', () => {
     expect(tool?.isFullyClientSide).toBe(true);
   });
 
+  it('should find favicon-app-icon-suite tool by id', () => {
+    const tool = getToolById('favicon-app-icon-suite');
+    expect(tool).toBeDefined();
+    expect(tool?.name).toBe('App Icon & Favicon Suite Generator');
+    expect(tool?.category).toBe('media');
+    expect(tool?.isFullyClientSide).toBe(true);
+  });
+
   it('should find tools by category', () => {
     const privacyTools = getToolsByCategory('privacy');
     expect(privacyTools.length).toBeGreaterThan(0);
@@ -117,5 +125,6 @@ describe('ToolRegistry (Seam 3: Catalog & Architecture Verification)', () => {
     const mediaTools = getToolsByCategory('media');
     expect(mediaTools.length).toBeGreaterThan(0);
     expect(mediaTools.some((t) => t.id === 'batch-image-compressor')).toBe(true);
+    expect(mediaTools.some((t) => t.id === 'favicon-app-icon-suite')).toBe(true);
   });
 });
