@@ -10,6 +10,7 @@ export interface DocumentPage {
   width: number;
   height: number;
   selected?: boolean;
+  thumbnailUrl?: string;
 }
 
 export interface LoadedPdfDocument {
@@ -23,4 +24,10 @@ export interface LoadedPdfDocument {
 
 export interface PdfMergeOptions {
   outputFileName?: string;
+}
+
+export interface SplitPdfResult {
+  fileName: string;
+  bytes: Uint8Array;
+  pageCount: number;
 }

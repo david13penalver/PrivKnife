@@ -1,6 +1,14 @@
 import { PDFDocument } from 'pdf-lib';
 import { describe, expect, it } from 'vitest';
-import { assemblePdf, loadPdfDocument, rotateAllPages, rotatePage } from './engine';
+import {
+  assemblePdf,
+  createSplitZip,
+  loadPdfDocument,
+  renderPageThumbnail,
+  rotateAllPages,
+  rotatePage,
+  splitPdfIntoSinglePages,
+} from './engine';
 import { createTestPdfBuffer } from './test-fixtures';
 
 describe('PdfEngine (Seam 1: Pure PDF Assembly, Reordering & Merging)', () => {
@@ -71,5 +79,42 @@ describe('PdfEngine (Seam 1: Pure PDF Assembly, Reordering & Merging)', () => {
     // Page 3 was rotated 90 degrees
     const lastPage = verifiedPdf.getPage(2);
     expect(lastPage.getRotation().angle).toBe(90);
+  });
+
+  it('should split document into separate individual PDF files', async () => {
+    const buffer = await createTestPdfBuffer(3, 'SplitDoc');
+    const doc = await loadPdfDocument(buffer, 'splitdoc.pdf');
+    const sourceMap = new Map<string, ArrayBuffer>([[doc.id, doc.buffer]]);
+
+    const splitResults = await splitPdfIntoSinglePages(doc.pages, sourceMap);
+    expect(splitResults).toHaveLength(3);
+    expect(splitResults[0].fileName).toBe('splitdoc-p1.pdf');
+    expect(splitResults[1].fileName).toBe('splitdoc-p2.pdf');
+    expect(splitResults[2].fileName).toBe('splitdoc-p3.pdf');
+
+    // Verify each result is a valid 1-page PDF
+    for (const item of splitResults) {
+      const parsed = await PDFDocument.load(item.bytes);
+      expect(parsed.getPageCount()).toBe(1);
+    }
+  });
+
+  it('should bundle split PDFs into a valid .zip archive Blob', async () => {
+    const buffer = await createTestPdfBuffer(2, 'ZipDoc');
+    const doc = await loadPdfDocument(buffer, 'zipdoc.pdf');
+    const sourceMap = new Map<string, ArrayBuffer>([[doc.id, doc.buffer]]);
+
+    const splitResults = await splitPdfIntoSinglePages(doc.pages, sourceMap);
+    const zipBlob = await createSplitZip(splitResults);
+
+    expect(zipBlob).toBeInstanceOf(Blob);
+    expect(zipBlob.size).toBeGreaterThan(0);
+  });
+
+  it('should handle renderPageThumbnail safely', async () => {
+    const buffer = await createTestPdfBuffer(1, 'Thumb');
+    const thumb = await renderPageThumbnail(buffer, 0);
+    // In headless test environments without canvas 2D, returns undefined safely
+    expect(thumb === undefined || typeof thumb === 'string').toBe(true);
   });
 });

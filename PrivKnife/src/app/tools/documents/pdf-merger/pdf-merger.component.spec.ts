@@ -98,6 +98,80 @@ describe('PdfMergerComponent (Seam 2: UI, Actions & Privacy Boundary)', () => {
     expect(revokeObjectURLSpy).toHaveBeenCalled();
   });
 
+  it('should support page selection and bulk selection operations', async () => {
+    const buffer = await createTestPdfBuffer(3, 'SelectTest');
+    const mockFile = new File([buffer], 'select.pdf', { type: 'application/pdf' });
+    await component.onFilesDropped([mockFile]);
+
+    expect(component.selectedCount()).toBe(0);
+
+    // Select page 0
+    component.toggleSelectPage(0);
+    expect(component.selectedCount()).toBe(1);
+    expect(component.pages()[0].selected).toBe(true);
+
+    // Select all
+    component.selectAll();
+    expect(component.selectedCount()).toBe(3);
+
+    // Rotate selected
+    component.rotateSelected();
+    expect(component.pages()[0].rotation).toBe(90);
+    expect(component.pages()[1].rotation).toBe(90);
+
+    // Deselect all
+    component.deselectAll();
+    expect(component.selectedCount()).toBe(0);
+
+    // Select page 1 and delete selected
+    component.toggleSelectPage(1);
+    expect(component.selectedCount()).toBe(1);
+    component.deleteSelected();
+    expect(component.pages()).toHaveLength(2);
+    expect(component.selectedCount()).toBe(0);
+  });
+
+  it('should split document into individual pages and download as .zip', async () => {
+    const buffer = await createTestPdfBuffer(2, 'SplitDoc');
+    const mockFile = new File([buffer], 'split.pdf', { type: 'application/pdf' });
+    await component.onFilesDropped([mockFile]);
+
+    await component.splitAndDownloadZip();
+
+    expect(createObjectURLSpy).toHaveBeenCalled();
+    expect(revokeObjectURLSpy).toHaveBeenCalled();
+  });
+
+  it('should reorder pages via HTML5 drag-and-drop events', async () => {
+    const buffer = await createTestPdfBuffer(3, 'DragDoc');
+    const mockFile = new File([buffer], 'drag.pdf', { type: 'application/pdf' });
+    await component.onFilesDropped([mockFile]);
+
+    const mockDragEvent = {
+      preventDefault: vi.fn(),
+      dataTransfer: {
+        effectAllowed: 'move',
+        dropEffect: 'move',
+        setData: vi.fn(),
+      },
+    } as unknown as DragEvent;
+
+    // Drag item at index 0 to index 2
+    component.onDragStart(0, mockDragEvent);
+    expect(component.draggedIndex()).toBe(0);
+
+    component.onDrop(2, mockDragEvent);
+    expect(component.draggedIndex()).toBeNull();
+    expect(component.pages()[2].pageIndex).toBe(0); // Moved to index 2
+  });
+
+  it('should display error message on invalid or corrupted files', async () => {
+    const corruptFile = new File(['not a pdf buffer'], 'corrupt.pdf', { type: 'application/pdf' });
+    await component.onFilesDropped([corruptFile]);
+
+    expect(component.errorMessage()).toContain('Error reading PDF');
+  });
+
   it('should execute processing with ZERO network calls (Privacy Verification)', async () => {
     const fetchSpy = vi.spyOn(window, 'fetch');
     const xhrSpy = vi.spyOn(XMLHttpRequest.prototype, 'open');
