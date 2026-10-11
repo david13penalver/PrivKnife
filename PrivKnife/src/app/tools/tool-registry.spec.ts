@@ -87,6 +87,14 @@ describe('ToolRegistry (Seam 3: Catalog & Architecture Verification)', () => {
     expect(tool?.isFullyClientSide).toBe(true);
   });
 
+  it('should find batch-image-compressor tool by id', () => {
+    const tool = getToolById('batch-image-compressor');
+    expect(tool).toBeDefined();
+    expect(tool?.name).toBe('Batch Image Compressor & WebP Converter');
+    expect(tool?.category).toBe('media');
+    expect(tool?.isFullyClientSide).toBe(true);
+  });
+
   it('should find tools by category', () => {
     const privacyTools = getToolsByCategory('privacy');
     expect(privacyTools.length).toBeGreaterThan(0);
@@ -105,5 +113,9 @@ describe('ToolRegistry (Seam 3: Catalog & Architecture Verification)', () => {
     expect(docTools.some((t) => t.id === 'graph-dot-grid-paper')).toBe(true);
     expect(docTools.some((t) => t.id === 'avery-barcode-sheet')).toBe(true);
     expect(docTools.some((t) => t.id === 'table-tent-maker')).toBe(true);
+
+    const mediaTools = getToolsByCategory('media');
+    expect(mediaTools.length).toBeGreaterThan(0);
+    expect(mediaTools.some((t) => t.id === 'batch-image-compressor')).toBe(true);
   });
 });

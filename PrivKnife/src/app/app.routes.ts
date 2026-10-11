@@ -242,6 +242,31 @@ export const routes: Routes = [
     pathMatch: 'full',
   },
   {
+    path: 'tools/batch-image-compressor',
+    title: 'Batch Image Compressor & WebP Converter — PrivKnife',
+    data: {
+      description:
+        'Losslessly compress hundreds of photos and convert them to modern WebP with zero upload limits. 100% in-browser with instant ZIP download.',
+      keywords: [
+        'bulk image compressor no upload',
+        'batch image compressor',
+        'convert png to webp batch',
+        'offline bulk image compressor',
+        'compress images in browser',
+        'client side webp converter',
+        'batch photo optimizer',
+      ],
+      url: '/tools/batch-image-compressor',
+    },
+    loadComponent: () =>
+      import('./tools/media/batch-compressor').then((m) => m.BatchCompressorComponent),
+  },
+  {
+    path: 'tools/image-compressor',
+    redirectTo: 'tools/batch-image-compressor',
+    pathMatch: 'full',
+  },
+  {
     path: '**',
     title: 'Page Not Found — PrivKnife',
     data: {
