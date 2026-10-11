@@ -97,6 +97,12 @@ export function parseExcel(buffer: ArrayBuffer, sheetIndex = 0): ParsedTable {
 }
 
 /**
+ * Matches numeric literals (integers, floats, negative numbers, scientific notation)
+ * while preserving padded string identifiers like '007' or '0123'.
+ */
+const NUMERIC_PATTERN = /^-?(?:0|[1-9]\d*)(?:\.\d+)?(?:[eE][+-]?\d+)?$/;
+
+/**
  * Infer JavaScript typed value from string cell content (numbers, booleans, null, strings).
  */
 function inferTypedValue(val: string): any {
@@ -110,7 +116,7 @@ function inferTypedValue(val: string): any {
   if (trimmed.toLowerCase() === 'false') {
     return false;
   }
-  if (!isNaN(Number(trimmed)) && !trimmed.startsWith('0') || trimmed === '0') {
+  if (NUMERIC_PATTERN.test(trimmed)) {
     return Number(trimmed);
   }
   return val;
@@ -166,7 +172,7 @@ function formatSqlValue(val: string): string {
   if (trimmed.toLowerCase() === 'false') {
     return 'FALSE';
   }
-  if (!isNaN(Number(trimmed)) && !trimmed.startsWith('0') || trimmed === '0') {
+  if (NUMERIC_PATTERN.test(trimmed)) {
     return trimmed;
   }
   // Escape single quotes: ' -> ''
@@ -186,13 +192,19 @@ export function tableToSql(table: ParsedTable, options: SqlFormatOptions): strin
   const escapedTableName = `${quoteChar}${options.tableName}${quoteChar}`;
   const escapedColumns = table.headers.map((h) => `${quoteChar}${h}${quoteChar}`).join(', ');
 
-  const valueRows = table.rows.map((row) => {
-    const formattedVals = row.map(formatSqlValue).join(', ');
-    return `(${formattedVals})`;
-  });
+  const batchSize = options.batchSize && options.batchSize > 0 ? options.batchSize : table.rows.length;
+  const queries: string[] = [];
 
-  const query = `INSERT INTO ${escapedTableName} (${escapedColumns}) VALUES\n  ${valueRows.join(',\n  ')};`;
-  return query;
+  for (let i = 0; i < table.rows.length; i += batchSize) {
+    const batchRows = table.rows.slice(i, i + batchSize);
+    const valueRows = batchRows.map((row) => {
+      const formattedVals = row.map(formatSqlValue).join(', ');
+      return `(${formattedVals})`;
+    });
+    queries.push(`INSERT INTO ${escapedTableName} (${escapedColumns}) VALUES\n  ${valueRows.join(',\n  ')};`);
+  }
+
+  return queries.join('\n\n');
 }
 
 /**

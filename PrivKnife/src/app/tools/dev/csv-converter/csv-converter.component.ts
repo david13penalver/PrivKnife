@@ -52,6 +52,14 @@ import {
         <!-- Left Column: Input & Options -->
         <div class="l-columns__area">
           <app-card title="Input Data">
+            @if (errorMessage()) {
+              <div
+                class="g--margin-bottom-4"
+                style="padding: 10px 14px; background: var(--color-danger-subtle); color: var(--color-danger); border-radius: var(--radius-sm); font-size: 0.8125rem; font-weight: 500;">
+                ⚠️ {{ errorMessage() }}
+              </div>
+            }
+
             <!-- Tabs: Paste vs File Upload -->
             <div class="g--margin-bottom-4" style="display: flex; gap: 8px;">
               <button
@@ -162,6 +170,18 @@ import {
                     </select>
                   </div>
                 </div>
+                <div class="c-input g--margin-top-3">
+                  <label class="c-input__label">Batch Size (INSERT Chunking)</label>
+                  <select
+                    class="c-input__control"
+                    [value]="sqlBatchSize()"
+                    (change)="onSqlBatchSizeChange($any($event.target).value)">
+                    <option value="0">All rows in 1 query</option>
+                    <option value="50">50 rows / query</option>
+                    <option value="100">100 rows / query</option>
+                    <option value="500">500 rows / query</option>
+                  </select>
+                </div>
               } @else if (activeFormat() === 'markdown') {
                 <div class="c-input">
                   <label class="c-input__label">Column Alignment</label>
@@ -256,6 +276,117 @@ import {
         </div>
       </div>
 
+      <!-- Live Data Grid Preview Card -->
+      <div class="l-columns__area g--margin-top-6">
+        <app-card title="Interactive Data Grid Preview">
+          @if (parsedTable() && parsedTable()!.headers.length > 0) {
+            <!-- Grid Toolbar -->
+            <div
+              class="l-extremo g--margin-bottom-3 g--padding-bottom-2"
+              style="border-bottom: 1px solid var(--color-border-default); align-items: center; flex-wrap: wrap; gap: 8px;">
+              <div style="font-size: 0.8125rem; color: var(--color-text-secondary);">
+                Showing rows <strong>{{ startRowIndex() }}</strong> – <strong>{{ endRowIndex() }}</strong> of <strong>{{ totalRows() }}</strong>
+                ({{ parsedTable()!.columnCount }} columns)
+              </div>
+
+              <div style="display: flex; align-items: center; gap: 12px;">
+                <div style="display: flex; align-items: center; gap: 6px;">
+                  <label style="font-size: 0.75rem; color: var(--color-text-muted);">Rows per page:</label>
+                  <select
+                    class="c-input__control"
+                    style="padding: 2px 8px; font-size: 0.75rem; width: auto;"
+                    [value]="gridPageSize()"
+                    (change)="setGridPageSize(+$any($event.target).value)">
+                    <option [value]="5">5</option>
+                    <option [value]="10">10</option>
+                    <option [value]="25">25</option>
+                    <option [value]="50">50</option>
+                  </select>
+                </div>
+
+                <div style="display: flex; gap: 4px; align-items: center;">
+                  <button
+                    type="button"
+                    class="c-button c-button--ghost c-button--small"
+                    style="padding: 4px 8px;"
+                    [disabled]="gridPage() <= 1"
+                    (click)="setGridPage(1)"
+                    title="First Page">
+                    ⏮
+                  </button>
+                  <button
+                    type="button"
+                    class="c-button c-button--ghost c-button--small"
+                    style="padding: 4px 8px;"
+                    [disabled]="gridPage() <= 1"
+                    (click)="setGridPage(gridPage() - 1)"
+                    title="Previous Page">
+                    ◀ Prev
+                  </button>
+                  <span style="font-size: 0.75rem; padding: 0 4px; font-weight: 600;">
+                    {{ gridPage() }} / {{ totalPages() }}
+                  </span>
+                  <button
+                    type="button"
+                    class="c-button c-button--ghost c-button--small"
+                    style="padding: 4px 8px;"
+                    [disabled]="gridPage() >= totalPages()"
+                    (click)="setGridPage(gridPage() + 1)"
+                    title="Next Page">
+                    Next ▶
+                  </button>
+                  <button
+                    type="button"
+                    class="c-button c-button--ghost c-button--small"
+                    style="padding: 4px 8px;"
+                    [disabled]="gridPage() >= totalPages()"
+                    (click)="setGridPage(totalPages())"
+                    title="Last Page">
+                    ⏭
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            <!-- Table Scroll Area -->
+            <div style="overflow-x: auto; border: 1px solid var(--color-border-default); border-radius: var(--radius-sm); max-height: 380px;">
+              <table style="width: 100%; border-collapse: collapse; font-size: 0.8125rem; text-align: left;">
+                <thead>
+                  <tr style="background: var(--color-bg-subtle); border-bottom: 2px solid var(--color-border-default);">
+                    <th style="padding: 8px 12px; font-weight: 600; color: var(--color-text-muted); width: 48px; border-right: 1px solid var(--color-border-default);">#</th>
+                    @for (header of parsedTable()!.headers; track $index) {
+                      <th style="padding: 8px 12px; font-weight: 600; color: var(--color-text-primary); border-right: 1px solid var(--color-border-default); white-space: nowrap;">
+                        {{ header }}
+                      </th>
+                    }
+                  </tr>
+                </thead>
+                <tbody>
+                  @for (row of paginatedRows(); track $index; let rowIdx = $index) {
+                    <tr style="border-bottom: 1px solid var(--color-border-subtle); transition: background 0.15s ease;"
+                        [style.background]="rowIdx % 2 === 0 ? 'var(--color-bg-surface)' : 'var(--color-bg-subtle)'">
+                      <td style="padding: 6px 12px; color: var(--color-text-muted); border-right: 1px solid var(--color-border-default); font-family: var(--font-code, monospace); font-size: 0.75rem;">
+                        {{ (gridPage() - 1) * gridPageSize() + rowIdx + 1 }}
+                      </td>
+                      @for (cell of row; track $index) {
+                        <td style="padding: 6px 12px; border-right: 1px solid var(--color-border-default); white-space: nowrap; max-width: 240px; overflow: hidden; text-overflow: ellipsis;"
+                            [title]="cell">
+                          {{ cell }}
+                        </td>
+                      }
+                    </tr>
+                  }
+                </tbody>
+              </table>
+            </div>
+          } @else {
+            <p style="color: var(--color-text-muted); font-size: 0.875rem; text-align: center; padding: 24px 0; margin: 0;">
+              No tabular rows loaded yet. Paste CSV text or drop a spreadsheet file to preview rows.
+            </p>
+          }
+        </app-card>
+      </div>
+
       <!-- Educational Card -->
       <div class="l-columns__area g--margin-top-6">
         <app-card title="Client-Side Tabular Conversion Guarantee">
@@ -281,12 +412,33 @@ export class CsvConverterComponent implements OnInit, OnDestroy {
   // SQL Options
   readonly sqlTableName = signal<string>('records');
   readonly sqlDialect = signal<SqlDialect>('mysql');
+  readonly sqlBatchSize = signal<number>(0);
 
   // Markdown Options
   readonly markdownAlignment = signal<MarkdownAlignment>('left');
 
-  // UI state
+  // UI state & pagination
   readonly copied = signal<boolean>(false);
+  readonly errorMessage = signal<string | null>(null);
+  readonly gridPage = signal<number>(1);
+  readonly gridPageSize = signal<number>(10);
+
+  readonly totalRows = computed(() => this.parsedTable()?.rows.length || 0);
+  readonly totalPages = computed(() => Math.max(1, Math.ceil(this.totalRows() / this.gridPageSize())));
+  readonly paginatedRows = computed(() => {
+    const table = this.parsedTable();
+    if (!table || table.rows.length === 0) return [];
+    const start = (this.gridPage() - 1) * this.gridPageSize();
+    return table.rows.slice(start, start + this.gridPageSize());
+  });
+  readonly startRowIndex = computed(() => {
+    if (this.totalRows() === 0) return 0;
+    return (this.gridPage() - 1) * this.gridPageSize() + 1;
+  });
+  readonly endRowIndex = computed(() => {
+    return Math.min(this.gridPage() * this.gridPageSize(), this.totalRows());
+  });
+
   private copyTimeout: any = null;
   private currentWorkbookBuffer: ArrayBuffer | null = null;
   private activeBlobUrls: string[] = [];
@@ -306,6 +458,7 @@ export class CsvConverterComponent implements OnInit, OnDestroy {
       return tableToSql(table, {
         tableName: this.sqlTableName() || 'records',
         dialect: this.sqlDialect(),
+        batchSize: this.sqlBatchSize() > 0 ? this.sqlBatchSize() : undefined,
       });
     }
     // Markdown
@@ -320,6 +473,7 @@ export class CsvConverterComponent implements OnInit, OnDestroy {
 
   setInputMode(mode: 'text' | 'file'): void {
     this.inputMode.set(mode);
+    this.errorMessage.set(null);
   }
 
   setFormat(format: OutputFormat): void {
@@ -334,33 +488,61 @@ export class CsvConverterComponent implements OnInit, OnDestroy {
     }
   }
 
+  onSqlBatchSizeChange(val: string): void {
+    this.sqlBatchSize.set(+val || 0);
+  }
+
+  setGridPage(page: number): void {
+    if (page >= 1 && page <= this.totalPages()) {
+      this.gridPage.set(page);
+    }
+  }
+
+  setGridPageSize(size: number): void {
+    this.gridPageSize.set(size);
+    this.gridPage.set(1);
+  }
+
   onTextInputChange(text: string): void {
     this.rawTextInput.set(text);
+    this.gridPage.set(1);
     this.parseCurrentText();
   }
 
   private parseCurrentText(): void {
-    const text = this.rawTextInput();
-    const table = parseCsv(text);
-    this.parsedTable.set(table);
+    try {
+      this.errorMessage.set(null);
+      const text = this.rawTextInput();
+      const table = parseCsv(text);
+      this.parsedTable.set(table);
+    } catch (err: any) {
+      this.errorMessage.set('Failed to parse CSV text: ' + (err?.message || 'Invalid format'));
+    }
   }
 
   async onFilesDropped(files: File[]): Promise<void> {
     if (!files || files.length === 0) return;
-    const file = files[0];
-    const name = file.name.toLowerCase();
+    this.errorMessage.set(null);
+    this.gridPage.set(1);
 
-    if (name.endsWith('.xlsx') || name.endsWith('.xls')) {
-      const buffer = await file.arrayBuffer();
-      this.currentWorkbookBuffer = buffer;
-      const table = parseExcel(buffer);
-      this.parsedTable.set(table);
-    } else {
-      // Text CSV/TSV
-      const text = await file.text();
-      this.rawTextInput.set(text);
-      this.currentWorkbookBuffer = null;
-      this.parseCurrentText();
+    try {
+      const file = files[0];
+      const name = file.name.toLowerCase();
+
+      if (name.endsWith('.xlsx') || name.endsWith('.xls')) {
+        const buffer = await file.arrayBuffer();
+        this.currentWorkbookBuffer = buffer;
+        const table = parseExcel(buffer);
+        this.parsedTable.set(table);
+      } else {
+        // Text CSV/TSV
+        const text = await file.text();
+        this.rawTextInput.set(text);
+        this.currentWorkbookBuffer = null;
+        this.parseCurrentText();
+      }
+    } catch (err: any) {
+      this.errorMessage.set('Failed to parse file: ' + (err?.message || 'Unsupported format'));
     }
   }
 
@@ -368,8 +550,14 @@ export class CsvConverterComponent implements OnInit, OnDestroy {
     if (this.currentWorkbookBuffer && this.parsedTable()?.sheetNames) {
       const idx = this.parsedTable()!.sheetNames!.indexOf(sheetName);
       if (idx !== -1) {
-        const table = parseExcel(this.currentWorkbookBuffer, idx);
-        this.parsedTable.set(table);
+        try {
+          this.errorMessage.set(null);
+          this.gridPage.set(1);
+          const table = parseExcel(this.currentWorkbookBuffer, idx);
+          this.parsedTable.set(table);
+        } catch (err: any) {
+          this.errorMessage.set('Failed to load sheet: ' + (err?.message || 'Error reading sheet'));
+        }
       }
     }
   }
