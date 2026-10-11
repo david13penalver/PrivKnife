@@ -213,6 +213,18 @@ const CATALOG_TOOLS: CatalogTool[] = [
     icon: '📅',
   },
   {
+    id: 'email-signature-generator',
+    name: 'HTML Email Signature Generator',
+    category: 'dev',
+    categoryLabel: 'Dev / Productivity',
+    description: 'Design responsive, multi-client compatible HTML email signatures for Gmail, Outlook, and Apple Mail with instant rich-text copy.',
+    keywords: ['email signature', 'html email', 'gmail', 'outlook', 'signature', 'templates'],
+    status: 'ready',
+    route: '/tools/email-signature-generator',
+    techStack: 'DOM Table Renderer • Clipboard API',
+    icon: '✉️',
+  },
+  {
     id: '3d-qr-stand',
     name: '3D QR Stand & Keychain Generator',
     category: '3d',

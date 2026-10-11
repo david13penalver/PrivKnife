@@ -2,6 +2,7 @@ import { ToolCategory, ToolDefinition } from '../core/models/tool.model';
 import { calendarLinkerTool } from './dev/calendar-linker';
 import { colorPaletteExtractorTool } from './dev/color-palette-extractor';
 import { csvConverterTool } from './dev/csv-converter';
+import { emailSignatureGeneratorTool } from './dev/email-signature-generator';
 import { cssMeshGradientMakerTool } from './dev/mesh-gradient-maker';
 import { averyBarcodeSheetTool } from './documents/barcode-labels';
 import { gridPaperTool } from './documents/grid-paper';
@@ -23,6 +24,7 @@ export const TOOL_REGISTRY: ToolDefinition[] = [
   colorPaletteExtractorTool,
   cssMeshGradientMakerTool,
   calendarLinkerTool,
+  emailSignatureGeneratorTool,
   pdfMergerTool,
   pdfRedactionTool,
   invoiceMakerTool,

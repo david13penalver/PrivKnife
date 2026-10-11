@@ -156,6 +156,7 @@ describe('ToolRegistry (Seam 3: Catalog & Architecture Verification)', () => {
     expect(devTools.some((t) => t.id === 'color-palette-extractor')).toBe(true);
     expect(devTools.some((t) => t.id === 'css-mesh-gradient-maker')).toBe(true);
     expect(devTools.some((t) => t.id === 'calendar-linker')).toBe(true);
+    expect(devTools.some((t) => t.id === 'email-signature-generator')).toBe(true);
 
     const docTools = getToolsByCategory('documents');
     expect(docTools.length).toBeGreaterThan(0);
@@ -171,5 +172,13 @@ describe('ToolRegistry (Seam 3: Catalog & Architecture Verification)', () => {
     expect(mediaTools.some((t) => t.id === 'favicon-app-icon-suite')).toBe(true);
     expect(mediaTools.some((t) => t.id === 'og-card-maker')).toBe(true);
     expect(mediaTools.some((t) => t.id === 'subtitles-shifter')).toBe(true);
+  });
+
+  it('should find email-signature-generator tool by id', () => {
+    const tool = getToolById('email-signature-generator');
+    expect(tool).toBeDefined();
+    expect(tool?.name).toBe('HTML Email Signature Generator');
+    expect(tool?.category).toBe('dev');
+    expect(tool?.isFullyClientSide).toBe(true);
   });
 });

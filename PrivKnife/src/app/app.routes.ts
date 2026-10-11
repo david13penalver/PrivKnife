@@ -431,8 +431,35 @@ export const routes: Routes = [
     pathMatch: 'full',
   },
   {
-    path: 'tools/ics-calendar-linker',
-    redirectTo: 'tools/calendar-linker',
+    path: 'tools/email-signature-generator',
+    title: 'Free HTML Email Signature Generator — PrivKnife',
+    data: {
+      description:
+        'Create professional, responsive HTML email signatures for Gmail, Outlook, and Apple Mail with zero server uploads, zero tracking, and instant rich-text copying.',
+      keywords: [
+        'free html email signature maker',
+        'gmail signature generator',
+        'outlook html signature builder',
+        'no sign up email signature tool',
+        'raw html email signature generator',
+        'responsive email signature templates',
+        'client side signature maker',
+      ],
+      url: '/tools/email-signature-generator',
+    },
+    loadComponent: () =>
+      import('./tools/dev/email-signature-generator').then(
+        (m) => m.EmailSignatureGeneratorComponent
+      ),
+  },
+  {
+    path: 'tools/html-email-signature',
+    redirectTo: 'tools/email-signature-generator',
+    pathMatch: 'full',
+  },
+  {
+    path: 'tools/email-signature',
+    redirectTo: 'tools/email-signature-generator',
     pathMatch: 'full',
   },
   {
