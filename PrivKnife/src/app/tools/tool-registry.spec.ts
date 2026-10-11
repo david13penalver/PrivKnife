@@ -135,6 +135,14 @@ describe('ToolRegistry (Seam 3: Catalog & Architecture Verification)', () => {
     expect(tool?.isFullyClientSide).toBe(true);
   });
 
+  it('should find calendar-linker tool by id', () => {
+    const tool = getToolById('calendar-linker');
+    expect(tool).toBeDefined();
+    expect(tool?.name).toBe('Universal Event & .ics Calendar Linker');
+    expect(tool?.category).toBe('dev');
+    expect(tool?.isFullyClientSide).toBe(true);
+  });
+
   it('should find tools by category', () => {
     const privacyTools = getToolsByCategory('privacy');
     expect(privacyTools.length).toBeGreaterThan(0);
@@ -147,6 +155,7 @@ describe('ToolRegistry (Seam 3: Catalog & Architecture Verification)', () => {
     expect(devTools.some((t) => t.id === 'csv-to-sql-json')).toBe(true);
     expect(devTools.some((t) => t.id === 'color-palette-extractor')).toBe(true);
     expect(devTools.some((t) => t.id === 'css-mesh-gradient-maker')).toBe(true);
+    expect(devTools.some((t) => t.id === 'calendar-linker')).toBe(true);
 
     const docTools = getToolsByCategory('documents');
     expect(docTools.length).toBeGreaterThan(0);

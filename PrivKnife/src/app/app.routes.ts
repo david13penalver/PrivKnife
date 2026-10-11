@@ -404,6 +404,38 @@ export const routes: Routes = [
     pathMatch: 'full',
   },
   {
+    path: 'tools/calendar-linker',
+    title: 'Universal Event & .ics Calendar Linker — PrivKnife',
+    data: {
+      description:
+        'Generate universal "Add to Calendar" links for Google, Outlook, Office 365, and Yahoo, plus standard RFC 5545 .ics files and email embed snippets offline.',
+      keywords: [
+        'add to calendar link generator',
+        'free ics file generator online',
+        'create add to calendar button for email',
+        'google calendar url builder',
+        'outlook invite link maker',
+        'rfc 5545 ics maker offline',
+        'client side event calendar linker',
+      ],
+      url: '/tools/calendar-linker',
+    },
+    loadComponent: () =>
+      import('./tools/dev/calendar-linker').then(
+        (m) => m.CalendarLinkerComponent
+      ),
+  },
+  {
+    path: 'tools/event-calendar-linker',
+    redirectTo: 'tools/calendar-linker',
+    pathMatch: 'full',
+  },
+  {
+    path: 'tools/ics-calendar-linker',
+    redirectTo: 'tools/calendar-linker',
+    pathMatch: 'full',
+  },
+  {
     path: '**',
     title: 'Page Not Found — PrivKnife',
     data: {

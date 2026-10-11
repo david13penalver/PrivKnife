@@ -201,6 +201,18 @@ const CATALOG_TOOLS: CatalogTool[] = [
     icon: '💬',
   },
   {
+    id: 'calendar-linker',
+    name: 'Universal Event & .ics Calendar Linker',
+    category: 'dev',
+    categoryLabel: 'Dev / Productivity',
+    description: 'Generate universal "Add to Calendar" links for Google, Outlook, and Yahoo, plus standard RFC 5545 .ics files.',
+    keywords: ['calendar', 'ics', 'google calendar', 'outlook', 'event', 'invite'],
+    status: 'ready',
+    route: '/tools/calendar-linker',
+    techStack: 'RFC 5545 • Deep-Link Encoders',
+    icon: '📅',
+  },
+  {
     id: '3d-qr-stand',
     name: '3D QR Stand & Keychain Generator',
     category: '3d',

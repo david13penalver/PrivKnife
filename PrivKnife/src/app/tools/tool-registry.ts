@@ -1,4 +1,5 @@
 import { ToolCategory, ToolDefinition } from '../core/models/tool.model';
+import { calendarLinkerTool } from './dev/calendar-linker';
 import { colorPaletteExtractorTool } from './dev/color-palette-extractor';
 import { csvConverterTool } from './dev/csv-converter';
 import { cssMeshGradientMakerTool } from './dev/mesh-gradient-maker';
@@ -21,6 +22,7 @@ export const TOOL_REGISTRY: ToolDefinition[] = [
   csvConverterTool,
   colorPaletteExtractorTool,
   cssMeshGradientMakerTool,
+  calendarLinkerTool,
   pdfMergerTool,
   pdfRedactionTool,
   invoiceMakerTool,
