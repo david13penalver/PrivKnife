@@ -371,6 +371,39 @@ export const routes: Routes = [
     pathMatch: 'full',
   },
   {
+    path: 'tools/subtitles-shifter',
+    title: 'Subtitles Timestamp Shifter & SRT/VTT Converter — PrivKnife',
+    data: {
+      description:
+        'Shift subtitle delays in milliseconds or seconds, apply FPS conversion scaling, and convert between SRT and WebVTT formats offline. 100% in-browser.',
+      keywords: [
+        'shift srt subtitles online',
+        'sync srt files',
+        'convert srt to vtt free',
+        'fix subtitle delay online',
+        'vtt time offset tool',
+        'adjust subtitle fps 24 to 25',
+        'client side subtitle shifter',
+        'offline srt vtt converter',
+      ],
+      url: '/tools/subtitles-shifter',
+    },
+    loadComponent: () =>
+      import('./tools/media/subtitles-shifter').then(
+        (m) => m.SubtitlesShifterComponent
+      ),
+  },
+  {
+    path: 'tools/subtitle-shifter',
+    redirectTo: 'tools/subtitles-shifter',
+    pathMatch: 'full',
+  },
+  {
+    path: 'tools/srt-vtt-converter',
+    redirectTo: 'tools/subtitles-shifter',
+    pathMatch: 'full',
+  },
+  {
     path: '**',
     title: 'Page Not Found — PrivKnife',
     data: {

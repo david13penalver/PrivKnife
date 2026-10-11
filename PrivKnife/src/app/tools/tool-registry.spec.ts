@@ -127,6 +127,14 @@ describe('ToolRegistry (Seam 3: Catalog & Architecture Verification)', () => {
     expect(tool?.isFullyClientSide).toBe(true);
   });
 
+  it('should find subtitles-shifter tool by id', () => {
+    const tool = getToolById('subtitles-shifter');
+    expect(tool).toBeDefined();
+    expect(tool?.name).toBe('Subtitles Timestamp Shifter & SRT/VTT Converter');
+    expect(tool?.category).toBe('media');
+    expect(tool?.isFullyClientSide).toBe(true);
+  });
+
   it('should find tools by category', () => {
     const privacyTools = getToolsByCategory('privacy');
     expect(privacyTools.length).toBeGreaterThan(0);
@@ -153,5 +161,6 @@ describe('ToolRegistry (Seam 3: Catalog & Architecture Verification)', () => {
     expect(mediaTools.some((t) => t.id === 'batch-image-compressor')).toBe(true);
     expect(mediaTools.some((t) => t.id === 'favicon-app-icon-suite')).toBe(true);
     expect(mediaTools.some((t) => t.id === 'og-card-maker')).toBe(true);
+    expect(mediaTools.some((t) => t.id === 'subtitles-shifter')).toBe(true);
   });
 });

@@ -72,7 +72,7 @@ gantt
 | **12** | [12 - Social Share (Open Graph) Card Maker](12%20-%20Social%20Share%20(Open%20Graph)%20Card%20Maker/spec.md) | Media | 1200×630 `.png` / `.webp` | Canvas API, SVG rendering | [x] |
 | **13** | [13 - Color Palette Extractor & Contrast Checker](13%20-%20Color%20Palette%20Extractor%20&%20Contrast%20Checker/spec.md) | Design | Palette `.json` + WCAG report | `ColorThief`, Canvas pixel sampling | [x] |
 | **14** | [14 - CSS Mesh Gradient & Glassmorphism Code Maker](14%20-%20CSS%20Mesh%20Gradient%20&%20Glassmorphism%20Code%20Maker/spec.md) | Dev / Design | Copy-ready CSS / Tailwind | Canvas shader, CSS backdrop-filter | [x] |
-| **15** | [15 - Subtitles Timestamp Shifter & SRT-VTT Converter](15%20-%20Subtitles%20Timestamp%20Shifter%20&%20SRT-VTT%20Converter/spec.md) | Media | Re-synced `.srt` / `.vtt` | Regex time parsing, File API | [ ] |
+| **15** | [15 - Subtitles Timestamp Shifter & SRT-VTT Converter](15%20-%20Subtitles%20Timestamp%20Shifter%20&%20SRT-VTT%20Converter/spec.md) | Media | Re-synced `.srt` / `.vtt` | Regex time parsing, File API | [x] |
 | **16** | [16 - Universal Event & .ics Calendar Linker](16%20-%20Universal%20Event%20&%20.ics%20Calendar%20Linker/spec.md) | Dev | `.ics` file + calendar URLs | RFC 5545 format, Blob API | [ ] |
 | **17** | [17 - HTML Email Signature Generator](17%20-%20HTML%20Email%20Signature%20Generator/spec.md) | Dev | Raw HTML + Rich-text copy | DOM Table renderer, Clipboard API | [ ] |
 | **18** | [18 - Robots.txt & XML Sitemap Builder](18%20-%20Robots.txt%20&%20XML%20Sitemap%20Builder/spec.md) | Dev | `robots.txt` / `sitemap.xml` | `DOMParser`, `XMLSerializer` | [ ] |
