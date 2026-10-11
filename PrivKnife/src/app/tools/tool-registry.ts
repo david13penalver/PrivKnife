@@ -7,6 +7,7 @@ import { pdfMergerTool } from './documents/pdf-merger';
 import { tableTentMakerTool } from './documents/table-tent-maker';
 import { batchImageCompressorTool } from './media/batch-compressor';
 import { faviconAppIconSuiteTool } from './media/favicon-generator';
+import { ogCardMakerTool } from './media/og-card-maker';
 import { cryptoHashUuidTool } from './privacy/crypto-hash-uuid';
 import { exifStripperTool } from './privacy/exif-stripper';
 import { pdfRedactionTool } from './privacy/pdf-redaction';
@@ -23,6 +24,7 @@ export const TOOL_REGISTRY: ToolDefinition[] = [
   tableTentMakerTool,
   batchImageCompressorTool,
   faviconAppIconSuiteTool,
+  ogCardMakerTool,
 ];
 
 export function getToolById(id: string): ToolDefinition | undefined {

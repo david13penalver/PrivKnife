@@ -292,6 +292,31 @@ export const routes: Routes = [
     pathMatch: 'full',
   },
   {
+    path: 'tools/og-card-maker',
+    title: 'Social Share (Open Graph) Card Maker — PrivKnife',
+    data: {
+      description:
+        'Generate high-CTR 1200×630 Open Graph preview cards for Twitter, Facebook, and LinkedIn in seconds. 100% in-browser with zero telemetry.',
+      keywords: [
+        'og image generator online',
+        'open graph card maker',
+        'twitter card generator 1200x630',
+        'github social preview generator',
+        'linkedin card builder',
+        'social share preview card',
+        'free og card maker offline',
+      ],
+      url: '/tools/og-card-maker',
+    },
+    loadComponent: () =>
+      import('./tools/media/og-card-maker').then((m) => m.OgCardMakerComponent),
+  },
+  {
+    path: 'tools/social-share-card',
+    redirectTo: 'tools/og-card-maker',
+    pathMatch: 'full',
+  },
+  {
     path: '**',
     title: 'Page Not Found — PrivKnife',
     data: {
