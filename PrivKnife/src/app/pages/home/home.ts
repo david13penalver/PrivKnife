@@ -285,6 +285,18 @@ const CATALOG_TOOLS: CatalogTool[] = [
     icon: '🎬',
   },
   {
+    id: 'screenshot-mockup',
+    name: 'App Screenshot Mockup Studio',
+    category: 'media',
+    categoryLabel: 'Media',
+    description: 'Transform mobile and web app screenshots into realistic 3D angled device frames with customizable shadows, glass reflections, and gradient backgrounds.',
+    keywords: ['device mockup', 'screenshot studio', 'iphone mockup', '3d mockup', 'app store screenshots', 'macbook frame'],
+    status: 'ready',
+    route: '/tools/screenshot-mockup',
+    techStack: 'HTML5 2.5D Canvas • Perspective Math • File API',
+    icon: '📱',
+  },
+  {
     id: '3d-qr-stand',
     name: '3D QR Stand & Keychain Generator',
     category: '3d',

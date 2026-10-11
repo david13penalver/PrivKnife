@@ -232,4 +232,15 @@ describe('ToolRegistry (Seam 3: Catalog & Architecture Verification)', () => {
     const audioTools = getToolsByCategory('audio-video');
     expect(audioTools.some((t) => t.id === 'video-to-gif')).toBe(true);
   });
+
+  it('should find screenshot-mockup tool by id and category', () => {
+    const tool = getToolById('screenshot-mockup');
+    expect(tool).toBeDefined();
+    expect(tool?.name).toBe('App Screenshot Mockup Studio');
+    expect(tool?.category).toBe('media');
+    expect(tool?.isFullyClientSide).toBe(true);
+
+    const mediaTools = getToolsByCategory('media');
+    expect(mediaTools.some((t) => t.id === 'screenshot-mockup')).toBe(true);
+  });
 });

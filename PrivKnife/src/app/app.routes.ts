@@ -609,8 +609,36 @@ export const routes: Routes = [
     pathMatch: 'full',
   },
   {
-    path: 'tools/gif-converter',
-    redirectTo: 'tools/video-to-gif',
+    path: 'tools/screenshot-mockup',
+    title: 'App Screenshot Mockup Studio — PrivKnife',
+    data: {
+      description:
+        'Transform mobile and web app screenshots into realistic 3D angled device frames with customizable drop shadows, glass reflections, metallic finishes, and high-DPI transparent or gradient exports. 100% in-browser.',
+      keywords: [
+        'device mockup generator free',
+        '3d app screenshot mockup',
+        'iphone mockup generator no upload',
+        'free store screenshot maker',
+        'macbook mockup generator',
+        'browser mockup frame generator',
+        'app store screenshot generator',
+        'client side screenshot mockup',
+      ],
+      url: '/tools/screenshot-mockup',
+    },
+    loadComponent: () =>
+      import('./tools/media/screenshot-mockup').then(
+        (m) => m.ScreenshotMockupComponent
+      ),
+  },
+  {
+    path: 'tools/app-screenshot-studio',
+    redirectTo: 'tools/screenshot-mockup',
+    pathMatch: 'full',
+  },
+  {
+    path: 'tools/device-mockup',
+    redirectTo: 'tools/screenshot-mockup',
     pathMatch: 'full',
   },
   {

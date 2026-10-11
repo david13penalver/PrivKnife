@@ -17,6 +17,7 @@ import { tableTentMakerTool } from './documents/table-tent-maker';
 import { batchImageCompressorTool } from './media/batch-compressor';
 import { faviconAppIconSuiteTool } from './media/favicon-generator';
 import { ogCardMakerTool } from './media/og-card-maker';
+import { screenshotMockupTool } from './media/screenshot-mockup';
 import { subtitlesShifterTool } from './media/subtitles-shifter';
 import { cryptoHashUuidTool } from './privacy/crypto-hash-uuid';
 import { exifStripperTool } from './privacy/exif-stripper';
@@ -41,6 +42,7 @@ export const TOOL_REGISTRY: ToolDefinition[] = [
   batchImageCompressorTool,
   faviconAppIconSuiteTool,
   ogCardMakerTool,
+  screenshotMockupTool,
   subtitlesShifterTool,
   bpmTapDetectorTool,
   soundwaveArtMakerTool,
