@@ -210,4 +210,15 @@ describe('ToolRegistry (Seam 3: Catalog & Architecture Verification)', () => {
     const audioTools = getToolsByCategory('audio-video');
     expect(audioTools.some((t) => t.id === 'audio-bpm-detector')).toBe(true);
   });
+
+  it('should find soundwave-art-maker tool by id and category', () => {
+    const tool = getToolById('soundwave-art-maker');
+    expect(tool).toBeDefined();
+    expect(tool?.name).toBe('Spotify Code & Soundwave Art Maker');
+    expect(tool?.category).toBe('audio-video');
+    expect(tool?.isFullyClientSide).toBe(true);
+
+    const audioTools = getToolsByCategory('audio-video');
+    expect(audioTools.some((t) => t.id === 'soundwave-art-maker')).toBe(true);
+  });
 });

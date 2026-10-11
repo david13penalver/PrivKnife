@@ -261,6 +261,18 @@ const CATALOG_TOOLS: CatalogTool[] = [
     icon: '🎵',
   },
   {
+    id: 'soundwave-art-maker',
+    name: 'Spotify Code & Soundwave Art Maker',
+    category: 'audio-video',
+    categoryLabel: 'Audio / Video',
+    description: 'Transform memorable songs, voice notes, or Spotify links into custom soundwave art with laser-cut SVG, framed PDF, and dual-color 3D STL exports.',
+    keywords: ['soundwave art', 'spotify code', '3d print soundwave', 'voice note art', 'stl maker', 'laser cut svg', 'audio visualizer'],
+    status: 'ready',
+    route: '/tools/soundwave-art-maker',
+    techStack: 'Web Audio API • Vector SVG • Solid 3D STL',
+    icon: '〰️',
+  },
+  {
     id: '3d-qr-stand',
     name: '3D QR Stand & Keychain Generator',
     category: '3d',

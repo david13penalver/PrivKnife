@@ -555,6 +555,38 @@ export const routes: Routes = [
     pathMatch: 'full',
   },
   {
+    path: 'tools/soundwave-art-maker',
+    title: 'Spotify Code & Soundwave Art Maker — PrivKnife',
+    data: {
+      description:
+        'Transform audio tracks, voice notes, or Spotify links into custom soundwave art. Export laser-cut vectors (.svg), printable framed posters (.pdf), and dual-color 3D printable models (.stl).',
+      keywords: [
+        'soundwave art generator stl',
+        'spotify code 3d print',
+        'custom soundwave stl maker',
+        'voice note 3d print generator',
+        'printable soundwave art pdf',
+        'wedding vows soundwave maker',
+        'client side soundwave svg',
+      ],
+      url: '/tools/soundwave-art-maker',
+    },
+    loadComponent: () =>
+      import('./tools/audio-video/soundwave-art-maker').then(
+        (m) => m.SoundwaveArtMakerComponent
+      ),
+  },
+  {
+    path: 'tools/soundwave-art',
+    redirectTo: 'tools/soundwave-art-maker',
+    pathMatch: 'full',
+  },
+  {
+    path: 'tools/spotify-code-maker',
+    redirectTo: 'tools/soundwave-art-maker',
+    pathMatch: 'full',
+  },
+  {
     path: '**',
     title: 'Page Not Found — PrivKnife',
     data: {
