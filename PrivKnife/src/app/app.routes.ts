@@ -582,8 +582,35 @@ export const routes: Routes = [
     pathMatch: 'full',
   },
   {
-    path: 'tools/spotify-code-maker',
-    redirectTo: 'tools/soundwave-art-maker',
+    path: 'tools/video-to-gif',
+    title: 'Video to GIF & Clip Trimmer — PrivKnife',
+    data: {
+      description:
+        'Trim video clips and convert them into lightweight animated GIFs or trimmed video clips directly in your browser with zero uploads, zero queues, and zero file size caps.',
+      keywords: [
+        'convert video to gif without upload',
+        'free video to gif offline',
+        'trim video in browser free',
+        'video to gif maker no watermark',
+        'video clip trimmer online',
+        'client side video to gif converter',
+        'video trimmer no upload',
+      ],
+      url: '/tools/video-to-gif',
+    },
+    loadComponent: () =>
+      import('./tools/audio-video/video-gif-trimmer').then(
+        (m) => m.VideoGifTrimmerComponent
+      ),
+  },
+  {
+    path: 'tools/video-trimmer',
+    redirectTo: 'tools/video-to-gif',
+    pathMatch: 'full',
+  },
+  {
+    path: 'tools/gif-converter',
+    redirectTo: 'tools/video-to-gif',
     pathMatch: 'full',
   },
   {

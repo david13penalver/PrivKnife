@@ -1,6 +1,7 @@
 import { ToolCategory, ToolDefinition } from '../core/models/tool.model';
 import { bpmTapDetectorTool } from './audio-video/bpm-tap-detector';
 import { soundwaveArtMakerTool } from './audio-video/soundwave-art-maker';
+import { videoGifTrimmerTool } from './audio-video/video-gif-trimmer';
 import { calendarLinkerTool } from './dev/calendar-linker';
 import { colorPaletteExtractorTool } from './dev/color-palette-extractor';
 import { csvConverterTool } from './dev/csv-converter';
@@ -43,6 +44,7 @@ export const TOOL_REGISTRY: ToolDefinition[] = [
   subtitlesShifterTool,
   bpmTapDetectorTool,
   soundwaveArtMakerTool,
+  videoGifTrimmerTool,
 ];
 
 export function getToolById(id: string): ToolDefinition | undefined {

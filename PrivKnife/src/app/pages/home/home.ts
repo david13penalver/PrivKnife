@@ -273,6 +273,18 @@ const CATALOG_TOOLS: CatalogTool[] = [
     icon: '〰️',
   },
   {
+    id: 'video-to-gif',
+    name: 'Video to GIF & Clip Trimmer',
+    category: 'audio-video',
+    categoryLabel: 'Audio / Video',
+    description: 'Trim video clips and convert them into lightweight animated GIFs or trimmed video clips with millisecond timeline scrubbing.',
+    keywords: ['video to gif', 'trim video', 'gif converter', 'video trimmer', 'clip maker', 'animated gif'],
+    status: 'ready',
+    route: '/tools/video-to-gif',
+    techStack: 'GIF89a LZW • HTML5 Canvas • MediaRecorder',
+    icon: '🎬',
+  },
+  {
     id: '3d-qr-stand',
     name: '3D QR Stand & Keychain Generator',
     category: '3d',

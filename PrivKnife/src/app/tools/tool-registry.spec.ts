@@ -221,4 +221,15 @@ describe('ToolRegistry (Seam 3: Catalog & Architecture Verification)', () => {
     const audioTools = getToolsByCategory('audio-video');
     expect(audioTools.some((t) => t.id === 'soundwave-art-maker')).toBe(true);
   });
+
+  it('should find video-to-gif tool by id and category', () => {
+    const tool = getToolById('video-to-gif');
+    expect(tool).toBeDefined();
+    expect(tool?.name).toBe('Video to GIF & Clip Trimmer');
+    expect(tool?.category).toBe('audio-video');
+    expect(tool?.isFullyClientSide).toBe(true);
+
+    const audioTools = getToolsByCategory('audio-video');
+    expect(audioTools.some((t) => t.id === 'video-to-gif')).toBe(true);
+  });
 });
