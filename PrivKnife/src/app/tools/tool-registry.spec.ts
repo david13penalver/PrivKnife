@@ -71,6 +71,14 @@ describe('ToolRegistry (Seam 3: Catalog & Architecture Verification)', () => {
     expect(tool?.isFullyClientSide).toBe(true);
   });
 
+  it('should find avery-barcode-sheet tool by id', () => {
+    const tool = getToolById('avery-barcode-sheet');
+    expect(tool).toBeDefined();
+    expect(tool?.name).toBe('Avery Barcode & Label Sheet Generator');
+    expect(tool?.category).toBe('documents');
+    expect(tool?.isFullyClientSide).toBe(true);
+  });
+
   it('should find tools by category', () => {
     const privacyTools = getToolsByCategory('privacy');
     expect(privacyTools.length).toBeGreaterThan(0);
@@ -87,5 +95,6 @@ describe('ToolRegistry (Seam 3: Catalog & Architecture Verification)', () => {
     expect(docTools.some((t) => t.id === 'pdf-merger-splitter')).toBe(true);
     expect(docTools.some((t) => t.id === 'invoice-receipt-maker')).toBe(true);
     expect(docTools.some((t) => t.id === 'graph-dot-grid-paper')).toBe(true);
+    expect(docTools.some((t) => t.id === 'avery-barcode-sheet')).toBe(true);
   });
 });

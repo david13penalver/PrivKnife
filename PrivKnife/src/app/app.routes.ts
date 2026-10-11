@@ -191,6 +191,32 @@ export const routes: Routes = [
     pathMatch: 'full',
   },
   {
+    path: 'tools/barcode-labels',
+    title: 'Avery® Barcode & Label Sheet Generator — PrivKnife',
+    data: {
+      description:
+        'Generate precision grid-aligned barcode sticker sheets for standard Avery® labels (5160, 5163, 5167, L7160). 100% in-browser with zero server uploads.',
+      keywords: [
+        'avery 5160 barcode generator',
+        'barcode label sheet generator',
+        'print barcodes on avery labels',
+        'free avery label template with barcodes',
+        'generate avery 5163 barcode stickers',
+        'sequential barcode sticker sheet',
+        'client side barcode generator',
+        'upc label sheet generator',
+      ],
+      url: '/tools/barcode-labels',
+    },
+    loadComponent: () =>
+      import('./tools/documents/barcode-labels').then((m) => m.BarcodeLabelsComponent),
+  },
+  {
+    path: 'tools/avery-barcode-sheet',
+    redirectTo: 'tools/barcode-labels',
+    pathMatch: 'full',
+  },
+  {
     path: '**',
     title: 'Page Not Found — PrivKnife',
     data: {
