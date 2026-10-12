@@ -249,6 +249,18 @@ const CATALOG_TOOLS: CatalogTool[] = [
     icon: '🤖',
   },
   {
+    id: 'dns-checker',
+    name: 'Global DNS Propagation & WHOIS Checker',
+    category: 'dev',
+    categoryLabel: 'Dev / Networking',
+    description: 'Verify DNS record propagation across multiple global Anycast resolvers in real time using direct browser DoH and inspect RDAP WHOIS records.',
+    keywords: ['dns propagation', 'whois', 'doh', 'dns over https', 'dns records', 'a record', 'mx record'],
+    status: 'ready',
+    route: '/tools/dns-checker',
+    techStack: 'Browser DoH • RFC 8484 • RDAP Protocol',
+    icon: '🌐',
+  },
+  {
     id: 'markdown-cheatsheet',
     name: 'Markdown to Academic / Tech PDF Cheatsheet',
     category: 'documents',

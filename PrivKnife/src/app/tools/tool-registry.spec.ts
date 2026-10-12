@@ -287,4 +287,15 @@ describe('ToolRegistry (Seam 3: Catalog & Architecture Verification)', () => {
     const mediaTools = getToolsByCategory('media');
     expect(mediaTools.some((t) => t.id === 'background-remover')).toBe(true);
   });
+
+  it('should find dns-checker tool by id and category', () => {
+    const tool = getToolById('dns-checker');
+    expect(tool).toBeDefined();
+    expect(tool?.name).toBe('Global DNS Propagation & WHOIS Checker');
+    expect(tool?.category).toBe('dev');
+    expect(tool?.isFullyClientSide).toBe(true);
+
+    const devTools = getToolsByCategory('dev');
+    expect(devTools.some((t) => t.id === 'dns-checker')).toBe(true);
+  });
 });

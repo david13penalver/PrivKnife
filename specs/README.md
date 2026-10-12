@@ -85,7 +85,7 @@ gantt
 | **25** | [25 - Custom Cookie Cutter & Stamp 3D Maker](25%20-%20Custom%20Cookie%20Cutter%20&%20Stamp%203D%20Maker/spec.md) | 3D | Cutter / stamp `.stl` / `.3mf` | `ClipperLib` (2D offset), `Three.js` | [x] |
 | **26** | [26 - Parametric Desk Wedge & Nameplate Maker](26%20-%20Parametric%20Desk%20Wedge%20&%20Nameplate%20Maker/spec.md) | 3D | Multi-color `.3mf` | `Three.js` CSG, `FontLoader` | [x] |
 | **27** | [27 - Automated Background Removal (High Quality)](27%20-%20Automated%20Background%20Removal%20(High%20Quality)/spec.md) | Media | Transparent cutout `.png` | ONNX Runtime Web (`WebGPU` / WASM) | [x] |
-| **28** | [28 - Global DNS Propagation & WHOIS Checker](28%20-%20Global%20DNS%20Propagation%20&%20WHOIS%20Checker/spec.md) | Dev | DNS records table | Browser DNS-over-HTTPS (DoH) | [ ] |
+| **28** | [28 - Global DNS Propagation & WHOIS Checker](28%20-%20Global%20DNS%20Propagation%20&%20WHOIS%20Checker/spec.md) | Dev | DNS records table | Browser DNS-over-HTTPS (DoH) | [x] |
 | **29** | [29 - Website Performance - Core Web Vitals Checker](29%20-%20Website%20Performance%20-%20Core%20Web%20Vitals%20Checker/spec.md) | Dev | Audit score & diagnostic tips | Direct PageSpeed API / Navigation Timing | [ ] |
 
 ---

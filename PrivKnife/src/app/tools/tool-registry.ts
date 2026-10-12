@@ -8,6 +8,7 @@ import { videoGifTrimmerTool } from './audio-video/video-gif-trimmer';
 import { calendarLinkerTool } from './dev/calendar-linker';
 import { colorPaletteExtractorTool } from './dev/color-palette-extractor';
 import { csvConverterTool } from './dev/csv-converter';
+import { dnsCheckerTool } from './dev/dns-checker';
 import { emailSignatureGeneratorTool } from './dev/email-signature-generator';
 import { cssMeshGradientMakerTool } from './dev/mesh-gradient-maker';
 import { robotsSitemapBuilderTool } from './dev/robots-sitemap-builder';
@@ -55,6 +56,7 @@ export const TOOL_REGISTRY: ToolDefinition[] = [
   cookieCutterTool,
   deskWedgeNameplateTool,
   backgroundRemoverTool,
+  dnsCheckerTool,
 ];
 
 export function getToolById(id: string): ToolDefinition | undefined {

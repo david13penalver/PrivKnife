@@ -523,6 +523,36 @@ export const routes: Routes = [
     pathMatch: 'full',
   },
   {
+    path: 'tools/dns-checker',
+    title: 'Global DNS Propagation & WHOIS Checker — PrivKnife',
+    data: {
+      description:
+        'Verify DNS record propagation across multiple global Anycast resolvers in real time using direct browser DNS-over-HTTPS (DoH) and inspect RDAP domain registration records.',
+      keywords: [
+        'dns propagation checker',
+        'check A record propagation',
+        'online whois lookup tool',
+        'test mx record global',
+        'dns over https checker',
+        'browser doh lookup',
+        'global dns lookup tool',
+      ],
+      url: '/tools/dns-checker',
+    },
+    loadComponent: () =>
+      import('./tools/dev/dns-checker').then((m) => m.DnsCheckerComponent),
+  },
+  {
+    path: 'tools/dns-propagation',
+    redirectTo: 'tools/dns-checker',
+    pathMatch: 'full',
+  },
+  {
+    path: 'tools/whois-checker',
+    redirectTo: 'tools/dns-checker',
+    pathMatch: 'full',
+  },
+  {
     path: 'tools/markdown-cheatsheet',
     title: 'Markdown to Academic / Tech PDF Cheatsheet — PrivKnife',
     data: {
