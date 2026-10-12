@@ -696,6 +696,33 @@ export const routes: Routes = [
     pathMatch: 'full',
   },
   {
+    path: 'tools/desk-wedge-nameplate',
+    title: 'Parametric Desk Wedge & Nameplate Maker — PrivKnife',
+    data: {
+      description:
+        'Design bespoke executive, technical, and medical desk signs with crisp parametric bevels and dual-color typography. Dual-material .3mf and .stl exports.',
+      keywords: [
+        'custom desk nameplate 3d print stl',
+        'desk wedge 3d model generator',
+        'dual color desk nameplate 3mf',
+        '3d print office name plate free',
+        'parametric desk sign generator',
+        'bambu lab multi color desk wedge',
+        'prusa mmu desk nameplate stl',
+      ],
+      url: '/tools/desk-wedge-nameplate',
+    },
+    loadComponent: () =>
+      import('./tools/3d/desk-wedge-nameplate').then(
+        (m) => m.DeskWedgeNameplateComponent
+      ),
+  },
+  {
+    path: 'tools/desk-nameplate',
+    redirectTo: 'tools/desk-wedge-nameplate',
+    pathMatch: 'full',
+  },
+  {
     path: '**',
     title: 'Page Not Found — PrivKnife',
     data: {

@@ -265,4 +265,15 @@ describe('ToolRegistry (Seam 3: Catalog & Architecture Verification)', () => {
     const threeDTools = getToolsByCategory('3d');
     expect(threeDTools.some((t) => t.id === 'cookie-cutter-3d')).toBe(true);
   });
+
+  it('should find desk-wedge-nameplate tool by id and category', () => {
+    const tool = getToolById('desk-wedge-nameplate');
+    expect(tool).toBeDefined();
+    expect(tool?.name).toBe('Parametric Desk Wedge & Nameplate Maker');
+    expect(tool?.category).toBe('3d');
+    expect(tool?.isFullyClientSide).toBe(true);
+
+    const threeDTools = getToolsByCategory('3d');
+    expect(threeDTools.some((t) => t.id === 'desk-wedge-nameplate')).toBe(true);
+  });
 });

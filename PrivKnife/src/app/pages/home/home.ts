@@ -320,6 +320,18 @@ const CATALOG_TOOLS: CatalogTool[] = [
     techStack: 'Three.js • Polygon Offsetting • File API',
     icon: '🍪',
   },
+  {
+    id: 'desk-wedge-nameplate',
+    name: 'Parametric Desk Wedge & Nameplate Maker',
+    category: '3d',
+    categoryLabel: '3D Fabrication',
+    description: 'Design executive, technical, and medical desk signs with crisp bevels, dual-color 3MF, and slice-ready STL files.',
+    keywords: ['desk wedge', 'nameplate', 'office sign', '3d print', 'stl', '3mf', 'bambu lab'],
+    status: 'ready',
+    route: '/tools/desk-wedge-nameplate',
+    techStack: 'Three.js • CSG Subtraction • Binary STL / 3MF',
+    icon: '🏷️',
+  },
 ];
 
 @Component({
