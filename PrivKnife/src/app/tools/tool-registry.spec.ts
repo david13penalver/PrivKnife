@@ -276,4 +276,15 @@ describe('ToolRegistry (Seam 3: Catalog & Architecture Verification)', () => {
     const threeDTools = getToolsByCategory('3d');
     expect(threeDTools.some((t) => t.id === 'desk-wedge-nameplate')).toBe(true);
   });
+
+  it('should find background-remover tool by id and category', () => {
+    const tool = getToolById('background-remover');
+    expect(tool).toBeDefined();
+    expect(tool?.name).toBe('Automated Background Removal (High Quality)');
+    expect(tool?.category).toBe('media');
+    expect(tool?.isFullyClientSide).toBe(true);
+
+    const mediaTools = getToolsByCategory('media');
+    expect(mediaTools.some((t) => t.id === 'background-remover')).toBe(true);
+  });
 });

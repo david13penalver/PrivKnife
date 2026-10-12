@@ -141,6 +141,18 @@ const CATALOG_TOOLS: CatalogTool[] = [
     icon: '🗜️',
   },
   {
+    id: 'background-remover',
+    name: 'Automated Background Removal (High Quality)',
+    category: 'media',
+    categoryLabel: 'Media',
+    description: 'Instant, client-side background removal producing clean transparent .png cutouts with edge anti-aliasing.',
+    keywords: ['background remover', 'transparent png', 'cutout', 'chroma key', 'product photo', 'white background'],
+    status: 'ready',
+    route: '/tools/background-remover',
+    techStack: 'Canvas Pixel Segmentation • Alpha Matting • File API',
+    icon: '✂️',
+  },
+  {
     id: 'favicon-app-icon-suite',
     name: 'App Icon & Favicon Suite Generator',
     category: 'media',

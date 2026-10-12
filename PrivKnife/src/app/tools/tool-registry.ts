@@ -17,6 +17,7 @@ import { invoiceMakerTool } from './documents/invoice-maker';
 import { markdownCheatsheetTool } from './documents/markdown-cheatsheet';
 import { pdfMergerTool } from './documents/pdf-merger';
 import { tableTentMakerTool } from './documents/table-tent-maker';
+import { backgroundRemoverTool } from './media/background-remover';
 import { batchImageCompressorTool } from './media/batch-compressor';
 import { faviconAppIconSuiteTool } from './media/favicon-generator';
 import { ogCardMakerTool } from './media/og-card-maker';
@@ -53,6 +54,7 @@ export const TOOL_REGISTRY: ToolDefinition[] = [
   qrStandKeychainTool,
   cookieCutterTool,
   deskWedgeNameplateTool,
+  backgroundRemoverTool,
 ];
 
 export function getToolById(id: string): ToolDefinition | undefined {

@@ -267,6 +267,39 @@ export const routes: Routes = [
     pathMatch: 'full',
   },
   {
+    path: 'tools/background-remover',
+    title: 'Automated Background Removal (High Quality) — PrivKnife',
+    data: {
+      description:
+        'Instant, client-side background removal producing clean transparent .png cutouts. 100% in-browser with zero server uploads and zero watermarks.',
+      keywords: [
+        'remove background free',
+        'remove background from product photo',
+        'remove background free no watermark',
+        'transparent png converter',
+        'car photo background remover',
+        'client side background remover',
+        'free background eraser',
+        'chroma key background remover',
+      ],
+      url: '/tools/background-remover',
+    },
+    loadComponent: () =>
+      import('./tools/media/background-remover').then(
+        (m) => m.BackgroundRemoverComponent
+      ),
+  },
+  {
+    path: 'tools/remove-background',
+    redirectTo: 'tools/background-remover',
+    pathMatch: 'full',
+  },
+  {
+    path: 'tools/bg-remover',
+    redirectTo: 'tools/background-remover',
+    pathMatch: 'full',
+  },
+  {
     path: 'tools/favicon-app-icon-suite',
     title: 'App Icon & Favicon Suite Generator — PrivKnife',
     data: {
