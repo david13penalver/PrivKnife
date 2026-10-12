@@ -664,8 +664,35 @@ export const routes: Routes = [
     pathMatch: 'full',
   },
   {
-    path: 'tools/qr-3d-print',
-    redirectTo: 'tools/3d-qr-stand',
+    path: 'tools/cookie-cutter',
+    title: 'Custom Cookie Cutter & Stamp 3D Maker — PrivKnife',
+    data: {
+      description:
+        'Transform silhouettes, graphics, or logos into dual-part 3D-printable cookie cutters and impression stamps. 100% in-browser with slice-ready .3mf and .stl exports.',
+      keywords: [
+        'custom cookie cutter stl maker',
+        '3d print cookie cutter generator',
+        'image to cookie cutter stl',
+        'free custom stamp stl generator',
+        'convert picture to cookie cutter',
+        'cookie cutter 3mf',
+        'baking 3d print stl',
+      ],
+      url: '/tools/cookie-cutter',
+    },
+    loadComponent: () =>
+      import('./tools/3d/cookie-cutter').then(
+        (m) => m.CookieCutterComponent
+      ),
+  },
+  {
+    path: 'tools/cookie-cutter-3d',
+    redirectTo: 'tools/cookie-cutter',
+    pathMatch: 'full',
+  },
+  {
+    path: 'tools/custom-cookie-cutter',
+    redirectTo: 'tools/cookie-cutter',
     pathMatch: 'full',
   },
   {

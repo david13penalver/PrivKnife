@@ -308,6 +308,18 @@ const CATALOG_TOOLS: CatalogTool[] = [
     techStack: 'Three.js • three-bvh-csg',
     icon: '🧊',
   },
+  {
+    id: 'cookie-cutter-3d',
+    name: 'Custom Cookie Cutter & Stamp 3D Maker',
+    category: '3d',
+    categoryLabel: '3D Fabrication',
+    description: 'Transform 2D silhouettes into dual-part 3D-printable cookie cutters and matching impression stamps.',
+    keywords: ['cookie cutter', 'stamp', '3d print', 'stl', '3mf', 'baking', 'silhouette'],
+    status: 'ready',
+    route: '/tools/cookie-cutter',
+    techStack: 'Three.js • Polygon Offsetting • File API',
+    icon: '🍪',
+  },
 ];
 
 @Component({

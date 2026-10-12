@@ -82,7 +82,7 @@ gantt
 | **22** | [22 - Video to GIF & Clip Trimmer](22%20-%20Video%20to%20GIF%20&%20Clip%20Trimmer/spec.md) | Video | Animated `.gif` / `.mp4` | GIF89a LZW, HTML5 Canvas, MediaRecorder | [x] |
 | **23** | [23 - App Screenshot Mockup Studio](23%20-%20App%20Screenshot%20Mockup%20Studio/spec.md) | Media | 3D device frame `.png` | HTML5 2.5D Canvas, Perspective Affine Math | [x] |
 | **24** | [24 - 3D QR Stand & Keychain Generator](24%20-%203D%20QR%20Stand%20&%20Keychain%20Generator/spec.md) | 3D | Dual-color `.3mf` / `.stl` | `Three.js`, `three-bvh-csg`, `qrcode` | [x] |
-| **25** | [25 - Custom Cookie Cutter & Stamp 3D Maker](25%20-%20Custom%20Cookie%20Cutter%20&%20Stamp%203D%20Maker/spec.md) | 3D | Cutter / stamp `.stl` / `.3mf` | `ClipperLib` (2D offset), `Three.js` | [ ] |
+| **25** | [25 - Custom Cookie Cutter & Stamp 3D Maker](25%20-%20Custom%20Cookie%20Cutter%20&%20Stamp%203D%20Maker/spec.md) | 3D | Cutter / stamp `.stl` / `.3mf` | `ClipperLib` (2D offset), `Three.js` | [x] |
 | **26** | [26 - Parametric Desk Wedge & Nameplate Maker](26%20-%20Parametric%20Desk%20Wedge%20&%20Nameplate%20Maker/spec.md) | 3D | Multi-color `.3mf` | `Three.js` CSG, `FontLoader` | [ ] |
 | **27** | [27 - Automated Background Removal (High Quality)](27%20-%20Automated%20Background%20Removal%20(High%20Quality)/spec.md) | Media | Transparent cutout `.png` | ONNX Runtime Web (`WebGPU` / WASM) | [ ] |
 | **28** | [28 - Global DNS Propagation & WHOIS Checker](28%20-%20Global%20DNS%20Propagation%20&%20WHOIS%20Checker/spec.md) | Dev | DNS records table | Browser DNS-over-HTTPS (DoH) | [ ] |

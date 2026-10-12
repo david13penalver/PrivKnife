@@ -254,4 +254,15 @@ describe('ToolRegistry (Seam 3: Catalog & Architecture Verification)', () => {
     const threeDTools = getToolsByCategory('3d');
     expect(threeDTools.some((t) => t.id === '3d-qr-stand')).toBe(true);
   });
+
+  it('should find cookie-cutter-3d tool by id and category', () => {
+    const tool = getToolById('cookie-cutter-3d');
+    expect(tool).toBeDefined();
+    expect(tool?.name).toBe('Custom Cookie Cutter & Stamp 3D Maker');
+    expect(tool?.category).toBe('3d');
+    expect(tool?.isFullyClientSide).toBe(true);
+
+    const threeDTools = getToolsByCategory('3d');
+    expect(threeDTools.some((t) => t.id === 'cookie-cutter-3d')).toBe(true);
+  });
 });
