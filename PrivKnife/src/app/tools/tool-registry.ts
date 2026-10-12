@@ -1,4 +1,5 @@
 import { ToolCategory, ToolDefinition } from '../core/models/tool.model';
+import { qrStandKeychainTool } from './3d/qr-stand-keychain';
 import { bpmTapDetectorTool } from './audio-video/bpm-tap-detector';
 import { soundwaveArtMakerTool } from './audio-video/soundwave-art-maker';
 import { videoGifTrimmerTool } from './audio-video/video-gif-trimmer';
@@ -47,6 +48,7 @@ export const TOOL_REGISTRY: ToolDefinition[] = [
   bpmTapDetectorTool,
   soundwaveArtMakerTool,
   videoGifTrimmerTool,
+  qrStandKeychainTool,
 ];
 
 export function getToolById(id: string): ToolDefinition | undefined {

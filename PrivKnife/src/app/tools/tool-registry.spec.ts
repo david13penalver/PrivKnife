@@ -243,4 +243,15 @@ describe('ToolRegistry (Seam 3: Catalog & Architecture Verification)', () => {
     const mediaTools = getToolsByCategory('media');
     expect(mediaTools.some((t) => t.id === 'screenshot-mockup')).toBe(true);
   });
+
+  it('should find 3d-qr-stand tool by id and category', () => {
+    const tool = getToolById('3d-qr-stand');
+    expect(tool).toBeDefined();
+    expect(tool?.name).toBe('3D QR Stand & Keychain Generator');
+    expect(tool?.category).toBe('3d');
+    expect(tool?.isFullyClientSide).toBe(true);
+
+    const threeDTools = getToolsByCategory('3d');
+    expect(threeDTools.some((t) => t.id === '3d-qr-stand')).toBe(true);
+  });
 });

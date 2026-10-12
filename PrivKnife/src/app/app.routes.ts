@@ -637,8 +637,35 @@ export const routes: Routes = [
     pathMatch: 'full',
   },
   {
-    path: 'tools/device-mockup',
-    redirectTo: 'tools/screenshot-mockup',
+    path: 'tools/3d-qr-stand',
+    title: '3D QR Stand & Keychain Generator — PrivKnife',
+    data: {
+      description:
+        'Generate slice-ready dual-color .3mf and .stl models of functional tabletop QR code stands, keychain loops, and plaques for 3D printing. 100% in-browser with zero uploads.',
+      keywords: [
+        'qr code 3d print generator',
+        '3d printable qr code stand',
+        'custom wifi qr keychain stl',
+        'bambu lab multi color qr code generator',
+        'dual color qr 3mf',
+        'tabletop qr stand 3d print',
+        '3mf qr generator',
+      ],
+      url: '/tools/3d-qr-stand',
+    },
+    loadComponent: () =>
+      import('./tools/3d/qr-stand-keychain').then(
+        (m) => m.QrStandKeychainComponent
+      ),
+  },
+  {
+    path: 'tools/qr-stand-keychain',
+    redirectTo: 'tools/3d-qr-stand',
+    pathMatch: 'full',
+  },
+  {
+    path: 'tools/qr-3d-print',
+    redirectTo: 'tools/3d-qr-stand',
     pathMatch: 'full',
   },
   {
