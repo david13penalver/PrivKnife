@@ -298,4 +298,15 @@ describe('ToolRegistry (Seam 3: Catalog & Architecture Verification)', () => {
     const devTools = getToolsByCategory('dev');
     expect(devTools.some((t) => t.id === 'dns-checker')).toBe(true);
   });
+
+  it('should find web-vitals tool by id and category', () => {
+    const tool = getToolById('web-vitals');
+    expect(tool).toBeDefined();
+    expect(tool?.name).toBe('Website Performance & Core Web Vitals Checker');
+    expect(tool?.category).toBe('dev');
+    expect(tool?.isFullyClientSide).toBe(true);
+
+    const devTools = getToolsByCategory('dev');
+    expect(devTools.some((t) => t.id === 'web-vitals')).toBe(true);
+  });
 });

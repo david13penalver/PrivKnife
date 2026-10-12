@@ -261,6 +261,18 @@ const CATALOG_TOOLS: CatalogTool[] = [
     icon: '🌐',
   },
   {
+    id: 'web-vitals',
+    name: 'Website Performance & Core Web Vitals Checker',
+    category: 'dev',
+    categoryLabel: 'Dev / Performance',
+    description: 'Audit page loading speed, inspect official Google Core Web Vitals (LCP, INP, CLS, FCP, TTFB), and receive actionable developer diagnostics.',
+    keywords: ['core web vitals', 'pagespeed', 'lighthouse', 'lcp', 'inp', 'cls', 'website speed', 'performance'],
+    status: 'ready',
+    route: '/tools/web-vitals',
+    techStack: 'Direct PageSpeed API • Navigation Timing • Client-Side Audit',
+    icon: '⚡',
+  },
+  {
     id: 'markdown-cheatsheet',
     name: 'Markdown to Academic / Tech PDF Cheatsheet',
     category: 'documents',

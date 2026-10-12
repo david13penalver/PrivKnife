@@ -12,6 +12,7 @@ import { dnsCheckerTool } from './dev/dns-checker';
 import { emailSignatureGeneratorTool } from './dev/email-signature-generator';
 import { cssMeshGradientMakerTool } from './dev/mesh-gradient-maker';
 import { robotsSitemapBuilderTool } from './dev/robots-sitemap-builder';
+import { webVitalsTool } from './dev/web-vitals';
 import { averyBarcodeSheetTool } from './documents/barcode-labels';
 import { gridPaperTool } from './documents/grid-paper';
 import { invoiceMakerTool } from './documents/invoice-maker';
@@ -57,6 +58,7 @@ export const TOOL_REGISTRY: ToolDefinition[] = [
   deskWedgeNameplateTool,
   backgroundRemoverTool,
   dnsCheckerTool,
+  webVitalsTool,
 ];
 
 export function getToolById(id: string): ToolDefinition | undefined {

@@ -553,6 +553,36 @@ export const routes: Routes = [
     pathMatch: 'full',
   },
   {
+    path: 'tools/web-vitals',
+    title: 'Website Performance & Core Web Vitals Checker — PrivKnife',
+    data: {
+      description:
+        'Audit page loading speed, inspect official Google Core Web Vitals (LCP, INP, CLS, FCP, TTFB), and receive actionable developer diagnostics directly from your browser.',
+      keywords: [
+        'check website speed online',
+        'core web vitals checker',
+        'free page speed test',
+        'lighthouse audit online',
+        'lcp cls inp checker',
+        'website performance test',
+        'mobile speed test online',
+      ],
+      url: '/tools/web-vitals',
+    },
+    loadComponent: () =>
+      import('./tools/dev/web-vitals').then((m) => m.WebVitalsComponent),
+  },
+  {
+    path: 'tools/pagespeed-checker',
+    redirectTo: 'tools/web-vitals',
+    pathMatch: 'full',
+  },
+  {
+    path: 'tools/core-web-vitals',
+    redirectTo: 'tools/web-vitals',
+    pathMatch: 'full',
+  },
+  {
     path: 'tools/markdown-cheatsheet',
     title: 'Markdown to Academic / Tech PDF Cheatsheet — PrivKnife',
     data: {
