@@ -346,6 +346,26 @@ import {
     @media (max-width: 1024px) {
       .subs-studio-grid { grid-template-columns: 1fr; }
     }
+    @media (max-width: 600px) {
+      .format-toggle-grid {
+        grid-template-columns: 1fr;
+      }
+      .direction-toggle-group {
+        grid-template-columns: 1fr;
+      }
+      .time-amount-row {
+        flex-direction: column;
+      }
+      .c-card__header-flex {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 8px;
+      }
+      .export-actions-cluster {
+        width: 100%;
+        justify-content: flex-end;
+      }
+    }
     .c-card__header-flex {
       display: flex;
       align-items: center;
