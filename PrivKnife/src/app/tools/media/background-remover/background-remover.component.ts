@@ -79,7 +79,7 @@ import {
       </div>
 
       <!-- Main Layout: Controls Left (5 cols) vs Canvas / Split-View Right (7 cols) -->
-      <div class="l-columns l-columns--12" style="gap: 24px; align-items: start;">
+      <div class="l-columns l-columns--12 bg-remover-workspace" style="gap: 24px; align-items: start;">
         
         <!-- Controls Column (5 cols) -->
         <div class="l-columns__area l-columns__area--span-5">
@@ -395,6 +395,19 @@ import {
       </div>
     </div>
   `,
+  styles: [
+    `
+      @media (max-width: 1024px) {
+        .bg-remover-workspace {
+          grid-template-columns: 1fr !important;
+        }
+
+        .bg-remover-workspace > .l-columns__area {
+          grid-column: span 1 !important;
+        }
+      }
+    `,
+  ],
 })
 export class BackgroundRemoverComponent implements AfterViewInit, OnDestroy {
   @ViewChild('renderCanvas') renderCanvas!: ElementRef<HTMLCanvasElement>;
