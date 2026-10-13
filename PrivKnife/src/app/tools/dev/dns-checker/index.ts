@@ -21,3 +21,8 @@ export const dnsCheckerTool: ToolDefinition = {
   loadComponent: () =>
     import('./dns-checker.component').then((m) => m.DnsCheckerComponent),
 };
+
+export { DnsCheckerComponent } from './dns-checker.component';
+export * from './types';
+export * from './engine';
+export * from './test-fixtures';

@@ -24,3 +24,8 @@ export const backgroundRemoverTool: ToolDefinition = {
       (m) => m.BackgroundRemoverComponent
     ),
 };
+
+export { BackgroundRemoverComponent } from './background-remover.component';
+export * from './types';
+export * from './engine';
+export * from './test-fixtures';

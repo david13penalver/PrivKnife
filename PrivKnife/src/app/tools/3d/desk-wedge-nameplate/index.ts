@@ -23,3 +23,8 @@ export const deskWedgeNameplateTool: ToolDefinition = {
       (m) => m.DeskWedgeNameplateComponent
     ),
 };
+
+export { DeskWedgeNameplateComponent } from './desk-wedge-nameplate.component';
+export * from './types';
+export * from './engine';
+export * from './test-fixtures';

@@ -21,3 +21,8 @@ export const webVitalsTool: ToolDefinition = {
   loadComponent: () =>
     import('./web-vitals.component').then((m) => m.WebVitalsComponent),
 };
+
+export { WebVitalsComponent } from './web-vitals.component';
+export * from './types';
+export * from './engine';
+export * from './test-fixtures';

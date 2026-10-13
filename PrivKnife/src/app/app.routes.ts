@@ -300,6 +300,11 @@ export const routes: Routes = [
     pathMatch: 'full',
   },
   {
+    path: 'tools/bg-removal',
+    redirectTo: 'tools/background-remover',
+    pathMatch: 'full',
+  },
+  {
     path: 'tools/favicon-app-icon-suite',
     title: 'App Icon & Favicon Suite Generator — PrivKnife',
     data: {
@@ -812,6 +817,11 @@ export const routes: Routes = [
   },
   {
     path: 'tools/desk-nameplate',
+    redirectTo: 'tools/desk-wedge-nameplate',
+    pathMatch: 'full',
+  },
+  {
+    path: 'tools/nameplate-maker',
     redirectTo: 'tools/desk-wedge-nameplate',
     pathMatch: 'full',
   },
