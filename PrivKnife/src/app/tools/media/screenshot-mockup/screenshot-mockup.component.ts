@@ -61,7 +61,7 @@ import {
       </div>
 
       <!-- Main Studio Workspace (12 cols) -->
-      <div class="l-columns l-columns--12" style="gap: 24px; align-items: start;">
+      <div class="l-columns l-columns--12 mockup-workspace" style="gap: 24px; align-items: start;">
         <!-- Left: Live Canvas Viewport (7 cols) -->
         <div class="l-columns__area l-columns__area--span-7">
           <app-card title="Interactive Device Viewport">
@@ -432,6 +432,19 @@ import {
       </div>
     </div>
   `,
+  styles: [
+    `
+      @media (max-width: 1024px) {
+        .mockup-workspace {
+          grid-template-columns: 1fr !important;
+        }
+
+        .mockup-workspace > .l-columns__area {
+          grid-column: span 1 !important;
+        }
+      }
+    `,
+  ],
 })
 export class ScreenshotMockupComponent implements AfterViewInit, OnDestroy {
   @ViewChild('mockupCanvas') canvasRef!: ElementRef<HTMLCanvasElement>;
