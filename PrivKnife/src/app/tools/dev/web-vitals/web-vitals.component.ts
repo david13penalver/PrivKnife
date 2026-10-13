@@ -79,7 +79,7 @@ import {
       <div class="l-columns__area g--margin-bottom-5">
         <div class="c-card" style="padding: 20px;">
           <form (submit)="onSubmit($event)" class="l-columns l-columns--1" style="gap: 16px;">
-            <div class="l-columns l-columns--12" style="gap: 12px; align-items: end;">
+            <div class="l-columns l-columns--12 vitals-form-grid" style="gap: 12px; align-items: end;">
               <!-- Website URL (7 cols) -->
               <div class="l-columns__area l-columns__area--span-7">
                 <label style="font-size: 0.85rem; font-weight: 600; display: block; margin-bottom: 6px;">
@@ -197,7 +197,7 @@ import {
 
         <!-- Category Score Gauges -->
         <div class="l-columns__area g--margin-bottom-5">
-          <div class="l-columns l-columns--4" style="gap: 16px;">
+          <div class="l-columns l-columns--4 vitals-gauges-grid" style="gap: 16px;">
             @for (cat of rep.categories; track cat.id) {
               <div class="c-card" style="padding: 20px; text-align: center;">
                 <span style="color: var(--color-text-secondary); display: block; font-size: 0.85rem; font-weight: 600;">
@@ -380,6 +380,29 @@ import {
       }
     </div>
   `,
+  styles: [
+    `
+      @media (max-width: 900px) {
+        .vitals-form-grid {
+          grid-template-columns: 1fr !important;
+        }
+
+        .vitals-form-grid > .l-columns__area {
+          grid-column: span 1 !important;
+        }
+
+        .vitals-gauges-grid {
+          grid-template-columns: repeat(2, 1fr) !important;
+        }
+      }
+
+      @media (max-width: 500px) {
+        .vitals-gauges-grid {
+          grid-template-columns: 1fr !important;
+        }
+      }
+    `,
+  ],
 })
 export class WebVitalsComponent implements OnInit, OnDestroy {
   readonly presets = PRESET_AUDIT_SAMPLES;
