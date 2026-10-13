@@ -95,7 +95,7 @@ export type PreviewTab = 'all' | 'chrome' | 'iphone' | 'android' | 'google';
       </div>
 
       <!-- Configuration & Sidebar Grid -->
-      <div class="l-columns l-columns--2 g--margin-bottom-6" style="gap: 24px;">
+      <div class="l-columns l-columns--2 favicon-workspace g--margin-bottom-6" style="gap: 24px;">
         <!-- Left: Options Controls -->
         <div class="l-columns__area">
           <app-card title="2. Branding &amp; Platform Configuration">
@@ -520,6 +520,19 @@ export type PreviewTab = 'all' | 'chrome' | 'iphone' | 'android' | 'google';
       }
     </div>
   `,
+  styles: [
+    `
+      @media (max-width: 1024px) {
+        .favicon-workspace {
+          grid-template-columns: 1fr !important;
+        }
+
+        .favicon-workspace > .l-columns__area {
+          grid-column: span 1 !important;
+        }
+      }
+    `,
+  ],
 })
 export class FaviconGeneratorComponent implements OnDestroy {
   readonly config = signal<FaviconConfig>({ ...DEFAULT_FAVICON_CONFIG });
