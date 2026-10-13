@@ -757,6 +757,13 @@ import {
       gap: 12px;
     }
 
+    @media (max-width: 640px) {
+      .form-row {
+        flex-direction: column;
+        gap: 8px;
+      }
+    }
+
     .form-group {
       flex: 1;
       display: flex;
