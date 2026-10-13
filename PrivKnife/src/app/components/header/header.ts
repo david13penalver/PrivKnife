@@ -2,33 +2,38 @@ import { ChangeDetectionStrategy, Component, signal } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { Badge } from '../badge/badge';
 import { Button } from '../button/button';
+import { LangSelector } from '../lang-selector/lang-selector';
+import { TranslatePipe } from '../../core/i18n';
 
 @Component({
   selector: 'app-header',
+  standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [RouterLink, Badge, Button],
+  imports: [RouterLink, Badge, Button, LangSelector, TranslatePipe],
   template: `
     <header class="c-header">
       <div class="c-header__inner">
         <a class="c-header__brand" routerLink="/">
           <div class="c-header__logo" aria-hidden="true">🇨🇭</div>
           <div>
-            <div class="c-header__title">PrivKnife</div>
-            <div class="c-header__tagline">Private In-Browser Toolkit</div>
+            <div class="c-header__title">{{ 'header.title' | translate }}</div>
+            <div class="c-header__tagline">{{ 'header.tagline' | translate }}</div>
           </div>
         </a>
 
         <div class="c-header__actions">
           <app-badge variant="privacy" [dot]="true">
-            100% In-Browser
+            {{ 'common.inBrowserBadge' | translate }}
           </app-badge>
+
+          <app-lang-selector />
 
           <app-button
             variant="ghost"
             size="small"
             (clicked)="toggleTheme()"
-            [attr.aria-label]="isDarkMode() ? 'Switch to light mode' : 'Switch to dark mode'">
-            {{ isDarkMode() ? '☀️ Light' : '🌙 Dark' }}
+            [attr.aria-label]="isDarkMode() ? ('common.themeLight' | translate) : ('common.themeDark' | translate)">
+            {{ isDarkMode() ? ('common.themeLight' | translate) : ('common.themeDark' | translate) }}
           </app-button>
         </div>
       </div>

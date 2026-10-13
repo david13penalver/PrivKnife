@@ -265,11 +265,11 @@ To introduce any future language (e.g. German `de`, French `fr`, or Simplified C
 
 # 8. Implementation Checklist & Phased Roadmap
 
-- [ ] **Phase 1: Core i18n Engine & Types**:
+- [x] **Phase 1: Core i18n Engine & Types**:
   - Implement `types.ts`, `languages.config.ts`, `I18nService`, and `TranslatePipe` in `src/app/core/i18n/`.
   - Implement English (`en.ts`) and Spanish (`es.ts`) dictionaries.
   - Implement fallback and interpolation engines.
-- [ ] **Phase 2: Header Language Switcher**:
+- [x] **Phase 2: Header Language Switcher**:
   - Update `Header` component in `src/app/components/header/` with accessible BEM language menu.
   - Test OS language detection and `localStorage` persistence.
 - [ ] **Phase 3: Catalog & Home Localization**:

@@ -10,3 +10,4 @@ export * from './progress-bar/progress-bar';
 export * from './split-preview/split-preview';
 export * from './header/header';
 export * from './footer/footer';
+export * from './lang-selector/lang-selector';

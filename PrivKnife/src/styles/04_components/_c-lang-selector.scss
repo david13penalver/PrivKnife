@@ -1,0 +1,144 @@
+/* ==========================================================================
+   04_COMPONENTS: Language Selector Dropdown Component
+   Nomenclature: .c-lang-selector & elements/modifiers (BEM)
+   ========================================================================== */
+
+@use "../01_utilities/functions" as fn;
+@use "../01_utilities/mixins" as mx;
+
+.c-lang-selector {
+  position: relative;
+  display: inline-block;
+
+  &__button {
+    display: inline-flex;
+    align-items: center;
+    gap: fn.spacing(1.5);
+    padding: fn.spacing(1.5) fn.spacing(2.5);
+    background-color: transparent;
+    color: var(--color-text-secondary);
+    border: 1px solid var(--color-border-default);
+    border-radius: var(--radius-md);
+    font-size: fn.rem(13px);
+    font-weight: 500;
+    cursor: pointer;
+    user-select: none;
+    @include mx.transition(all, 150ms, ease);
+
+    &:hover {
+      color: var(--color-text-primary);
+      background-color: var(--color-bg-subtle);
+      border-color: var(--color-border-strong);
+    }
+
+    &:focus-visible {
+      @include mx.focus-ring;
+    }
+  }
+
+  &__globe {
+    font-size: fn.rem(14px);
+    line-height: 1;
+  }
+
+  &__code {
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    font-weight: 600;
+  }
+
+  &__chevron {
+    font-size: fn.rem(10px);
+    color: var(--color-text-muted);
+    transition: transform 150ms ease;
+
+    &--open {
+      transform: rotate(180deg);
+    }
+  }
+
+  &__menu {
+    position: absolute;
+    top: calc(100% + #{fn.spacing(1.5)});
+    right: 0;
+    min-width: 160px;
+    background-color: var(--color-bg-surface);
+    border: 1px solid var(--color-border-default);
+    border-radius: var(--radius-md);
+    box-shadow: var(--shadow-lg);
+    padding: fn.spacing(1);
+    z-index: 110;
+    display: flex;
+    flex-direction: column;
+    gap: fn.spacing(0.5);
+    animation: cLangSelectorFadeIn 150ms cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  &__item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+    padding: fn.spacing(2) fn.spacing(2.5);
+    background: transparent;
+    border: none;
+    border-radius: var(--radius-sm);
+    color: var(--color-text-secondary);
+    font-size: fn.rem(13px);
+    cursor: pointer;
+    text-align: left;
+    @include mx.transition(all, 120ms, ease);
+
+    &:hover {
+      background-color: var(--color-bg-subtle);
+      color: var(--color-text-primary);
+    }
+
+    &:focus-visible {
+      @include mx.focus-ring;
+    }
+
+    &--active {
+      color: var(--color-primary);
+      background-color: var(--color-primary-subtle);
+      font-weight: 600;
+
+      &:hover {
+        background-color: var(--color-primary-subtle);
+        color: var(--color-primary);
+      }
+    }
+  }
+
+  &__item-content {
+    display: flex;
+    align-items: center;
+    gap: fn.spacing(2);
+  }
+
+  &__flag {
+    font-size: fn.rem(16px);
+    line-height: 1;
+  }
+
+  &__name {
+    font-size: fn.rem(13px);
+  }
+
+  &__check {
+    color: var(--color-primary);
+    font-weight: 700;
+    font-size: fn.rem(13px);
+  }
+}
+
+@keyframes cLangSelectorFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
