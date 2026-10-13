@@ -456,6 +456,15 @@ import {
     @media (max-width: 1024px) {
       .mesh-studio-grid { grid-template-columns: 1fr; }
     }
+    @media (max-width: 600px) {
+      .point-sliders-grid {
+        grid-template-columns: 1fr !important;
+      }
+      .c-card__header-flex {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+    }
     .c-card__header-flex {
       display: flex;
       align-items: center;
