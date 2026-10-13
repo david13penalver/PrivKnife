@@ -384,6 +384,20 @@ import { CalendarEvent, EmbedSnippetType, RecurrenceFreq } from './types';
     @media (max-width: 1024px) {
       .cal-studio-grid { grid-template-columns: 1fr; }
     }
+    @media (max-width: 600px) {
+      .dates-grid {
+        grid-template-columns: 1fr;
+      }
+      .provider-item {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 8px;
+      }
+      .provider-actions {
+        width: 100%;
+        justify-content: flex-end;
+      }
+    }
     .c-card__header-flex {
       display: flex;
       align-items: center;
