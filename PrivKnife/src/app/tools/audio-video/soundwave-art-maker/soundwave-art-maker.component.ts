@@ -57,7 +57,7 @@ const STORAGE_KEY = 'privknife_soundwave_config';
       </div>
 
       <!-- Main Layout: Editor Controls & Live Art Preview Pane -->
-      <div class="l-columns l-columns--12" style="gap: 24px; align-items: start;">
+      <div class="l-columns l-columns--12 soundwave-workspace" style="gap: 24px; align-items: start;">
         <!-- Left Column: Audio Inputs & Customization Controls (7 cols) -->
         <div class="l-columns__area l-columns__area--span-7">
           <div class="l-columns l-columns--1" style="gap: 20px;">
@@ -399,6 +399,16 @@ const STORAGE_KEY = 'privknife_soundwave_config';
         width: 100% !important;
         height: auto !important;
         border-radius: 8px;
+      }
+
+      @media (max-width: 1024px) {
+        .soundwave-workspace {
+          grid-template-columns: 1fr !important;
+        }
+
+        .soundwave-workspace > .l-columns__area {
+          grid-column: span 1 !important;
+        }
       }
     `,
   ],
