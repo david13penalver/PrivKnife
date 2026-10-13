@@ -63,7 +63,7 @@ import {
       </div>
 
       <!-- 2-Column Main Workspace -->
-      <div class="l-columns l-columns--2 g--margin-bottom-6" style="gap: 24px; align-items: start;">
+      <div class="l-columns l-columns--2 palette-workspace g--margin-bottom-6" style="gap: 24px; align-items: start;">
         
         <!-- Left: Image Ingestion & Eyedropper Workspace -->
         <div class="l-columns__area" style="display: flex; flex-direction: column; gap: 20px;">
@@ -403,6 +403,19 @@ import {
       }
     </div>
   `,
+  styles: [
+    `
+      @media (max-width: 1024px) {
+        .palette-workspace {
+          grid-template-columns: 1fr !important;
+        }
+
+        .palette-workspace > .l-columns__area {
+          grid-column: span 1 !important;
+        }
+      }
+    `,
+  ],
 })
 export class ColorPaletteExtractorComponent implements OnDestroy {
   readonly previewImg = viewChild<ElementRef<HTMLImageElement>>('previewImg');
