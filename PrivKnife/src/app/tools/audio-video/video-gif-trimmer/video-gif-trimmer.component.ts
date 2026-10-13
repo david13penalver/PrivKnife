@@ -78,7 +78,7 @@ import {
         </div>
       } @else {
         <!-- Video Active Workspace: Player, Timeline Trimmer & Settings -->
-        <div class="l-columns l-columns--12" style="gap: 24px; align-items: start;">
+        <div class="l-columns l-columns--12 trimmer-workspace" style="gap: 24px; align-items: start;">
           <!-- Left Column: Video Player & Timeline Scrubber (7 cols) -->
           <div class="l-columns__area l-columns__area--span-7">
             <app-card [title]="'Video Preview: ' + videoMetadata()!.fileName">
@@ -376,6 +376,16 @@ import {
     `
       .c-timeline-panel input[type='range'] {
         cursor: pointer;
+      }
+
+      @media (max-width: 1024px) {
+        .trimmer-workspace {
+          grid-template-columns: 1fr !important;
+        }
+
+        .trimmer-workspace > .l-columns__area {
+          grid-column: span 1 !important;
+        }
       }
     `,
   ],
