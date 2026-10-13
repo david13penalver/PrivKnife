@@ -30,6 +30,13 @@ export const es: TranslationSchema = {
     options: 'Opciones',
     save: 'Guardar',
     undo: 'Deshacer',
+    readyToUse: 'Listo para Usar',
+    roadmap: 'En Desarrollo',
+    comingSoon: 'Próximamente',
+    openTool: 'Abrir Herramienta',
+    clearFilters: 'Limpiar Filtros',
+    guaranteedClientSide: 'Garantizado en el Cliente',
+    verifiableOpenSource: 'Verificable y Código Abierto',
   },
   header: {
     title: 'PrivKnife',
@@ -39,12 +46,24 @@ export const es: TranslationSchema = {
   home: {
     heroTitle: 'Herramientas Cotidianas Consolidadas.',
     heroSubtitle: 'Sin Servidores de Backend. Cero Telemetría. 100% del Lado del Cliente.',
+    heroBadge: '🛡️ 100% en el Navegador • Cero Ingestión en Servidor • Cero Telemetría',
+    heroHeadingStart: 'La Navaja Suiza',
+    heroHeadingHighlight: 'Privada en el Navegador',
+    heroDescription:
+      'Una suite consolidada de herramientas web cotidianas y rápidas que se ejecutan íntegramente en tu navegador. Sin subidas a la nube. Sin telemetría. Sin cookies.',
+    ribbonTools: '🇨🇭 Más de 29 Herramientas Cotidianas',
+    ribbonZeroBytes: '🔒 0 Bytes Salen del Dispositivo',
+    ribbonWasm: '⚡ WebAssembly en el Cliente',
+    ribbonOpenSource: '📜 Código Abierto MIT',
     searchPlaceholder: 'Buscar entre más de 29 herramientas privadas (PDF, imágenes, 3D, crypto, dev)...',
     allTools: 'Todas las Herramientas',
     toolsCount: '{count} herramientas disponibles',
     noResultsTitle: 'No se encontraron herramientas coincidentes',
     noResultsHint: 'Intenta con una búsqueda diferente o selecciona una categoría superior.',
     launchTool: 'Abrir Herramienta',
+    privacyByArchTitle: 'Privacidad por Arquitectura, No por Política',
+    privacyByArchDesc:
+      'La mayoría de las herramientas web te piden que confíes en sus términos legales mientras suben tus documentos privados a la nube. PrivKnife es fundamentalmente diferente.',
     categories: {
       all: 'Todas las Herramientas',
       privacy: 'Privacidad y Seguridad',
@@ -56,17 +75,32 @@ export const es: TranslationSchema = {
     },
     pillars: {
       zeroServerTitle: 'Cero Ingesta de Servidor',
-      zeroServerDesc: 'Tus archivos nunca abandonan el navegador. No existen puntos de ingesta ni servidores remotos.',
-      privacyTitle: 'Cero Telemetría',
-      privacyDesc: 'Sin balizas de analítica, píxeles de seguimiento ni registro remoto. Anonimato total para el usuario.',
-      threadTitle: 'Rendimiento Fluido',
-      threadDesc: 'Los cálculos intensivos se ejecutan en Web Workers dedicados para mantener la interfaz fluida a 60 FPS.',
+      zeroServerDesc:
+        'PrivKnife no tiene servidores de procesamiento ni almacenamiento remoto. Toda manipulación de archivos y renderizado se realiza localmente mediante WebAssembly y Web Workers.',
+      privacyTitle: 'Cero Telemetría y Rastreo',
+      privacyDesc:
+        'Sin Google Analytics, sin píxeles de seguimiento, sin balizas de telemetría y cero cookies publicitarias. Operas con anonimato digital total.',
+      threadTitle: 'Rendimiento Local Ultrarrápido',
+      threadDesc:
+        'Cero latencia de subida por red. Procesa documentos masivos o cientos de fotos directamente en tu dispositivo a velocidad nativa.',
     },
+    verifiableTitle: 'Verificable y Código Abierto',
+    verifiableDesc:
+      'Abre las herramientas de desarrollador (F12) → pestaña Red para verificar 0 peticiones salientes, o inspecciona nuestro código fuente en GitHub.',
+    githubRepo: 'Repositorio de GitHub',
+    uiKitDesignSystem: 'Sistema de Diseño & Kit de UI',
   },
   footer: {
-    mission: 'PrivKnife se ejecuta completamente en tu navegador web, sin ingesta de datos en servidores ni seguimiento analítico.',
-    privacyNotice: 'Privacidad por Arquitectura, no por Política.',
-    copyright: 'PrivKnife — Navaja Suiza de Código Abierto. Todo el procesamiento se realiza localmente en la memoria del navegador.',
+    mission:
+      'PrivKnife se ejecuta completamente en tu navegador web, sin ingesta de datos en servidores ni seguimiento analítico.',
+    privacyNotice: 'Privacidad por Arquitectura, No por Política.',
+    copyright: '© 2026 PrivKnife. Código abierto bajo Licencia MIT.',
+    zeroStorage: 'Cero Almacenamiento en Servidor • Cero Telemetría • Cero Cookies',
+    privacyLink: 'Privacidad',
+    termsLink: 'Términos',
+    uiKitLink: 'Kit de UI',
+    githubLink: 'GitHub',
+    contactLink: 'Contacto & Problemas',
   },
   tools: {
     exifStripper: {

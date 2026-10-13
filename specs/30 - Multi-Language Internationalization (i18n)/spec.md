@@ -272,7 +272,7 @@ To introduce any future language (e.g. German `de`, French `fr`, or Simplified C
 - [x] **Phase 2: Header Language Switcher**:
   - Update `Header` component in `src/app/components/header/` with accessible BEM language menu.
   - Test OS language detection and `localStorage` persistence.
-- [ ] **Phase 3: Catalog & Home Localization**:
+- [x] **Phase 3: Catalog & Home Localization**:
   - Update `Home` component and `Showcase` component templates to use `TranslatePipe` or `I18nService`.
   - Localize search input, category filters, tool counters, and footer.
 - [ ] **Phase 4: Tool Registry Metadata Localization**:

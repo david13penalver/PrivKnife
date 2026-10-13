@@ -1,21 +1,42 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { provideRouter } from '@angular/router';
-import { describe, expect, it, beforeEach } from 'vitest';
+import { describe, expect, it, beforeEach, afterEach } from 'vitest';
 import { Home } from './home';
+import { I18nService } from '../../core/i18n';
 
 describe('Home Component (Presentation & Tool Catalog)', () => {
   let fixture: ComponentFixture<Home>;
   let component: Home;
+  let store: Record<string, string> = {};
 
   beforeEach(async () => {
+    store = {};
+    const mockStorage = {
+      getItem: (key: string) => store[key] || null,
+      setItem: (key: string, value: string) => {
+        store[key] = value;
+      },
+      removeItem: (key: string) => {
+        delete store[key];
+      },
+      clear: () => {
+        for (const k in store) delete store[k];
+      },
+    };
+    vi.stubGlobal('localStorage', mockStorage);
+
     await TestBed.configureTestingModule({
       imports: [Home],
-      providers: [provideRouter([])],
+      providers: [provideRouter([]), I18nService],
     }).compileComponents();
 
     fixture = TestBed.createComponent(Home);
     component = fixture.componentInstance;
     fixture.detectChanges();
+  });
+
+  afterEach(() => {
+    vi.unstubAllGlobals();
   });
 
   it('should create the home component', () => {
@@ -82,6 +103,30 @@ describe('Home Component (Presentation & Tool Catalog)', () => {
     expect(cardGrids.length).toBeGreaterThanOrEqual(2);
     expect(cardGrids[0].classList.contains('l-columns--3')).toBe(true);
     expect(cardGrids[0].classList.contains('l-columns--cards')).toBe(true);
+  });
+
+  it('should reactively update all home strings and tool cards when switching to Spanish', async () => {
+    const i18n = TestBed.inject(I18nService);
+    await i18n.setLanguage('es');
+    fixture.detectChanges();
+
+    const compiled = fixture.nativeElement as HTMLElement;
+
+    // Spanish Hero & Pillars
+    expect(compiled.querySelector('h1')?.textContent).toContain('La Navaja Suiza');
+    expect(compiled.querySelector('h1')?.textContent).toContain('Privada en el Navegador');
+    expect(compiled.textContent).toContain('Cero Ingesta de Servidor');
+    expect(compiled.textContent).toContain('Privacidad por Arquitectura, No por Política');
+
+    // Spanish Tool Card
+    expect(compiled.textContent).toContain('Eliminador de Metadatos EXIF y Privacidad');
+    expect(compiled.textContent).toContain('Listo para Usar');
+    expect(compiled.textContent).toContain('Abrir Herramienta');
+
+    // Spanish Search Query
+    component.searchQuery.set('metadatos');
+    fixture.detectChanges();
+    expect(component.filteredTools().some((t) => t.id === 'exif-stripper')).toBe(true);
   });
 });
 

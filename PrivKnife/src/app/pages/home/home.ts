@@ -1,14 +1,16 @@
-import { ChangeDetectionStrategy, Component, computed, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, inject, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { RouterLink } from '@angular/router';
 import { Badge } from '../../components/badge/badge';
 import { Button } from '../../components/button/button';
 import { Card } from '../../components/card/card';
 import { ToolCategory } from '../../core/models/tool.model';
+import { I18nService, TranslatePipe } from '../../core/i18n';
 
 export interface CatalogTool {
   id: string;
   name: string;
+  i18nKey?: string;
   category: ToolCategory;
   categoryLabel: string;
   description: string;
@@ -22,6 +24,7 @@ export interface CatalogTool {
 const CATALOG_TOOLS: CatalogTool[] = [
   {
     id: 'exif-stripper',
+    i18nKey: 'exifStripper',
     name: 'EXIF & Privacy Metadata Stripper',
     category: 'privacy',
     categoryLabel: 'Privacy',
@@ -34,6 +37,7 @@ const CATALOG_TOOLS: CatalogTool[] = [
   },
   {
     id: 'crypto-hash-uuid',
+    i18nKey: 'cryptoHash',
     name: 'Cryptographic Hash & UUID Batch Generator',
     category: 'privacy',
     categoryLabel: 'Privacy / Dev',
@@ -46,6 +50,7 @@ const CATALOG_TOOLS: CatalogTool[] = [
   },
   {
     id: 'csv-json-sql',
+    i18nKey: 'csvConverter',
     name: 'CSV to JSON, SQL & Markdown Converter',
     category: 'dev',
     categoryLabel: 'Dev / Data',
@@ -58,6 +63,7 @@ const CATALOG_TOOLS: CatalogTool[] = [
   },
   {
     id: 'pdf-merger-splitter',
+    i18nKey: 'pdfMerger',
     name: 'PDF Merger, Splitter & Page Organizer',
     category: 'documents',
     categoryLabel: 'Documents',
@@ -70,6 +76,7 @@ const CATALOG_TOOLS: CatalogTool[] = [
   },
   {
     id: 'pdf-redaction',
+    i18nKey: 'pdfRedaction',
     name: 'PDF Redaction & Anonymizer',
     category: 'privacy',
     categoryLabel: 'Privacy',
@@ -82,6 +89,7 @@ const CATALOG_TOOLS: CatalogTool[] = [
   },
   {
     id: 'invoice-receipt-maker',
+    i18nKey: 'invoiceMaker',
     name: 'Instant Client-Side Invoice & Receipt Maker',
     category: 'documents',
     categoryLabel: 'Documents',
@@ -94,6 +102,7 @@ const CATALOG_TOOLS: CatalogTool[] = [
   },
   {
     id: 'graph-dot-grid-paper',
+    i18nKey: 'gridPaper',
     name: 'Custom Printable Graph & Dot Grid Paper',
     category: 'documents',
     categoryLabel: 'Documents',
@@ -106,6 +115,7 @@ const CATALOG_TOOLS: CatalogTool[] = [
   },
   {
     id: 'avery-barcode-sheet',
+    i18nKey: 'barcodeLabels',
     name: 'Avery Barcode & Label Sheet Generator',
     category: 'documents',
     categoryLabel: 'Documents',
@@ -118,6 +128,7 @@ const CATALOG_TOOLS: CatalogTool[] = [
   },
   {
     id: 'table-tent-maker',
+    i18nKey: 'tableTentMaker',
     name: 'Foldable Table Tent & Counter Sign Maker',
     category: 'documents',
     categoryLabel: 'Documents',
@@ -130,6 +141,7 @@ const CATALOG_TOOLS: CatalogTool[] = [
   },
   {
     id: 'batch-image-compressor',
+    i18nKey: 'batchCompressor',
     name: 'Batch Image Compressor & WebP Converter',
     category: 'media',
     categoryLabel: 'Media',
@@ -142,6 +154,7 @@ const CATALOG_TOOLS: CatalogTool[] = [
   },
   {
     id: 'background-remover',
+    i18nKey: 'backgroundRemover',
     name: 'Automated Background Removal (High Quality)',
     category: 'media',
     categoryLabel: 'Media',
@@ -154,6 +167,7 @@ const CATALOG_TOOLS: CatalogTool[] = [
   },
   {
     id: 'favicon-app-icon-suite',
+    i18nKey: 'faviconGenerator',
     name: 'App Icon & Favicon Suite Generator',
     category: 'media',
     categoryLabel: 'Media',
@@ -166,6 +180,7 @@ const CATALOG_TOOLS: CatalogTool[] = [
   },
   {
     id: 'og-card-maker',
+    i18nKey: 'ogCardMaker',
     name: 'Social Share (Open Graph) Card Maker',
     category: 'media',
     categoryLabel: 'Media',
@@ -178,6 +193,7 @@ const CATALOG_TOOLS: CatalogTool[] = [
   },
   {
     id: 'color-palette-extractor',
+    i18nKey: 'colorPalette',
     name: 'Color Palette Extractor & Contrast Checker',
     category: 'dev',
     categoryLabel: 'Design / Dev',
@@ -190,6 +206,7 @@ const CATALOG_TOOLS: CatalogTool[] = [
   },
   {
     id: 'css-mesh-gradient-maker',
+    i18nKey: 'meshGradient',
     name: 'CSS Mesh Gradient & Glassmorphism Maker',
     category: 'dev',
     categoryLabel: 'Dev / Design',
@@ -202,6 +219,7 @@ const CATALOG_TOOLS: CatalogTool[] = [
   },
   {
     id: 'subtitles-shifter',
+    i18nKey: 'subtitlesShifter',
     name: 'Subtitles Timestamp Shifter & Converter',
     category: 'media',
     categoryLabel: 'Media',
@@ -214,6 +232,7 @@ const CATALOG_TOOLS: CatalogTool[] = [
   },
   {
     id: 'calendar-linker',
+    i18nKey: 'calendarLinker',
     name: 'Universal Event & .ics Calendar Linker',
     category: 'dev',
     categoryLabel: 'Dev / Productivity',
@@ -226,6 +245,7 @@ const CATALOG_TOOLS: CatalogTool[] = [
   },
   {
     id: 'email-signature-generator',
+    i18nKey: 'emailSignature',
     name: 'HTML Email Signature Generator',
     category: 'dev',
     categoryLabel: 'Dev / Productivity',
@@ -238,6 +258,7 @@ const CATALOG_TOOLS: CatalogTool[] = [
   },
   {
     id: 'robots-sitemap-builder',
+    i18nKey: 'robotsSitemap',
     name: 'Robots.txt & XML Sitemap Builder',
     category: 'dev',
     categoryLabel: 'Dev / Productivity',
@@ -250,6 +271,7 @@ const CATALOG_TOOLS: CatalogTool[] = [
   },
   {
     id: 'dns-checker',
+    i18nKey: 'dnsChecker',
     name: 'Global DNS Propagation & WHOIS Checker',
     category: 'dev',
     categoryLabel: 'Dev / Networking',
@@ -262,6 +284,7 @@ const CATALOG_TOOLS: CatalogTool[] = [
   },
   {
     id: 'web-vitals',
+    i18nKey: 'webVitals',
     name: 'Website Performance & Core Web Vitals Checker',
     category: 'dev',
     categoryLabel: 'Dev / Performance',
@@ -274,6 +297,7 @@ const CATALOG_TOOLS: CatalogTool[] = [
   },
   {
     id: 'markdown-cheatsheet',
+    i18nKey: 'markdownCheatsheet',
     name: 'Markdown to Academic / Tech PDF Cheatsheet',
     category: 'documents',
     categoryLabel: 'Documents',
@@ -286,6 +310,7 @@ const CATALOG_TOOLS: CatalogTool[] = [
   },
   {
     id: 'audio-bpm-detector',
+    i18nKey: 'bpmTapDetector',
     name: 'Audio BPM, Pitch & Key Tap Detector',
     category: 'audio-video',
     categoryLabel: 'Audio / Video',
@@ -298,6 +323,7 @@ const CATALOG_TOOLS: CatalogTool[] = [
   },
   {
     id: 'soundwave-art-maker',
+    i18nKey: 'soundwaveArt',
     name: 'Spotify Code & Soundwave Art Maker',
     category: 'audio-video',
     categoryLabel: 'Audio / Video',
@@ -310,6 +336,7 @@ const CATALOG_TOOLS: CatalogTool[] = [
   },
   {
     id: 'video-to-gif',
+    i18nKey: 'videoGifTrimmer',
     name: 'Video to GIF & Clip Trimmer',
     category: 'audio-video',
     categoryLabel: 'Audio / Video',
@@ -322,6 +349,7 @@ const CATALOG_TOOLS: CatalogTool[] = [
   },
   {
     id: 'screenshot-mockup',
+    i18nKey: 'screenshotMockup',
     name: 'App Screenshot Mockup Studio',
     category: 'media',
     categoryLabel: 'Media',
@@ -334,6 +362,7 @@ const CATALOG_TOOLS: CatalogTool[] = [
   },
   {
     id: '3d-qr-stand',
+    i18nKey: 'qrStandKeychain',
     name: '3D QR Stand & Keychain Generator',
     category: '3d',
     categoryLabel: '3D Fabrication',
@@ -346,6 +375,7 @@ const CATALOG_TOOLS: CatalogTool[] = [
   },
   {
     id: 'cookie-cutter-3d',
+    i18nKey: 'cookieCutter',
     name: 'Custom Cookie Cutter & Stamp 3D Maker',
     category: '3d',
     categoryLabel: '3D Fabrication',
@@ -358,6 +388,7 @@ const CATALOG_TOOLS: CatalogTool[] = [
   },
   {
     id: 'desk-wedge-nameplate',
+    i18nKey: 'deskWedge',
     name: 'Parametric Desk Wedge & Nameplate Maker',
     category: '3d',
     categoryLabel: '3D Fabrication',
@@ -374,33 +405,32 @@ const CATALOG_TOOLS: CatalogTool[] = [
   selector: 'app-home',
   standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [RouterLink, FormsModule, Badge, Card],
+  imports: [RouterLink, FormsModule, Badge, Card, TranslatePipe],
   template: `
     <div class="l-columns l-columns--1 g--margin-x-auto" style="max-width: 1200px;">
       <!-- Hero Presentation Section -->
       <div class="l-columns__area g--text-center g--margin-bottom-8">
         <div class="g--flex-center g--margin-bottom-4">
           <app-badge variant="privacy" [dot]="true">
-            🛡️ 100% In-Browser &bull; Zero Server Ingestion &bull; Zero Telemetry
+            {{ 'home.heroBadge' | translate }}
           </app-badge>
         </div>
 
         <h1 style="font-size: clamp(2rem, 5vw, 3.25rem); font-weight: 800; line-height: 1.15; letter-spacing: -0.02em;">
-          The Private In-Browser<br />
-          <span style="color: var(--color-primary);">Swiss Army Knife</span>
+          {{ 'home.heroHeadingStart' | translate }}<br />
+          <span style="color: var(--color-primary);">{{ 'home.heroHeadingHighlight' | translate }}</span>
         </h1>
 
         <p class="g--margin-top-4 g--margin-x-auto" style="max-width: 680px; font-size: 1.25rem; color: var(--color-text-secondary); line-height: 1.6;">
-          A consolidated suite of fast, everyday web tools running entirely inside your browser.
-          No cloud uploads. No telemetry. No cookies.
+          {{ 'home.heroDescription' | translate }}
         </p>
 
         <!-- Platform Pillars Badge Ribbon -->
         <div class="g--flex-center g--margin-top-6" style="gap: 12px; flex-wrap: wrap;">
-          <app-badge variant="neutral">🇨🇭 29+ Everyday Tools</app-badge>
-          <app-badge variant="neutral">🔒 0 Bytes Leaves Device</app-badge>
-          <app-badge variant="neutral">⚡ Client-Side WebAssembly</app-badge>
-          <app-badge variant="neutral">📜 MIT Open Source</app-badge>
+          <app-badge variant="neutral">{{ 'home.ribbonTools' | translate }}</app-badge>
+          <app-badge variant="neutral">{{ 'home.ribbonZeroBytes' | translate }}</app-badge>
+          <app-badge variant="neutral">{{ 'home.ribbonWasm' | translate }}</app-badge>
+          <app-badge variant="neutral">{{ 'home.ribbonOpenSource' | translate }}</app-badge>
         </div>
       </div>
 
@@ -413,7 +443,7 @@ const CATALOG_TOOLS: CatalogTool[] = [
               <input
                 type="text"
                 class="c-input"
-                placeholder="🔍 Search tools by name or keyword (e.g. EXIF, PDF, Hash, Image, 3D)..."
+                [placeholder]="'home.searchPlaceholder' | translate"
                 [ngModel]="searchQuery()"
                 (ngModelChange)="searchQuery.set($event)"
                 style="width: 100%; font-size: 1rem; padding: 12px 16px;" />
@@ -427,7 +457,7 @@ const CATALOG_TOOLS: CatalogTool[] = [
                 [class.c-button--primary]="selectedCategory() === 'all'"
                 [class.c-button--outline]="selectedCategory() !== 'all'"
                 (click)="selectedCategory.set('all')">
-                All ({{ allCount() }})
+                {{ 'home.categories.all' | translate }} ({{ allCount() }})
               </button>
               <button
                 type="button"
@@ -435,7 +465,7 @@ const CATALOG_TOOLS: CatalogTool[] = [
                 [class.c-button--primary]="selectedCategory() === 'privacy'"
                 [class.c-button--outline]="selectedCategory() !== 'privacy'"
                 (click)="selectedCategory.set('privacy')">
-                Privacy
+                {{ 'home.categories.privacy' | translate }}
               </button>
               <button
                 type="button"
@@ -443,7 +473,7 @@ const CATALOG_TOOLS: CatalogTool[] = [
                 [class.c-button--primary]="selectedCategory() === 'documents'"
                 [class.c-button--outline]="selectedCategory() !== 'documents'"
                 (click)="selectedCategory.set('documents')">
-                Documents
+                {{ 'home.categories.documents' | translate }}
               </button>
               <button
                 type="button"
@@ -451,7 +481,7 @@ const CATALOG_TOOLS: CatalogTool[] = [
                 [class.c-button--primary]="selectedCategory() === 'media'"
                 [class.c-button--outline]="selectedCategory() !== 'media'"
                 (click)="selectedCategory.set('media')">
-                Media &amp; Images
+                {{ 'home.categories.media' | translate }}
               </button>
               <button
                 type="button"
@@ -459,7 +489,7 @@ const CATALOG_TOOLS: CatalogTool[] = [
                 [class.c-button--primary]="selectedCategory() === 'dev'"
                 [class.c-button--outline]="selectedCategory() !== 'dev'"
                 (click)="selectedCategory.set('dev')">
-                Developer
+                {{ 'home.categories.dev' | translate }}
               </button>
               <button
                 type="button"
@@ -467,7 +497,7 @@ const CATALOG_TOOLS: CatalogTool[] = [
                 [class.c-button--primary]="selectedCategory() === '3d'"
                 [class.c-button--outline]="selectedCategory() !== '3d'"
                 (click)="selectedCategory.set('3d')">
-                3D Fabrication
+                {{ 'home.categories.3d' | translate }}
               </button>
             </div>
           </div>
@@ -485,9 +515,9 @@ const CATALOG_TOOLS: CatalogTool[] = [
                   <span style="font-size: 1.5rem;" aria-hidden="true">{{ tool.icon }}</span>
                   <div>
                     @if (tool.status === 'ready') {
-                      <app-badge variant="success" [dot]="true">Ready to Use</app-badge>
+                      <app-badge variant="success" [dot]="true">{{ 'common.readyToUse' | translate }}</app-badge>
                     } @else {
-                      <app-badge variant="neutral">Roadmap</app-badge>
+                      <app-badge variant="neutral">{{ 'common.roadmap' | translate }}</app-badge>
                     }
                   </div>
                 </div>
@@ -495,10 +525,10 @@ const CATALOG_TOOLS: CatalogTool[] = [
                 <!-- Card Body -->
                 <div>
                   <h3 style="font-size: 1.125rem; font-weight: 600; line-height: 1.3; margin-bottom: 8px;">
-                    {{ tool.name }}
+                    {{ tool.i18nKey ? ('tools.' + tool.i18nKey + '.name' | translate) : tool.name }}
                   </h3>
                   <p style="color: var(--color-text-secondary); font-size: 0.875rem; line-height: 1.5; margin-bottom: 12px;">
-                    {{ tool.description }}
+                    {{ tool.i18nKey ? ('tools.' + tool.i18nKey + '.description' | translate) : tool.description }}
                   </p>
                   <div style="font-size: 0.75rem; color: var(--color-text-muted);">
                     ⚡ {{ tool.techStack }}
@@ -508,16 +538,16 @@ const CATALOG_TOOLS: CatalogTool[] = [
                 <!-- Card Footer Action -->
                 <div card-footer class="l-extremo" style="align-items: center; width: 100%;">
                   <span style="font-size: 0.75rem; color: var(--color-text-muted); font-weight: 500;">
-                    {{ tool.categoryLabel }}
+                    {{ 'home.categories.' + (tool.category === 'audio-video' ? 'audioVideo' : tool.category) | translate }}
                   </span>
                   <div>
                     @if (tool.status === 'ready' && tool.route) {
                       <a [routerLink]="tool.route" class="c-button c-button--primary c-button--small">
-                        Open Tool &rarr;
+                        {{ 'common.openTool' | translate }} &rarr;
                       </a>
                     } @else {
                       <span style="font-size: 0.75rem; color: var(--color-text-muted); font-style: italic;">
-                        Coming Soon
+                        {{ 'common.comingSoon' | translate }}
                       </span>
                     }
                   </div>
@@ -530,13 +560,13 @@ const CATALOG_TOOLS: CatalogTool[] = [
         @if (filteredTools().length === 0) {
           <div class="g--text-center g--padding-y-8">
             <p style="color: var(--color-text-muted); font-size: 1.125rem;">
-              No tools found matching "{{ searchQuery() }}".
+              {{ 'home.noResultsTitle' | translate }}
             </p>
             <button
               type="button"
               class="c-button c-button--outline g--margin-top-4"
               (click)="resetFilters()">
-              Clear Filters
+              {{ 'common.clearFilters' | translate }}
             </button>
           </div>
         }
@@ -545,34 +575,34 @@ const CATALOG_TOOLS: CatalogTool[] = [
       <!-- Core Philosophy: "Privacy by Architecture" (3 Pillars) -->
       <div class="l-columns__area g--margin-bottom-8">
         <div class="g--text-center g--margin-bottom-6">
-          <app-badge variant="privacy">Guaranteed Client-Side</app-badge>
-          <h2 class="g--margin-top-2">Privacy by Architecture, Not by Policy</h2>
+          <app-badge variant="privacy">{{ 'common.guaranteedClientSide' | translate }}</app-badge>
+          <h2 class="g--margin-top-2">{{ 'home.privacyByArchTitle' | translate }}</h2>
           <p style="color: var(--color-text-muted); max-width: 640px; margin: 8px auto 0;">
-            Most web tools ask you to trust their legal terms while silently uploading your private documents to remote cloud storage. PrivKnife is fundamentally different.
+            {{ 'home.privacyByArchDesc' | translate }}
           </p>
         </div>
 
         <div class="l-columns l-columns--3 l-columns--cards" style="gap: 20px;">
           <div class="l-columns__area">
-            <app-card title="🛡️ Zero Server Ingestion">
+            <app-card [title]="'🛡️ ' + ('home.pillars.zeroServerTitle' | translate)">
               <p style="font-size: 0.875rem; color: var(--color-text-secondary); line-height: 1.6;">
-                PrivKnife has no processing servers or remote storage buckets. All file parsing, binary manipulation, and rendering run on your local machine using WebAssembly and Web Workers.
+                {{ 'home.pillars.zeroServerDesc' | translate }}
               </p>
             </app-card>
           </div>
 
           <div class="l-columns__area">
-            <app-card title="🚫 Zero Telemetry & Tracking">
+            <app-card [title]="'🚫 ' + ('home.pillars.privacyTitle' | translate)">
               <p style="font-size: 0.875rem; color: var(--color-text-secondary); line-height: 1.6;">
-                No Google Analytics, no tracking pixels, no telemetry beacons, and zero advertising cookies. You operate with complete digital anonymity.
+                {{ 'home.pillars.privacyDesc' | translate }}
               </p>
             </app-card>
           </div>
 
           <div class="l-columns__area">
-            <app-card title="⚡ Blazing Local Performance">
+            <app-card [title]="'⚡ ' + ('home.pillars.threadTitle' | translate)">
               <p style="font-size: 0.875rem; color: var(--color-text-secondary); line-height: 1.6;">
-                Zero network upload latency. Process gigabyte-scale documents or hundreds of photos directly on your device CPU/GPU at full native speed.
+                {{ 'home.pillars.threadDesc' | translate }}
               </p>
             </app-card>
           </div>
@@ -584,9 +614,9 @@ const CATALOG_TOOLS: CatalogTool[] = [
         <app-card>
           <div class="l-extremo" style="align-items: center; gap: 24px; flex-wrap: wrap;">
             <div>
-              <h3 style="font-size: 1.25rem; font-weight: 700;">Verifiable & Open Source</h3>
+              <h3 style="font-size: 1.25rem; font-weight: 700;">{{ 'home.verifiableTitle' | translate }}</h3>
               <p style="color: var(--color-text-muted); font-size: 0.875rem; margin-top: 4px;">
-                Open your browser DevTools (F12) &rarr; Network tab to verify 0 network requests, or inspect our source code on GitHub.
+                {{ 'home.verifiableDesc' | translate }}
               </p>
             </div>
             <div class="g--flex-center" style="gap: 12px; flex-wrap: wrap;">
@@ -595,10 +625,10 @@ const CATALOG_TOOLS: CatalogTool[] = [
                 target="_blank"
                 rel="noopener noreferrer"
                 class="c-button c-button--outline">
-                GitHub Repository &rarr;
+                {{ 'home.githubRepo' | translate }} &rarr;
               </a>
               <a routerLink="/ui-kit" class="c-button c-button--outline">
-                Design System &amp; UI Kit &rarr;
+                {{ 'home.uiKitDesignSystem' | translate }} &rarr;
               </a>
             </div>
           </div>
@@ -608,6 +638,8 @@ const CATALOG_TOOLS: CatalogTool[] = [
   `,
 })
 export class Home {
+  private readonly i18n = inject(I18nService);
+
   readonly searchQuery = signal<string>('');
   readonly selectedCategory = signal<string>('all');
   readonly allTools = signal<CatalogTool[]>(CATALOG_TOOLS);
@@ -617,6 +649,8 @@ export class Home {
   readonly filteredTools = computed(() => {
     const q = this.searchQuery().trim().toLowerCase();
     const cat = this.selectedCategory();
+    // Reactively track current language signal
+    this.i18n.currentLang();
 
     return this.allTools().filter((tool) => {
       // Category match
@@ -625,8 +659,10 @@ export class Home {
 
       // Search match
       if (!q) return true;
-      const inName = tool.name.toLowerCase().includes(q);
-      const inDesc = tool.description.toLowerCase().includes(q);
+      const translatedName = tool.i18nKey ? this.i18n.t(`tools.${tool.i18nKey}.name`) : '';
+      const translatedDesc = tool.i18nKey ? this.i18n.t(`tools.${tool.i18nKey}.description`) : '';
+      const inName = tool.name.toLowerCase().includes(q) || translatedName.toLowerCase().includes(q);
+      const inDesc = tool.description.toLowerCase().includes(q) || translatedDesc.toLowerCase().includes(q);
       const inKeywords = tool.keywords.some((k) => k.toLowerCase().includes(q));
       return inName || inDesc || inKeywords;
     });
