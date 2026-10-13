@@ -277,6 +277,6 @@ To introduce any future language (e.g. German `de`, French `fr`, or Simplified C
   - Localize search input, category filters, tool counters, and footer.
 - [x] **Phase 4: Tool Registry Metadata Localization**:
   - Integrate reactive localized names, descriptions, and category labels in `TOOL_REGISTRY`.
-- [ ] **Phase 5: Verification & Zero-Exfiltration Tests**:
+- [x] **Phase 5: Verification & Zero-Exfiltration Tests**:
   - Write unit tests verifying detection, persistence, fallback, interpolation, and zero-network assertion.
   - Run full test suite and verify clean production build.

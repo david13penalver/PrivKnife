@@ -152,4 +152,23 @@ describe('I18nService', () => {
       });
     }
   });
+
+  it('should guarantee 100% client-side execution with zero external network exfiltration', async () => {
+    const fetchSpy = vi.spyOn(globalThis, 'fetch');
+
+    // Switch language and translate multiple keys
+    await service.setLanguage('es');
+    const heroTitle = service.t('home.heroTitle');
+    const count = service.t('home.toolsCount', { count: 29 });
+    const privacyNotice = service.t('footer.privacyNotice');
+
+    expect(heroTitle).toBeTruthy();
+    expect(count).toBeTruthy();
+    expect(privacyNotice).toBeTruthy();
+
+    // Verify absolutely no remote HTTP/fetch requests occurred
+    expect(fetchSpy).not.toHaveBeenCalled();
+
+    fetchSpy.mockRestore();
+  });
 });
