@@ -84,7 +84,7 @@ import {
       </div>
 
       <!-- Main Studio Layout: Controls (Left) vs 3D Interactive Viewport (Right) -->
-      <div class="l-columns l-columns--12" style="gap: 24px; align-items: start;">
+      <div class="l-columns l-columns--12 qr-stand-workspace" style="gap: 24px; align-items: start;">
         
         <!-- Controls Column (5 cols) -->
         <div class="l-columns__area l-columns__area--span-5">
@@ -465,6 +465,19 @@ import {
       </div>
     </div>
   `,
+  styles: [
+    `
+      @media (max-width: 1024px) {
+        .qr-stand-workspace {
+          grid-template-columns: 1fr !important;
+        }
+
+        .qr-stand-workspace > .l-columns__area {
+          grid-column: span 1 !important;
+        }
+      }
+    `,
+  ],
 })
 export class QrStandKeychainComponent implements AfterViewInit, OnDestroy {
   @ViewChild('viewportCanvas') canvasRef!: ElementRef<HTMLCanvasElement>;
