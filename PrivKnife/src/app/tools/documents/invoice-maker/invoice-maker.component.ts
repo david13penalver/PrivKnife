@@ -767,6 +767,14 @@ const DRAFT_STORAGE_KEY = 'privknife_invoice_draft';
           grid-template-columns: 1fr !important;
         }
       }
+
+      @media (max-width: 600px) {
+        .editor-pane .l-columns--2,
+        .editor-pane .l-columns--3,
+        .editor-pane .l-columns--4 {
+          grid-template-columns: 1fr !important;
+        }
+      }
     `,
   ],
 })
