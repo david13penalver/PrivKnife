@@ -616,6 +616,13 @@ const STORAGE_KEY = 'privknife_grid_paper_settings';
         }
       }
 
+      @media (max-width: 600px) {
+        .controls-pane .l-columns--2,
+        .controls-pane .l-columns--4 {
+          grid-template-columns: 1fr !important;
+        }
+      }
+
       @media print {
         .print-hidden,
         .ad-slot,
