@@ -522,6 +522,31 @@ import {
       gap: 12px;
     }
 
+    @media (max-width: 768px) {
+      .form-row {
+        flex-direction: column;
+        gap: 8px;
+      }
+
+      .sitemap-entry-row {
+        flex-direction: column !important;
+        align-items: stretch !important;
+        gap: 8px !important;
+        background: var(--color-bg);
+        border: 1px solid var(--color-border);
+        border-radius: var(--radius-sm);
+        padding: 10px;
+      }
+
+      .sitemap-entry-row > div {
+        width: 100%;
+      }
+
+      .sitemap-entry-row .delete-btn {
+        align-self: flex-end;
+      }
+    }
+
     .form-group {
       flex: 1;
       display: flex;
