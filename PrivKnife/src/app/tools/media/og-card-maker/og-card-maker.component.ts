@@ -63,7 +63,7 @@ export type MockupTab = 'studio' | 'twitter' | 'linkedin' | 'meta';
       </div>
 
       <!-- Main Studio 2-Column Grid -->
-      <div class="l-columns l-columns--2 g--margin-bottom-6" style="gap: 24px; align-items: start;">
+      <div class="l-columns l-columns--2 og-workspace g--margin-bottom-6" style="gap: 24px; align-items: start;">
         
         <!-- Left: Controls Panel -->
         <div class="l-columns__area" style="display: flex; flex-direction: column; gap: 20px;">
@@ -739,6 +739,19 @@ export type MockupTab = 'studio' | 'twitter' | 'linkedin' | 'meta';
       }
     </div>
   `,
+  styles: [
+    `
+      @media (max-width: 1024px) {
+        .og-workspace {
+          grid-template-columns: 1fr !important;
+        }
+
+        .og-workspace > .l-columns__area {
+          grid-column: span 1 !important;
+        }
+      }
+    `,
+  ],
 })
 export class OgCardMakerComponent implements AfterViewInit, OnDestroy {
   readonly previewCanvas = viewChild<ElementRef<HTMLCanvasElement>>('previewCanvas');
