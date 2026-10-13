@@ -476,7 +476,7 @@ const CATALOG_TOOLS: CatalogTool[] = [
 
       <!-- Tools Grid -->
       <div class="l-columns__area g--margin-bottom-8">
-        <div class="l-columns l-columns--3" style="gap: 20px;">
+        <div class="l-columns l-columns--3 l-columns--cards" style="gap: 20px;">
           @for (tool of filteredTools(); track tool.id) {
             <div class="l-columns__area">
               <app-card [interactive]="tool.status === 'ready'" [hasHeader]="true" [hasFooter]="true">
@@ -552,7 +552,7 @@ const CATALOG_TOOLS: CatalogTool[] = [
           </p>
         </div>
 
-        <div class="l-columns l-columns--3" style="gap: 20px;">
+        <div class="l-columns l-columns--3 l-columns--cards" style="gap: 20px;">
           <div class="l-columns__area">
             <app-card title="🛡️ Zero Server Ingestion">
               <p style="font-size: 0.875rem; color: var(--color-text-secondary); line-height: 1.6;">

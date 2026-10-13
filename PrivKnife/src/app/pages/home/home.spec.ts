@@ -75,4 +75,13 @@ describe('Home Component (Presentation & Tool Catalog)', () => {
     expect(component.selectedCategory()).toBe('all');
     expect(component.filteredTools().length).toBe(component.allCount());
   });
+
+  it('should structure tool cards and pillars using responsive card grid classes', () => {
+    const compiled = fixture.nativeElement as HTMLElement;
+    const cardGrids = compiled.querySelectorAll('.l-columns--cards');
+    expect(cardGrids.length).toBeGreaterThanOrEqual(2);
+    expect(cardGrids[0].classList.contains('l-columns--3')).toBe(true);
+    expect(cardGrids[0].classList.contains('l-columns--cards')).toBe(true);
+  });
 });
+

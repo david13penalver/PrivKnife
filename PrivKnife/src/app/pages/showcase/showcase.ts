@@ -52,8 +52,8 @@ import { SplitPreview } from '../../components/split-preview/split-preview';
 
       <!-- 3. Layout Grid & Cards -->
       <div class="g--margin-bottom-8">
-        <h3 class="g--margin-bottom-3">3. Cards & 3-Column Grid (.l-columns--3)</h3>
-        <div class="l-columns l-columns--3">
+        <h3 class="g--margin-bottom-3">3. Cards & 3-Column Grid (.l-columns--3, .l-columns--cards)</h3>
+        <div class="l-columns l-columns--3 l-columns--cards">
           <div class="l-columns__area">
             <app-card title="EXIF Stripper" [hasFooter]="true">
               <p>Remove location, camera metadata, and timestamps from JPEG/PNG images locally.</p>
