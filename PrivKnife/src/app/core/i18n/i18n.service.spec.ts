@@ -1,0 +1,155 @@
+import { TestBed } from '@angular/core/testing';
+import { I18nService } from './i18n.service';
+import {
+  DEFAULT_LANGUAGE_CODE,
+  STORAGE_KEY_LANG,
+  SUPPORTED_LANGUAGES,
+} from './languages.config';
+
+describe('I18nService', () => {
+  let service: I18nService;
+  let store: Record<string, string> = {};
+  let mockStorage: {
+    getItem: (key: string) => string | null;
+    setItem: (key: string, value: string) => void;
+    removeItem: (key: string) => void;
+    clear: () => void;
+  };
+
+  beforeEach(() => {
+    store = {};
+    mockStorage = {
+      getItem: (key: string) => store[key] || null,
+      setItem: (key: string, value: string) => {
+        store[key] = value;
+      },
+      removeItem: (key: string) => {
+        delete store[key];
+      },
+      clear: () => {
+        for (const k in store) delete store[k];
+      },
+    };
+    vi.stubGlobal('localStorage', mockStorage);
+
+    TestBed.configureTestingModule({
+      providers: [I18nService],
+    });
+    service = TestBed.inject(I18nService);
+  });
+
+  afterEach(() => {
+    vi.unstubAllGlobals();
+  });
+
+  it('should be created and initialized with a supported language', () => {
+    expect(service).toBeTruthy();
+    expect(service.currentLang()).toBeTruthy();
+    expect(SUPPORTED_LANGUAGES.some((l) => l.code === service.currentLang().code)).toBe(true);
+  });
+
+  it('should expose supported languages array with English and Spanish', () => {
+    const codes = service.supportedLanguages.map((l) => l.code);
+    expect(codes).toContain('en');
+    expect(codes).toContain('es');
+  });
+
+  it('should resolve English translations synchronously', () => {
+    const brand = service.t('common.brandName');
+    expect(brand).toBe('PrivKnife');
+
+    const download = service.t('common.download');
+    expect(download).toBe('Download');
+  });
+
+  it('should switch language to Spanish and update translations', async () => {
+    await service.setLanguage('es');
+
+    expect(service.currentLang().code).toBe('es');
+    expect(service.currentLang().name).toBe('Spanish');
+    expect(service.currentLang().nativeName).toBe('Español');
+
+    expect(service.t('common.download')).toBe('Descargar');
+    expect(service.t('common.brandName')).toBe('PrivKnife');
+    expect(service.t('home.heroTitle')).toBe('Herramientas Cotidianas Consolidadas.');
+    expect(service.t('common.privacyBadge')).toContain('100% en el Navegador');
+
+    // Should be saved in localStorage
+    expect(localStorage.getItem(STORAGE_KEY_LANG)).toBe('es');
+  });
+
+  it('should update document.documentElement lang and dir attributes', async () => {
+    await service.setLanguage('es');
+
+    if (typeof document !== 'undefined' && document.documentElement) {
+      expect(document.documentElement.lang).toBe('es');
+      expect(document.documentElement.dir).toBe('ltr');
+    }
+  });
+
+  it('should gracefully fallback to English when a key is missing in Spanish', async () => {
+    await service.setLanguage('es');
+
+    // Temporarily manipulate translations to simulate a missing key
+    service.translations.set({
+      common: {},
+    });
+
+    // Key exists in English fallback dictionary
+    const fallbackText = service.t('common.download');
+    expect(fallbackText).toBe('Download');
+  });
+
+  it('should return key string if key is not found in any dictionary', () => {
+    const missing = service.t('non.existent.translation.key');
+    expect(missing).toBe('non.existent.translation.key');
+  });
+
+  it('should interpolate dynamic parameters correctly', () => {
+    const interpolated = service.t('home.toolsCount', { count: 29 });
+    expect(interpolated).toBe('29 tools available');
+  });
+
+  it('should interpolate parameters in Spanish when switched', async () => {
+    await service.setLanguage('es');
+    const interpolated = service.t('home.toolsCount', { count: 29 });
+    expect(interpolated).toBe('29 herramientas disponibles');
+  });
+
+  it('should normalize regional locale variants (e.g. es-MX, es-ES) to primary code', async () => {
+    await service.setLanguage('es-MX');
+    expect(service.currentLang().code).toBe('es');
+
+    await service.setLanguage('en-US');
+    expect(service.currentLang().code).toBe('en');
+  });
+
+  it('should fallback to default language if unknown language code is requested', async () => {
+    await service.setLanguage('xyz-unknown');
+    expect(service.currentLang().code).toBe(DEFAULT_LANGUAGE_CODE);
+  });
+
+  it('should detect browser language from navigator.languages', () => {
+    const originalNavigator = window.navigator;
+
+    try {
+      // Mock navigator.languages with Spanish first
+      Object.defineProperty(window, 'navigator', {
+        value: {
+          ...originalNavigator,
+          languages: ['es-ES', 'es', 'en'],
+          language: 'es-ES',
+        },
+        configurable: true,
+      });
+
+      const detected = service.detectBrowserLanguage();
+      expect(detected).toBe('es');
+    } finally {
+      Object.defineProperty(window, 'navigator', {
+        value: originalNavigator,
+        configurable: true,
+      });
+    }
+  });
+});
