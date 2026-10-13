@@ -684,6 +684,27 @@ import {
       </div>
     }
   `,
+  styles: [
+    `
+      .mobile-tab-bar {
+        display: none;
+      }
+
+      @media (max-width: 900px) {
+        .mobile-tab-bar {
+          display: block;
+        }
+
+        .mobile-hidden {
+          display: none !important;
+        }
+
+        .tent-workspace {
+          grid-template-columns: 1fr !important;
+        }
+      }
+    `,
+  ],
 })
 export class TableTentMakerComponent {
   readonly presets = TENT_PRESETS;
