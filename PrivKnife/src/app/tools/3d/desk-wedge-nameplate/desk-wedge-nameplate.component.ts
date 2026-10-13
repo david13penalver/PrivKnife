@@ -85,7 +85,7 @@ import {
       </div>
 
       <!-- Main Layout: Controls Left (5 cols) vs 3D Viewport Right (7 cols) -->
-      <div class="l-columns l-columns--12" style="gap: 24px; align-items: start;">
+      <div class="l-columns l-columns--12 nameplate-workspace" style="gap: 24px; align-items: start;">
         
         <!-- Controls Column -->
         <div class="l-columns__area l-columns__area--span-5">
@@ -496,6 +496,19 @@ import {
       </div>
     </div>
   `,
+  styles: [
+    `
+      @media (max-width: 1024px) {
+        .nameplate-workspace {
+          grid-template-columns: 1fr !important;
+        }
+
+        .nameplate-workspace > .l-columns__area {
+          grid-column: span 1 !important;
+        }
+      }
+    `,
+  ],
 })
 export class DeskWedgeNameplateComponent implements AfterViewInit, OnDestroy {
   @ViewChild('viewportContainer') viewportContainer!: ElementRef<HTMLDivElement>;
