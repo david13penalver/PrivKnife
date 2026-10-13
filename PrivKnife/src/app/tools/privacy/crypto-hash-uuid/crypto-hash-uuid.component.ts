@@ -65,7 +65,7 @@ import {
       </div>
 
       <!-- Main Two-Column Layout -->
-      <div class="l-columns l-columns--2" style="gap: 24px; align-items: start;">
+      <div class="l-columns l-columns--2 crypto-workspace" style="gap: 24px; align-items: start;">
         <!-- Left Column: Controls & Configuration -->
         <div class="l-columns__area">
           <app-card [title]="activeMode() === 'uuid' ? 'UUID Configuration' : 'Hasher Configuration'">
@@ -363,6 +363,19 @@ import {
       </div>
     </div>
   `,
+  styles: [
+    `
+      @media (max-width: 1024px) {
+        .crypto-workspace {
+          grid-template-columns: 1fr !important;
+        }
+
+        .crypto-workspace > .l-columns__area {
+          grid-column: span 1 !important;
+        }
+      }
+    `,
+  ],
 })
 export class CryptoHashUuidComponent implements OnInit, OnDestroy {
   readonly activeMode = signal<'uuid' | 'hasher'>('uuid');
