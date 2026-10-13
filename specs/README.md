@@ -87,6 +87,7 @@ gantt
 | **27** | [27 - Automated Background Removal (High Quality)](27%20-%20Automated%20Background%20Removal%20(High%20Quality)/spec.md) | Media | Transparent cutout `.png` | ONNX Runtime Web (`WebGPU` / WASM) | [x] |
 | **28** | [28 - Global DNS Propagation & WHOIS Checker](28%20-%20Global%20DNS%20Propagation%20&%20WHOIS%20Checker/spec.md) | Dev | DNS records table | Browser DNS-over-HTTPS (DoH) | [x] |
 | **29** | [29 - Website Performance - Core Web Vitals Checker](29%20-%20Website%20Performance%20-%20Core%20Web%20Vitals%20Checker/spec.md) | Dev | Audit score & diagnostic tips | Direct PageSpeed API / Navigation Timing | [x] |
+| **30** | [30 - Multi-Language Internationalization (i18n)](30%20-%20Multi-Language%20Internationalization%20(i18n)/spec.md) | Platform / i18n | Client-side i18n engine & Spanish locale | Angular Signals, Dynamic ES Imports, LocalStorage | [ ] |
 
 ---
 
