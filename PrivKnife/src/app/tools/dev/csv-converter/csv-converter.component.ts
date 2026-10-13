@@ -48,7 +48,7 @@ import {
       </div>
 
       <!-- Main Two-Column Layout -->
-      <div class="l-columns l-columns--2" style="gap: 24px; align-items: start;">
+      <div class="l-columns l-columns--2 csv-workspace" style="gap: 24px; align-items: start;">
         <!-- Left Column: Input & Options -->
         <div class="l-columns__area">
           <app-card title="Input Data">
@@ -398,6 +398,19 @@ import {
       </div>
     </div>
   `,
+  styles: [
+    `
+      @media (max-width: 1024px) {
+        .csv-workspace {
+          grid-template-columns: 1fr !important;
+        }
+
+        .csv-workspace > .l-columns__area {
+          grid-column: span 1 !important;
+        }
+      }
+    `,
+  ],
 })
 export class CsvConverterComponent implements OnInit, OnDestroy {
   readonly inputMode = signal<'text' | 'file'>('text');
