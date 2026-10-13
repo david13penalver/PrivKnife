@@ -86,7 +86,7 @@ import { ParsedMetadata, StrippedResult } from './types';
             </div>
 
             <!-- Preview & Tag Grid -->
-            <div class="l-columns l-columns--2 g--margin-bottom-4" style="gap: 24px;">
+            <div class="l-columns l-columns--2 exif-workspace g--margin-bottom-4" style="gap: 24px;">
               <!-- Image Preview -->
               <div class="l-columns__area g--text-center">
                 @if (previewUrl()) {
@@ -181,6 +181,19 @@ import { ParsedMetadata, StrippedResult } from './types';
       </div>
     </div>
   `,
+  styles: [
+    `
+      @media (max-width: 900px) {
+        .exif-workspace {
+          grid-template-columns: 1fr !important;
+        }
+
+        .exif-workspace > .l-columns__area {
+          grid-column: span 1 !important;
+        }
+      }
+    `,
+  ],
 })
 export class ExifStripperComponent implements OnDestroy {
   readonly selectedFile = signal<File | null>(null);
