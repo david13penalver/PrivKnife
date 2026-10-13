@@ -124,6 +124,24 @@ export class I18nService {
       case 'es':
         dict = (await import('./locales/es')).es;
         break;
+      case 'fr':
+        dict = (await import('./locales/fr')).fr;
+        break;
+      case 'it':
+        dict = (await import('./locales/it')).it;
+        break;
+      case 'de':
+        dict = (await import('./locales/de')).de;
+        break;
+      case 'zh':
+        dict = (await import('./locales/zh')).zh;
+        break;
+      case 'ja':
+        dict = (await import('./locales/ja')).ja;
+        break;
+      case 'ar':
+        dict = (await import('./locales/ar')).ar;
+        break;
       case 'en':
       default:
         dict = (await import('./locales/en')).en;
