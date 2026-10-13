@@ -1,5 +1,12 @@
 import { describe, expect, it } from 'vitest';
-import { getToolById, getToolsByCategory, TOOL_REGISTRY } from './tool-registry';
+import {
+  getLocalizedTool,
+  getLocalizedToolById,
+  getToolById,
+  getToolsByCategory,
+  TOOL_I18N_MAP,
+  TOOL_REGISTRY,
+} from './tool-registry';
 
 describe('ToolRegistry (Seam 3: Catalog & Architecture Verification)', () => {
   it('should have registered tools', () => {
@@ -308,5 +315,45 @@ describe('ToolRegistry (Seam 3: Catalog & Architecture Verification)', () => {
 
     const devTools = getToolsByCategory('dev');
     expect(devTools.some((t) => t.id === 'web-vitals')).toBe(true);
+  });
+
+  describe('Tool Registry Localization (i18n)', () => {
+    it('should have an i18n key mapping for every registered tool', () => {
+      for (const tool of TOOL_REGISTRY) {
+        const key = tool.i18nKey || TOOL_I18N_MAP[tool.id];
+        expect(key).toBeDefined();
+        expect(key?.length).toBeGreaterThan(0);
+      }
+    });
+
+    it('should localize tool metadata using getLocalizedTool with Spanish translations', () => {
+      const mockI18n = {
+        t: (key: string) => {
+          if (key === 'tools.exifStripper.name') return 'Eliminador de Metadatos EXIF y Privacidad';
+          if (key === 'tools.exifStripper.description') return 'Elimina coordenadas GPS de fotos.';
+          return key;
+        },
+      };
+
+      const tool = getToolById('exif-stripper')!;
+      const localized = getLocalizedTool(tool, mockI18n);
+
+      expect(localized.name).toBe('Eliminador de Metadatos EXIF y Privacidad');
+      expect(localized.description).toBe('Elimina coordenadas GPS de fotos.');
+      expect(localized.i18nKey).toBe('exifStripper');
+    });
+
+    it('should retrieve localized tool by id via getLocalizedToolById', () => {
+      const mockI18n = {
+        t: (key: string) => {
+          if (key === 'tools.cryptoHash.name') return 'Generador de Hashes Criptográficos';
+          return key;
+        },
+      };
+
+      const localized = getLocalizedToolById('crypto-hash-uuid', mockI18n);
+      expect(localized).toBeDefined();
+      expect(localized?.name).toBe('Generador de Hashes Criptográficos');
+    });
   });
 });

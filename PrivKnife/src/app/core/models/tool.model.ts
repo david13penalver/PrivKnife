@@ -11,6 +11,7 @@ export type ToolCategory =
 export interface ToolDefinition {
   id: string;
   name: string;
+  i18nKey?: string;
   category: ToolCategory;
   description: string;
   keywords: string[];

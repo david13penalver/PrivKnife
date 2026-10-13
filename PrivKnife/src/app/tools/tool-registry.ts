@@ -68,3 +68,70 @@ export function getToolById(id: string): ToolDefinition | undefined {
 export function getToolsByCategory(category: ToolCategory): ToolDefinition[] {
   return TOOL_REGISTRY.filter((tool) => tool.category === category);
 }
+
+export const TOOL_I18N_MAP: Record<string, string> = {
+  'exif-stripper': 'exifStripper',
+  'crypto-hash-uuid': 'cryptoHash',
+  'csv-to-sql-json': 'csvConverter',
+  'csv-json-sql': 'csvConverter',
+  'color-palette-extractor': 'colorPalette',
+  'css-mesh-gradient-maker': 'meshGradient',
+  'calendar-linker': 'calendarLinker',
+  'email-signature-generator': 'emailSignature',
+  'robots-sitemap-builder': 'robotsSitemap',
+  'pdf-merger-splitter': 'pdfMerger',
+  'pdf-redaction': 'pdfRedaction',
+  'invoice-receipt-maker': 'invoiceMaker',
+  'graph-dot-grid-paper': 'gridPaper',
+  'avery-barcode-sheet': 'barcodeLabels',
+  'table-tent-maker': 'tableTentMaker',
+  'markdown-cheatsheet': 'markdownCheatsheet',
+  'batch-image-compressor': 'batchCompressor',
+  'favicon-app-icon-suite': 'faviconGenerator',
+  'og-card-maker': 'ogCardMaker',
+  'screenshot-mockup': 'screenshotMockup',
+  'subtitles-shifter': 'subtitlesShifter',
+  'audio-bpm-detector': 'bpmTapDetector',
+  'bpm-tap-detector': 'bpmTapDetector',
+  'soundwave-art-maker': 'soundwaveArt',
+  'video-to-gif': 'videoGifTrimmer',
+  'video-gif-trimmer': 'videoGifTrimmer',
+  '3d-qr-stand': 'qrStandKeychain',
+  'cookie-cutter-3d': 'cookieCutter',
+  'cookie-cutter': 'cookieCutter',
+  'desk-wedge-nameplate': 'deskWedge',
+  'background-remover': 'backgroundRemover',
+  'dns-checker': 'dnsChecker',
+  'web-vitals': 'webVitals',
+};
+
+export function getToolI18nKey(id: string): string | undefined {
+  return TOOL_I18N_MAP[id];
+}
+
+export function getLocalizedTool(
+  tool: ToolDefinition,
+  i18n: { t: (key: string) => string }
+): ToolDefinition {
+  const i18nKey = tool.i18nKey || TOOL_I18N_MAP[tool.id];
+  if (!i18nKey) return tool;
+
+  const translatedName = i18n.t(`tools.${i18nKey}.name`);
+  const translatedDesc = i18n.t(`tools.${i18nKey}.description`);
+
+  return {
+    ...tool,
+    i18nKey,
+    name: translatedName !== `tools.${i18nKey}.name` ? translatedName : tool.name,
+    description:
+      translatedDesc !== `tools.${i18nKey}.description` ? translatedDesc : tool.description,
+  };
+}
+
+export function getLocalizedToolById(
+  id: string,
+  i18n: { t: (key: string) => string }
+): ToolDefinition | undefined {
+  const tool = getToolById(id);
+  return tool ? getLocalizedTool(tool, i18n) : undefined;
+}

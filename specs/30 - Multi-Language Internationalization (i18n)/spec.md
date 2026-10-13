@@ -275,7 +275,7 @@ To introduce any future language (e.g. German `de`, French `fr`, or Simplified C
 - [x] **Phase 3: Catalog & Home Localization**:
   - Update `Home` component and `Showcase` component templates to use `TranslatePipe` or `I18nService`.
   - Localize search input, category filters, tool counters, and footer.
-- [ ] **Phase 4: Tool Registry Metadata Localization**:
+- [x] **Phase 4: Tool Registry Metadata Localization**:
   - Integrate reactive localized names, descriptions, and category labels in `TOOL_REGISTRY`.
 - [ ] **Phase 5: Verification & Zero-Exfiltration Tests**:
   - Write unit tests verifying detection, persistence, fallback, interpolation, and zero-network assertion.
