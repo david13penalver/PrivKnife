@@ -280,3 +280,8 @@ To introduce any future language (e.g. German `de`, French `fr`, or Simplified C
 - [x] **Phase 5: Verification & Zero-Exfiltration Tests**:
   - Write unit tests verifying detection, persistence, fallback, interpolation, and zero-network assertion.
   - Run full test suite and verify clean production build.
+- [x] **Phase 6: Multi-Language Expansion (French, Italian, German, Chinese, Japanese, Arabic RTL)**:
+  - Add typed dictionaries for French (`fr.ts`), Italian (`it.ts`), German (`de.ts`), Chinese (`zh.ts`), Japanese (`ja.ts`), and Arabic (`ar.ts`).
+  - Register all 6 new languages in `languages.config.ts` and `I18nService.loadDictionary()`.
+  - Add bidirectional LTR/RTL support (`direction: 'rtl'` for Arabic) dynamically updating `document.documentElement.dir`.
+  - Add unit tests for all 8 languages and RTL switching in `i18n.service.spec.ts` and `lang-selector.spec.ts`.

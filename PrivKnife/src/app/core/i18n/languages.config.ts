@@ -15,6 +15,48 @@ export const SUPPORTED_LANGUAGES: readonly LanguageDefinition[] = [
     flag: '🇪🇸',
     direction: 'ltr',
   },
+  {
+    code: 'fr',
+    name: 'French',
+    nativeName: 'Français',
+    flag: '🇫🇷',
+    direction: 'ltr',
+  },
+  {
+    code: 'it',
+    name: 'Italian',
+    nativeName: 'Italiano',
+    flag: '🇮🇹',
+    direction: 'ltr',
+  },
+  {
+    code: 'de',
+    name: 'German',
+    nativeName: 'Deutsch',
+    flag: '🇩🇪',
+    direction: 'ltr',
+  },
+  {
+    code: 'zh',
+    name: 'Chinese',
+    nativeName: '简体中文',
+    flag: '🇨🇳',
+    direction: 'ltr',
+  },
+  {
+    code: 'ja',
+    name: 'Japanese',
+    nativeName: '日本語',
+    flag: '🇯🇵',
+    direction: 'ltr',
+  },
+  {
+    code: 'ar',
+    name: 'Arabic',
+    nativeName: 'العربية',
+    flag: '🇸🇦',
+    direction: 'rtl',
+  },
 ] as const;
 
 export const DEFAULT_LANGUAGE_CODE = 'en';

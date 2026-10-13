@@ -48,10 +48,9 @@ describe('I18nService', () => {
     expect(SUPPORTED_LANGUAGES.some((l) => l.code === service.currentLang().code)).toBe(true);
   });
 
-  it('should expose supported languages array with English and Spanish', () => {
+  it('should expose supported languages array with all 8 configured languages', () => {
     const codes = service.supportedLanguages.map((l) => l.code);
-    expect(codes).toContain('en');
-    expect(codes).toContain('es');
+    expect(codes).toEqual(['en', 'es', 'fr', 'it', 'de', 'zh', 'ja', 'ar']);
   });
 
   it('should resolve English translations synchronously', () => {
@@ -78,11 +77,50 @@ describe('I18nService', () => {
     expect(localStorage.getItem(STORAGE_KEY_LANG)).toBe('es');
   });
 
-  it('should update document.documentElement lang and dir attributes', async () => {
-    await service.setLanguage('es');
+  it('should switch language to French, Italian, German, Chinese, Japanese, and Arabic', async () => {
+    await service.setLanguage('fr');
+    expect(service.currentLang().code).toBe('fr');
+    expect(service.t('common.download')).toBe('Télécharger');
 
+    await service.setLanguage('it');
+    expect(service.currentLang().code).toBe('it');
+    expect(service.t('common.download')).toBe('Scarica');
+
+    await service.setLanguage('de');
+    expect(service.currentLang().code).toBe('de');
+    expect(service.t('common.download')).toBe('Herunterladen');
+
+    await service.setLanguage('zh');
+    expect(service.currentLang().code).toBe('zh');
+    expect(service.t('common.download')).toBe('下载');
+
+    await service.setLanguage('ja');
+    expect(service.currentLang().code).toBe('ja');
+    expect(service.t('common.download')).toBe('ダウンロード');
+
+    await service.setLanguage('ar');
+    expect(service.currentLang().code).toBe('ar');
+    expect(service.t('common.download')).toBe('تحميل');
+  });
+
+  it('should update document.documentElement lang and dir attributes for LTR and RTL', async () => {
+    await service.setLanguage('es');
     if (typeof document !== 'undefined' && document.documentElement) {
       expect(document.documentElement.lang).toBe('es');
+      expect(document.documentElement.dir).toBe('ltr');
+    }
+
+    // Switch to Arabic -> should set dir to rtl
+    await service.setLanguage('ar');
+    if (typeof document !== 'undefined' && document.documentElement) {
+      expect(document.documentElement.lang).toBe('ar');
+      expect(document.documentElement.dir).toBe('rtl');
+    }
+
+    // Switch back to Japanese -> should revert dir to ltr
+    await service.setLanguage('ja');
+    if (typeof document !== 'undefined' && document.documentElement) {
+      expect(document.documentElement.lang).toBe('ja');
       expect(document.documentElement.dir).toBe('ltr');
     }
   });

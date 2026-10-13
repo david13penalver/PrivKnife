@@ -89,6 +89,29 @@ describe('LangSelector Component', () => {
     expect(menuAfter).toBeNull();
   });
 
+  it('should switch language to Arabic (RTL) and update direction when Arabic is selected', async () => {
+    const button = fixture.nativeElement.querySelector('.c-lang-selector__button');
+    button.click();
+    fixture.detectChanges();
+
+    const items = fixture.nativeElement.querySelectorAll('.c-lang-selector__item');
+    const arabicItem = Array.from(items).find((el: any) =>
+      el.textContent.includes('العربية')
+    ) as HTMLButtonElement;
+
+    expect(arabicItem).toBeTruthy();
+    arabicItem.click();
+    await new Promise((resolve) => setTimeout(resolve, 50));
+    fixture.detectChanges();
+
+    expect(i18nService.currentLang().code).toBe('ar');
+    expect(i18nService.currentLang().direction).toBe('rtl');
+    expect(store[STORAGE_KEY_LANG]).toBe('ar');
+    if (typeof document !== 'undefined' && document.documentElement) {
+      expect(document.documentElement.dir).toBe('rtl');
+    }
+  });
+
   it('should close menu when Escape key is pressed', () => {
     const button = fixture.nativeElement.querySelector('.c-lang-selector__button');
     button.click();

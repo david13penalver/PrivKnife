@@ -60,8 +60,8 @@
   &__menu {
     position: absolute;
     top: calc(100% + #{fn.spacing(1.5)});
-    right: 0;
-    min-width: 160px;
+    inset-inline-end: 0;
+    min-width: 170px;
     background-color: var(--color-bg-surface);
     border: 1px solid var(--color-border-default);
     border-radius: var(--radius-md);
@@ -86,7 +86,7 @@
     color: var(--color-text-secondary);
     font-size: fn.rem(13px);
     cursor: pointer;
-    text-align: left;
+    text-align: start;
     @include mx.transition(all, 120ms, ease);
 
     &:hover {
