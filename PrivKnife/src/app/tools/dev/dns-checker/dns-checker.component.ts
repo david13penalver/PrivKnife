@@ -83,7 +83,7 @@ import {
       <div class="l-columns__area g--margin-bottom-5">
         <div class="c-card" style="padding: 20px;">
           <form (submit)="onSubmit($event)" class="l-columns l-columns--1" style="gap: 16px;">
-            <div class="l-columns l-columns--12" style="gap: 12px; align-items: end;">
+            <div class="l-columns l-columns--12 dns-form-grid" style="gap: 12px; align-items: end;">
               <!-- Domain Name Input (6 cols) -->
               <div class="l-columns__area l-columns__area--span-6">
                 <label style="font-size: 0.85rem; font-weight: 600; display: block; margin-bottom: 6px;">
@@ -204,7 +204,7 @@ import {
         <!-- Summary Banner -->
         <div class="l-columns__area g--margin-bottom-5">
           <div class="c-card" style="padding: 16px;">
-            <div class="l-columns l-columns--4" style="gap: 16px; text-align: center;">
+            <div class="l-columns l-columns--4 dns-metrics-grid" style="gap: 16px; text-align: center;">
               <div>
                 <span style="color: var(--color-text-secondary); display: block; font-size: 0.75rem;">Global Propagation</span>
                 <strong style="font-size: 1.25rem; color: #10b981;">
@@ -330,7 +330,7 @@ import {
           } @else if (whoisData()) {
             <div class="l-columns l-columns--1" style="gap: 16px;">
               <app-card title="Domain Registration Overview (RDAP / WHOIS)">
-                <div class="l-columns l-columns--2" style="gap: 16px;">
+                <div class="l-columns l-columns--2 dns-details-grid" style="gap: 16px;">
                   <div>
                     <span style="color: var(--color-text-secondary); display: block; font-size: 0.8rem;">Domain Name</span>
                     <strong style="font-size: 1.1rem; font-family: monospace;">{{ whoisData()?.domain }}</strong>
@@ -396,6 +396,33 @@ import {
       }
     </div>
   `,
+  styles: [
+    `
+      @media (max-width: 900px) {
+        .dns-form-grid {
+          grid-template-columns: 1fr !important;
+        }
+
+        .dns-form-grid > .l-columns__area {
+          grid-column: span 1 !important;
+        }
+
+        .dns-metrics-grid {
+          grid-template-columns: repeat(2, 1fr) !important;
+        }
+
+        .dns-details-grid {
+          grid-template-columns: 1fr !important;
+        }
+      }
+
+      @media (max-width: 500px) {
+        .dns-metrics-grid {
+          grid-template-columns: 1fr !important;
+        }
+      }
+    `,
+  ],
 })
 export class DnsCheckerComponent implements OnInit, OnDestroy {
   readonly providers = GLOBAL_DOH_PROVIDERS;
