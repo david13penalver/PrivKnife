@@ -88,7 +88,7 @@ gantt
 | **28** | [28 - Global DNS Propagation & WHOIS Checker](28%20-%20Global%20DNS%20Propagation%20&%20WHOIS%20Checker/spec.md) | Dev | DNS records table | Browser DNS-over-HTTPS (DoH) | [x] |
 | **29** | [29 - Website Performance - Core Web Vitals Checker](29%20-%20Website%20Performance%20-%20Core%20Web%20Vitals%20Checker/spec.md) | Dev | Audit score & diagnostic tips | Direct PageSpeed API / Navigation Timing | [x] |
 | **30** | [30 - Multi-Language Internationalization (i18n)](30%20-%20Multi-Language%20Internationalization%20(i18n)/spec.md) | Platform / i18n | Client-side i18n engine & Spanish locale | Angular Signals, Dynamic ES Imports, LocalStorage | [ ] |
-| **31** | [31 - QA Logic Audit & Defect Remediation](31%20-%20QA%20Logic%20Audit%20&%20Defect%20Remediation/spec.md) | Quality Assurance | Cross-Tool Logic Audit, Card Header Projection & Privacy Fixes | Chromium Headless, Angular Signals, CSP & Error Boundaries | [ ] |
+| **31** | [31 - QA Logic Audit & Defect Remediation](31%20-%20QA%20Logic%20Audit%20&%20Defect%20Remediation/spec.md) | Quality Assurance | Cross-Tool Logic Audit, Card Header Projection & Privacy Fixes | Chromium Headless, Angular Signals, CSP & Error Boundaries | [x] |
 
 ---
 
