@@ -27,7 +27,7 @@ export function sanitizeUrl(url: string | undefined): string {
   if (!url) return '';
   const trimmed = url.trim();
   const safeProtocolRegex =
-    /^(https?:\/\/|mailto:|tel:|data:image\/(png|jpeg|jpg|webp|gif);base64,)/i;
+    /^(https?:\/\/|mailto:|tel:|data:image\/(png|jpeg|jpg|webp|gif|svg\+xml);base64,)/i;
 
   if (safeProtocolRegex.test(trimmed)) {
     return getPurifier().sanitize(trimmed, { ALLOWED_TAGS: [] });

@@ -339,6 +339,12 @@ import {
       align-items: start;
     }
 
+    .cs-editor-col,
+    .cs-preview-col {
+      min-width: 0;
+      width: 100%;
+    }
+
     @media (min-width: 1024px) {
       .cs-studio-grid {
         grid-template-columns: 1fr 1.15fr;
@@ -470,8 +476,14 @@ import {
       padding: 16px;
       border-radius: var(--radius-md);
       overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
+      max-width: 100%;
+      box-sizing: border-box;
       display: flex;
-      justify-content: center;
+      justify-content: flex-start;
+      @media (min-width: 768px) {
+        justify-content: center;
+      }
     }
 
     .paper-sheet {
@@ -479,13 +491,16 @@ import {
       color: #1e293b;
       width: 100%;
       max-width: 650px;
+      min-width: 500px;
       min-height: 850px;
       box-shadow: 0 10px 25px rgba(0, 0, 0, 0.35);
       border-radius: 2px;
+      flex-shrink: 0;
     }
 
     .paper-sheet--landscape {
       max-width: 880px;
+      min-width: 680px;
       min-height: 620px;
     }
 

@@ -343,6 +343,11 @@ import {
       grid-template-columns: 420px 1fr;
       gap: 24px;
     }
+    .subs-controls-col,
+    .subs-preview-col {
+      min-width: 0;
+      width: 100%;
+    }
     @media (max-width: 1024px) {
       .subs-studio-grid { grid-template-columns: 1fr; }
     }
@@ -501,10 +506,13 @@ import {
     }
     .table-responsive-box {
       overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
+      max-width: 100%;
       max-height: 520px;
     }
     .preview-table {
       width: 100%;
+      min-width: 480px;
       border-collapse: collapse;
       font-size: 0.8125rem;
       th {
@@ -530,6 +538,8 @@ import {
       border-radius: 8px;
       padding: 16px;
       overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
+      max-width: 100%;
       max-height: 520px;
     }
     .code-snippet-pre {
@@ -538,7 +548,9 @@ import {
       font-size: 0.8125rem;
       line-height: 1.5;
       color: #e2e8f0;
-      white-space: pre;
+      white-space: pre-wrap;
+      word-break: break-all;
+      overflow-wrap: anywhere;
     }
   `],
 })

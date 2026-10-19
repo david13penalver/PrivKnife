@@ -5,22 +5,18 @@ import { ChangeDetectionStrategy, Component, computed, input } from '@angular/co
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     <div [class]="cardClasses()">
-      @if (title() || hasHeader()) {
-        <div class="c-card__header">
-          @if (title()) {
-            <h3 class="c-card__title">{{ title() }}</h3>
-          }
-          <ng-content select="[card-header]" />
-        </div>
-      }
+      <div class="c-card__header">
+        @if (title()) {
+          <h3 class="c-card__title">{{ title() }}</h3>
+        }
+        <ng-content select="[card-header]" />
+      </div>
       <div class="c-card__body">
         <ng-content />
       </div>
-      @if (hasFooter()) {
-        <div class="c-card__footer">
-          <ng-content select="[card-footer]" />
-        </div>
-      }
+      <div class="c-card__footer">
+        <ng-content select="[card-footer]" />
+      </div>
     </div>
   `,
 })
@@ -42,3 +38,4 @@ export class Card {
     return classes.join(' ');
   });
 }
+

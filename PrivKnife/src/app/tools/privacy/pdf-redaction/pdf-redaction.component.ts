@@ -45,6 +45,15 @@ import {
         </p>
       </div>
 
+      <!-- Error Alert -->
+      @if (errorMessage()) {
+        <div class="l-columns__area g--margin-bottom-4">
+          <div class="g--padding-3" style="background-color: var(--color-danger-subtle, #fee2e2); border: 1px solid var(--color-danger); border-radius: var(--radius-sm); color: var(--color-danger);">
+            <strong>Error:</strong> {{ errorMessage() }}
+          </div>
+        </div>
+      }
+
       <!-- Dropzone (if no document loaded) -->
       @if (!loadedDocument()) {
         <div class="l-columns__area">
@@ -274,6 +283,7 @@ export class PdfRedactionComponent implements OnDestroy {
   readonly canvasContainer = viewChild<ElementRef<HTMLDivElement>>('canvasContainer');
 
   readonly loadedDocument = signal<RedactionDocument | null>(null);
+  readonly errorMessage = signal<string | null>(null);
   readonly currentPageIndex = signal<number>(0);
   readonly redactionsByPage = signal<Map<number, RedactionBox[]>>(new Map());
   readonly activeTool = signal<RedactionColor>('black');
@@ -334,6 +344,7 @@ export class PdfRedactionComponent implements OnDestroy {
 
   async onFileDropped(file: File): Promise<void> {
     this.isProcessing.set(true);
+    this.errorMessage.set(null);
     try {
       const buffer = await file.arrayBuffer();
       const doc = await loadPdfForRedaction(buffer, file.name);
@@ -342,6 +353,9 @@ export class PdfRedactionComponent implements OnDestroy {
       this.redactionsByPage.set(new Map());
       this.zoomLevel.set(1.0);
       await this.loadActivePagePreview();
+    } catch (err: any) {
+      this.errorMessage.set(err?.message || 'The selected file is not a valid PDF or is corrupted.');
+      this.loadedDocument.set(null);
     } finally {
       this.isProcessing.set(false);
     }
@@ -421,6 +435,7 @@ export class PdfRedactionComponent implements OnDestroy {
 
   resetDocument(): void {
     this.loadedDocument.set(null);
+    this.errorMessage.set(null);
     this.currentPageIndex.set(0);
     this.redactionsByPage.set(new Map());
     this.currentPagePreview.set(null);

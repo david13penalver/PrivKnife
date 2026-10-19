@@ -84,9 +84,9 @@ describe('CryptoHashUuidComponent (Seam 2: UI & Privacy Boundary)', () => {
     numberInput.dispatchEvent(new Event('blur'));
     fixture.detectChanges();
 
-    expect(component.uuidQuantity()).toBe(5000);
-    expect(component.quantityInput()).toBe('5000');
-    expect(component.generatedUuids().length).toBe(5000);
+    expect(component.uuidQuantity()).toBe(1000);
+    expect(component.quantityInput()).toBe('1000');
+    expect(component.generatedUuids().length).toBe(1000);
   });
 
   it('should switch to String Hasher mode and compute hashes for inputs', async () => {

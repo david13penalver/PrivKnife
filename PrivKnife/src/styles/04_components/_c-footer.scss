@@ -43,13 +43,20 @@
 
   &__links {
     display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
     align-items: center;
-    gap: fn.spacing(4);
+    gap: fn.spacing(2) fn.spacing(4);
     font-size: fn.rem(13px);
     color: var(--color-text-secondary);
 
-    a:hover {
-      color: var(--color-primary);
+    a {
+      display: inline-block;
+      padding: fn.spacing(1.5) fn.spacing(1);
+
+      &:hover {
+        color: var(--color-primary);
+      }
     }
   }
 }

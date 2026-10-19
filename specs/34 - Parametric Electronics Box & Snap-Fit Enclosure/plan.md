@@ -1,0 +1,126 @@
+# Test-Driven Development (TDD) Implementation Plan: Parametric Electronics Box & Snap-Fit Enclosure
+
+> **Tool**: `34 - Parametric Electronics Box & Snap-Fit Enclosure`  
+> **Route**: `/tools/electronics-box-enclosure`  
+> **Category**: `3d`  
+> **Methodology**: Strict Test-Driven Development (TDD) via Vertical Slices (Red → Green → Refactor)
+
+---
+
+## 1. Architecture & Domain Overview
+
+The **Parametric Electronics Box & Snap-Fit Enclosure** is a self-contained, client-side utility built according to the non-negotiable directives in `AGENTS.md`.
+
+### Directory Layout (`src/app/tools/3d/electronics-box-enclosure/`)
+```
+src/app/tools/3d/electronics-box-enclosure/
+├── index.ts                         # Tool registry metadata & definition
+├── types.ts                         # Domain contracts, options, and result interfaces
+├── engine.ts                        # Pure client-side computational engine (zero Angular, zero DOM)
+├── engine.spec.ts                   # Unit tests for core engine (Seam 1)
+├── worker.ts                        # Dedicated Web Worker for off-main-thread compute
+├── test-fixtures.ts                 # Synthetic independent test vectors & mocks
+├── electronics-box-enclosure.component.ts    # Angular Standalone Component with Signals & BEM
+├── electronics-box-enclosure.component.html  # Accessible UI template
+├── electronics-box-enclosure.component.scss  # Scoped component styling
+└── electronics-box-enclosure.component.spec.ts # Component & Privacy Verification Tests (Seam 2)
+```
+
+---
+
+## 2. Pre-Agreed Testing Seams
+
+Tests live exclusively at public seams to survive internal refactorings while exercising observable behavior:
+
+### Seam 1: `EnclosureEngine` (Pure Processing Boundary — `engine.ts`)
+- **Public Interface**:
+  - `process(options: ElectronicsBoxEnclosureOptions): Promise<ElectronicsBoxEnclosureResult>`
+  - `validateOptions(options: ElectronicsBoxEnclosureOptions): boolean`
+- **What it catches**:
+  - Algorithmic correctness of data transformations and asset compilations.
+  - Correct export encoding for '.stl', '.3mf'.
+  - Boundary value handling (minimum, maximum, negative, and extreme inputs).
+  - Clean error handling on invalid or corrupt input without throwing uncaught exceptions.
+- **What it misses**:
+  - DOM events, Drag-and-drop bindings, Angular Signal reactivity, visual download prompts, and UI animations.
+
+### Seam 2: `ElectronicsBoxEnclosureComponent` (Angular UI & Interaction Boundary)
+- **Public Interface**:
+  - User interacts with configuration controls &rarr; signals update and preview regenerates.
+  - User clicks primary action button &rarr; triggers export generation and displays download link.
+  - User triggers Reset / Clear &rarr; clears state and revokes all active `ObjectURL`s.
+- **What it catches**:
+  - Angular Signals reactivity and form state synchronization.
+  - BEM styling contract compliance (`.c-card`, `.c-badge--privacy`, `.c-button`, `.c-input`, `.c-preview`).
+  - Zero Network Exfiltration: Asserts that 0 HTTP requests (`fetch` / `XMLHttpRequest`) are made during processing.
+  - Memory Hygiene: Asserts that `URL.revokeObjectURL()` is called when resetting and on `ngOnDestroy`.
+- **What it misses**:
+  - Algorithmic edge cases covered at Seam 1.
+
+### Seam 3: `ToolRegistry & AppRoutes` (Integration Boundary)
+- **Public Interface**:
+  - `toolRegistry` entry in `src/app/tools/tool-registry.ts`.
+  - Lazy route definition in `src/app/app.routes.ts`.
+- **What it catches**:
+  - Route reachability, SEO title & meta description tags, category registration.
+- **What it misses**:
+  - Interactive UI behavior and binary parsing.
+
+---
+
+## 3. Data Models (`types.ts`)
+
+```typescript
+export interface ElectronicsBoxEnclosureOptions {
+  innerLengthMm: number;
+  innerWidthMm: number;
+  innerHeightMm: number;
+  wallThicknessMm: number;
+  cornerRadiusMm: number;
+  closureType: 'snap_fit' | 'm3_screws' | 'slide_lid';
+  pcbPreset: 'custom' | 'arduino_uno' | 'esp32_dev' | 'rpi_pico';
+  standoffHeightMm: number;
+  cableSlot: boolean;
+  cableSlotDiameterMm: number;
+  ventilationGrille: boolean;
+}
+
+export interface ElectronicsBoxEnclosureResult {
+  success: boolean;
+  blob: Blob;
+  fileName: string;
+  fileSize: number;
+  mimeType: string;
+  metadata?: Record<string, unknown>;
+}
+```
+
+---
+
+## 4. Vertical Slices & Test Vectors
+
+### Slice 1: Pure Engine Math & Transformation (Seam 1)
+- **Input**: Standard default configuration `ElectronicsBoxEnclosureOptions`.
+- **Expected Output**: Valid `ElectronicsBoxEnclosureResult` with correct MIME type and non-zero byte size.
+- **Test Vectors**:
+  - Minimum boundary values (smallest permissible dimensions/values).
+  - Maximum boundary values (stress test thresholds).
+  - Corrupted or invalid parameter combinations.
+
+### Slice 2: Angular Component UI & Reactive State (Seam 2)
+- **Inputs**: User interaction events on controls.
+- **Expected Outputs**: Reactive updates reflected in signals, live preview canvas rendered.
+
+### Slice 3: Privacy & Zero Exfiltration Assertion (Seam 2)
+- **Spy**: `window.fetch` and `XMLHttpRequest.prototype.open`.
+- **Assert**: Call count is strictly `0` across the full execution lifecycle.
+
+---
+
+## 5. Edge Cases & Memory Hygiene Checklist
+
+- [ ] Verify `URL.revokeObjectURL()` is called on every download trigger cleanup and in `ngOnDestroy`.
+- [ ] Call `.dispose()` on all Three.js geometries, materials, and textures upon scene updates and component unmount.
+- [ ] Cleanly terminate Web Worker instances in `ngOnDestroy`.
+- [ ] Ensure non-blocking execution to keep main UI thread at 60 FPS.
+- [ ] Assert zero network calls dispatched during tool operation.

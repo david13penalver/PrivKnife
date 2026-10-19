@@ -12,6 +12,7 @@
   justify-content: center;
   gap: fn.spacing(2);
   padding: fn.spacing(2) fn.spacing(4);
+  min-height: 40px;
   font-weight: 500;
   font-size: fn.rem(14px);
   line-height: 1.5;
@@ -20,6 +21,11 @@
   cursor: pointer;
   user-select: none;
   white-space: nowrap;
+
+  @media (max-width: 640px) {
+    white-space: normal;
+    text-align: center;
+  }
   @include mx.transition(all, 150ms, ease);
 
   &:focus-visible {
@@ -88,18 +94,49 @@
 
   /* Size Modifiers */
   &--small {
-    padding: fn.spacing(1) fn.spacing(2.5);
-    font-size: fn.rem(12px);
+    padding: fn.spacing(1.5) fn.spacing(3);
+    font-size: fn.rem(13px);
+    min-height: 36px;
+  }
+
+  &--chip {
+    padding: fn.spacing(1.5) fn.spacing(3);
+    min-height: 36px;
+    border-radius: 9999px;
+    font-size: fn.rem(13px);
+    font-weight: 500;
+    line-height: 1.4;
+    cursor: pointer;
+    background: var(--color-bg-subtle);
+    border: 1px solid var(--color-border-default);
+    color: var(--color-text-primary);
+    user-select: none;
+    @include mx.transition(all, 150ms, ease);
+
+    &:hover {
+      border-color: var(--color-primary);
+      color: var(--color-primary);
+    }
+
+    &.is-active,
+    &-active {
+      background: var(--color-primary);
+      border-color: var(--color-primary);
+      color: #ffffff;
+    }
   }
 
   &--large {
     padding: fn.spacing(3) fn.spacing(6);
     font-size: fn.rem(16px);
+    min-height: 44px;
   }
 
   &--icon-only {
     padding: fn.spacing(2);
     border-radius: var(--radius-md);
+    min-width: 38px;
+    min-height: 38px;
   }
 
   /* Loading State */

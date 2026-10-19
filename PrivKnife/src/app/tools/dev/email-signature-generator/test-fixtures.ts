@@ -1,5 +1,18 @@
 import { SignatureConfig } from './types';
 
+/**
+ * Self-contained SVG Data URI for default avatar image.
+ * Eliminates external network requests to third-party image hosts (Unsplash).
+ */
+export const DEFAULT_AVATAR_DATA_URI =
+  'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxNjAiIGhlaWdodD0iMTYwIiB2aWV3Qm94PSIwIDAgMjQgMjQiIGZpbGw9IiM5NGEzYjgiPjxjaXJjbGUgY3g9IjEyIiBjeT0iOCIgcj0iNCIvPjxwYXRoIGQ9Ik00IDIwYzAtNCA0LTYgOC02czggMiA4IDYiLz48L3N2Zz4=';
+
+/**
+ * Self-contained SVG Data URI for default corporate logo image.
+ */
+export const DEFAULT_LOGO_DATA_URI =
+  'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxNjAiIGhlaWdodD0iNjAiIHZpZXdCb3g9IjAgMCAxNjAgNjAiPjxyZWN0IHdpZHRoPSIxNjAiIGhlaWdodD0iNjAiIHJ4PSI4IiBmaWxsPSIjZTJlOGYwIi8+PHRleHQgeD0iNTAlIiB5PSI1NSUiIGRvbWluYW50LWJhc2VsaW5lPSJtaWRkbGUiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZvbnQtZmFtaWx5PSJzYW5zLXNlcmlmIiBmb250LXNpemU9IjE0IiBmb250LXdlaWdodD0iYm9sZCIgZmlsbD0iIzQ3NTU2OSI+TE9HTzwvdGV4dD48L3N2Zz4=';
+
 export const DEFAULT_SIGNATURE_CONFIG: SignatureConfig = {
   personal: {
     fullName: 'Alex Morgan',
@@ -23,7 +36,7 @@ export const DEFAULT_SIGNATURE_CONFIG: SignatureConfig = {
     youtube: '',
   },
   images: {
-    avatarUrl: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=160&h=160&fit=crop&crop=faces',
+    avatarUrl: DEFAULT_AVATAR_DATA_URI,
     avatarShape: 'round',
     avatarSize: 80,
     logoUrl: '',
@@ -64,10 +77,10 @@ export const CORPORATE_SIGNATURE_CONFIG: SignatureConfig = {
     youtube: '',
   },
   images: {
-    avatarUrl: 'https://images.unsplash.com/photo-1580489944761-15a19d654956?w=160&h=160&fit=crop&crop=faces',
+    avatarUrl: DEFAULT_AVATAR_DATA_URI,
     avatarShape: 'rounded',
     avatarSize: 84,
-    logoUrl: 'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=120&h=60&fit=crop',
+    logoUrl: DEFAULT_LOGO_DATA_URI,
     logoSize: 48,
   },
   style: {
@@ -188,7 +201,7 @@ export const TWO_COLUMN_SIGNATURE_CONFIG: SignatureConfig = {
     youtube: 'https://youtube.com/@marcusbrody',
   },
   images: {
-    avatarUrl: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=160&h=160&fit=crop&crop=faces',
+    avatarUrl: DEFAULT_AVATAR_DATA_URI,
     avatarShape: 'round',
     avatarSize: 88,
     logoUrl: '',

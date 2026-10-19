@@ -369,7 +369,7 @@ import {
             <app-card title="Live 3D Slice &amp; Fabrication Preview">
               <!-- Viewport Toolbar -->
               <div class="g--flex-center g--margin-bottom-3" style="justify-content: space-between; flex-wrap: wrap; gap: 8px;">
-                <div class="g--flex-center" style="gap: 6px;">
+                <div class="g--flex-center" style="gap: 6px; flex-wrap: wrap;">
                   <button type="button" class="c-button c-button--small c-button--outline" (click)="setCameraView('incline')">
                     Incline Face
                   </button>
@@ -431,17 +431,17 @@ import {
                   <button
                     type="button"
                     class="c-button c-button--primary"
-                    style="flex: 1; min-width: 220px;"
+                    style="flex: 1 1 180px; white-space: normal; text-align: center;"
                     [disabled]="isExporting()"
                     (click)="exportDualColor3mf()">
-                    Download Multi-Color .3MF (AMS/MMU)
+                    Download Multi-Color .3MF
                   </button>
 
                   <!-- Unified STL -->
                   <button
                     type="button"
                     class="c-button c-button--outline"
-                    style="flex: 1; min-width: 180px;"
+                    style="flex: 1 1 160px; white-space: normal; text-align: center;"
                     [disabled]="isExporting()"
                     (click)="exportUnifiedStl()">
                     Unified .STL (Single Color)
@@ -483,10 +483,10 @@ import {
                   <button
                     type="button"
                     class="c-button c-button--secondary"
-                    style="width: 100%;"
+                    style="width: 100%; white-space: normal; text-align: center; line-height: 1.4; padding: 10px 14px;"
                     [disabled]="isExporting()"
                     (click)="exportBundleZip()">
-                    📦 Download Complete ZIP Bundle (.3MF + .STLs + Slicing Guide)
+                    📦 Download Complete ZIP Bundle (.3MF + .STL)
                   </button>
                 </div>
               </div>

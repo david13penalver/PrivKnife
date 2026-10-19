@@ -418,9 +418,9 @@ export type PreviewTab = 'all' | 'chrome' | 'iphone' | 'android' | 'google';
       <!-- Step 4: HTML Code Snippet -->
       <div class="g--margin-bottom-6">
         <app-card title="4. Generated HTML <head> Code">
-          <div style="position: relative;">
+          <div style="position: relative; max-width: 100%;">
             <pre
-              style="margin: 0; padding: 16px; background: #0f172a; color: #e2e8f0; border-radius: var(--radius-md); font-family: monospace; font-size: 0.875rem; overflow-x: auto; line-height: 1.5;"><code>{{ htmlSnippet() }}</code></pre>
+              style="margin: 0; padding: 16px; background: #0f172a; color: #e2e8f0; border-radius: var(--radius-md); font-family: monospace; font-size: 0.875rem; overflow-x: auto; -webkit-overflow-scrolling: touch; white-space: pre-wrap; word-break: break-all; line-height: 1.5; max-width: 100%;"><code>{{ htmlSnippet() }}</code></pre>
             <div style="margin-top: 12px; display: flex; justify-content: flex-end;">
               <app-button
                 variant="secondary"

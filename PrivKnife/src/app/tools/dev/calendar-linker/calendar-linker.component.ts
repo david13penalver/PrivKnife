@@ -381,6 +381,11 @@ import { CalendarEvent, EmbedSnippetType, RecurrenceFreq } from './types';
       grid-template-columns: 460px 1fr;
       gap: 24px;
     }
+    .cal-form-col,
+    .cal-preview-col {
+      min-width: 0;
+      width: 100%;
+    }
     @media (max-width: 1024px) {
       .cal-studio-grid { grid-template-columns: 1fr; }
     }
@@ -577,6 +582,8 @@ import { CalendarEvent, EmbedSnippetType, RecurrenceFreq } from './types';
       border-radius: 8px;
       padding: 16px;
       overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
+      max-width: 100%;
       max-height: 280px;
     }
     .code-snippet-pre {
@@ -585,7 +592,9 @@ import { CalendarEvent, EmbedSnippetType, RecurrenceFreq } from './types';
       font-size: 0.8125rem;
       line-height: 1.5;
       color: #e2e8f0;
-      white-space: pre;
+      white-space: pre-wrap;
+      word-break: break-all;
+      overflow-wrap: anywhere;
     }
   `],
 })

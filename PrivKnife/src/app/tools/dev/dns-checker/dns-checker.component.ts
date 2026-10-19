@@ -160,14 +160,14 @@ import {
       <!-- Navigation Tabs: DNS Table vs WHOIS -->
       <div class="l-columns__area g--margin-bottom-4">
         <div class="g--flex-center" style="gap: 12px; justify-content: space-between; flex-wrap: wrap;">
-          <div class="g--flex-center" style="gap: 8px;">
+          <div class="g--flex-center" style="gap: 8px; flex-wrap: wrap; width: 100%;">
             <button
               type="button"
               class="c-button"
               [class.c-button--primary]="activeTab() === 'dns'"
               [class.c-button--outline]="activeTab() !== 'dns'"
               (click)="setActiveTab('dns')">
-              🌐 Global DNS Propagation ({{ results().length }} Resolvers)
+              🌐 Global DNS ({{ results().length }} Resolvers)
             </button>
             <button
               type="button"

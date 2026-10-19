@@ -24,6 +24,10 @@ describe('Website Performance & Core Web Vitals Engine', () => {
     expect(isValidUrl('https://privknife.org/tools')).toBe(true);
     expect(isValidUrl('ftp://invalid-protocol.com')).toBe(false);
     expect(isValidUrl('')).toBe(false);
+    expect(isValidUrl('https://privknife.orghttps://example.com')).toBe(false);
+    expect(isValidUrl('http://site.com/http://other.com')).toBe(false);
+    expect(isValidUrl('invalid-no-tld')).toBe(false);
+    expect(isValidUrl('http://.com')).toBe(false);
   });
 
   it('evaluates metric and score ratings using Core Web Vitals thresholds', () => {

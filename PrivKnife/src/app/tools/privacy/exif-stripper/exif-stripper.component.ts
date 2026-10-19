@@ -235,8 +235,8 @@ export class ExifStripperComponent implements OnDestroy {
       this.strippedResult.set(null);
       this.cleanedDownloadUrl.set(null);
     } catch (err: any) {
-      this.errorMessage.set(err.message || 'Failed to parse image metadata.');
-      this.reset();
+      this.reset(true);
+      this.errorMessage.set(err.message || 'Failed to parse image metadata. File may be corrupted.');
     }
   }
 
@@ -273,14 +273,16 @@ export class ExifStripperComponent implements OnDestroy {
     }
   }
 
-  reset(): void {
+  reset(preserveError: boolean = false): void {
     this.cleanObjectUrls();
     this.selectedFile.set(null);
     this.metadata.set(null);
     this.strippedResult.set(null);
     this.cleanedDownloadUrl.set(null);
     this.cleanedFileName.set(null);
-    this.errorMessage.set(null);
+    if (!preserveError) {
+      this.errorMessage.set(null);
+    }
     this.isProcessing.set(false);
   }
 

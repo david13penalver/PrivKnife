@@ -182,4 +182,17 @@ describe('PdfRedactionComponent (Seam 2: UI, Signals, Redactions & Privacy Bound
     expect(fetchSpy).not.toHaveBeenCalled();
     expect(xhrSpy).not.toHaveBeenCalled();
   });
+
+  it('should catch corrupt non-PDF upload, prevent unhandled rejection, and display error banner', async () => {
+    const corruptFile = new File([new Uint8Array([1, 2, 3, 4, 5])], 'invalid.pdf', { type: 'application/pdf' });
+
+    await component.onFileDropped(corruptFile);
+    fixture.detectChanges();
+
+    expect(component.isProcessing()).toBe(false);
+    expect(component.loadedDocument()).toBeNull();
+    expect((component as any).errorMessage()).not.toBeNull();
+    const compiled = fixture.nativeElement as HTMLElement;
+    expect(compiled.textContent).toContain((component as any).errorMessage()!);
+  });
 });

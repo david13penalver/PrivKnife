@@ -173,4 +173,24 @@ describe('EmailSignatureGeneratorComponent', () => {
     expect(fetchSpy).not.toHaveBeenCalled();
     expect(xhrSpy).not.toHaveBeenCalled();
   });
+
+  it('should not contain any external HTTP/HTTPS image URLs in default templates (Privacy Directive 1 & 2)', () => {
+    const avatarUrl = component.config().images.avatarUrl;
+    const logoUrl = component.config().images.logoUrl;
+
+    if (avatarUrl) {
+      expect(avatarUrl.startsWith('http')).toBe(false);
+      expect(avatarUrl.startsWith('data:image/svg+xml')).toBe(true);
+    }
+    if (logoUrl) {
+      expect(logoUrl.startsWith('http')).toBe(false);
+      expect(logoUrl.startsWith('data:image/svg+xml')).toBe(true);
+    }
+
+    const compiled = fixture.nativeElement as HTMLElement;
+    const images = Array.from(compiled.querySelectorAll('img'));
+    for (const img of images) {
+      expect(img.src.includes('unsplash.com')).toBe(false);
+    }
+  });
 });

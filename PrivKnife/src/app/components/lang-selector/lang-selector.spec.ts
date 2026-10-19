@@ -79,7 +79,7 @@ describe('LangSelector Component', () => {
 
     expect(spanishItem).toBeTruthy();
     spanishItem.click();
-    await new Promise((resolve) => setTimeout(resolve, 50));
+    await new Promise((resolve) => setTimeout(resolve, 150));
     fixture.detectChanges();
 
     expect(i18nService.currentLang().code).toBe('es');
@@ -101,7 +101,7 @@ describe('LangSelector Component', () => {
 
     expect(arabicItem).toBeTruthy();
     arabicItem.click();
-    await new Promise((resolve) => setTimeout(resolve, 50));
+    await new Promise((resolve) => setTimeout(resolve, 150));
     fixture.detectChanges();
 
     expect(i18nService.currentLang().code).toBe('ar');

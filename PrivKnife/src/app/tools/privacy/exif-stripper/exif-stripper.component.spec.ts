@@ -2,7 +2,11 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { provideRouter } from '@angular/router';
 import { describe, expect, it, vi, beforeEach, afterEach } from 'vitest';
 import { ExifStripperComponent } from './exif-stripper.component';
-import { createMockJpegWithExif, createMockJpegClean } from './test-fixtures';
+import {
+  createMockJpegWithExif,
+  createMockJpegClean,
+  createMockCorruptedFile,
+} from './test-fixtures';
 
 describe('ExifStripperComponent (Seam 2: UI & Privacy Boundary)', () => {
   let fixture: ComponentFixture<ExifStripperComponent>;
@@ -122,5 +126,17 @@ describe('ExifStripperComponent (Seam 2: UI & Privacy Boundary)', () => {
 
     expect(fetchSpy).not.toHaveBeenCalled();
     expect(xhrSpy).not.toHaveBeenCalled();
+  });
+
+  it('should preserve and display error message when a corrupt file is selected', async () => {
+    const corruptBytes = createMockCorruptedFile();
+    const mockFile = new File([corruptBytes as BlobPart], 'corrupt.jpg', { type: 'image/jpeg' });
+
+    await component.onFileSelected(mockFile);
+    fixture.detectChanges();
+
+    expect(component.errorMessage()).not.toBeNull();
+    const compiled = fixture.nativeElement as HTMLElement;
+    expect(compiled.textContent).toContain(component.errorMessage()!);
   });
 });

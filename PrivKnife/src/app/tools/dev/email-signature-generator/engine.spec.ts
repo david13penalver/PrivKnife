@@ -57,7 +57,7 @@ describe('Email Signature Generator Engine (engine.ts)', () => {
       expect(html).toContain('Vance & Sterling Partners');
       expect(html).toContain('CONFIDENTIALITY NOTICE');
       expect(html).toContain('Georgia, serif');
-      expect(html).toContain('https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe'); // Logo
+      expect(html).toContain('data:image/svg+xml'); // Logo
       expect(html).toContain('border-radius: 8px'); // rounded avatar
     });
 

@@ -22,6 +22,7 @@
   /* Base Text, Number, & Select Controls */
   &__control {
     width: 100%;
+    min-height: 38px;
     padding: fn.spacing(2) fn.spacing(3);
     font-size: fn.rem(14px);
     color: var(--color-text-primary);

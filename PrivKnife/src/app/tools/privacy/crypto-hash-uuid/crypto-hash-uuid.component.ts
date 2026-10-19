@@ -540,7 +540,7 @@ export class CryptoHashUuidComponent implements OnInit, OnDestroy {
 
     const val = parseInt(raw, 10);
     if (!isNaN(val) && val >= 1) {
-      const clamped = Math.min(val, 5000);
+      const clamped = Math.min(val, 1000);
       this.uuidQuantity.set(clamped);
       this.generateUuids();
     }
@@ -552,8 +552,8 @@ export class CryptoHashUuidComponent implements OnInit, OnDestroy {
     let val = parseInt(raw, 10);
     if (isNaN(val) || val < 1) {
       val = 1;
-    } else if (val > 5000) {
-      val = 5000;
+    } else if (val > 1000) {
+      val = 1000;
     }
     this.quantityInput.set(String(val));
     this.uuidQuantity.set(val);

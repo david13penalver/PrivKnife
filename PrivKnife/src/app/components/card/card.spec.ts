@@ -1,3 +1,4 @@
+import { Component } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { Card } from './card';
 
@@ -33,4 +34,40 @@ describe('Card Component', () => {
     const cardElement = fixture.nativeElement.querySelector('.c-card');
     expect(cardElement.classList.contains('c-card--interactive')).toBe(true);
   });
+
+  it('should leave header element empty when neither title nor projected header is provided', () => {
+    const headerElement = fixture.nativeElement.querySelector('.c-card__header');
+    expect(headerElement.textContent.trim()).toBe('');
+  });
 });
+
+@Component({
+  standalone: true,
+  imports: [Card],
+  template: `
+    <app-card>
+      <div card-header class="custom-header">
+        <button id="test-action-btn">Custom Action</button>
+      </div>
+      <p id="test-body">Body Content</p>
+    </app-card>
+  `,
+})
+class TestProjectedHeaderHost {}
+
+describe('Card Component - Content Projection', () => {
+  it('should render projected header content even when title and hasHeader are not specified', async () => {
+    await TestBed.configureTestingModule({
+      imports: [TestProjectedHeaderHost],
+    }).compileComponents();
+
+    const hostFixture = TestBed.createComponent(TestProjectedHeaderHost);
+    hostFixture.detectChanges();
+
+    const header = hostFixture.nativeElement.querySelector('.c-card__header');
+    expect(header).toBeTruthy();
+    expect(header.textContent).toContain('Custom Action');
+    expect(hostFixture.nativeElement.querySelector('#test-action-btn')).toBeTruthy();
+  });
+});
+

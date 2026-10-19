@@ -25,13 +25,22 @@ export function normalizeUrl(input: string): string {
  */
 export function isValidUrl(input: string): boolean {
   if (!input || !input.trim()) return false;
+  const clean = input.trim();
+  // Reject multiple protocol occurrences (e.g. concatenated URLs)
+  if ((clean.match(/https?:\/\//gi) || []).length > 1) {
+    return false;
+  }
   try {
-    const normalized = normalizeUrl(input);
+    const normalized = normalizeUrl(clean);
     const url = new URL(normalized);
     if (url.protocol !== 'http:' && url.protocol !== 'https:') {
       return false;
     }
-    return url.hostname.includes('.') && url.hostname.length > 3;
+    const host = url.hostname;
+    // Must contain a valid domain structure: at least one dot, valid labels, valid TLD
+    const domainRegex =
+      /^[a-zA-Z0-9]([a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(\.[a-zA-Z0-9]([a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*\.[a-zA-Z]{2,}$/;
+    return domainRegex.test(host);
   } catch {
     return false;
   }

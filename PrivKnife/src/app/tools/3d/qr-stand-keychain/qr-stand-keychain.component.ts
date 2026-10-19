@@ -157,11 +157,11 @@ import {
                   <label class="c-input__label" style="display: block; margin-bottom: 6px; font-weight: 600; font-size: 0.85rem;">
                     Model Style:
                   </label>
-                  <div class="g--flex-center" style="gap: 8px;">
+                  <div class="g--flex-center" style="gap: 8px; flex-wrap: wrap;">
                     <button
                       type="button"
                       class="c-button"
-                      style="flex: 1;"
+                      style="flex: 1 1 90px;"
                       [class.c-button--primary]="config().baseShape === 'desk-stand'"
                       [class.c-button--outline]="config().baseShape !== 'desk-stand'"
                       (click)="setBaseShape('desk-stand')">

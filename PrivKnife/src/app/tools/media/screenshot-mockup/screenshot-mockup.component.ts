@@ -199,7 +199,7 @@ import {
                 <label class="c-input__label" style="display: block; margin-bottom: 6px; font-weight: 600; font-size: 0.85rem;">
                   Screenshot Screen Fit
                 </label>
-                <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px;">
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(90px, 1fr)); gap: 6px;">
                   @for (fit of imageFitModes; track fit.id) {
                     <button
                       type="button"
@@ -224,7 +224,7 @@ import {
                 <label class="c-input__label" style="display: block; margin-bottom: 6px; font-weight: 600; font-size: 0.85rem;">
                   Background Style
                 </label>
-                <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px;">
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(95px, 1fr)); gap: 6px;">
                   <button
                     type="button"
                     class="c-button c-button--small"
@@ -261,7 +261,7 @@ import {
                   <label class="c-input__label" style="display: block; margin-bottom: 6px; font-weight: 600; font-size: 0.85rem;">
                     Gradient Color Palette
                   </label>
-                  <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px;">
+                  <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(70px, 1fr)); gap: 6px;">
                     @for (grad of gradientPresets; track grad.id) {
                       <button
                         type="button"
@@ -294,7 +294,7 @@ import {
                 <label class="c-input__label" style="display: block; margin-bottom: 6px; font-weight: 600; font-size: 0.85rem;">
                   Export Canvas Size &amp; Aspect Ratio
                 </label>
-                <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px;">
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(90px, 1fr)); gap: 6px;">
                   @for (sz of canvasSizePresets; track sz.id) {
                     <button
                       type="button"

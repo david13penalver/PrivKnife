@@ -669,6 +669,12 @@ import {
       align-items: start;
     }
 
+    .sig-form-col,
+    .sig-preview-col {
+      min-width: 0;
+      width: 100%;
+    }
+
     @media (min-width: 1024px) {
       .sig-studio-grid {
         grid-template-columns: 1fr 1.15fr;
@@ -849,8 +855,12 @@ import {
     }
 
     .email-mockup-body {
-      padding: 24px;
+      padding: 16px;
       color: #334155;
+      max-width: 100%;
+      overflow-x: auto;
+      box-sizing: border-box;
+      -webkit-overflow-scrolling: touch;
     }
 
     .email-dummy-text {
@@ -865,6 +875,8 @@ import {
 
     .rendered-signature-container {
       overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
+      max-width: 100%;
     }
 
     .code-stage {
