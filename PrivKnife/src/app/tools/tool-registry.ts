@@ -1,10 +1,23 @@
 import { ToolCategory, ToolDefinition } from '../core/models/tool.model';
+import { brailleAdaSignGeneratorTool } from './3d/braille-ada-sign-generator';
+import { cappuccinoStencilMakerTool } from './3d/cappuccino-stencil-maker';
+import { hswInsertAdapterTool } from './3d/hsw-insert-adapter';
+import { keycapSwitchTesterMakerTool } from './3d/keycap-switch-tester-maker';
+import { petIdTagGeneratorTool } from './3d/pet-id-tag-generator';
 import { cookieCutterTool } from './3d/cookie-cutter';
 import { deskWedgeNameplateTool } from './3d/desk-wedge-nameplate';
+import { electronicsBoxEnclosureTool } from './3d/electronics-box-enclosure';
+import { gridfinityBinGeneratorTool } from './3d/gridfinity-bin-generator';
+import { lithophaneMakerTool } from './3d/lithophane-maker';
+import { parametricLampDesignerTool } from './3d/parametric-lamp-designer';
 import { qrStandKeychainTool } from './3d/qr-stand-keychain';
+import { underDeskClampGeneratorTool } from './3d/under-desk-clamp-generator';
+import { geometricPlantPotTool } from './3d/geometric-plant-pot';
+import { skadisPegboardMakerTool } from './3d/skadis-pegboard-maker';
 import { bpmTapDetectorTool } from './audio-video/bpm-tap-detector';
 import { soundwaveArtMakerTool } from './audio-video/soundwave-art-maker';
 import { videoGifTrimmerTool } from './audio-video/video-gif-trimmer';
+import { bankStatementConverterTool } from './dev/bank-statement-converter';
 import { calendarLinkerTool } from './dev/calendar-linker';
 import { colorPaletteExtractorTool } from './dev/color-palette-extractor';
 import { csvConverterTool } from './dev/csv-converter';
@@ -16,18 +29,25 @@ import { webVitalsTool } from './dev/web-vitals';
 import { averyBarcodeSheetTool } from './documents/barcode-labels';
 import { gridPaperTool } from './documents/grid-paper';
 import { invoiceMakerTool } from './documents/invoice-maker';
+import { localOcrTextExtractorTool } from './documents/local-ocr-text-extractor';
 import { markdownCheatsheetTool } from './documents/markdown-cheatsheet';
 import { pdfMergerTool } from './documents/pdf-merger';
+import { pdfSignerStamperTool } from './documents/pdf-signer-stamper';
 import { tableTentMakerTool } from './documents/table-tent-maker';
 import { backgroundRemoverTool } from './media/background-remover';
 import { batchImageCompressorTool } from './media/batch-compressor';
 import { faviconAppIconSuiteTool } from './media/favicon-generator';
+import { heicAvifConverterTool } from './media/heic-avif-converter';
 import { ogCardMakerTool } from './media/og-card-maker';
+import { passportBiometricPhotoTool } from './media/passport-biometric-photo';
 import { screenshotMockupTool } from './media/screenshot-mockup';
 import { subtitlesShifterTool } from './media/subtitles-shifter';
 import { cryptoHashUuidTool } from './privacy/crypto-hash-uuid';
 import { exifStripperTool } from './privacy/exif-stripper';
+import { facePlateBlurTool } from './privacy/face-plate-blur';
+import { fileEncryptorVaultTool } from './privacy/file-encryptor-vault';
 import { pdfRedactionTool } from './privacy/pdf-redaction';
+import { piiScrubberAnonymizerTool } from './privacy/pii-scrubber-anonymizer';
 
 export const TOOL_REGISTRY: ToolDefinition[] = [
   exifStripperTool,
@@ -56,6 +76,25 @@ export const TOOL_REGISTRY: ToolDefinition[] = [
   qrStandKeychainTool,
   cookieCutterTool,
   deskWedgeNameplateTool,
+  parametricLampDesignerTool,
+  lithophaneMakerTool,
+  gridfinityBinGeneratorTool,
+  electronicsBoxEnclosureTool,
+  underDeskClampGeneratorTool,
+  skadisPegboardMakerTool,
+  geometricPlantPotTool,
+  brailleAdaSignGeneratorTool,
+  keycapSwitchTesterMakerTool,
+  cappuccinoStencilMakerTool,
+  petIdTagGeneratorTool,
+  hswInsertAdapterTool,
+  passportBiometricPhotoTool,
+  heicAvifConverterTool,
+  pdfSignerStamperTool,
+  facePlateBlurTool,
+  localOcrTextExtractorTool,
+  fileEncryptorVaultTool,
+  piiScrubberAnonymizerTool,
   backgroundRemoverTool,
   dnsCheckerTool,
   webVitalsTool,
@@ -100,6 +139,39 @@ export const TOOL_I18N_MAP: Record<string, string> = {
   'cookie-cutter-3d': 'cookieCutter',
   'cookie-cutter': 'cookieCutter',
   'desk-wedge-nameplate': 'deskWedge',
+  'parametric-lamp-designer': 'parametricLampDesigner',
+  'lithophane-maker': 'lithophaneMaker',
+  'gridfinity-bin-generator': 'gridfinityBin',
+  'electronics-box-enclosure': 'electronicsBox',
+  'under-desk-clamp-generator': 'underDeskClamp',
+  'skadis-pegboard-maker': 'skadisPegboard',
+  'geometric-plant-pot': 'geometricPlantPot',
+  'braille-ada-sign-generator': 'brailleAdaSign',
+  'keycap-switch-tester-maker': 'keycapSwitchTester',
+  'cappuccino-stencil-maker': 'cappuccinoStencil',
+  'pet-id-tag-generator': 'petIdTag',
+  'hsw-insert-adapter': 'hswInsertAdapter',
+  'passport-biometric-photo': 'passportBiometricPhoto',
+  'passport-photo': 'passportBiometricPhoto',
+  'heic-avif-converter': 'heicAvifConverter',
+  'heic-converter': 'heicAvifConverter',
+  'avif-converter': 'heicAvifConverter',
+  'pdf-signer-stamper': 'pdfSignerStamper',
+  'pdf-signer': 'pdfSignerStamper',
+  'face-plate-blur': 'facePlateBlur',
+  'privacy-blur': 'facePlateBlur',
+  'censor-photo': 'facePlateBlur',
+  'local-ocr-text-extractor': 'localOcr',
+  'local-ocr': 'localOcr',
+  'ocr-text-extractor': 'localOcr',
+  'image-to-text': 'localOcr',
+  'file-encryptor-vault': 'fileEncryptorVault',
+  'file-encryptor': 'fileEncryptorVault',
+  'file-vault': 'fileEncryptorVault',
+  'pii-scrubber-anonymizer': 'piiScrubber',
+  'pii-scrubber': 'piiScrubber',
+  'data-anonymizer': 'piiScrubber',
+  'backgroundRemover': 'backgroundRemover',
   'background-remover': 'backgroundRemover',
   'dns-checker': 'dnsChecker',
   'web-vitals': 'webVitals',

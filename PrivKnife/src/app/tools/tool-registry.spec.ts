@@ -284,6 +284,171 @@ describe('ToolRegistry (Seam 3: Catalog & Architecture Verification)', () => {
     expect(threeDTools.some((t) => t.id === 'desk-wedge-nameplate')).toBe(true);
   });
 
+  it('should find parametric-lamp-designer tool by id and category', () => {
+    const tool = getToolById('parametric-lamp-designer');
+    expect(tool).toBeDefined();
+    expect(tool?.name).toBe('3D Parametric Lamp & Lampshade Designer');
+    expect(tool?.category).toBe('3d');
+    expect(tool?.isFullyClientSide).toBe(true);
+
+    const threeDTools = getToolsByCategory('3d');
+    expect(threeDTools.some((t) => t.id === 'parametric-lamp-designer')).toBe(true);
+  });
+
+  it('should find lithophane-maker tool by id and category', () => {
+    const tool = getToolById('lithophane-maker');
+    expect(tool).toBeDefined();
+    expect(tool?.name).toBe('Curved & Flat 3D Lithophane Maker');
+    expect(tool?.category).toBe('3d');
+    expect(tool?.isFullyClientSide).toBe(true);
+
+    const threeDTools = getToolsByCategory('3d');
+    expect(threeDTools.some((t) => t.id === 'lithophane-maker')).toBe(true);
+  });
+
+  it('should find gridfinity-bin-generator tool by id and category', () => {
+    const tool = getToolById('gridfinity-bin-generator');
+    expect(tool).toBeDefined();
+    expect(tool?.name).toBe('Gridfinity & Modular Drawer Bin Generator');
+    expect(tool?.category).toBe('3d');
+    expect(tool?.isFullyClientSide).toBe(true);
+
+    const threeDTools = getToolsByCategory('3d');
+    expect(threeDTools.some((t) => t.id === 'gridfinity-bin-generator')).toBe(true);
+  });
+
+  it('should find electronics-box-enclosure tool by id and category', () => {
+    const tool = getToolById('electronics-box-enclosure');
+    expect(tool).toBeDefined();
+    expect(tool?.name).toBe('Parametric Electronics Box & Snap-Fit Enclosure');
+    expect(tool?.category).toBe('3d');
+    expect(tool?.isFullyClientSide).toBe(true);
+
+    const threeDTools = getToolsByCategory('3d');
+    expect(threeDTools.some((t) => t.id === 'electronics-box-enclosure')).toBe(true);
+  });
+
+  it('should find under-desk-clamp-generator tool by id and category', () => {
+    const tool = getToolById('under-desk-clamp-generator');
+    expect(tool).toBeDefined();
+    expect(tool?.name).toBe('Under-Desk Clamp & Cable Management Generator');
+    expect(tool?.category).toBe('3d');
+    expect(tool?.isFullyClientSide).toBe(true);
+
+    const threeDTools = getToolsByCategory('3d');
+    expect(threeDTools.some((t) => t.id === 'under-desk-clamp-generator')).toBe(true);
+  });
+
+  it('should find skadis-pegboard-maker tool by id and category', () => {
+    const tool = getToolById('skadis-pegboard-maker');
+    expect(tool).toBeDefined();
+    expect(tool?.name).toBe('IKEA Skadis & Pegboard Hook & Holder Maker');
+    expect(tool?.category).toBe('3d');
+    expect(tool?.isFullyClientSide).toBe(true);
+
+    const threeDTools = getToolsByCategory('3d');
+    expect(threeDTools.some((t) => t.id === 'skadis-pegboard-maker')).toBe(true);
+  });
+
+  it('should find geometric-plant-pot tool by id and category', () => {
+    const tool = getToolById('geometric-plant-pot');
+    expect(tool).toBeDefined();
+    expect(tool?.name).toBe('Geometric Plant Pot & Self-Watering Planter');
+    expect(tool?.category).toBe('3d');
+    expect(tool?.isFullyClientSide).toBe(true);
+
+    const threeDTools = getToolsByCategory('3d');
+    expect(threeDTools.some((t) => t.id === 'geometric-plant-pot')).toBe(true);
+  });
+
+  it('should find braille-ada-sign-generator tool by id and category', () => {
+    const tool = getToolById('braille-ada-sign-generator');
+    expect(tool).toBeDefined();
+    expect(tool?.name).toBe('Braille & ADA Tactile Door Sign Generator');
+    expect(tool?.category).toBe('3d');
+    expect(tool?.isFullyClientSide).toBe(true);
+
+    const threeDTools = getToolsByCategory('3d');
+    expect(threeDTools.some((t) => t.id === 'braille-ada-sign-generator')).toBe(true);
+  });
+
+  it('should find keycap-switch-tester-maker tool by id and category', () => {
+    const tool = getToolById('keycap-switch-tester-maker');
+    expect(tool).toBeDefined();
+    expect(tool?.name).toBe('Custom Mechanical Keycap & Switch Tester Maker');
+    expect(tool?.category).toBe('3d');
+    expect(tool?.isFullyClientSide).toBe(true);
+
+    const threeDTools = getToolsByCategory('3d');
+    expect(threeDTools.some((t) => t.id === 'keycap-switch-tester-maker')).toBe(true);
+  });
+
+  it('should find cappuccino-stencil-maker tool by id and category', () => {
+    const tool = getToolById('cappuccino-stencil-maker');
+    expect(tool).toBeDefined();
+    expect(tool?.name).toBe('Cappuccino Stencil & Airbrush Template Maker');
+    expect(tool?.category).toBe('3d');
+    expect(tool?.isFullyClientSide).toBe(true);
+
+    const threeDTools = getToolsByCategory('3d');
+    expect(threeDTools.some((t) => t.id === 'cappuccino-stencil-maker')).toBe(true);
+  });
+
+  it('should find pet-id-tag-generator tool by id and category', () => {
+    const tool = getToolById('pet-id-tag-generator');
+    expect(tool).toBeDefined();
+    expect(tool?.name).toBe('Pet ID Tag & Collar Slide-On Generator');
+    expect(tool?.category).toBe('3d');
+    expect(tool?.isFullyClientSide).toBe(true);
+
+    const threeDTools = getToolsByCategory('3d');
+    expect(threeDTools.some((t) => t.id === 'pet-id-tag-generator')).toBe(true);
+  });
+
+  it('should find hsw-insert-adapter tool by id and category', () => {
+    const tool = getToolById('hsw-insert-adapter');
+    expect(tool).toBeDefined();
+    expect(tool?.name).toBe('Honeycomb Storage Wall (HSW) Insert & Adapter');
+    expect(tool?.category).toBe('3d');
+    expect(tool?.isFullyClientSide).toBe(true);
+
+    const threeDTools = getToolsByCategory('3d');
+    expect(threeDTools.some((t) => t.id === 'hsw-insert-adapter')).toBe(true);
+  });
+
+  it('should find passport-biometric-photo tool by id and category', () => {
+    const tool = getToolById('passport-biometric-photo');
+    expect(tool).toBeDefined();
+    expect(tool?.name).toBe('Passport, Visa & ID Biometric Photo Maker');
+    expect(tool?.category).toBe('media');
+    expect(tool?.isFullyClientSide).toBe(true);
+
+    const mediaTools = getToolsByCategory('media');
+    expect(mediaTools.some((t) => t.id === 'passport-biometric-photo')).toBe(true);
+  });
+
+  it('should find heic-avif-converter tool by id and category', () => {
+    const tool = getToolById('heic-avif-converter');
+    expect(tool).toBeDefined();
+    expect(tool?.name).toBe('HEIC & AVIF to JPG/PNG Batch Converter');
+    expect(tool?.category).toBe('media');
+    expect(tool?.isFullyClientSide).toBe(true);
+
+    const mediaTools = getToolsByCategory('media');
+    expect(mediaTools.some((t) => t.id === 'heic-avif-converter')).toBe(true);
+  });
+
+  it('should find pdf-signer-stamper tool by id and category', () => {
+    const tool = getToolById('pdf-signer-stamper');
+    expect(tool).toBeDefined();
+    expect(tool?.name).toBe('Client-Side PDF Signer, Date Stamper & Initials');
+    expect(tool?.category).toBe('documents');
+    expect(tool?.isFullyClientSide).toBe(true);
+
+    const docTools = getToolsByCategory('documents');
+    expect(docTools.some((t) => t.id === 'pdf-signer-stamper')).toBe(true);
+  });
+
   it('should find background-remover tool by id and category', () => {
     const tool = getToolById('background-remover');
     expect(tool).toBeDefined();
@@ -315,6 +480,50 @@ describe('ToolRegistry (Seam 3: Catalog & Architecture Verification)', () => {
 
     const devTools = getToolsByCategory('dev');
     expect(devTools.some((t) => t.id === 'web-vitals')).toBe(true);
+  });
+
+  it('should find face-plate-blur tool by id and category', () => {
+    const tool = getToolById('face-plate-blur');
+    expect(tool).toBeDefined();
+    expect(tool?.name).toBe('Face & License Plate Privacy Blur Tool');
+    expect(tool?.category).toBe('privacy');
+    expect(tool?.isFullyClientSide).toBe(true);
+
+    const privacyTools = getToolsByCategory('privacy');
+    expect(privacyTools.some((t) => t.id === 'face-plate-blur')).toBe(true);
+  });
+
+  it('should find local-ocr-text-extractor tool by id and category', () => {
+    const tool = getToolById('local-ocr-text-extractor');
+    expect(tool).toBeDefined();
+    expect(tool?.name).toBe('Local OCR Image & Scanned PDF to Text & Word');
+    expect(tool?.category).toBe('documents');
+    expect(tool?.isFullyClientSide).toBe(true);
+
+    const docTools = getToolsByCategory('documents');
+    expect(docTools.some((t) => t.id === 'local-ocr-text-extractor')).toBe(true);
+  });
+
+  it('should find file-encryptor-vault tool by id and category', () => {
+    const tool = getToolById('file-encryptor-vault');
+    expect(tool).toBeDefined();
+    expect(tool?.name).toBe('Zero-Knowledge File Encryptor & Vault');
+    expect(tool?.category).toBe('privacy');
+    expect(tool?.isFullyClientSide).toBe(true);
+
+    const privacyTools = getToolsByCategory('privacy');
+    expect(privacyTools.some((t) => t.id === 'file-encryptor-vault')).toBe(true);
+  });
+
+  it('should find pii-scrubber-anonymizer tool by id and category', () => {
+    const tool = getToolById('pii-scrubber-anonymizer');
+    expect(tool).toBeDefined();
+    expect(tool?.name).toBe('PII Log & CSV Scrubber & Data Anonymizer');
+    expect(tool?.category).toBe('privacy');
+    expect(tool?.isFullyClientSide).toBe(true);
+
+    const privacyTools = getToolsByCategory('privacy');
+    expect(privacyTools.some((t) => t.id === 'pii-scrubber-anonymizer')).toBe(true);
   });
 
   describe('Tool Registry Localization (i18n)', () => {

@@ -826,6 +826,648 @@ export const routes: Routes = [
     pathMatch: 'full',
   },
   {
+    path: 'tools/parametric-lamp-designer',
+    title: '3D Parametric Lamp & Lampshade Designer — PrivKnife',
+    data: {
+      description:
+        'Design custom spiral, ribbed, fluted, and organic lampshades with standard E27/E14 socket mounts. Watertight shell and spiralize vase mode STL & 3MF exports.',
+      keywords: [
+        '3d printed lamp shade generator parametric stl',
+        'custom lampshade 3d print',
+        'spiral vase mode lamp shade stl',
+        'e27 socket lampshade generator',
+        'parametric lighting 3d print',
+        'bambu lab lampshade 3mf',
+        'prusa vase mode lamp',
+        'organic fluted lampshade 3d model',
+      ],
+      url: '/tools/parametric-lamp-designer',
+    },
+    loadComponent: () =>
+      import('./tools/3d/parametric-lamp-designer').then(
+        (m) => m.ParametricLampDesignerComponent
+      ),
+  },
+  {
+    path: 'tools/lamp-designer',
+    redirectTo: 'tools/parametric-lamp-designer',
+    pathMatch: 'full',
+  },
+  {
+    path: 'tools/lampshade-studio',
+    redirectTo: 'tools/parametric-lamp-designer',
+    pathMatch: 'full',
+  },
+  {
+    path: 'tools/lithophane-maker',
+    title: 'Curved & Flat 3D Lithophane Maker — PrivKnife',
+    data: {
+      description:
+        'Turn digital photos into high-detail 3D printable lithophanes with flat, curved arc, 360° cylindrical, and nightlight geometries with real-time backlit preview.',
+      keywords: [
+        'lithophane stl generator online free 3d print curved',
+        'curved lithophane generator',
+        'cylinder lithophane maker 3d print',
+        'nightlight lithophane stl',
+        'photo to 3d print stl',
+        'bambu lithophane generator',
+        'prusa lithophane maker',
+        'backlit 3d photo print',
+      ],
+      url: '/tools/lithophane-maker',
+    },
+    loadComponent: () =>
+      import('./tools/3d/lithophane-maker').then(
+        (m) => m.LithophaneMakerComponent
+      ),
+  },
+  {
+    path: 'tools/lithophane',
+    redirectTo: 'tools/lithophane-maker',
+    pathMatch: 'full',
+  },
+  {
+    path: 'tools/gridfinity-bin-generator',
+    title: 'Gridfinity & Modular Drawer Bin Generator — PrivKnife',
+    data: {
+      description:
+        'Parametric 3D printable bins conforming to Zack Freedman’s open-source Gridfinity standard. Custom unit sizes, internal dividers, scoops, and label tabs.',
+      keywords: [
+        'gridfinity bin generator stl 3d print modular drawer',
+        'custom gridfinity bins',
+        'gridfinity generator online',
+        '3d printable drawer organizer',
+        'zack freedman gridfinity stl',
+        'gridfinity divider bin 3mf',
+        'bambu gridfinity generator',
+        'modular workshop storage 3d print',
+      ],
+      url: '/tools/gridfinity-bin-generator',
+    },
+    loadComponent: () =>
+      import('./tools/3d/gridfinity-bin-generator').then(
+        (m) => m.GridfinityBinGeneratorComponent
+      ),
+  },
+  {
+    path: 'tools/gridfinity',
+    redirectTo: 'tools/gridfinity-bin-generator',
+    pathMatch: 'full',
+  },
+  {
+    path: 'tools/electronics-box-enclosure',
+    title: 'Parametric Electronics Box & Snap-Fit Enclosure — PrivKnife',
+    data: {
+      description:
+        'Generate custom two-part 3D printable enclosures for DIY electronics, microcontrollers (Arduino, ESP32, Raspberry Pi Pico), and PCBs with snap-fit or screw joints.',
+      keywords: [
+        'parametric electronics box stl 3d print enclosure snap fit',
+        '3d printed project box generator',
+        'arduino uno enclosure 3d print',
+        'esp32 case generator stl',
+        'raspberry pi pico snap fit case',
+        'custom pcb enclosure 3d model',
+        'bambu electronics enclosure 3mf',
+        'screw boss standoff electronics box',
+      ],
+      url: '/tools/electronics-box-enclosure',
+    },
+    loadComponent: () =>
+      import('./tools/3d/electronics-box-enclosure').then(
+        (m) => m.ElectronicsBoxEnclosureComponent
+      ),
+  },
+  {
+    path: 'tools/electronics-box',
+    redirectTo: 'tools/electronics-box-enclosure',
+    pathMatch: 'full',
+  },
+  {
+    path: 'tools/under-desk-clamp-generator',
+    title: 'Under-Desk Clamp & Cable Management Generator — PrivKnife',
+    data: {
+      description:
+        'Generate heavy-duty parametric C-clamps with 3D-printable trapezoidal screw threads, clamping bolt knobs, and customizable attachments for headphones, cable raceways, power strips, and beverages.',
+      keywords: [
+        'under desk clamp 3d print generator stl cable raceway headphone hook',
+        '3d printed desk clamp stl',
+        'headphone hanger clamp generator',
+        'cable management raceway under desk 3d print',
+        'parametric c clamp threaded bolt 3d model',
+        'power strip under desk mount 3mf',
+        'desk edge cup holder 3d print',
+        'trapezoidal thread 3d printable screw bolt',
+      ],
+      url: '/tools/under-desk-clamp-generator',
+    },
+    loadComponent: () =>
+      import('./tools/3d/under-desk-clamp-generator').then(
+        (m) => m.UnderDeskClampGeneratorComponent
+      ),
+  },
+  {
+    path: 'tools/desk-clamp',
+    redirectTo: 'tools/under-desk-clamp-generator',
+    pathMatch: 'full',
+  },
+  {
+    path: 'tools/cable-clamp',
+    redirectTo: 'tools/under-desk-clamp-generator',
+    pathMatch: 'full',
+  },
+  {
+    path: 'tools/skadis-pegboard-maker',
+    title: 'IKEA Skadis & Pegboard Hook & Holder Maker — PrivKnife',
+    data: {
+      description:
+        'Generate precision 3D printable hooks, prongs, tool holsters, and shelf brackets with custom mounting lugs for IKEA Skådis slots or standard 1/4" pegboards.',
+      keywords: [
+        'ikea skadis hook generator 3d print pegboard stl holder',
+        'skadis custom hook 3d print',
+        'ikea skadis tool holder generator',
+        '3d printable pegboard hooks stl',
+        'standard pegboard shelf bracket 3d model',
+        'skadis caliper holster 3mf',
+        'dual prong pegboard hook generator',
+        'skadis parts cup 3d print',
+      ],
+      url: '/tools/skadis-pegboard-maker',
+    },
+    loadComponent: () =>
+      import('./tools/3d/skadis-pegboard-maker').then(
+        (m) => m.SkadisPegboardMakerComponent
+      ),
+  },
+  {
+    path: 'tools/skadis-hook',
+    redirectTo: 'tools/skadis-pegboard-maker',
+    pathMatch: 'full',
+  },
+  {
+    path: 'tools/skadis-generator',
+    redirectTo: 'tools/skadis-pegboard-maker',
+    pathMatch: 'full',
+  },
+  {
+    path: 'tools/pegboard-hook',
+    redirectTo: 'tools/skadis-pegboard-maker',
+    pathMatch: 'full',
+  },
+  {
+    path: 'tools/geometric-plant-pot',
+    title: 'Geometric Plant Pot & Self-Watering Planter — PrivKnife',
+    data: {
+      description:
+        'Generate modern faceted, twisted, or ribbed plant pots with sub-irrigation reservoir inserts, wick slots, and matching drip saucers. 100% in-browser.',
+      keywords: [
+        'geometric plant pot 3d print stl self watering planter',
+        'twisted vase mode plant pot 3d print',
+        'self watering planter stl generator',
+        'faceted geometric succulent planter 3d print',
+        'plant pot with saucer stl',
+        'sub irrigation plant pot 3mf',
+        'custom planter generator 3d print',
+      ],
+      url: '/tools/geometric-plant-pot',
+    },
+    loadComponent: () =>
+      import('./tools/3d/geometric-plant-pot').then(
+        (m) => m.GeometricPlantPotComponent
+      ),
+  },
+  {
+    path: 'tools/plant-pot',
+    redirectTo: 'tools/geometric-plant-pot',
+    pathMatch: 'full',
+  },
+  {
+    path: 'tools/self-watering-planter',
+    redirectTo: 'tools/geometric-plant-pot',
+    pathMatch: 'full',
+  },
+  {
+    path: 'tools/braille-ada-sign-generator',
+    title: 'Braille & ADA Tactile Door Sign Generator — PrivKnife',
+    data: {
+      description:
+        'Generate 100% ADA-compliant room signage featuring 1/32" raised tactile lettering, Grade 2 contracted Braille domes, standard pictograms, and multi-color 3MF slicer layers. 100% in-browser.',
+      keywords: [
+        'ada braille sign generator 3d print stl 3mf tactile door sign',
+        '3d printable braille door sign stl',
+        'ada compliant room sign generator',
+        'tactile door sign 3mf bambu',
+        'grade 2 braille sign 3d print',
+        'restroom sign with braille stl',
+        'accessible wheelchair sign 3d print',
+      ],
+      url: '/tools/braille-ada-sign-generator',
+    },
+    loadComponent: () =>
+      import('./tools/3d/braille-ada-sign-generator').then(
+        (m) => m.BrailleAdaSignGeneratorComponent
+      ),
+  },
+  {
+    path: 'tools/ada-sign',
+    redirectTo: 'tools/braille-ada-sign-generator',
+    pathMatch: 'full',
+  },
+  {
+    path: 'tools/braille-sign',
+    redirectTo: 'tools/braille-ada-sign-generator',
+    pathMatch: 'full',
+  },
+  {
+    path: 'tools/keycap-switch-tester-maker',
+    title: 'Custom Mechanical Keycap & Switch Tester Maker — PrivKnife',
+    data: {
+      description:
+        'Parametrically generate Cherry, OEM, DSA, and SA mechanical keycaps with custom legends and calibrated MX stems, or modular snap-in switch tester desk trays. 100% in-browser.',
+      keywords: [
+        'custom keycap stl 3d print mechanical keyboard switch tester',
+        'cherry mx keycap 3d print',
+        'switch tester stl',
+        'custom keycap maker 3mf',
+        'dsa keycap 3d print',
+        'oem profile keycap stl',
+        'artisan keycap 3d model generator',
+      ],
+      url: '/tools/keycap-switch-tester-maker',
+    },
+    loadComponent: () =>
+      import('./tools/3d/keycap-switch-tester-maker').then(
+        (m) => m.KeycapSwitchTesterMakerComponent
+      ),
+  },
+  {
+    path: 'tools/keycap-maker',
+    redirectTo: 'tools/keycap-switch-tester-maker',
+    pathMatch: 'full',
+  },
+  {
+    path: 'tools/switch-tester',
+    redirectTo: 'tools/keycap-switch-tester-maker',
+    pathMatch: 'full',
+  },
+  {
+    path: 'tools/cappuccino-stencil-maker',
+    title: 'Cappuccino Stencil & Airbrush Template Maker — PrivKnife',
+    data: {
+      description:
+        'Turn coffee art motifs, pet silhouettes, and custom text into food-safe 3D printable stencils and laser-cut vector templates with automatic island bridging. 100% in-browser.',
+      keywords: [
+        'cappuccino stencil generator 3d print stl svg coffee template',
+        'latte art stencil 3d print',
+        'food safe coffee stencil stl',
+        'laser cut stencil svg',
+        'airbrush template generator',
+        'cappuccino duster stencil maker',
+      ],
+      url: '/tools/cappuccino-stencil-maker',
+    },
+    loadComponent: () =>
+      import('./tools/3d/cappuccino-stencil-maker').then(
+        (m) => m.CappuccinoStencilMakerComponent
+      ),
+  },
+  {
+    path: 'tools/coffee-stencil',
+    redirectTo: 'tools/cappuccino-stencil-maker',
+    pathMatch: 'full',
+  },
+  {
+    path: 'tools/airbrush-stencil',
+    redirectTo: 'tools/cappuccino-stencil-maker',
+    pathMatch: 'full',
+  },
+  {
+    path: 'tools/pet-id-tag-generator',
+    title: 'Pet ID Tag & Collar Slide-On Generator — PrivKnife',
+    data: {
+      description:
+        'Generate stylish, rattle-free 3D printable pet tags in traditional hanging charm shapes or curved silent collar slide-on bands with high-contrast dual-color typography. 100% in-browser.',
+      keywords: [
+        'pet id tag 3d print stl dog tag generator collar slide on',
+        'custom dog tag 3d print',
+        'collar slide on pet tag stl',
+        'silent pet id tag 3mf',
+        'dual color pet tag 3d model',
+        'cat id tag 3d print',
+      ],
+      url: '/tools/pet-id-tag-generator',
+    },
+    loadComponent: () =>
+      import('./tools/3d/pet-id-tag-generator').then(
+        (m) => m.PetIdTagGeneratorComponent
+      ),
+  },
+  {
+    path: 'tools/pet-tag',
+    redirectTo: 'tools/pet-id-tag-generator',
+    pathMatch: 'full',
+  },
+  {
+    path: 'tools/dog-tag',
+    redirectTo: 'tools/pet-id-tag-generator',
+    pathMatch: 'full',
+  },
+  {
+    path: 'tools/collar-tag',
+    redirectTo: 'tools/pet-id-tag-generator',
+    pathMatch: 'full',
+  },
+  {
+    path: 'tools/hsw-insert-adapter',
+    title: 'Honeycomb Storage Wall (HSW) Insert & Adapter — PrivKnife',
+    data: {
+      description:
+        'Generate dimensionally accurate snap-fit inserts, captive nut pockets (M3/M4/M5), neodymium magnet holders, utility hooks, and can loops for the open-source Honeycomb Storage Wall standard. 100% in-browser.',
+      keywords: [
+        'honeycomb storage wall insert generator stl 3d print hsw adapter',
+        'hsw insert 3d print',
+        'honeycomb storage wall hook stl',
+        'hsw magnet insert',
+        'hsw nut pocket 3d print',
+        'hsw parametric adapter',
+      ],
+      url: '/tools/hsw-insert-adapter',
+    },
+    loadComponent: () =>
+      import('./tools/3d/hsw-insert-adapter').then(
+        (m) => m.HswInsertAdapterComponent
+      ),
+  },
+  {
+    path: 'tools/hsw-insert',
+    redirectTo: 'tools/hsw-insert-adapter',
+    pathMatch: 'full',
+  },
+  {
+    path: 'tools/hsw-adapter',
+    redirectTo: 'tools/hsw-insert-adapter',
+    pathMatch: 'full',
+  },
+  {
+    path: 'tools/honeycomb-wall',
+    redirectTo: 'tools/hsw-insert-adapter',
+    pathMatch: 'full',
+  },
+  {
+    path: 'tools/passport-biometric-photo',
+    title: 'Passport, Visa & ID Biometric Photo Maker — PrivKnife',
+    data: {
+      description:
+        'Convert any portrait into official biometric passport, visa, and ID photos with standard ICAO guidelines and print-ready tiled photo sheets. 100% client-side.',
+      keywords: [
+        'passport photo maker 2x2 35x45 printable sheet 4x6 100 client side',
+        'passport photo generator free printable',
+        'us passport photo online 2x2',
+        'schengen visa photo 35x45 mm print sheet',
+        'id photo maker 4x6 photo paper',
+        'biometric passport photo cutter',
+      ],
+      url: '/tools/passport-biometric-photo',
+    },
+    loadComponent: () =>
+      import(
+        './tools/media/passport-biometric-photo'
+      ).then((m) => m.PassportBiometricPhotoComponent),
+  },
+  {
+    path: 'tools/passport-photo',
+    redirectTo: 'tools/passport-biometric-photo',
+    pathMatch: 'full',
+  },
+  {
+    path: 'tools/visa-photo',
+    redirectTo: 'tools/passport-biometric-photo',
+    pathMatch: 'full',
+  },
+  {
+    path: 'tools/id-photo',
+    redirectTo: 'tools/passport-biometric-photo',
+    pathMatch: 'full',
+  },
+  {
+    path: 'tools/heic-avif-converter',
+    title: 'HEIC & AVIF to JPG/PNG Batch Converter — PrivKnife',
+    data: {
+      description:
+        'Convert Apple HEIC/HEIF photos and modern AVIF files into universal JPEG, PNG, or WebP formats locally in browser memory. Up to 100 images in parallel with zero server uploads.',
+      keywords: [
+        'convert heic to jpg online batch free avif to png no upload',
+        'heic to jpg batch converter',
+        'heic to png converter free',
+        'avif to jpg converter',
+        'avif to png client side',
+        'apple heic converter private',
+      ],
+      url: '/tools/heic-avif-converter',
+    },
+    loadComponent: () =>
+      import(
+        './tools/media/heic-avif-converter'
+      ).then((m) => m.HeicAvifConverterComponent),
+  },
+  {
+    path: 'tools/heic-to-jpg',
+    redirectTo: 'tools/heic-avif-converter',
+    pathMatch: 'full',
+  },
+  {
+    path: 'tools/avif-to-png',
+    redirectTo: 'tools/heic-avif-converter',
+    pathMatch: 'full',
+  },
+  {
+    path: 'tools/heic-converter',
+    redirectTo: 'tools/heic-avif-converter',
+    pathMatch: 'full',
+  },
+  {
+    path: 'tools/pdf-signer-stamper',
+    title: 'Client-Side PDF Signer, Date Stamper & Initials — PrivKnife',
+    data: {
+      description:
+        'Sign contracts, NDAs, and forms privately in your browser. Draw pressure-smoothed signatures, place date stamps and initials, and permanently flatten annotations. 100% client-side.',
+      keywords: [
+        'sign pdf online free client side date stamp initials contract',
+        'sign pdf online free no upload',
+        'private pdf signer',
+        'pdf date stamper free',
+        'pdf initials tool client side',
+        'flatten pdf signature',
+      ],
+      url: '/tools/pdf-signer-stamper',
+    },
+    loadComponent: () =>
+      import(
+        './tools/documents/pdf-signer-stamper'
+      ).then((m) => m.PdfSignerStamperComponent),
+  },
+  {
+    path: 'tools/sign-pdf',
+    redirectTo: 'tools/pdf-signer-stamper',
+    pathMatch: 'full',
+  },
+  {
+    path: 'tools/pdf-signer',
+    redirectTo: 'tools/pdf-signer-stamper',
+    pathMatch: 'full',
+  },
+  {
+    path: 'tools/pdf-stamper',
+    redirectTo: 'tools/pdf-signer-stamper',
+    pathMatch: 'full',
+  },
+  {
+    path: 'tools/face-plate-blur',
+    title: 'Face & License Plate Privacy Blur Tool — PrivKnife',
+    data: {
+      description:
+        'Permanently pixelate or blackout faces, street signs, and vehicle license plates before publishing. Irreversible canvas censoring with 100% EXIF/GPS metadata stripping.',
+      keywords: [
+        'blur face license plate online free privacy censor photo',
+        'face blur online',
+        'license plate censor',
+        'privacy photo pixelate',
+        'censor photo without upload',
+        'strip exif metadata',
+      ],
+      url: '/tools/face-plate-blur',
+    },
+    loadComponent: () =>
+      import(
+        './tools/privacy/face-plate-blur'
+      ).then((m) => m.FacePlateBlurComponent),
+  },
+  {
+    path: 'tools/privacy-blur',
+    redirectTo: 'tools/face-plate-blur',
+    pathMatch: 'full',
+  },
+  {
+    path: 'tools/censor-photo',
+    redirectTo: 'tools/face-plate-blur',
+    pathMatch: 'full',
+  },
+  {
+    path: 'tools/face-blur',
+    redirectTo: 'tools/face-plate-blur',
+    pathMatch: 'full',
+  },
+  {
+    path: 'tools/local-ocr-text-extractor',
+    title: 'Local OCR Image & Scanned PDF to Text & Word — PrivKnife',
+    data: {
+      description:
+        'Extract editable text, tables, and paragraphs from photos, invoices, and scanned multi-page PDFs locally in your browser with zero server uploads.',
+      keywords: [
+        'ocr image to text free offline client side scanned pdf to word',
+        'ocr pdf to text',
+        'image to text converter',
+        'offline ocr',
+        'scanned pdf to docx',
+        'extract text from photo',
+        'private ocr',
+      ],
+      url: '/tools/local-ocr-text-extractor',
+    },
+    loadComponent: () =>
+      import(
+        './tools/documents/local-ocr-text-extractor'
+      ).then((m) => m.LocalOcrTextExtractorComponent),
+  },
+  {
+    path: 'tools/local-ocr',
+    redirectTo: 'tools/local-ocr-text-extractor',
+    pathMatch: 'full',
+  },
+  {
+    path: 'tools/ocr-text-extractor',
+    redirectTo: 'tools/local-ocr-text-extractor',
+    pathMatch: 'full',
+  },
+  {
+    path: 'tools/image-to-text',
+    redirectTo: 'tools/local-ocr-text-extractor',
+    pathMatch: 'full',
+  },
+  {
+    path: 'tools/file-encryptor-vault',
+    title: 'Zero-Knowledge File Encryptor & Vault — PrivKnife',
+    data: {
+      description:
+        'Military-grade client-side file encryption and decryption using AES-256-GCM and PBKDF2 with zero server knowledge.',
+      keywords: [
+        'file encryptor online zero knowledge aes 256 gcm password protect client side',
+        'encrypt file browser',
+        'zero knowledge vault',
+        'aes 256 file encryption',
+        'decrypt priv file',
+        'client side file locker',
+        'password protect file offline',
+      ],
+      url: '/tools/file-encryptor-vault',
+    },
+    loadComponent: () =>
+      import(
+        './tools/privacy/file-encryptor-vault'
+      ).then((m) => m.FileEncryptorVaultComponent),
+  },
+  {
+    path: 'tools/file-encryptor',
+    redirectTo: 'tools/file-encryptor-vault',
+    pathMatch: 'full',
+  },
+  {
+    path: 'tools/file-vault',
+    redirectTo: 'tools/file-encryptor-vault',
+    pathMatch: 'full',
+  },
+  {
+    path: 'tools/encrypt-file',
+    redirectTo: 'tools/file-encryptor-vault',
+    pathMatch: 'full',
+  },
+  {
+    path: 'tools/pii-scrubber-anonymizer',
+    title: 'PII Log & CSV Scrubber & Data Anonymizer — PrivKnife',
+    data: {
+      description:
+        'Detect and redact Personally Identifiable Information (emails, phone numbers, IP addresses, credit cards, SSNs, API tokens) from logs and CSVs 100% locally in your browser.',
+      keywords: [
+        'pii scrubber online sanitize logs anonymize csv gdpr hipaa compliance',
+        'pii anonymizer',
+        'sanitize logs',
+        'anonymize csv data',
+        'remove pii from text',
+        'mask sensitive data',
+        'gdpr pii scrubber',
+      ],
+      url: '/tools/pii-scrubber-anonymizer',
+    },
+    loadComponent: () =>
+      import(
+        './tools/privacy/pii-scrubber-anonymizer'
+      ).then((m) => m.PiiScrubberAnonymizerComponent),
+  },
+  {
+    path: 'tools/pii-scrubber',
+    redirectTo: 'tools/pii-scrubber-anonymizer',
+    pathMatch: 'full',
+  },
+  {
+    path: 'tools/data-anonymizer',
+    redirectTo: 'tools/pii-scrubber-anonymizer',
+    pathMatch: 'full',
+  },
+  {
+    path: 'tools/log-scrubber',
+    redirectTo: 'tools/pii-scrubber-anonymizer',
+    pathMatch: 'full',
+  },
+  {
     path: '**',
     title: 'Page Not Found — PrivKnife',
     data: {
