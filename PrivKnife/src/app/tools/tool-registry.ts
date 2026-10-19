@@ -14,8 +14,10 @@ import { qrStandKeychainTool } from './3d/qr-stand-keychain';
 import { underDeskClampGeneratorTool } from './3d/under-desk-clamp-generator';
 import { geometricPlantPotTool } from './3d/geometric-plant-pot';
 import { skadisPegboardMakerTool } from './3d/skadis-pegboard-maker';
+import { audioTrimmerBoosterTool } from './audio-video/audio-trimmer-booster';
 import { bpmTapDetectorTool } from './audio-video/bpm-tap-detector';
 import { soundwaveArtMakerTool } from './audio-video/soundwave-art-maker';
+import { videoCompressorResizerTool } from './audio-video/video-compressor-resizer';
 import { videoGifTrimmerTool } from './audio-video/video-gif-trimmer';
 import { bankStatementConverterTool } from './dev/bank-statement-converter';
 import { calendarLinkerTool } from './dev/calendar-linker';
@@ -25,12 +27,14 @@ import { dnsCheckerTool } from './dev/dns-checker';
 import { emailSignatureGeneratorTool } from './dev/email-signature-generator';
 import { cssMeshGradientMakerTool } from './dev/mesh-gradient-maker';
 import { robotsSitemapBuilderTool } from './dev/robots-sitemap-builder';
+import { svgOptimizerCleanerTool } from './dev/svg-optimizer-cleaner';
 import { webVitalsTool } from './dev/web-vitals';
 import { averyBarcodeSheetTool } from './documents/barcode-labels';
 import { gridPaperTool } from './documents/grid-paper';
 import { invoiceMakerTool } from './documents/invoice-maker';
 import { localOcrTextExtractorTool } from './documents/local-ocr-text-extractor';
 import { markdownCheatsheetTool } from './documents/markdown-cheatsheet';
+import { nutritionLabelMakerTool } from './documents/nutrition-label-maker';
 import { pdfMergerTool } from './documents/pdf-merger';
 import { pdfSignerStamperTool } from './documents/pdf-signer-stamper';
 import { tableTentMakerTool } from './documents/table-tent-maker';
@@ -95,6 +99,11 @@ export const TOOL_REGISTRY: ToolDefinition[] = [
   localOcrTextExtractorTool,
   fileEncryptorVaultTool,
   piiScrubberAnonymizerTool,
+  bankStatementConverterTool,
+  audioTrimmerBoosterTool,
+  videoCompressorResizerTool,
+  nutritionLabelMakerTool,
+  svgOptimizerCleanerTool,
   backgroundRemoverTool,
   dnsCheckerTool,
   webVitalsTool,
@@ -171,6 +180,26 @@ export const TOOL_I18N_MAP: Record<string, string> = {
   'pii-scrubber-anonymizer': 'piiScrubber',
   'pii-scrubber': 'piiScrubber',
   'data-anonymizer': 'piiScrubber',
+  'bank-statement-converter': 'bankStatementConverter',
+  'bank-statement': 'bankStatementConverter',
+  'ofx-converter': 'bankStatementConverter',
+  'qif-converter': 'bankStatementConverter',
+  'audio-trimmer-booster': 'audioTrimmerBooster',
+  'audio-trimmer': 'audioTrimmerBooster',
+  'volume-booster': 'audioTrimmerBooster',
+  'ringtone-maker': 'audioTrimmerBooster',
+  'video-compressor-resizer': 'videoCompressor',
+  'video-compressor': 'videoCompressor',
+  'discord-video-compressor': 'videoCompressor',
+  'video-resizer': 'videoCompressor',
+  'nutrition-label-maker': 'nutritionLabelMaker',
+  'nutrition-facts-maker': 'nutritionLabelMaker',
+  'fda-label-maker': 'nutritionLabelMaker',
+  'supplement-facts-maker': 'nutritionLabelMaker',
+  'svg-optimizer-cleaner': 'svgOptimizerCleaner',
+  'svg-optimizer': 'svgOptimizerCleaner',
+  'svg-cleaner': 'svgOptimizerCleaner',
+  'svg-to-react': 'svgOptimizerCleaner',
   'backgroundRemover': 'backgroundRemover',
   'background-remover': 'backgroundRemover',
   'dns-checker': 'dnsChecker',

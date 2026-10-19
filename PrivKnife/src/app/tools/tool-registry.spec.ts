@@ -526,6 +526,61 @@ describe('ToolRegistry (Seam 3: Catalog & Architecture Verification)', () => {
     expect(privacyTools.some((t) => t.id === 'pii-scrubber-anonymizer')).toBe(true);
   });
 
+  it('should find bank-statement-converter tool by id and category', () => {
+    const tool = getToolById('bank-statement-converter');
+    expect(tool).toBeDefined();
+    expect(tool?.name).toBe('Bank Statement CSV & OFX to Excel & QIF Converter');
+    expect(tool?.category).toBe('dev');
+    expect(tool?.isFullyClientSide).toBe(true);
+
+    const devTools = getToolsByCategory('dev');
+    expect(devTools.some((t) => t.id === 'bank-statement-converter')).toBe(true);
+  });
+
+  it('should find audio-trimmer-booster tool by id and category', () => {
+    const tool = getToolById('audio-trimmer-booster');
+    expect(tool).toBeDefined();
+    expect(tool?.name).toBe('Audio Trimmer, Volume Booster & Ringtone Maker');
+    expect(tool?.category).toBe('audio-video');
+    expect(tool?.isFullyClientSide).toBe(true);
+
+    const audioTools = getToolsByCategory('audio-video');
+    expect(audioTools.some((t) => t.id === 'audio-trimmer-booster')).toBe(true);
+  });
+
+  it('should find video-compressor-resizer tool by id and category', () => {
+    const tool = getToolById('video-compressor-resizer');
+    expect(tool).toBeDefined();
+    expect(tool?.name).toBe('Client-Side Video Compressor & Social Resizer');
+    expect(tool?.category).toBe('audio-video');
+    expect(tool?.isFullyClientSide).toBe(true);
+
+    const audioTools = getToolsByCategory('audio-video');
+    expect(audioTools.some((t) => t.id === 'video-compressor-resizer')).toBe(true);
+  });
+
+  it('should find nutrition-label-maker tool by id and category', () => {
+    const tool = getToolById('nutrition-label-maker');
+    expect(tool).toBeDefined();
+    expect(tool?.name).toBe('FDA & EU Nutrition Facts & Supplement Label Maker');
+    expect(tool?.category).toBe('documents');
+    expect(tool?.isFullyClientSide).toBe(true);
+
+    const docTools = getToolsByCategory('documents');
+    expect(docTools.some((t) => t.id === 'nutrition-label-maker')).toBe(true);
+  });
+
+  it('should find svg-optimizer-cleaner tool by id in dev category', () => {
+    const tool = getToolById('svg-optimizer-cleaner');
+    expect(tool).toBeDefined();
+    expect(tool?.name).toBe('SVG Optimizer, Path Cleaner & React/Vue Exporter');
+    expect(tool?.category).toBe('dev');
+    expect(tool?.isFullyClientSide).toBe(true);
+
+    const devTools = getToolsByCategory('dev');
+    expect(devTools.some((t) => t.id === 'svg-optimizer-cleaner')).toBe(true);
+  });
+
   describe('Tool Registry Localization (i18n)', () => {
     it('should have an i18n key mapping for every registered tool', () => {
       for (const tool of TOOL_REGISTRY) {

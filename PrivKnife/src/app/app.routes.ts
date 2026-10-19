@@ -1468,6 +1468,195 @@ export const routes: Routes = [
     pathMatch: 'full',
   },
   {
+    path: 'tools/bank-statement-converter',
+    title: 'Bank Statement CSV & OFX to Excel & QIF Converter — PrivKnife',
+    data: {
+      description:
+        'Convert bank statements from messy CSV, OFX, and QFX into standardized Excel, clean CSV, and QIF formats 100% locally in your browser.',
+      keywords: [
+        'bank statement converter ofx qfx to excel csv qif format private accounting',
+        'convert bank statement to excel',
+        'ofx to excel converter',
+        'qfx to csv converter',
+        'bank statement to qif',
+        'clean bank csv',
+        'client side financial converter',
+      ],
+      url: '/tools/bank-statement-converter',
+    },
+    loadComponent: () =>
+      import(
+        './tools/dev/bank-statement-converter'
+      ).then((m) => m.BankStatementConverterComponent),
+  },
+  {
+    path: 'tools/bank-statement',
+    redirectTo: 'tools/bank-statement-converter',
+    pathMatch: 'full',
+  },
+  {
+    path: 'tools/ofx-converter',
+    redirectTo: 'tools/bank-statement-converter',
+    pathMatch: 'full',
+  },
+  {
+    path: 'tools/qif-converter',
+    redirectTo: 'tools/bank-statement-converter',
+    pathMatch: 'full',
+  },
+  {
+    path: 'tools/audio-trimmer-booster',
+    title: 'Audio Trimmer, Volume Booster & Ringtone Maker — PrivKnife',
+    data: {
+      description:
+        'Trim audio with millisecond precision, boost volume up to 400% with soft-knee limiting, apply fade in/out curves, and export to MP3, WAV, or iPhone M4R ringtone format 100% locally in your browser.',
+      keywords: [
+        'audio trimmer online free volume booster mp3 ringtone maker m4r',
+        'audio trimmer',
+        'volume booster online',
+        'mp3 cutter',
+        'ringtone maker m4r',
+        'boost audio volume',
+        'cut wav file',
+        'client side audio editor',
+      ],
+      url: '/tools/audio-trimmer-booster',
+    },
+    loadComponent: () =>
+      import(
+        './tools/audio-video/audio-trimmer-booster'
+      ).then((m) => m.AudioTrimmerBoosterComponent),
+  },
+  {
+    path: 'tools/audio-trimmer',
+    redirectTo: 'tools/audio-trimmer-booster',
+    pathMatch: 'full',
+  },
+  {
+    path: 'tools/volume-booster',
+    redirectTo: 'tools/audio-trimmer-booster',
+    pathMatch: 'full',
+  },
+  {
+    path: 'tools/ringtone-maker',
+    redirectTo: 'tools/audio-trimmer-booster',
+    pathMatch: 'full',
+  },
+  {
+    path: 'tools/video-compressor-resizer',
+    title: 'Client-Side Video Compressor & Social Resizer — PrivKnife',
+    data: {
+      description:
+        'Compress MP4 and WebM videos to fit Discord 8MB/25MB/50MB, WhatsApp, and email size limits with automatic social cropping for TikTok (9:16), Instagram (1:1, 4:5), and YouTube (16:9) 100% locally in your browser.',
+      keywords: [
+        'compress video online free no upload discord video resize reels tiktok',
+        'discord video compressor 8mb',
+        'compress video client side',
+        'resize video for tiktok',
+        'instagram video resizer',
+        'reduce mp4 file size',
+        'video compressor no watermark',
+        'webm compressor',
+      ],
+      url: '/tools/video-compressor-resizer',
+    },
+    loadComponent: () =>
+      import(
+        './tools/audio-video/video-compressor-resizer'
+      ).then((m) => m.VideoCompressorResizerComponent),
+  },
+  {
+    path: 'tools/video-compressor',
+    redirectTo: 'tools/video-compressor-resizer',
+    pathMatch: 'full',
+  },
+  {
+    path: 'tools/discord-video-compressor',
+    redirectTo: 'tools/video-compressor-resizer',
+    pathMatch: 'full',
+  },
+  {
+    path: 'tools/video-resizer',
+    redirectTo: 'tools/video-compressor-resizer',
+    pathMatch: 'full',
+  },
+  {
+    path: 'tools/nutrition-label-maker',
+    title: 'FDA & EU Nutrition Facts & Supplement Label Maker — PrivKnife',
+    data: {
+      description:
+        'Generate FDA 2016, EU Regulation 1169/2011, and Supplement Facts nutrition panels with real-time Daily Value % calculations, exporting pixel-perfect vector SVG and PDF files 100% locally in your browser.',
+      keywords: [
+        'nutrition facts label maker fda eu compliant free svg pdf supplement label',
+        'fda nutrition facts generator',
+        'nutrition label maker free',
+        'eu nutrition table generator',
+        'supplement facts maker',
+        'nutrition facts vector svg',
+        'nutrition facts to pdf',
+        'client side nutrition label',
+      ],
+      url: '/tools/nutrition-label-maker',
+    },
+    loadComponent: () =>
+      import(
+        './tools/documents/nutrition-label-maker'
+      ).then((m) => m.NutritionLabelMakerComponent),
+  },
+  {
+    path: 'tools/nutrition-facts-maker',
+    redirectTo: 'tools/nutrition-label-maker',
+    pathMatch: 'full',
+  },
+  {
+    path: 'tools/fda-label-maker',
+    redirectTo: 'tools/nutrition-label-maker',
+    pathMatch: 'full',
+  },
+  {
+    path: 'tools/supplement-facts-maker',
+    redirectTo: 'tools/nutrition-label-maker',
+    pathMatch: 'full',
+  },
+  {
+    path: 'tools/svg-optimizer-cleaner',
+    title: 'SVG Optimizer, Path Cleaner & React/Vue Exporter — PrivKnife',
+    data: {
+      description:
+        'Minify bloated vector SVGs, strip metadata and editor attributes, round coordinates, and convert to clean React JSX/TSX or Vue 3 SFC components locally in your browser.',
+      keywords: [
+        'svg optimizer online path cleaner convert svg to react vue jsx component',
+        'svg optimizer',
+        'svg minifier',
+        'svg to react',
+        'svg to jsx',
+        'svg to vue',
+        'clean svg path',
+        'svgo online',
+      ],
+      url: '/tools/svg-optimizer-cleaner',
+    },
+    loadComponent: () =>
+      import(
+        './tools/dev/svg-optimizer-cleaner'
+      ).then((m) => m.SvgOptimizerCleanerComponent),
+  },
+  {
+    path: 'tools/svg-optimizer',
+    redirectTo: 'tools/svg-optimizer-cleaner',
+    pathMatch: 'full',
+  },
+  {
+    path: 'tools/svg-cleaner',
+    redirectTo: 'tools/svg-optimizer-cleaner',
+    pathMatch: 'full',
+  },
+  {
+    path: 'tools/svg-to-react',
+    redirectTo: 'tools/svg-optimizer-cleaner',
+    pathMatch: 'full',
+  },
+  {
     path: '**',
     title: 'Page Not Found — PrivKnife',
     data: {
