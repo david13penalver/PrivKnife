@@ -1657,6 +1657,253 @@ export const routes: Routes = [
     pathMatch: 'full',
   },
   {
+    path: 'tools/diff-checker',
+    title: 'Side-by-Side Code & Contract Diff Checker — PrivKnife',
+    data: {
+      description:
+        'Private, high-speed code, text, and contract comparison with word-level differences and unified patch export 100% locally in your browser.',
+      keywords: [
+        'side by side diff checker online code compare contract difference text compare',
+        'diff checker',
+        'code diff',
+        'text compare',
+        'contract diff checker',
+        'online diff checker',
+        'unified diff',
+        'file comparison',
+      ],
+      url: '/tools/diff-checker',
+    },
+    loadComponent: () =>
+      import(
+        './tools/dev/diff-checker'
+      ).then((m) => m.DiffCheckerComponent),
+  },
+  {
+    path: 'tools/code-diff',
+    redirectTo: 'tools/diff-checker',
+    pathMatch: 'full',
+  },
+  {
+    path: 'tools/text-compare',
+    redirectTo: 'tools/diff-checker',
+    pathMatch: 'full',
+  },
+  {
+    path: 'tools/contract-diff',
+    redirectTo: 'tools/diff-checker',
+    pathMatch: 'full',
+  },
+  {
+    path: 'tools/font-subsetter-converter',
+    title: 'Web Font Subsetter & TTF/OTF to WOFF2 Converter — PrivKnife',
+    data: {
+      description:
+        'Compress heavy desktop typography into ultra-compact WOFF2 web fonts by stripping unused glyphs and layout tables, cutting payloads by up to 95% locally in your browser.',
+      keywords: [
+        'font subsetter online convert ttf to woff2 compress webfont reduce font size',
+        'font subsetter',
+        'ttf to woff2',
+        'otf to woff2',
+        'compress web font',
+        'reduce font size',
+        'woff2 converter',
+        'glyph stripper',
+      ],
+      url: '/tools/font-subsetter-converter',
+    },
+    loadComponent: () =>
+      import(
+        './tools/dev/font-subsetter-converter'
+      ).then((m) => m.FontSubsetterConverterComponent),
+  },
+  {
+    path: 'tools/font-subsetter',
+    redirectTo: 'tools/font-subsetter-converter',
+    pathMatch: 'full',
+  },
+  {
+    path: 'tools/ttf-to-woff2',
+    redirectTo: 'tools/font-subsetter-converter',
+    pathMatch: 'full',
+  },
+  {
+    path: 'tools/otf-to-woff2',
+    redirectTo: 'tools/font-subsetter-converter',
+    pathMatch: 'full',
+  },
+  {
+    path: 'tools/webfont-generator',
+    redirectTo: 'tools/font-subsetter-converter',
+    pathMatch: 'full',
+  },
+  {
+    path: 'tools/seamless-texture-generator',
+    title: 'Seamless Tileable Texture & Pattern Generator — PrivKnife',
+    data: {
+      description:
+        'Transform ordinary photos into seamless repeating 3D textures with edge crossfading, Sobel normal map generation, and live tiled viewport preview directly in your browser.',
+      keywords: [
+        'seamless texture generator online tileable pattern normal map 3d texture',
+        'seamless texture',
+        'tileable texture',
+        'texture generator',
+        'normal map generator',
+        'pattern maker',
+        '3d texture maker',
+        'seamless pattern',
+      ],
+      url: '/tools/seamless-texture-generator',
+    },
+    loadComponent: () =>
+      import(
+        './tools/media/seamless-texture-generator'
+      ).then((m) => m.SeamlessTextureGeneratorComponent),
+  },
+  {
+    path: 'tools/seamless-texture',
+    redirectTo: 'tools/seamless-texture-generator',
+    pathMatch: 'full',
+  },
+  {
+    path: 'tools/texture-generator',
+    redirectTo: 'tools/seamless-texture-generator',
+    pathMatch: 'full',
+  },
+  {
+    path: 'tools/normal-map-generator',
+    redirectTo: 'tools/seamless-texture-generator',
+    pathMatch: 'full',
+  },
+  {
+    path: 'tools/floor-plan-furniture-scaler',
+    title: 'Interactive 2D Floor Plan & Room Furniture Scaler — PrivKnife',
+    data: {
+      description:
+        'Draft scaled architectural walls, position real-dimension furniture items, verify clearance zones, and export print-ready blueprints or vector SVGs directly in your browser.',
+      keywords: [
+        '2d floor plan maker free online room layout furniture scale blueprint pdf',
+        'floor plan maker',
+        'room furniture scaler',
+        'blueprint creator',
+        'floor plan scaler',
+        'architectural blueprint',
+        'room layout planner',
+      ],
+      url: '/tools/floor-plan-furniture-scaler',
+    },
+    loadComponent: () =>
+      import(
+        './tools/documents/floor-plan-furniture-scaler'
+      ).then((m) => m.FloorPlanFurnitureScalerComponent),
+  },
+  {
+    path: 'tools/floor-plan-scaler',
+    redirectTo: 'tools/floor-plan-furniture-scaler',
+    pathMatch: 'full',
+  },
+  {
+    path: 'tools/floor-plan-maker',
+    redirectTo: 'tools/floor-plan-furniture-scaler',
+    pathMatch: 'full',
+  },
+  {
+    path: 'tools/room-furniture-scaler',
+    redirectTo: 'tools/floor-plan-furniture-scaler',
+    pathMatch: 'full',
+  },
+  {
+    path: 'tools/blueprint-scaler',
+    redirectTo: 'tools/floor-plan-furniture-scaler',
+    pathMatch: 'full',
+  },
+  {
+    path: 'tools/emergency-recovery-kit',
+    title: 'Printable Emergency Recovery & Password Kit Sheet — PrivKnife',
+    data: {
+      description:
+        'Generate tamper-evident physical paper vaults for master passwords, 2FA backup codes, 12/24-word cryptocurrency seeds, and emergency directives with offline SHA-256 verification.',
+      keywords: [
+        'emergency password sheet printable recovery kit digital legacy pdf safe deposit box',
+        'emergency recovery kit',
+        'emergency password sheet',
+        'recovery kit',
+        'crypto seed sheet',
+        'paper vault',
+        '2fa recovery codes sheet',
+        'digital legacy kit',
+      ],
+      url: '/tools/emergency-recovery-kit',
+    },
+    loadComponent: () =>
+      import(
+        './tools/privacy/emergency-recovery-kit'
+      ).then((m) => m.EmergencyRecoveryKitComponent),
+  },
+  {
+    path: 'tools/emergency-password-sheet',
+    redirectTo: 'tools/emergency-recovery-kit',
+    pathMatch: 'full',
+  },
+  {
+    path: 'tools/recovery-kit',
+    redirectTo: 'tools/emergency-recovery-kit',
+    pathMatch: 'full',
+  },
+  {
+    path: 'tools/crypto-seed-sheet',
+    redirectTo: 'tools/emergency-recovery-kit',
+    pathMatch: 'full',
+  },
+  {
+    path: 'tools/paper-vault',
+    redirectTo: 'tools/emergency-recovery-kit',
+    pathMatch: 'full',
+  },
+  {
+    path: 'tools/csv-vector-chart-builder',
+    title: 'CSV / Paste to Vector Chart & Infographic Builder — PrivKnife',
+    data: {
+      description:
+        'Convert copied spreadsheet tables or CSV files into publication-grade vector charts (bar, line, stacked area, donut) with designer palettes and instant SVG/PNG/PDF downloads.',
+      keywords: [
+        'csv to vector chart maker free infographic generator svg pdf presentation chart',
+        'csv to chart',
+        'vector chart builder',
+        'infographic generator',
+        'svg chart maker',
+        'bar chart maker',
+        'donut chart generator',
+        'spreadsheet to chart',
+      ],
+      url: '/tools/csv-vector-chart-builder',
+    },
+    loadComponent: () =>
+      import(
+        './tools/dev/csv-vector-chart-builder'
+      ).then((m) => m.CsvVectorChartBuilderComponent),
+  },
+  {
+    path: 'tools/csv-to-chart',
+    redirectTo: 'tools/csv-vector-chart-builder',
+    pathMatch: 'full',
+  },
+  {
+    path: 'tools/vector-chart-builder',
+    redirectTo: 'tools/csv-vector-chart-builder',
+    pathMatch: 'full',
+  },
+  {
+    path: 'tools/infographic-generator',
+    redirectTo: 'tools/csv-vector-chart-builder',
+    pathMatch: 'full',
+  },
+  {
+    path: 'tools/svg-chart-maker',
+    redirectTo: 'tools/csv-vector-chart-builder',
+    pathMatch: 'full',
+  },
+  {
     path: '**',
     title: 'Page Not Found — PrivKnife',
     data: {

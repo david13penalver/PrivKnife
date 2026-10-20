@@ -1,0 +1,120 @@
+import {
+  FloorPlanProject,
+  FloorPlanOptions,
+  FurnitureTemplate,
+} from './types';
+
+export const DEFAULT_FLOOR_PLAN_OPTIONS: FloorPlanOptions = {
+  measurementUnit: 'metric_meters',
+  blueprintScale: '1:50',
+  gridSnapStepCm: 25,
+  wallThicknessCm: 15,
+  showDimensions: true,
+  showAreaReadouts: true,
+  showFurniture: true,
+  showGrid: true,
+  themeColor: 'blueprint_blue',
+  projectName: 'Master Suite & Living Layout',
+  designerName: 'PrivKnife Architect',
+};
+
+export const FURNITURE_TEMPLATES: FurnitureTemplate[] = [
+  { type: 'bed_single', category: 'bedroom', name: 'Single Bed (90x200)', defaultWidthCm: 90, defaultDepthCm: 200 },
+  { type: 'bed_double', category: 'bedroom', name: 'Queen Bed (160x200)', defaultWidthCm: 160, defaultDepthCm: 200 },
+  { type: 'bed_king', category: 'bedroom', name: 'King Bed (180x200)', defaultWidthCm: 180, defaultDepthCm: 200 },
+  { type: 'desk_office', category: 'office', name: 'Office Desk (140x70)', defaultWidthCm: 140, defaultDepthCm: 70 },
+  { type: 'desk_corner', category: 'office', name: 'L-Desk (160x140)', defaultWidthCm: 160, defaultDepthCm: 140 },
+  { type: 'sofa_2seat', category: 'seating', name: '2-Seat Couch (160x85)', defaultWidthCm: 160, defaultDepthCm: 85 },
+  { type: 'sofa_3seat', category: 'seating', name: '3-Seat Couch (210x90)', defaultWidthCm: 210, defaultDepthCm: 90 },
+  { type: 'armchair', category: 'seating', name: 'Armchair (80x80)', defaultWidthCm: 80, defaultDepthCm: 80 },
+  { type: 'dining_table_4', category: 'tables', name: 'Dining Table 4P (120x80)', defaultWidthCm: 120, defaultDepthCm: 80 },
+  { type: 'dining_table_6', category: 'tables', name: 'Dining Table 6P (180x90)', defaultWidthCm: 180, defaultDepthCm: 90 },
+  { type: 'dining_chair', category: 'seating', name: 'Dining Chair (45x45)', defaultWidthCm: 45, defaultDepthCm: 45 },
+  { type: 'wardrobe', category: 'storage', name: 'Wardrobe Closet (150x60)', defaultWidthCm: 150, defaultDepthCm: 60 },
+  { type: 'bookshelf', category: 'storage', name: 'Bookshelf (80x35)', defaultWidthCm: 80, defaultDepthCm: 35 },
+  { type: 'bathtub', category: 'bathroom', name: 'Bathtub (170x75)', defaultWidthCm: 170, defaultDepthCm: 75 },
+  { type: 'shower', category: 'bathroom', name: 'Shower Enclosure (90x90)', defaultWidthCm: 90, defaultDepthCm: 90 },
+  { type: 'toilet', category: 'bathroom', name: 'Toilet (40x65)', defaultWidthCm: 40, defaultDepthCm: 65 },
+  { type: 'sink', category: 'bathroom', name: 'Vanity Sink (80x50)', defaultWidthCm: 80, defaultDepthCm: 50 },
+  { type: 'kitchen_counter', category: 'kitchen', name: 'Kitchen Counter (180x60)', defaultWidthCm: 180, defaultDepthCm: 60 },
+  { type: 'refrigerator', category: 'kitchen', name: 'Refrigerator (70x70)', defaultWidthCm: 70, defaultDepthCm: 70 },
+];
+
+export const SAMPLE_STUDIO_PLAN: FloorPlanProject = {
+  version: '1.0',
+  name: 'Studio Apartment 30m²',
+  options: { ...DEFAULT_FLOOR_PLAN_OPTIONS, projectName: 'Studio Loft 30m²' },
+  walls: [
+    { id: 'w1', start: { x: 0, y: 0 }, end: { x: 600, y: 0 }, thicknessCm: 20, isExterior: true },
+    { id: 'w2', start: { x: 600, y: 0 }, end: { x: 600, y: 500 }, thicknessCm: 20, isExterior: true },
+    { id: 'w3', start: { x: 600, y: 500 }, end: { x: 0, y: 500 }, thicknessCm: 20, isExterior: true },
+    { id: 'w4', start: { x: 0, y: 500 }, end: { x: 0, y: 0 }, thicknessCm: 20, isExterior: true },
+  ],
+  doors: [
+    {
+      id: 'd1',
+      x: 100,
+      y: 500,
+      widthCm: 90,
+      rotationDeg: 0,
+      swingDirection: 'right',
+      isOpenInward: true,
+      wallId: 'w3',
+    },
+  ],
+  windows: [
+    {
+      id: 'win1',
+      x: 300,
+      y: 0,
+      widthCm: 150,
+      depthCm: 20,
+      rotationDeg: 0,
+      wallId: 'w1',
+    },
+  ],
+  furniture: [
+    {
+      id: 'f1',
+      type: 'bed_double',
+      name: 'Queen Bed',
+      x: 100,
+      y: 120,
+      widthCm: 160,
+      depthCm: 200,
+      rotationDeg: 0,
+    },
+    {
+      id: 'f2',
+      type: 'desk_office',
+      name: 'Study Desk',
+      x: 420,
+      y: 80,
+      widthCm: 140,
+      depthCm: 70,
+      rotationDeg: 0,
+    },
+    {
+      id: 'f3',
+      type: 'sofa_2seat',
+      name: 'Living Couch',
+      x: 400,
+      y: 350,
+      widthCm: 160,
+      depthCm: 85,
+      rotationDeg: 0,
+    },
+  ],
+  rooms: [
+    {
+      id: 'r1',
+      name: 'Studio Main Room',
+      points: [
+        { x: 0, y: 0 },
+        { x: 600, y: 0 },
+        { x: 600, y: 500 },
+        { x: 0, y: 500 },
+      ],
+    },
+  ],
+};

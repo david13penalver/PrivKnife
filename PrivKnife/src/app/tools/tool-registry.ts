@@ -23,13 +23,17 @@ import { bankStatementConverterTool } from './dev/bank-statement-converter';
 import { calendarLinkerTool } from './dev/calendar-linker';
 import { colorPaletteExtractorTool } from './dev/color-palette-extractor';
 import { csvConverterTool } from './dev/csv-converter';
+import { csvVectorChartBuilderTool } from './dev/csv-vector-chart-builder';
+import { diffCheckerTool } from './dev/diff-checker';
 import { dnsCheckerTool } from './dev/dns-checker';
+import { fontSubsetterConverterTool } from './dev/font-subsetter-converter';
 import { emailSignatureGeneratorTool } from './dev/email-signature-generator';
 import { cssMeshGradientMakerTool } from './dev/mesh-gradient-maker';
 import { robotsSitemapBuilderTool } from './dev/robots-sitemap-builder';
 import { svgOptimizerCleanerTool } from './dev/svg-optimizer-cleaner';
 import { webVitalsTool } from './dev/web-vitals';
 import { averyBarcodeSheetTool } from './documents/barcode-labels';
+import { floorPlanFurnitureScalerTool } from './documents/floor-plan-furniture-scaler';
 import { gridPaperTool } from './documents/grid-paper';
 import { invoiceMakerTool } from './documents/invoice-maker';
 import { localOcrTextExtractorTool } from './documents/local-ocr-text-extractor';
@@ -45,8 +49,10 @@ import { heicAvifConverterTool } from './media/heic-avif-converter';
 import { ogCardMakerTool } from './media/og-card-maker';
 import { passportBiometricPhotoTool } from './media/passport-biometric-photo';
 import { screenshotMockupTool } from './media/screenshot-mockup';
+import { seamlessTextureGeneratorTool } from './media/seamless-texture-generator';
 import { subtitlesShifterTool } from './media/subtitles-shifter';
 import { cryptoHashUuidTool } from './privacy/crypto-hash-uuid';
+import { emergencyRecoveryKitTool } from './privacy/emergency-recovery-kit';
 import { exifStripperTool } from './privacy/exif-stripper';
 import { facePlateBlurTool } from './privacy/face-plate-blur';
 import { fileEncryptorVaultTool } from './privacy/file-encryptor-vault';
@@ -104,6 +110,12 @@ export const TOOL_REGISTRY: ToolDefinition[] = [
   videoCompressorResizerTool,
   nutritionLabelMakerTool,
   svgOptimizerCleanerTool,
+  diffCheckerTool,
+  fontSubsetterConverterTool,
+  seamlessTextureGeneratorTool,
+  floorPlanFurnitureScalerTool,
+  emergencyRecoveryKitTool,
+  csvVectorChartBuilderTool,
   backgroundRemoverTool,
   dnsCheckerTool,
   webVitalsTool,
@@ -200,6 +212,34 @@ export const TOOL_I18N_MAP: Record<string, string> = {
   'svg-optimizer': 'svgOptimizerCleaner',
   'svg-cleaner': 'svgOptimizerCleaner',
   'svg-to-react': 'svgOptimizerCleaner',
+  'diff-checker': 'diffChecker',
+  'code-diff': 'diffChecker',
+  'text-compare': 'diffChecker',
+  'contract-diff': 'diffChecker',
+  'font-subsetter-converter': 'fontSubsetterConverter',
+  'font-subsetter': 'fontSubsetterConverter',
+  'ttf-to-woff2': 'fontSubsetterConverter',
+  'otf-to-woff2': 'fontSubsetterConverter',
+  'webfont-generator': 'fontSubsetterConverter',
+  'seamless-texture-generator': 'seamlessTextureGenerator',
+  'seamless-texture': 'seamlessTextureGenerator',
+  'texture-generator': 'seamlessTextureGenerator',
+  'normal-map-generator': 'seamlessTextureGenerator',
+  'floor-plan-furniture-scaler': 'floorPlanFurnitureScaler',
+  'floor-plan-scaler': 'floorPlanFurnitureScaler',
+  'floor-plan-maker': 'floorPlanFurnitureScaler',
+  'room-furniture-scaler': 'floorPlanFurnitureScaler',
+  'blueprint-scaler': 'floorPlanFurnitureScaler',
+  'emergency-recovery-kit': 'emergencyRecoveryKit',
+  'emergency-password-sheet': 'emergencyRecoveryKit',
+  'recovery-kit': 'emergencyRecoveryKit',
+  'crypto-seed-sheet': 'emergencyRecoveryKit',
+  'paper-vault': 'emergencyRecoveryKit',
+  'csv-vector-chart-builder': 'csvVectorChartBuilder',
+  'csv-to-chart': 'csvVectorChartBuilder',
+  'vector-chart-builder': 'csvVectorChartBuilder',
+  'infographic-generator': 'csvVectorChartBuilder',
+  'svg-chart-maker': 'csvVectorChartBuilder',
   'backgroundRemover': 'backgroundRemover',
   'background-remover': 'backgroundRemover',
   'dns-checker': 'dnsChecker',

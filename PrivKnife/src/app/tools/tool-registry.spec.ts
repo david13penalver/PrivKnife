@@ -581,6 +581,72 @@ describe('ToolRegistry (Seam 3: Catalog & Architecture Verification)', () => {
     expect(devTools.some((t) => t.id === 'svg-optimizer-cleaner')).toBe(true);
   });
 
+  it('should find diff-checker tool by id in dev category', () => {
+    const tool = getToolById('diff-checker');
+    expect(tool).toBeDefined();
+    expect(tool?.name).toBe('Side-by-Side Code & Contract Diff Checker');
+    expect(tool?.category).toBe('dev');
+    expect(tool?.isFullyClientSide).toBe(true);
+
+    const devTools = getToolsByCategory('dev');
+    expect(devTools.some((t) => t.id === 'diff-checker')).toBe(true);
+  });
+
+  it('should find font-subsetter-converter tool by id in dev category', () => {
+    const tool = getToolById('font-subsetter-converter');
+    expect(tool).toBeDefined();
+    expect(tool?.name).toBe('Web Font Subsetter & TTF/OTF to WOFF2 Converter');
+    expect(tool?.category).toBe('dev');
+    expect(tool?.isFullyClientSide).toBe(true);
+
+    const devTools = getToolsByCategory('dev');
+    expect(devTools.some((t) => t.id === 'font-subsetter-converter')).toBe(true);
+  });
+
+  it('should find seamless-texture-generator tool by id', () => {
+    const tool = getToolById('seamless-texture-generator');
+    expect(tool).toBeDefined();
+    expect(tool?.name).toBe('Seamless Tileable Texture & Pattern Generator');
+    expect(tool?.category).toBe('media');
+    expect(tool?.isFullyClientSide).toBe(true);
+
+    const mediaTools = getToolsByCategory('media');
+    expect(mediaTools.some((t) => t.id === 'seamless-texture-generator')).toBe(true);
+  });
+
+  it('should find floor-plan-furniture-scaler tool by id', () => {
+    const tool = getToolById('floor-plan-furniture-scaler');
+    expect(tool).toBeDefined();
+    expect(tool?.name).toBe('Interactive 2D Floor Plan & Room Furniture Scaler');
+    expect(tool?.category).toBe('documents');
+    expect(tool?.isFullyClientSide).toBe(true);
+
+    const docTools = getToolsByCategory('documents');
+    expect(docTools.some((t) => t.id === 'floor-plan-furniture-scaler')).toBe(true);
+  });
+
+  it('should find emergency-recovery-kit tool by id', () => {
+    const tool = getToolById('emergency-recovery-kit');
+    expect(tool).toBeDefined();
+    expect(tool?.name).toBe('Printable Emergency Recovery & Password Kit Sheet');
+    expect(tool?.category).toBe('privacy');
+    expect(tool?.isFullyClientSide).toBe(true);
+
+    const privacyTools = getToolsByCategory('privacy');
+    expect(privacyTools.some((t) => t.id === 'emergency-recovery-kit')).toBe(true);
+  });
+
+  it('should find csv-vector-chart-builder tool by id', () => {
+    const tool = getToolById('csv-vector-chart-builder');
+    expect(tool).toBeDefined();
+    expect(tool?.name).toBe('CSV / Paste to Vector Chart & Infographic Builder');
+    expect(tool?.category).toBe('dev');
+    expect(tool?.isFullyClientSide).toBe(true);
+
+    const devTools = getToolsByCategory('dev');
+    expect(devTools.some((t) => t.id === 'csv-vector-chart-builder')).toBe(true);
+  });
+
   describe('Tool Registry Localization (i18n)', () => {
     it('should have an i18n key mapping for every registered tool', () => {
       for (const tool of TOOL_REGISTRY) {
