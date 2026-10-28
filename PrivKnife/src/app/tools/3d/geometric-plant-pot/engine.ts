@@ -143,7 +143,7 @@ export function mergeBufferGeometries(
 /**
  * Creates the parametric outer plant pot with faceted, twisted, fluted, or minimal geometry.
  */
-function createOuterPotGeometry(options: GeometricPlantPotOptions): THREE.BufferGeometry {
+export function createOuterPotGeometry(options: GeometricPlantPotOptions): THREE.BufferGeometry {
   const {
     aestheticStyle,
     polygonSides,
@@ -260,20 +260,55 @@ function createOuterPotGeometry(options: GeometricPlantPotOptions): THREE.Buffer
     indices.push(o_i, in_i, in_next);
   }
 
-  // 4. Bottom Exterior Cap (y = 0)
-  const btmCenterIdx = positions.length / 3;
-  positions.push(0, 0, 0);
-  for (let i = 0; i < N; i++) {
-    const nextI = (i + 1) % N;
-    indices.push(btmCenterIdx, outerVertexStart + i, outerVertexStart + nextI);
-  }
+  if (planterType === 'drainage_with_saucer') {
+    const drainHoleR = Math.max(4.0, Math.min(btmR * 0.35, 12.0));
+    const btmHoleStart = positions.length / 3;
+    for (let i = 0; i < N; i++) {
+      const angle = (i * 2 * Math.PI) / N;
+      positions.push(drainHoleR * Math.cos(angle), 0, drainHoleR * Math.sin(angle));
+    }
+    const floorHoleStart = positions.length / 3;
+    for (let i = 0; i < N; i++) {
+      const angle = (i * 2 * Math.PI) / N;
+      positions.push(drainHoleR * Math.cos(angle), floorT, drainHoleR * Math.sin(angle));
+    }
 
-  // 5. Bottom Interior Floor (y = floorT)
-  const inFloorCenterIdx = positions.length / 3;
-  positions.push(0, floorT, 0);
-  for (let i = 0; i < N; i++) {
-    const nextI = (i + 1) % N;
-    indices.push(inFloorCenterIdx, innerVertexStart + nextI, innerVertexStart + i);
+    // 4. Bottom Exterior Cap (Annular quad between outer rim and bottom hole)
+    for (let i = 0; i < N; i++) {
+      const nextI = (i + 1) % N;
+      indices.push(btmHoleStart + i, outerVertexStart + i, outerVertexStart + nextI);
+      indices.push(btmHoleStart + i, outerVertexStart + nextI, btmHoleStart + nextI);
+    }
+
+    // 5. Bottom Interior Floor (Annular quad between inner cavity and floor hole)
+    for (let i = 0; i < N; i++) {
+      const nextI = (i + 1) % N;
+      indices.push(innerVertexStart + i, floorHoleStart + i, innerVertexStart + nextI);
+      indices.push(innerVertexStart + nextI, floorHoleStart + i, floorHoleStart + nextI);
+    }
+
+    // 6. Cylindrical Drainage Hole Wall (Connecting btmHole and floorHole)
+    for (let i = 0; i < N; i++) {
+      const nextI = (i + 1) % N;
+      indices.push(btmHoleStart + i, btmHoleStart + nextI, floorHoleStart + nextI);
+      indices.push(btmHoleStart + i, floorHoleStart + nextI, floorHoleStart + i);
+    }
+  } else {
+    // 4. Bottom Exterior Cap (y = 0)
+    const btmCenterIdx = positions.length / 3;
+    positions.push(0, 0, 0);
+    for (let i = 0; i < N; i++) {
+      const nextI = (i + 1) % N;
+      indices.push(btmCenterIdx, outerVertexStart + i, outerVertexStart + nextI);
+    }
+
+    // 5. Bottom Interior Floor (y = floorT)
+    const inFloorCenterIdx = positions.length / 3;
+    positions.push(0, floorT, 0);
+    for (let i = 0; i < N; i++) {
+      const nextI = (i + 1) % N;
+      indices.push(inFloorCenterIdx, innerVertexStart + nextI, innerVertexStart + i);
+    }
   }
 
   const geom = new THREE.BufferGeometry();
@@ -288,7 +323,7 @@ function createOuterPotGeometry(options: GeometricPlantPotOptions): THREE.Buffer
 /**
  * Creates the self-watering inner basket/liner.
  */
-function createReservoirInsertGeometry(
+export function createReservoirInsertGeometry(
   options: GeometricPlantPotOptions,
   exploded = false
 ): THREE.BufferGeometry {
@@ -316,36 +351,67 @@ function createReservoirInsertGeometry(
   const basketH = heightMm - basketBaseY;
 
   const topR = Math.max(5.0, topDiameterMm / 2 - wallT - 0.6);
-  const btmR = Math.max(4.0, (bottomDiameterMm / 2 - wallT - 0.6) * 0.95);
+  const basketWallThick = 1.6;
 
-  // Main basket conical wall
-  const basket = new THREE.CylinderGeometry(topR, btmR, basketH, 32, 1, true);
-  basket.translate(0, basketBaseY + basketH / 2, 0);
-  parts.push(basket);
+  // 1. Main basket cylinder wall with 1.6mm thickness
+  const basketShape = new THREE.Shape();
+  basketShape.absarc(0, 0, topR, 0, Math.PI * 2, false);
+  const basketHole = new THREE.Path();
+  basketHole.absarc(0, 0, Math.max(2.0, topR - basketWallThick), 0, Math.PI * 2, true);
+  basketShape.holes.push(basketHole);
+  const basketGeom = new THREE.ExtrudeGeometry(basketShape, {
+    depth: basketH,
+    bevelEnabled: false,
+    curveSegments: 32,
+  });
+  basketGeom.translate(0, 0, -basketH / 2);
+  basketGeom.rotateX(Math.PI / 2);
+  basketGeom.translate(0, basketBaseY + basketH / 2, 0);
+  parts.push(basketGeom);
 
-  // Floor disk with central wick pass-through hole
-  const floorDisk = new THREE.RingGeometry(wickHoleDiameterMm / 2, btmR, 32);
-  floorDisk.rotateX(-Math.PI / 2);
-  floorDisk.translate(0, basketBaseY, 0);
-  parts.push(floorDisk);
+  // 2. Floor disk of thickness 2.0mm with central wick pass-through hole
+  const floorShape = new THREE.Shape();
+  floorShape.absarc(0, 0, topR, 0, Math.PI * 2, false);
+  const wickHole = new THREE.Path();
+  wickHole.absarc(0, 0, Math.max(3.0, wickHoleDiameterMm / 2), 0, Math.PI * 2, true);
+  floorShape.holes.push(wickHole);
+  const floorGeom = new THREE.ExtrudeGeometry(floorShape, {
+    depth: 2.0,
+    bevelEnabled: false,
+    curveSegments: 32,
+  });
+  floorGeom.translate(0, 0, -1.0);
+  floorGeom.rotateX(Math.PI / 2);
+  floorGeom.translate(0, basketBaseY + 1.0, 0);
+  parts.push(floorGeom);
 
-  // Top resting lip that hangs on the outer pot rim
-  const rimLip = new THREE.RingGeometry(topR, topR + wallT + 1.5, 32);
-  rimLip.rotateX(-Math.PI / 2);
-  rimLip.translate(0, heightMm, 0);
-  parts.push(rimLip);
+  // 3. Top resting lip of thickness 2.0mm that hangs on the outer pot rim
+  const lipShape = new THREE.Shape();
+  lipShape.absarc(0, 0, topR + wallT + 1.5, 0, Math.PI * 2, false);
+  const lipHole = new THREE.Path();
+  lipHole.absarc(0, 0, Math.max(2.0, topR - basketWallThick), 0, Math.PI * 2, true);
+  lipShape.holes.push(lipHole);
+  const lipGeom = new THREE.ExtrudeGeometry(lipShape, {
+    depth: 2.0,
+    bevelEnabled: false,
+    curveSegments: 32,
+  });
+  lipGeom.translate(0, 0, -1.0);
+  lipGeom.rotateX(Math.PI / 2);
+  lipGeom.translate(0, heightMm - 1.0, 0);
+  parts.push(lipGeom);
 
-  // Support legs resting on pot floor to elevate soil basket above water pool
+  // 4. Support legs resting on pot floor to elevate soil basket above water pool
   const legCount = 4;
   for (let i = 0; i < legCount; i++) {
     const angle = (i * 2 * Math.PI) / legCount;
     const leg = new THREE.CylinderGeometry(2.5, 2.5, reservoirH, 12);
-    const legR = btmR * 0.75;
+    const legR = topR * 0.75;
     leg.translate(legR * Math.cos(angle), potFloorT + reservoirH / 2, legR * Math.sin(angle));
     parts.push(leg);
   }
 
-  // Water fill spout channel if enabled
+  // 5. Water fill spout channel if enabled
   if (waterSpoutOpening) {
     const spout = new THREE.CylinderGeometry(7, 7, basketH * 0.85, 16);
     spout.translate(topR * 0.85, basketBaseY + basketH * 0.42, 0);
@@ -418,7 +484,7 @@ function createSaucerGeometry(
  * - Pot standing upright on its flat base (Y=0)
  * - Insert or saucer placed beside the pot on the print bed
  */
-function createCombinedPrintBedGeometry(
+export function createCombinedPrintBedGeometry(
   potGeom: THREE.BufferGeometry,
   insertGeom: THREE.BufferGeometry,
   saucerGeom: THREE.BufferGeometry,
@@ -472,7 +538,9 @@ function createCombinedPrintBedGeometry(
   }
 
   const combined = mergeBufferGeometries(geomsToMerge);
-  potClone.dispose();
+  for (const g of geomsToMerge) {
+    g.dispose();
+  }
   return combined;
 }
 

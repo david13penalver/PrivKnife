@@ -16,6 +16,8 @@ import {
   AestheticStyle,
   GeometricPlantPotOptions,
   GeometricPlantPotMetrics,
+  GeometricPlantPotWorkerRequest,
+  GeometricPlantPotWorkerResponse,
   PlanterType,
   PresetPlanter,
 } from './types';
@@ -172,7 +174,7 @@ import {
                   </label>
                   <input
                     type="range"
-                    class="c-input c-input--slider"
+                    class="c-input c-input__slider"
                     min="50"
                     max="200"
                     step="5"
@@ -186,7 +188,7 @@ import {
                   </label>
                   <input
                     type="range"
-                    class="c-input c-input--slider"
+                    class="c-input c-input__slider"
                     min="40"
                     max="180"
                     step="5"
@@ -204,7 +206,7 @@ import {
                   </label>
                   <input
                     type="range"
-                    class="c-input c-input--slider"
+                    class="c-input c-input__slider"
                     min="50"
                     max="200"
                     step="5"
@@ -218,7 +220,7 @@ import {
                   </label>
                   <input
                     type="range"
-                    class="c-input c-input--slider"
+                    class="c-input c-input__slider"
                     min="3"
                     max="16"
                     step="1"
@@ -236,7 +238,7 @@ import {
                   </label>
                   <input
                     type="range"
-                    class="c-input c-input--slider"
+                    class="c-input c-input__slider"
                     min="-120"
                     max="120"
                     step="5"
@@ -254,7 +256,7 @@ import {
                 </label>
                 <input
                   type="range"
-                  class="c-input c-input--slider"
+                  class="c-input c-input__slider"
                   min="1.6"
                   max="4.0"
                   step="0.2"
@@ -272,7 +274,7 @@ import {
                     </label>
                     <input
                       type="range"
-                      class="c-input c-input--slider"
+                      class="c-input c-input__slider"
                       min="5"
                       max="14"
                       step="1"
@@ -341,6 +343,10 @@ import {
                 (mouseup)="onMouseUp()"
                 (mouseleave)="onMouseUp()"
                 (wheel)="onWheel($event)"
+                (touchstart)="onTouchStart($event)"
+                (touchmove)="onTouchMove($event)"
+                (touchend)="onTouchEnd()"
+                (touchcancel)="onTouchEnd()"
               >
                 <div class="viewport-hints">
                   Left-drag to rotate • Scroll to zoom • Procedural 3D preview
@@ -428,170 +434,7 @@ import {
       </div>
     </div>
   `,
-  styles: [
-    `
-      .preset-strip {
-        display: flex;
-        align-items: center;
-        gap: 12px;
-        flex-wrap: wrap;
-      }
-
-      .preset-label {
-        font-size: 0.85rem;
-        font-weight: 600;
-        color: #94a3b8;
-      }
-
-      .preset-buttons {
-        display: flex;
-        flex-wrap: wrap;
-        gap: 6px;
-      }
-
-      .btn-grid-2 {
-        display: grid;
-        grid-template-columns: 1fr 1fr;
-        gap: 6px;
-        margin-top: 6px;
-      }
-
-      .btn-toggle-column {
-        display: flex;
-        flex-direction: column;
-        gap: 6px;
-        margin-top: 6px;
-      }
-
-      .control-group {
-        display: flex;
-        flex-direction: column;
-      }
-
-      .control-row-2 {
-        display: grid;
-        grid-template-columns: 1fr 1fr;
-        gap: 16px;
-      }
-
-      .control-hint {
-        font-size: 0.75rem;
-        color: #64748b;
-        font-weight: 400;
-        margin-left: 4px;
-      }
-
-      .c-input--slider {
-        width: 100%;
-        margin-top: 4px;
-      }
-
-      .c-input__checkbox-label {
-        display: flex;
-        align-items: center;
-        gap: 8px;
-        cursor: pointer;
-        font-size: 0.9rem;
-      }
-
-      .planter-viewport {
-        position: relative;
-        width: 100%;
-        height: 380px;
-        background: #090d16;
-        border-radius: 8px;
-        overflow: hidden;
-        cursor: grab;
-      }
-
-      .planter-viewport:active {
-        cursor: grabbing;
-      }
-
-      .viewport-hints {
-        position: absolute;
-        bottom: 8px;
-        left: 8px;
-        font-size: 0.75rem;
-        color: rgba(255, 255, 255, 0.5);
-        pointer-events: none;
-        user-select: none;
-      }
-
-      .metrics-grid {
-        display: grid;
-        grid-template-columns: repeat(2, 1fr);
-        gap: 10px;
-      }
-
-      .metric-card {
-        background: rgba(255, 255, 255, 0.04);
-        border: 1px solid rgba(255, 255, 255, 0.08);
-        border-radius: 6px;
-        padding: 8px 12px;
-        display: flex;
-        flex-direction: column;
-      }
-
-      .metric-label {
-        font-size: 0.75rem;
-        color: #9ca3af;
-      }
-
-      .metric-value {
-        font-size: 0.95rem;
-        font-weight: 600;
-        color: #f3f4f6;
-        margin-top: 2px;
-      }
-
-      .slicer-tips-card {
-        background: rgba(16, 185, 129, 0.05);
-        border: 1px solid rgba(16, 185, 129, 0.2);
-        border-radius: 6px;
-        padding: 10px 14px;
-      }
-
-      .tips-title {
-        font-size: 0.85rem;
-        font-weight: 600;
-        color: #10b981;
-        margin: 0 0 6px 0;
-      }
-
-      .tips-list {
-        margin: 0;
-        padding-left: 18px;
-        font-size: 0.8rem;
-        color: #cbd5e1;
-        line-height: 1.4;
-      }
-
-      .export-box {
-        background: rgba(255, 255, 255, 0.02);
-        border: 1px solid rgba(255, 255, 255, 0.06);
-        border-radius: 8px;
-        padding: 14px;
-      }
-
-      .export-format-selector {
-        display: flex;
-        flex-direction: column;
-        gap: 6px;
-      }
-
-      .format-radios {
-        display: flex;
-        flex-wrap: wrap;
-        gap: 8px;
-      }
-
-      .download-btn {
-        width: 100%;
-        justify-content: center;
-      }
-    `,
-  ],
+  styleUrl: './geometric-plant-pot.component.scss',
 })
 export class GeometricPlantPotComponent implements OnInit, OnDestroy {
   @ViewChild('viewportContainer', { static: false })
@@ -634,6 +477,10 @@ export class GeometricPlantPotComponent implements OnInit, OnDestroy {
   // Track created object URLs
   private activeDownloadUrls: string[] = [];
 
+  // Web Worker offloading
+  private worker: Worker | null = null;
+  private workerRequestId = 0;
+
   // Three.js Scene References
   private scene: THREE.Scene | null = null;
   private camera: THREE.PerspectiveCamera | null = null;
@@ -650,6 +497,13 @@ export class GeometricPlantPotComponent implements OnInit, OnDestroy {
   private cameraDistance = 200;
 
   ngOnInit(): void {
+    if (typeof Worker !== 'undefined') {
+      try {
+        this.worker = new Worker(new URL('./worker.ts', import.meta.url), { type: 'module' });
+      } catch {
+        // Fallback to inline processing if workers restricted
+      }
+    }
     this.recalculateMetrics();
   }
 
@@ -659,6 +513,11 @@ export class GeometricPlantPotComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy(): void {
+    if (this.worker) {
+      this.worker.terminate();
+      this.worker = null;
+    }
+
     if (this.animationFrameId !== null) {
       cancelAnimationFrame(this.animationFrameId);
     }
@@ -792,35 +651,62 @@ export class GeometricPlantPotComponent implements OnInit, OnDestroy {
   async downloadFormat(format: 'stl' | '3mf'): Promise<void> {
     this.isGenerating.set(true);
 
-    const options: GeometricPlantPotOptions = {
-      aestheticStyle: this.aestheticStyle(),
-      polygonSides: this.polygonSides(),
-      twistAngleDeg: this.twistAngleDeg(),
-      topDiameterMm: this.topDiameterMm(),
-      bottomDiameterMm: this.bottomDiameterMm(),
-      heightMm: this.heightMm(),
-      wallThicknessMm: this.wallThicknessMm(),
-      planterType: this.planterType(),
-      wickHoleDiameterMm: this.wickHoleDiameterMm(),
-      waterSpoutOpening: this.waterSpoutOpening(),
-    };
+    const options = this.getOptions();
 
     try {
+      if (this.worker) {
+        const reqId = ++this.workerRequestId;
+        await new Promise<void>((resolve, reject) => {
+          const handler = (event: MessageEvent<GeometricPlantPotWorkerResponse>) => {
+            if (event.data.id !== reqId) return;
+
+            if (event.data.type === 'error') {
+              this.worker?.removeEventListener('message', handler);
+              reject(new Error(event.data.error || 'Export failed'));
+            } else if (event.data.type === 'result' && event.data.buffer) {
+              this.worker?.removeEventListener('message', handler);
+              const blob = new Blob([event.data.buffer], {
+                type: event.data.mimeType || 'application/octet-stream',
+              });
+              this.triggerFileDownload(blob, event.data.fileName || `planter.${format}`);
+              resolve();
+            }
+          };
+          this.worker!.addEventListener('message', handler);
+          this.worker!.postMessage({ id: reqId, options, format } as GeometricPlantPotWorkerRequest);
+        });
+      } else {
+        const result = await processPlanter(options, format);
+        if (result.success && result.blob) {
+          this.triggerFileDownload(result.blob, result.fileName);
+        }
+      }
+    } catch {
       const result = await processPlanter(options, format);
-      if (!result.success || !result.blob) return;
-
-      const url = URL.createObjectURL(result.blob);
-      this.activeDownloadUrls.push(url);
-
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = result.fileName;
-      document.body.appendChild(a);
-      a.click();
-      document.body.removeChild(a);
+      if (result.success && result.blob) {
+        this.triggerFileDownload(result.blob, result.fileName);
+      }
     } finally {
       this.isGenerating.set(false);
     }
+  }
+
+  private triggerFileDownload(blob: Blob, fileName: string): void {
+    const url = URL.createObjectURL(blob);
+    this.activeDownloadUrls.push(url);
+
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = fileName;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+
+    setTimeout(() => {
+      URL.revokeObjectURL(url);
+      const idx = this.activeDownloadUrls.indexOf(url);
+      if (idx !== -1) this.activeDownloadUrls.splice(idx, 1);
+    }, 100);
   }
 
   // --- THREE.JS VIEWPORT & RENDERING ---
@@ -855,18 +741,7 @@ export class GeometricPlantPotComponent implements OnInit, OnDestroy {
       rimLight.position.set(-100, -80, -100);
       this.scene.add(rimLight);
 
-      // Simulated plant potting soil surface inside
-      const soilGeom = new THREE.CircleGeometry(this.topDiameterMm() * 0.45, 32);
-      soilGeom.rotateX(-Math.PI / 2);
-      const soilMat = new THREE.MeshStandardMaterial({
-        color: 0x3f2e21,
-        roughness: 0.95,
-      });
-      const soilMesh = new THREE.Mesh(soilGeom, soilMat);
-      soilMesh.position.set(0, this.heightMm() - 8, 0);
-
       this.planterMeshGroup = new THREE.Group();
-      this.planterMeshGroup.add(soilMesh);
       this.scene.add(this.planterMeshGroup);
 
       const animate = () => {
@@ -895,8 +770,8 @@ export class GeometricPlantPotComponent implements OnInit, OnDestroy {
     this.camera.lookAt(0, this.heightMm() / 2, 0);
   }
 
-  private recalculateMetrics(): void {
-    const options: GeometricPlantPotOptions = {
+  private getOptions(exploded = false): GeometricPlantPotOptions {
+    return {
       aestheticStyle: this.aestheticStyle(),
       polygonSides: this.polygonSides(),
       twistAngleDeg: this.twistAngleDeg(),
@@ -907,21 +782,40 @@ export class GeometricPlantPotComponent implements OnInit, OnDestroy {
       planterType: this.planterType(),
       wickHoleDiameterMm: this.wickHoleDiameterMm(),
       waterSpoutOpening: this.waterSpoutOpening(),
+      explodedView: exploded,
     };
+  }
 
-    const { potGeometry, insertGeometry, saucerGeometry } = generatePlanterGeometries(options);
+  private recalculateMetrics(): void {
+    const options = this.getOptions();
+    const { potGeometry, insertGeometry, saucerGeometry, combinedGeometry } = generatePlanterGeometries(options);
     const m = calculatePlanterMetrics(potGeometry, insertGeometry, saucerGeometry, options);
     this.metrics.set(m);
 
     potGeometry.dispose();
     insertGeometry.dispose();
     saucerGeometry.dispose();
+    combinedGeometry.dispose();
   }
 
   private rebuildMesh(): void {
-    this.recalculateMetrics();
+    const options = this.getOptions(this.explodedView());
+    const { potGeometry, insertGeometry, saucerGeometry, combinedGeometry } = generatePlanterGeometries(
+      options,
+      options.explodedView
+    );
 
-    if (!this.scene || !this.planterMeshGroup) return;
+    const m = calculatePlanterMetrics(potGeometry, insertGeometry, saucerGeometry, options);
+    this.metrics.set(m);
+
+    combinedGeometry.dispose();
+
+    if (!this.scene || !this.planterMeshGroup) {
+      potGeometry.dispose();
+      insertGeometry.dispose();
+      saucerGeometry.dispose();
+      return;
+    }
 
     while (this.planterMeshGroup.children.length > 0) {
       const child = this.planterMeshGroup.children[0];
@@ -929,31 +823,12 @@ export class GeometricPlantPotComponent implements OnInit, OnDestroy {
       if (child instanceof THREE.Mesh) {
         child.geometry.dispose();
         if (Array.isArray(child.material)) {
-          child.material.forEach((m) => m.dispose());
+          child.material.forEach((mat) => mat.dispose());
         } else {
           child.material.dispose();
         }
       }
     }
-
-    const options: GeometricPlantPotOptions = {
-      aestheticStyle: this.aestheticStyle(),
-      polygonSides: this.polygonSides(),
-      twistAngleDeg: this.twistAngleDeg(),
-      topDiameterMm: this.topDiameterMm(),
-      bottomDiameterMm: this.bottomDiameterMm(),
-      heightMm: this.heightMm(),
-      wallThicknessMm: this.wallThicknessMm(),
-      planterType: this.planterType(),
-      wickHoleDiameterMm: this.wickHoleDiameterMm(),
-      waterSpoutOpening: this.waterSpoutOpening(),
-      explodedView: this.explodedView(),
-    };
-
-    const { potGeometry, insertGeometry, saucerGeometry } = generatePlanterGeometries(
-      options,
-      options.explodedView
-    );
 
     // Pot Material: Terracotta / Matte Ceramic Green
     const potMat = new THREE.MeshStandardMaterial({
@@ -976,6 +851,8 @@ export class GeometricPlantPotComponent implements OnInit, OnDestroy {
       });
       const insertMesh = new THREE.Mesh(insertGeometry, insertMat);
       this.planterMeshGroup.add(insertMesh);
+    } else {
+      insertGeometry.dispose();
     }
 
     // Saucer Material: Matching Terracotta
@@ -990,6 +867,8 @@ export class GeometricPlantPotComponent implements OnInit, OnDestroy {
       });
       const saucerMesh = new THREE.Mesh(saucerGeometry, saucerMat);
       this.planterMeshGroup.add(saucerMesh);
+    } else {
+      saucerGeometry.dispose();
     }
   }
 
@@ -1015,6 +894,33 @@ export class GeometricPlantPotComponent implements OnInit, OnDestroy {
   }
 
   onMouseUp(): void {
+    this.isDragging = false;
+  }
+
+  onTouchStart(event: TouchEvent): void {
+    if (event.touches.length === 1) {
+      this.isDragging = true;
+      this.previousMouseX = event.touches[0].clientX;
+      this.previousMouseY = event.touches[0].clientY;
+      event.preventDefault();
+    }
+  }
+
+  onTouchMove(event: TouchEvent): void {
+    if (!this.isDragging || event.touches.length !== 1) return;
+    const deltaX = event.touches[0].clientX - this.previousMouseX;
+    const deltaY = event.touches[0].clientY - this.previousMouseY;
+
+    this.meshRotationY += deltaX * 0.01;
+    this.meshRotationX += deltaY * 0.01;
+    this.meshRotationX = Math.max(-Math.PI / 2.2, Math.min(Math.PI / 2.2, this.meshRotationX));
+
+    this.previousMouseX = event.touches[0].clientX;
+    this.previousMouseY = event.touches[0].clientY;
+    event.preventDefault();
+  }
+
+  onTouchEnd(): void {
     this.isDragging = false;
   }
 

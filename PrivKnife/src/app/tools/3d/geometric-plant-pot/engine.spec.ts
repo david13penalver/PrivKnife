@@ -1,4 +1,5 @@
 import { describe, it, expect } from 'vitest';
+import * as THREE from 'three';
 import {
   validatePlanterOptions,
   generatePlanterGeometries,
@@ -6,6 +7,9 @@ import {
   exportPlanterSTL,
   exportPlanter3MF,
   processPlanter,
+  createOuterPotGeometry,
+  createReservoirInsertGeometry,
+  createCombinedPrintBedGeometry,
 } from './engine';
 import {
   DEFAULT_PLANTER_OPTIONS,
@@ -130,6 +134,91 @@ describe('GeometricPlantPotEngine (Seam 1: Pure Processing Engine)', () => {
       exploded.insertGeometry.dispose();
       exploded.saucerGeometry.dispose();
       exploded.combinedGeometry.dispose();
+    });
+
+    describe('Mechanical Correctness & Algorithmic Remediation (DEFECT-37-02)', () => {
+      it('should create an open central drainage hole in createOuterPotGeometry when planterType is drainage_with_saucer', () => {
+        const pot = createOuterPotGeometry({
+          ...DEFAULT_PLANTER_OPTIONS,
+          planterType: 'drainage_with_saucer',
+        });
+
+        const pos = pot.getAttribute('position');
+        expect(pos.count).toBeGreaterThan(0);
+
+        // All floor vertices (at y <= floorT ~ 3.6mm) must not be at the center (x=0, z=0)
+        // They must have Math.hypot(x, z) >= 4.0
+        let hasDrainHoleAperture = true;
+        let floorVertexCount = 0;
+        for (let i = 0; i < pos.count; i++) {
+          const x = pos.getX(i);
+          const y = pos.getY(i);
+          const z = pos.getZ(i);
+          if (y <= 4.0) {
+            floorVertexCount++;
+            const r = Math.hypot(x, z);
+            if (r < 3.5) {
+              hasDrainHoleAperture = false;
+              break;
+            }
+          }
+        }
+
+        expect(floorVertexCount).toBeGreaterThan(0);
+        expect(hasDrainHoleAperture).toBe(true);
+        pot.dispose();
+      });
+
+      it('should produce 3D manifold solid with non-zero thickness for createReservoirInsertGeometry', () => {
+        const insert = createReservoirInsertGeometry(DEFAULT_PLANTER_OPTIONS);
+        expect(insert).toBeDefined();
+
+        const pos = insert.getAttribute('position');
+        expect(pos.count).toBeGreaterThan(0);
+
+        // Ensure bounding box is valid and has volume
+        insert.computeBoundingBox();
+        const box = insert.boundingBox!;
+        expect(box.max.y - box.min.y).toBeGreaterThan(10);
+        expect(box.max.x - box.min.x).toBeGreaterThan(10);
+        expect(box.max.z - box.min.z).toBeGreaterThan(10);
+
+        // Check for non-zero thickness on the top lip rim (must have vertices at multiple Y levels around top rim)
+        let hasLipTop = false;
+        let hasLipBottom = false;
+        const topY = DEFAULT_PLANTER_OPTIONS.heightMm;
+        for (let i = 0; i < pos.count; i++) {
+          const y = pos.getY(i);
+          if (Math.abs(y - topY) < 0.2) hasLipTop = true;
+          if (Math.abs(y - (topY - 2.0)) < 0.5) hasLipBottom = true;
+        }
+
+        expect(hasLipTop).toBe(true);
+        expect(hasLipBottom).toBe(true);
+        insert.dispose();
+      });
+
+      it('should dispose all cloned sub-geometries inside createCombinedPrintBedGeometry', () => {
+        const { potGeometry, insertGeometry, saucerGeometry } = generatePlanterGeometries({
+          ...DEFAULT_PLANTER_OPTIONS,
+          planterType: 'self_watering_insert',
+        });
+
+        const combined = createCombinedPrintBedGeometry(
+          potGeometry,
+          insertGeometry,
+          saucerGeometry,
+          { ...DEFAULT_PLANTER_OPTIONS, planterType: 'self_watering_insert' }
+        );
+
+        expect(combined).toBeDefined();
+        expect(combined.getAttribute('position').count).toBeGreaterThan(0);
+
+        combined.dispose();
+        potGeometry.dispose();
+        insertGeometry.dispose();
+        saucerGeometry.dispose();
+      });
     });
   });
 

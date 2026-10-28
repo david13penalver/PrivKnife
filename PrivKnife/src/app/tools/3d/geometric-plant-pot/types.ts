@@ -52,3 +52,21 @@ export interface PresetPlanter {
   description: string;
   options: Partial<GeometricPlantPotOptions>;
 }
+
+export interface GeometricPlantPotWorkerRequest {
+  id: number;
+  options: GeometricPlantPotOptions;
+  format: 'stl' | '3mf';
+}
+
+export interface GeometricPlantPotWorkerResponse {
+  id: number;
+  type: 'progress' | 'result' | 'error';
+  percent?: number;
+  buffer?: ArrayBuffer;
+  fileName?: string;
+  fileSize?: number;
+  mimeType?: string;
+  metrics?: GeometricPlantPotMetrics;
+  error?: string;
+}

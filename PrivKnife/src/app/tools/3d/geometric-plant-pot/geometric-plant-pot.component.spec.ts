@@ -114,6 +114,62 @@ describe('GeometricPlantPotComponent (Seam 2 & 4)', () => {
       expect(revokeSpy).toHaveBeenCalledWith('blob:dummy-planter-url');
       revokeSpy.mockRestore();
     });
+
+    it('should update metrics and scene meshes during single-pass rebuildMesh', () => {
+      component.heightMm.set(100);
+      component['rebuildMesh']();
+
+      expect(component.metrics().totalTriangles).toBeGreaterThan(0);
+      if (component['planterMeshGroup']) {
+        expect(component['planterMeshGroup'].children.length).toBeGreaterThanOrEqual(1);
+      }
+    });
+  });
+
+  describe('Touch Viewport Navigation (DEFECT-37-05)', () => {
+    it('should orbit camera on touchstart and touchmove events', () => {
+      const initialRotX = component['meshRotationX'];
+      const initialRotY = component['meshRotationY'];
+
+      const touchStartEvent = {
+        touches: [{ clientX: 100, clientY: 100 }],
+        preventDefault: vi.fn(),
+      } as unknown as TouchEvent;
+
+      (component as any).onTouchStart(touchStartEvent);
+      expect(component['isDragging']).toBe(true);
+
+      const touchMoveEvent = {
+        touches: [{ clientX: 120, clientY: 110 }],
+        preventDefault: vi.fn(),
+      } as unknown as TouchEvent;
+
+      (component as any).onTouchMove(touchMoveEvent);
+      expect(component['meshRotationY']).not.toBe(initialRotY);
+      expect(component['meshRotationX']).not.toBe(initialRotX);
+
+      (component as any).onTouchEnd();
+      expect(component['isDragging']).toBe(false);
+    });
+  });
+
+  describe('Mobile Responsive & BEM Styling (DEFECT-37-01, DEFECT-37-04)', () => {
+    it('should use .c-input__slider on all range slider inputs', () => {
+      const compiled = fixture.nativeElement as HTMLElement;
+      const rangeInputs = compiled.querySelectorAll('input[type="range"]');
+      expect(rangeInputs.length).toBeGreaterThan(0);
+
+      rangeInputs.forEach((input) => {
+        expect(input.classList.contains('c-input__slider')).toBe(true);
+      });
+    });
+
+    it('should not contain hardcoded #f3f4f6 or #cbd5e1 in styles', () => {
+      const compiled = fixture.nativeElement as HTMLElement;
+      const html = compiled.innerHTML;
+      expect(html).not.toContain('#f3f4f6');
+      expect(html).not.toContain('#cbd5e1');
+    });
   });
 
   describe('Privacy & Zero Exfiltration (Directive 1 & 2)', () => {
