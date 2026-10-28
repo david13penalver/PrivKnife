@@ -85,6 +85,19 @@ export function evaluateRibWave(phase: number, profile: RibProfile): number {
   } else if (profile === 'gear') {
     const s = Math.sin(phase);
     return Math.max(-1, Math.min(1, s * 2.6));
+  } else if (profile === 'voronoi') {
+    // Deterministic periodic 1D Voronoi / cellular distance field over [0, 2PI]
+    const N = 4;
+    let minDist = 1.0;
+    for (let k = 0; k < N; k++) {
+      const seed = (k + 0.5 + 0.28 * Math.sin(k * 1.9 + 0.5)) / N;
+      let diff = Math.abs(t - seed);
+      if (diff > 0.5) diff = 1.0 - diff;
+      if (diff < minDist) minDist = diff;
+    }
+    const maxD = 0.5 / N;
+    const normDist = Math.min(1.0, minDist / maxD);
+    return 1.0 - 2.0 * normDist;
   } else {
     return Math.sin(phase);
   }
@@ -110,18 +123,20 @@ export function evaluateOuterRadius(u: number, v: number, p: LampConfig): number
   return Math.max(8, baseR + ribOffset + vRipple);
 }
 
-export function generateLampShadeGeometry(p: LampConfig): THREE.BufferGeometry {
-  const positions: number[] = [];
-  const colors: number[] = [];
+export interface MeshBuffers {
+  positions: number[];
+  colors: number[];
+}
 
+function createMeshBuilders(buffers: MeshBuffers) {
   function addTriangle(
     ax: number, ay: number, az: number,
     bx: number, by: number, bz: number,
     cx: number, cy: number, cz: number,
     ta = 0.5, tb = 0.5, tc = 0.5
   ) {
-    positions.push(ax, ay, az, bx, by, bz, cx, cy, cz);
-    colors.push(ta, ta, ta, tb, tb, tb, tc, tc, tc);
+    buffers.positions.push(ax, ay, az, bx, by, bz, cx, cy, cz);
+    buffers.colors.push(ta, ta, ta, tb, tb, tb, tc, tc, tc);
   }
 
   function addQuad(
@@ -134,6 +149,13 @@ export function generateLampShadeGeometry(p: LampConfig): THREE.BufferGeometry {
     addTriangle(x00, y00, z00, x10, y10, z10, x11, y11, z11, t00, t10, t11);
     addTriangle(x00, y00, z00, x11, y11, z11, x01, y01, z01, t00, t11, t01);
   }
+
+  return { addTriangle, addQuad };
+}
+
+export function buildShadeBodyBuffers(p: LampConfig): MeshBuffers {
+  const buffers: MeshBuffers = { positions: [], colors: [] };
+  const { addQuad } = createMeshBuilders(buffers);
 
   const R = Math.max(16, Math.floor(p.radialSegs));
   const H = Math.max(8, Math.floor(p.heightSegs));
@@ -243,72 +265,8 @@ export function generateLampShadeGeometry(p: LampConfig): THREE.BufferGeometry {
         0.7, 0.7, 0.7, 0.7
       );
     }
-
-    // 5. Socket Spider Collar & Spokes
-    if (p.socketPreset !== 'none' && p.socketDia > 0) {
-      const holeRad = p.socketDia * 0.5;
-      const collarOutRad = holeRad + p.collarWidth;
-      const cHeight = p.collarHeight;
-      const isTop = p.mountPos === 'top';
-      const cY0 = isTop ? totalH - cHeight : 0;
-      const cY1 = isTop ? totalH : cHeight;
-
-      // Collar Ring
-      const collarSegs = Math.min(64, R);
-      for (let i = 0; i < collarSegs; i++) {
-        const a0 = (i / collarSegs) * Math.PI * 2;
-        const a1 = ((i + 1) / collarSegs) * Math.PI * 2;
-        const c0 = Math.cos(a0), s0 = Math.sin(a0);
-        const c1 = Math.cos(a1), s1 = Math.sin(a1);
-
-        const ix0 = holeRad * c0, iz0 = holeRad * s0;
-        const ix1 = holeRad * c1, iz1 = holeRad * s1;
-        const ox0 = collarOutRad * c0, oz0 = collarOutRad * s0;
-        const ox1 = collarOutRad * c1, oz1 = collarOutRad * s1;
-
-        addQuad(ox0, cY0, oz0, ox0, cY1, oz0, ox1, cY1, oz1, ox1, cY0, oz1, 0.9, 0.9, 0.9, 0.9);
-        addQuad(ix0, cY0, iz0, ix1, cY0, iz1, ix1, cY1, iz1, ix0, cY1, iz0, 0.9, 0.9, 0.9, 0.9);
-        addQuad(ox0, cY0, oz0, ox1, cY0, oz1, ix1, cY0, iz1, ix0, cY0, iz0, 0.9, 0.9, 0.9, 0.9);
-        addQuad(ix0, cY1, iz0, ix1, cY1, iz1, ox1, cY1, oz1, ox0, cY1, oz0, 0.9, 0.9, 0.9, 0.9);
-      }
-
-      // Spokes
-      const numSpokes = p.spokeCount;
-      const halfW = p.spokeWidth * 0.5;
-      const mountV = isTop ? 0.92 : 0.02;
-      const shadeInnerWallR = Math.max(collarOutRad + 2, evaluateBaseRadius(mountV, p) - p.wallThickness * 0.4);
-
-      for (let k = 0; k < numSpokes; k++) {
-        const angle = (k / numSpokes) * Math.PI * 2;
-        const dirX = Math.cos(angle);
-        const dirZ = Math.sin(angle);
-        const perpX = -dirZ;
-        const perpZ = dirX;
-
-        const rStart = collarOutRad - 1.0;
-        const rEnd = Math.max(rStart + 2, shadeInnerWallR);
-        const spanR = Math.max(0, rEnd - rStart);
-        const dropOffset = isTop ? Math.min(totalH * 0.35, spanR * 0.75) : 0;
-
-        const sy0_in = cY0;
-        const sy1_in = cY1;
-        const sy0_out = Math.max(0, cY0 - dropOffset);
-        const sy1_out = Math.max(cHeight, cY1 - dropOffset);
-
-        const ibL_x = rStart * dirX - halfW * perpX, ibL_z = rStart * dirZ - halfW * perpZ;
-        const ibR_x = rStart * dirX + halfW * perpX, ibR_z = rStart * dirZ + halfW * perpZ;
-        const obL_x = rEnd * dirX - halfW * perpX, obL_z = rEnd * dirZ - halfW * perpZ;
-        const obR_x = rEnd * dirX + halfW * perpX, obR_z = rEnd * dirZ + halfW * perpZ;
-
-        addQuad(ibL_x, sy1_in, ibL_z, ibR_x, sy1_in, ibR_z, obR_x, sy1_out, obR_z, obL_x, sy1_out, obL_z, 0.9, 0.9, 0.9, 0.9);
-        addQuad(ibR_x, sy0_in, ibR_z, ibL_x, sy0_in, ibL_z, obL_x, sy0_out, obL_z, obR_x, sy0_out, obR_z, 0.9, 0.9, 0.9, 0.9);
-        addQuad(ibL_x, sy0_in, ibL_z, ibL_x, sy1_in, ibL_z, obL_x, sy1_out, obL_z, obL_x, sy0_out, obL_z, 0.9, 0.9, 0.9, 0.9);
-        addQuad(ibR_x, sy1_in, ibR_z, ibR_x, sy0_in, ibR_z, obR_x, sy0_out, obR_z, obR_x, sy1_out, obR_z, 0.9, 0.9, 0.9, 0.9);
-        addQuad(obL_x, sy0_out, obL_z, obL_x, sy1_out, obL_z, obR_x, sy1_out, obR_z, obR_x, sy0_out, obR_z, 0.9, 0.9, 0.9, 0.9);
-      }
-    }
   } else {
-    // MODE B: SINGLE-WALL VASE MODE
+    // Single-wall vase mode
     for (let j = 0; j < H; j++) {
       const y0 = yGrid[j];
       const y1 = yGrid[j + 1];
@@ -350,12 +308,118 @@ export function generateLampShadeGeometry(p: LampConfig): THREE.BufferGeometry {
     }
   }
 
+  return buffers;
+}
+
+export function buildSocketSpiderBuffers(p: LampConfig): MeshBuffers | null {
+  if (p.socketPreset === 'none' || p.socketDia <= 0 || p.printMode !== 'shell') {
+    return null;
+  }
+
+  const buffers: MeshBuffers = { positions: [], colors: [] };
+  const { addQuad } = createMeshBuilders(buffers);
+
+  const R = Math.max(16, Math.floor(p.radialSegs));
+  const totalH = p.height;
+  const holeRad = p.socketDia * 0.5;
+  const collarOutRad = holeRad + p.collarWidth;
+  const cHeight = p.collarHeight;
+  const isTop = p.mountPos === 'top';
+  const cY0 = isTop ? totalH - cHeight : 0;
+  const cY1 = isTop ? totalH : cHeight;
+
+  // Collar Ring
+  const collarSegs = Math.min(64, R);
+  for (let i = 0; i < collarSegs; i++) {
+    const a0 = (i / collarSegs) * Math.PI * 2;
+    const a1 = ((i + 1) / collarSegs) * Math.PI * 2;
+    const c0 = Math.cos(a0), s0 = Math.sin(a0);
+    const c1 = Math.cos(a1), s1 = Math.sin(a1);
+
+    const ix0 = holeRad * c0, iz0 = holeRad * s0;
+    const ix1 = holeRad * c1, iz1 = holeRad * s1;
+    const ox0 = collarOutRad * c0, oz0 = collarOutRad * s0;
+    const ox1 = collarOutRad * c1, oz1 = collarOutRad * s1;
+
+    addQuad(ox0, cY0, oz0, ox0, cY1, oz0, ox1, cY1, oz1, ox1, cY0, oz1, 0.9, 0.9, 0.9, 0.9);
+    addQuad(ix0, cY0, iz0, ix1, cY0, iz1, ix1, cY1, iz1, ix0, cY1, iz0, 0.9, 0.9, 0.9, 0.9);
+    addQuad(ox0, cY0, oz0, ox1, cY0, oz1, ix1, cY0, iz1, ix0, cY0, iz0, 0.9, 0.9, 0.9, 0.9);
+    addQuad(ix0, cY1, iz0, ix1, cY1, iz1, ox1, cY1, oz1, ox0, cY1, oz0, 0.9, 0.9, 0.9, 0.9);
+  }
+
+  // Spokes
+  const numSpokes = p.spokeCount;
+  const halfW = p.spokeWidth * 0.5;
+  const mountV = isTop ? 0.92 : 0.02;
+  const shadeInnerWallR = Math.max(collarOutRad + 2, evaluateBaseRadius(mountV, p) - p.wallThickness * 0.4);
+
+  for (let k = 0; k < numSpokes; k++) {
+    const angle = (k / numSpokes) * Math.PI * 2;
+    const dirX = Math.cos(angle);
+    const dirZ = Math.sin(angle);
+    const perpX = -dirZ;
+    const perpZ = dirX;
+
+    const rStart = collarOutRad - 1.0;
+    const rEnd = Math.max(rStart + 2, shadeInnerWallR);
+    const spanR = Math.max(0, rEnd - rStart);
+    const dropOffset = isTop ? Math.min(totalH * 0.35, spanR * 0.75) : 0;
+
+    const sy0_in = cY0;
+    const sy1_in = cY1;
+    const sy0_out = Math.max(0, cY0 - dropOffset);
+    const sy1_out = Math.max(cHeight, cY1 - dropOffset);
+
+    const ibL_x = rStart * dirX - halfW * perpX, ibL_z = rStart * dirZ - halfW * perpZ;
+    const ibR_x = rStart * dirX + halfW * perpX, ibR_z = rStart * dirZ + halfW * perpZ;
+    const obL_x = rEnd * dirX - halfW * perpX, obL_z = rEnd * dirZ - halfW * perpZ;
+    const obR_x = rEnd * dirX + halfW * perpX, obR_z = rEnd * dirZ + halfW * perpZ;
+
+    addQuad(ibL_x, sy1_in, ibL_z, ibR_x, sy1_in, ibR_z, obR_x, sy1_out, obR_z, obL_x, sy1_out, obL_z, 0.9, 0.9, 0.9, 0.9);
+    addQuad(ibR_x, sy0_in, ibR_z, ibL_x, sy0_in, ibL_z, obL_x, sy0_out, obL_z, obR_x, sy0_out, obR_z, 0.9, 0.9, 0.9, 0.9);
+    addQuad(ibL_x, sy0_in, ibL_z, ibL_x, sy1_in, ibL_z, obL_x, sy1_out, obL_z, obL_x, sy0_out, obL_z, 0.9, 0.9, 0.9, 0.9);
+    addQuad(ibR_x, sy1_in, ibR_z, ibR_x, sy0_in, ibR_z, obR_x, sy0_out, obR_z, obR_x, sy1_out, obR_z, 0.9, 0.9, 0.9, 0.9);
+    addQuad(obL_x, sy0_out, obL_z, obL_x, sy1_out, obL_z, obR_x, sy1_out, obR_z, obR_x, sy0_out, obR_z, 0.9, 0.9, 0.9, 0.9);
+  }
+
+  return buffers;
+}
+
+export function generateLampShadeGeometry(p: LampConfig): THREE.BufferGeometry {
+  const body = buildShadeBodyBuffers(p);
+  const spider = buildSocketSpiderBuffers(p);
+
+  const positions: number[] = body.positions.slice();
+  const colors: number[] = body.colors.slice();
+
+  if (spider) {
+    for (let i = 0; i < spider.positions.length; i++) {
+      positions.push(spider.positions[i]);
+    }
+    for (let i = 0; i < spider.colors.length; i++) {
+      colors.push(spider.colors[i]);
+    }
+  }
+
   const geometry = new THREE.BufferGeometry();
   geometry.setAttribute('position', new THREE.Float32BufferAttribute(positions, 3));
   geometry.setAttribute('color', new THREE.Float32BufferAttribute(colors, 3));
   geometry.computeVertexNormals();
 
   return geometry;
+}
+
+export function calculateLampMetrics(
+  config: LampConfig,
+  existingGeometry?: THREE.BufferGeometry
+): LampMetrics {
+  if (existingGeometry) {
+    return computeLampMetrics(existingGeometry, config);
+  }
+  const geom = generateLampShadeGeometry(config);
+  const metrics = computeLampMetrics(geom, config);
+  geom.dispose();
+  return metrics;
 }
 
 export function computeLampMetrics(geom: THREE.BufferGeometry, p: LampConfig): LampMetrics {
@@ -476,7 +540,59 @@ export function exportBinarySTL(geom: THREE.BufferGeometry, title = 'PrivKnife_L
   return arrayBuffer;
 }
 
-export async function export3mf(geom: THREE.BufferGeometry, config: LampConfig): Promise<Blob> {
+export const exportToBinarySTL = exportBinarySTL;
+
+function build3MFObjectXml(
+  id: number,
+  name: string,
+  positions: number[] | THREE.BufferAttribute
+): string {
+  const isAttr = typeof (positions as any).getX === 'function';
+  const vertexCount = isAttr
+    ? (positions as THREE.BufferAttribute).count
+    : (positions as number[]).length / 3;
+
+  let verticesXml = '';
+  for (let i = 0; i < vertexCount; i++) {
+    const x = isAttr
+      ? (positions as THREE.BufferAttribute).getX(i).toFixed(3)
+      : (positions as number[])[i * 3].toFixed(3);
+    const y = isAttr
+      ? (positions as THREE.BufferAttribute).getY(i).toFixed(3)
+      : (positions as number[])[i * 3 + 1].toFixed(3);
+    const z = isAttr
+      ? (positions as THREE.BufferAttribute).getZ(i).toFixed(3)
+      : (positions as number[])[i * 3 + 2].toFixed(3);
+    verticesXml += `        <vertex x="${x}" y="${y}" z="${z}"/>\n`;
+  }
+
+  const numTris = Math.floor(vertexCount / 3);
+  let trianglesXml = '';
+  for (let i = 0; i < numTris; i++) {
+    const v1 = i * 3;
+    const v2 = i * 3 + 1;
+    const v3 = i * 3 + 2;
+    trianglesXml += `        <triangle v1="${v1}" v2="${v2}" v3="${v3}"/>\n`;
+  }
+
+  return `    <object id="${id}" name="${name}" type="model">\n      <mesh>\n        <vertices>\n${verticesXml}        </vertices>\n        <triangles>\n${trianglesXml}        </triangles>\n      </mesh>\n    </object>`;
+}
+
+export async function export3mf(
+  geomOrConfig: THREE.BufferGeometry | LampConfig,
+  configOrGeom?: LampConfig | THREE.BufferGeometry
+): Promise<Blob> {
+  let geom: THREE.BufferGeometry | undefined;
+  let config: LampConfig;
+
+  if ('isBufferGeometry' in geomOrConfig || (geomOrConfig as any).getAttribute) {
+    geom = geomOrConfig as THREE.BufferGeometry;
+    config = configOrGeom as LampConfig;
+  } else {
+    config = geomOrConfig as LampConfig;
+    geom = configOrGeom as THREE.BufferGeometry | undefined;
+  }
+
   const zip = new JSZip();
 
   // Content Types
@@ -499,24 +615,28 @@ export async function export3mf(geom: THREE.BufferGeometry, config: LampConfig):
   );
 
   // 3D Model XML
-  const pos = geom.getAttribute('position');
-  const numTris = pos.count / 3;
+  let resourcesXml = '';
+  let buildItemsXml = '';
 
-  let verticesXml = '';
-  let trianglesXml = '';
+  const hasSocket = config.socketPreset !== 'none' && config.socketDia > 0;
+  if (hasSocket && config.printMode === 'shell') {
+    const bodyBuffers = buildShadeBodyBuffers(config);
+    const spiderBuffers = buildSocketSpiderBuffers(config);
 
-  for (let i = 0; i < pos.count; i++) {
-    const x = pos.getX(i).toFixed(3);
-    const y = pos.getY(i).toFixed(3);
-    const z = pos.getZ(i).toFixed(3);
-    verticesXml += `        <vertex x="${x}" y="${y}" z="${z}"/>\n`;
-  }
+    const bodyObjXml = build3MFObjectXml(1, 'Lampshade Body', bodyBuffers.positions);
+    const spiderObjXml = spiderBuffers && spiderBuffers.positions.length > 0
+      ? build3MFObjectXml(2, 'Socket Spider Fitter', spiderBuffers.positions)
+      : '';
 
-  for (let i = 0; i < numTris; i++) {
-    const v1 = i * 3;
-    const v2 = i * 3 + 1;
-    const v3 = i * 3 + 2;
-    trianglesXml += `        <triangle v1="${v1}" v2="${v2}" v3="${v3}"/>\n`;
+    resourcesXml = `${bodyObjXml}\n${spiderObjXml}`;
+    buildItemsXml = `    <item objectid="1"/>\n    <item objectid="2"/>`;
+  } else {
+    const pos = geom ? (geom.getAttribute('position') as THREE.BufferAttribute) : null;
+    const positions = pos ?? buildShadeBodyBuffers(config).positions;
+    const bodyObjXml = build3MFObjectXml(1, 'Lampshade Body', positions);
+
+    resourcesXml = bodyObjXml;
+    buildItemsXml = `    <item objectid="1"/>`;
   }
 
   const modelXml = `<?xml version="1.0" encoding="UTF-8"?>
@@ -526,17 +646,10 @@ export async function export3mf(geom: THREE.BufferGeometry, config: LampConfig):
   <metadata name="SocketPreset">${config.socketPreset.toUpperCase()}</metadata>
   <metadata name="PrintMode">${config.printMode}</metadata>
   <resources>
-    <object id="1" type="model">
-      <mesh>
-        <vertices>
-${verticesXml}        </vertices>
-        <triangles>
-${trianglesXml}        </triangles>
-      </mesh>
-    </object>
+${resourcesXml}
   </resources>
   <build>
-    <item objectid="1"/>
+${buildItemsXml}
   </build>
 </model>`;
 
@@ -548,6 +661,8 @@ ${trianglesXml}        </triangles>
     compression: 'DEFLATE',
   });
 }
+
+export const exportTo3MF = export3mf;
 
 export async function processLampDesign(
   config: LampConfig,

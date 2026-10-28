@@ -1,5 +1,6 @@
 export type CurveType = 'spline' | 'conical' | 'hourglass' | 'bulbous' | 'scurve';
-export type RibProfile = 'sine' | 'pleat' | 'scallop' | 'gear';
+export type RibProfile = 'sine' | 'pleat' | 'scallop' | 'gear' | 'voronoi';
+export type RibWaveType = RibProfile;
 export type PrintMode = 'shell' | 'vase';
 export type SocketPreset = 'e27' | 'e14' | 'ikea' | 'custom' | 'none';
 export type MountPosition = 'bottom' | 'top';
@@ -76,4 +77,19 @@ export interface ParametricLampDesignerResult {
   fileSize: number;
   mimeType: string;
   metrics: LampMetrics;
+}
+
+export interface LampWorkerRequest {
+  id: number;
+  type: 'export-stl' | 'export-3mf' | 'generate-mesh';
+  config: LampConfig;
+}
+
+export interface LampWorkerResponse {
+  id: number;
+  type: 'progress' | 'result' | 'error';
+  percent?: number;
+  buffer?: ArrayBuffer;
+  blob?: Blob;
+  error?: string;
 }

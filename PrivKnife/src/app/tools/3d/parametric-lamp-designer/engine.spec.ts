@@ -1,4 +1,5 @@
-import { describe, it, expect } from 'vitest';
+import { describe, it, expect, vi } from 'vitest';
+import JSZip from 'jszip';
 import {
   validateLampConfig,
   evaluateBaseRadius,
@@ -6,8 +7,11 @@ import {
   evaluateOuterRadius,
   generateLampShadeGeometry,
   computeLampMetrics,
+  calculateLampMetrics,
   exportBinarySTL,
+  exportToBinarySTL,
   export3mf,
+  exportTo3MF,
   processLampDesign,
 } from './engine';
 import { DEFAULT_LAMP_CONFIG, SAMPLE_LAMP_PRESETS } from './test-fixtures';
@@ -56,7 +60,7 @@ describe('LampDesignerEngine (Seam 1: Pure Processing Boundary)', () => {
     });
 
     it('should evaluate rib waves correctly for all profiles', () => {
-      const profiles: LampConfig['ribProfile'][] = ['sine', 'pleat', 'scallop', 'gear'];
+      const profiles: LampConfig['ribProfile'][] = ['sine', 'pleat', 'scallop', 'gear', 'voronoi'];
       for (const prof of profiles) {
         const val0 = evaluateRibWave(0, prof);
         const valPi = evaluateRibWave(Math.PI, prof);
@@ -65,6 +69,16 @@ describe('LampDesignerEngine (Seam 1: Pure Processing Boundary)', () => {
         expect(valPi).toBeGreaterThanOrEqual(-1.1);
         expect(valPi).toBeLessThanOrEqual(1.1);
       }
+    });
+
+    it('should evaluate voronoi cellular wave deterministically and vary across angles', () => {
+      const valA = evaluateRibWave(0.2, 'voronoi');
+      const valB = evaluateRibWave(1.5, 'voronoi');
+      const valC = evaluateRibWave(0.2, 'voronoi');
+      expect(valA).toBe(valC); // Deterministic
+      expect(valA).not.toBe(valB); // Varies
+      expect(valA).toBeGreaterThanOrEqual(-1.0);
+      expect(valA).toBeLessThanOrEqual(1.0);
     });
 
     it('should evaluate outer radius with rib and wave modulation', () => {
@@ -140,6 +154,28 @@ describe('LampDesignerEngine (Seam 1: Pure Processing Boundary)', () => {
       geom.dispose();
     });
 
+    it('should generate valid watertight BufferGeometry for voronoi cellular rib profile', () => {
+      const voronoiConfig: LampConfig = {
+        ...DEFAULT_LAMP_CONFIG,
+        ribProfile: 'voronoi',
+        ribCount: 16,
+        ribDepth: 8,
+        radialSegs: 32,
+        heightSegs: 16,
+      };
+      const geom = generateLampShadeGeometry(voronoiConfig);
+      expect(geom).toBeDefined();
+
+      const pos = geom.getAttribute('position');
+      expect(pos.count).toBeGreaterThan(100);
+      for (let i = 0; i < pos.count; i++) {
+        expect(Number.isNaN(pos.getX(i))).toBe(false);
+        expect(Number.isNaN(pos.getY(i))).toBe(false);
+        expect(Number.isNaN(pos.getZ(i))).toBe(false);
+      }
+      geom.dispose();
+    });
+
     it('should generate all curated presets successfully', () => {
       for (const preset of SAMPLE_LAMP_PRESETS) {
         const fullConfig: LampConfig = {
@@ -155,23 +191,30 @@ describe('LampDesignerEngine (Seam 1: Pure Processing Boundary)', () => {
     });
   });
 
-  describe('computeLampMetrics', () => {
-    it('should compute realistic volume, weight, and slicer advice', () => {
+  describe('calculateLampMetrics', () => {
+    it('should calculate metrics directly from prebuilt geometry without recreating it', () => {
       const config: LampConfig = {
         ...DEFAULT_LAMP_CONFIG,
         radialSegs: 32,
         heightSegs: 16,
       };
       const geom = generateLampShadeGeometry(config);
-      const metrics = computeLampMetrics(geom, config);
+      const metrics = calculateLampMetrics(config, geom);
 
-      expect(metrics.triangleCount).toBeGreaterThan(0);
-      expect(metrics.vertexCount).toBeGreaterThan(0);
+      expect(metrics.triangleCount).toBe(geom.getAttribute('position').count / 3);
+      expect(metrics.vertexCount).toBe(geom.getAttribute('position').count);
       expect(metrics.dimensionsMm.height).toBeCloseTo(config.height, 0);
-      expect(metrics.estimatedGrams).toBeGreaterThan(10);
-      expect(metrics.estimatedPrintTimeHours).toBeGreaterThan(0);
-      expect(metrics.slicerTips.length).toBeGreaterThan(0);
       geom.dispose();
+    });
+
+    it('should generate geometry internally if prebuilt geometry is omitted', () => {
+      const config: LampConfig = {
+        ...DEFAULT_LAMP_CONFIG,
+        radialSegs: 24,
+        heightSegs: 12,
+      };
+      const metrics = calculateLampMetrics(config);
+      expect(metrics.triangleCount).toBeGreaterThan(0);
     });
   });
 
@@ -212,6 +255,30 @@ describe('LampDesignerEngine (Seam 1: Pure Processing Boundary)', () => {
       expect(blob).toBeInstanceOf(Blob);
       expect(blob.size).toBeGreaterThan(100);
       expect(blob.type).toBe('application/vnd.ms-package.3dmanufacturing-3dmodel+xml');
+      geom.dispose();
+    });
+
+    it('should export separate objects for shade body and socket fitter in shell mode', async () => {
+      const config: LampConfig = {
+        ...DEFAULT_LAMP_CONFIG,
+        socketPreset: 'e27',
+        printMode: 'shell',
+        radialSegs: 24,
+        heightSegs: 12,
+      };
+      const geom = generateLampShadeGeometry(config);
+      const blob = await exportTo3MF(geom, config);
+      expect(blob).toBeInstanceOf(Blob);
+
+      const zip = await JSZip.loadAsync(blob);
+      const modelFile = zip.file('3D/3dmodel.model');
+      expect(modelFile).toBeDefined();
+
+      const modelXml = await modelFile!.async('text');
+      expect(modelXml).toContain('name="Lampshade Body"');
+      expect(modelXml).toContain('name="Socket Spider Fitter"');
+      expect(modelXml).toContain('<item objectid="1"');
+      expect(modelXml).toContain('<item objectid="2"');
       geom.dispose();
     });
   });

@@ -1,0 +1,139 @@
+.c-lamp-designer {
+  width: 100%;
+  max-width: 1360px;
+  margin-left: auto;
+  margin-right: auto;
+  padding: 0 16px;
+
+  &__workspace {
+    display: flex;
+    flex-direction: row;
+    gap: 24px;
+    align-items: flex-start;
+
+    @media (max-width: 900px) {
+      flex-direction: column;
+    }
+  }
+
+  &__controls-column {
+    flex: 5;
+    width: 100%;
+    min-width: 0;
+
+    @media (max-width: 900px) {
+      order: 2;
+    }
+  }
+
+  &__viewport-column {
+    flex: 7;
+    width: 100%;
+    min-width: 0;
+
+    @media (max-width: 900px) {
+      order: 1;
+    }
+  }
+
+  &__viewport-card {
+    position: relative;
+    overflow: hidden;
+    border-radius: var(--radius-lg, 12px);
+  }
+
+  &__viewport-hud {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 10;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    align-items: center;
+    gap: 8px;
+    padding: 12px;
+    pointer-events: none;
+
+    @media (max-width: 500px) {
+      flex-direction: column;
+      align-items: stretch;
+    }
+  }
+
+  &__hud-group {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 6px;
+    pointer-events: auto;
+
+    @media (max-width: 500px) {
+      justify-content: center;
+    }
+  }
+
+  &__hud-badge {
+    background: rgba(15, 23, 42, 0.85);
+    color: #f8fafc;
+    border: 1px solid rgba(148, 163, 184, 0.25);
+    backdrop-filter: blur(6px);
+    font-size: 0.75rem;
+    padding: 6px 10px;
+    border-radius: 6px;
+    font-weight: 600;
+    letter-spacing: 0.02em;
+  }
+
+  &__hud-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 38px;
+    padding: 6px 12px;
+    font-size: 0.82rem;
+    font-weight: 600;
+    border-radius: 6px;
+    cursor: pointer;
+    background: rgba(15, 23, 42, 0.85);
+    color: #f8fafc;
+    border: 1px solid rgba(148, 163, 184, 0.35);
+    backdrop-filter: blur(6px);
+    transition: all 0.15s ease;
+
+    &:hover {
+      background: rgba(30, 41, 59, 0.95);
+      border-color: rgba(203, 213, 225, 0.5);
+      color: #ffffff;
+    }
+
+    &--active {
+      background: var(--color-primary, #3b82f6) !important;
+      border-color: var(--color-primary, #3b82f6) !important;
+      color: #ffffff !important;
+    }
+  }
+
+  &__canvas {
+    width: 100%;
+    height: 520px;
+    background: radial-gradient(circle at 50% 40%, #1e293b 0%, #0f172a 100%);
+
+    @media (max-width: 640px) {
+      height: 380px;
+    }
+  }
+
+  /* Range sliders touch targets: minimum 38px height for accessibility */
+  .c-input__slider {
+    min-height: 38px;
+    height: 38px;
+    cursor: pointer;
+    margin: 0;
+  }
+
+  .c-input__control {
+    min-height: 38px;
+  }
+}

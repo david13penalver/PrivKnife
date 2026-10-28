@@ -15,6 +15,7 @@ import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
 import { Badge } from '../../../components/badge/badge';
 import { Card } from '../../../components/card/card';
 import {
+  calculateLampMetrics,
   computeLampMetrics,
   exportBinarySTL,
   export3mf,
@@ -31,6 +32,8 @@ import {
   FilamentOption,
   LampConfig,
   LampMetrics,
+  LampWorkerRequest,
+  LampWorkerResponse,
   MountPosition,
   PresetLampShade,
   PrintMode,
@@ -43,10 +46,11 @@ import {
   standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [FormsModule, DecimalPipe, Badge, Card],
+  styleUrl: './parametric-lamp-designer.component.scss',
   template: `
-    <div class="l-columns l-columns--1 g--margin-x-auto" style="max-width: 1360px; padding: 0 16px;">
+    <div class="c-lamp-designer">
       <!-- Header & Privacy Indicator -->
-      <div class="l-columns__area g--text-center g--margin-bottom-6">
+      <div class="g--text-center g--margin-bottom-6">
         <div class="g--flex-center g--margin-bottom-3">
           <app-badge variant="privacy" [dot]="true">
             🛡️ 100% In-Browser 3D Fabrication &bull; Zero Server Ingestion &bull; Zero Telemetry
@@ -62,7 +66,7 @@ import {
       </div>
 
       <!-- Presets Ribbon -->
-      <div class="l-columns__area g--margin-bottom-5">
+      <div class="g--margin-bottom-5">
         <div class="c-card" style="padding: 12px 16px;">
           <div class="g--flex-center" style="justify-content: space-between; flex-wrap: wrap; gap: 10px;">
             <div class="g--flex-center" style="gap: 8px; flex-wrap: wrap;">
@@ -88,11 +92,11 @@ import {
         </div>
       </div>
 
-      <!-- Main Layout: Controls Left (5 cols) vs 3D Viewport Right (7 cols) -->
-      <div class="l-columns l-columns--12 lamp-workspace" style="gap: 24px; align-items: start;">
+      <!-- Main Layout: Controls Left vs 3D Viewport Right -->
+      <div class="c-lamp-designer__workspace">
         
         <!-- Controls Column -->
-        <div class="l-columns__area l-columns__area--span-5">
+        <div class="c-lamp-designer__controls-column">
           <div class="l-columns l-columns--1" style="gap: 16px;">
             
             <!-- 1. Silhouette & Dimensions -->
@@ -103,7 +107,7 @@ import {
                     Silhouette Profile:
                   </label>
                   <select
-                    class="c-input"
+                    class="c-input__control"
                     style="width: 100%;"
                     [ngModel]="config().curveType"
                     (ngModelChange)="updateConfig({ curveType: $event })">
@@ -126,8 +130,8 @@ import {
                     min="80"
                     max="280"
                     step="5"
-                    class="c-input"
-                    style="width: 100%; padding: 0;"
+                    class="c-input__slider"
+                    style="width: 100%;"
                     [ngModel]="config().height"
                     (ngModelChange)="updateConfig({ height: +$event })" />
                 </div>
@@ -144,8 +148,8 @@ import {
                       min="25"
                       max="110"
                       step="1"
-                      class="c-input"
-                      style="width: 100%; padding: 0;"
+                      class="c-input__slider"
+                      style="width: 100%;"
                       [ngModel]="config().topRadius"
                       (ngModelChange)="updateConfig({ topRadius: +$event })" />
                   </div>
@@ -156,21 +160,21 @@ import {
                     </div>
                     <input
                       type="range"
-                      min="30"
-                      max="125"
+                      min="35"
+                      max="130"
                       step="1"
-                      class="c-input"
-                      style="width: 100%; padding: 0;"
+                      class="c-input__slider"
+                      style="width: 100%;"
                       [ngModel]="config().bottomRadius"
                       (ngModelChange)="updateConfig({ bottomRadius: +$event })" />
                   </div>
                 </div>
 
-                <!-- Mid Radius & Waist Ratio -->
+                <!-- Waist & Mid Radius -->
                 <div class="l-columns l-columns--2" style="gap: 12px;">
                   <div>
                     <div class="g--flex-center" style="justify-content: space-between; font-size: 0.82rem;">
-                      <span style="font-weight: 600;">Mid Radius:</span>
+                      <span style="font-weight: 600;">Mid/Waist Radius:</span>
                       <span style="font-family: monospace;">{{ config().midRadius }} mm</span>
                     </div>
                     <input
@@ -178,39 +182,56 @@ import {
                       min="25"
                       max="135"
                       step="1"
-                      class="c-input"
-                      style="width: 100%; padding: 0;"
+                      class="c-input__slider"
+                      style="width: 100%;"
                       [ngModel]="config().midRadius"
                       (ngModelChange)="updateConfig({ midRadius: +$event })" />
                   </div>
                   <div>
                     <div class="g--flex-center" style="justify-content: space-between; font-size: 0.82rem;">
-                      <span style="font-weight: 600;">Waist Height:</span>
+                      <span style="font-weight: 600;">Waist Height Pos:</span>
                       <span style="font-family: monospace;">{{ Math.round(config().waistRatio * 100) }}%</span>
                     </div>
                     <input
                       type="range"
-                      min="0.2"
-                      max="0.8"
-                      step="0.02"
-                      class="c-input"
-                      style="width: 100%; padding: 0;"
+                      min="0.15"
+                      max="0.85"
+                      step="0.05"
+                      class="c-input__slider"
+                      style="width: 100%;"
                       [ngModel]="config().waistRatio"
                       (ngModelChange)="updateConfig({ waistRatio: +$event })" />
                   </div>
                 </div>
+
+                <!-- Mesh Segments Resolution -->
+                <div>
+                  <div class="g--flex-center" style="justify-content: space-between; font-size: 0.82rem;">
+                    <span style="font-weight: 600;">Radial Resolution:</span>
+                    <span style="font-family: monospace;">{{ config().radialSegs }} segments</span>
+                  </div>
+                  <input
+                    type="range"
+                    min="36"
+                    max="180"
+                    step="6"
+                    class="c-input__slider"
+                    style="width: 100%;"
+                    [ngModel]="config().radialSegs"
+                    (ngModelChange)="updateConfig({ radialSegs: +$event })" />
+                </div>
               </div>
             </app-card>
 
-            <!-- 2. Ribs, Waves & Twist -->
-            <app-card title="2. Surface Ribs &amp; Spiral Twist">
+            <!-- 2. Ribs, Fluting & Surface -->
+            <app-card title="2. Ribs, Fluting &amp; Surface Texture">
               <div class="l-columns l-columns--1" style="gap: 12px;">
                 <div>
                   <label style="font-size: 0.85rem; font-weight: 600; display: block; margin-bottom: 4px;">
                     Rib Wave Shape:
                   </label>
                   <select
-                    class="c-input"
+                    class="c-input__control"
                     style="width: 100%;"
                     [ngModel]="config().ribProfile"
                     (ngModelChange)="updateConfig({ ribProfile: $event })">
@@ -218,6 +239,7 @@ import {
                     <option value="pleat">Sharp Origami Pleats</option>
                     <option value="scallop">Rounded Scalloped Arches</option>
                     <option value="gear">Flat-Top Fluted Grooves</option>
+                    <option value="voronoi">Voronoi Cellular Relief</option>
                   </select>
                 </div>
 
@@ -233,8 +255,8 @@ import {
                       min="0"
                       max="60"
                       step="2"
-                      class="c-input"
-                      style="width: 100%; padding: 0;"
+                      class="c-input__slider"
+                      style="width: 100%;"
                       [ngModel]="config().ribCount"
                       (ngModelChange)="updateConfig({ ribCount: +$event })" />
                   </div>
@@ -248,8 +270,8 @@ import {
                       min="0"
                       max="18"
                       step="0.5"
-                      class="c-input"
-                      style="width: 100%; padding: 0;"
+                      class="c-input__slider"
+                      style="width: 100%;"
                       [ngModel]="config().ribDepth"
                       (ngModelChange)="updateConfig({ ribDepth: +$event })" />
                   </div>
@@ -266,8 +288,8 @@ import {
                     min="-240"
                     max="240"
                     step="5"
-                    class="c-input"
-                    style="width: 100%; padding: 0;"
+                    class="c-input__slider"
+                    style="width: 100%;"
                     [ngModel]="config().twistAngle"
                     (ngModelChange)="updateConfig({ twistAngle: +$event })" />
                 </div>
@@ -284,8 +306,8 @@ import {
                       min="0"
                       max="8"
                       step="0.5"
-                      class="c-input"
-                      style="width: 100%; padding: 0;"
+                      class="c-input__slider"
+                      style="width: 100%;"
                       [ngModel]="config().vWaveFreq"
                       (ngModelChange)="updateConfig({ vWaveFreq: +$event })" />
                   </div>
@@ -299,8 +321,8 @@ import {
                       min="0"
                       max="10"
                       step="0.5"
-                      class="c-input"
-                      style="width: 100%; padding: 0;"
+                      class="c-input__slider"
+                      style="width: 100%;"
                       [ngModel]="config().vWaveAmp"
                       (ngModelChange)="updateConfig({ vWaveAmp: +$event })" />
                   </div>
@@ -349,8 +371,8 @@ import {
                       min="1.0"
                       max="3.2"
                       step="0.2"
-                      class="c-input"
-                      style="width: 100%; padding: 0;"
+                      class="c-input__slider"
+                      style="width: 100%;"
                       [ngModel]="config().wallThickness"
                       (ngModelChange)="updateConfig({ wallThickness: +$event })" />
                   </div>
@@ -363,7 +385,7 @@ import {
                       Socket Preset:
                     </label>
                     <select
-                      class="c-input"
+                      class="c-input__control"
                       style="width: 100%;"
                       [ngModel]="config().socketPreset"
                       (ngModelChange)="onSocketPresetChange($event)">
@@ -379,7 +401,7 @@ import {
                       Mount Position:
                     </label>
                     <select
-                      class="c-input"
+                      class="c-input__control"
                       style="width: 100%;"
                       [ngModel]="config().mountPos"
                       (ngModelChange)="updateConfig({ mountPos: $event })">
@@ -400,8 +422,8 @@ import {
                       min="18"
                       max="55"
                       step="1"
-                      class="c-input"
-                      style="width: 100%; padding: 0;"
+                      class="c-input__slider"
+                      style="width: 100%;"
                       [ngModel]="config().socketDia"
                       (ngModelChange)="updateConfig({ socketDia: +$event })" />
                   </div>
@@ -419,8 +441,8 @@ import {
                         min="2"
                         max="6"
                         step="1"
-                        class="c-input"
-                        style="width: 100%; padding: 0;"
+                        class="c-input__slider"
+                        style="width: 100%;"
                         [ngModel]="config().spokeCount"
                         (ngModelChange)="updateConfig({ spokeCount: +$event })" />
                     </div>
@@ -434,8 +456,8 @@ import {
                         min="4"
                         max="10"
                         step="0.5"
-                        class="c-input"
-                        style="width: 100%; padding: 0;"
+                        class="c-input__slider"
+                        style="width: 100%;"
                         [ngModel]="config().spokeWidth"
                         (ngModelChange)="updateConfig({ spokeWidth: +$event })" />
                     </div>
@@ -444,8 +466,8 @@ import {
               </div>
             </app-card>
 
-            <!-- 4. Filament Material Selection -->
-            <app-card title="4. Filament Material Simulation">
+            <!-- 4. Material Simulation -->
+            <app-card title="4. Filament Simulation (Preview Only)">
               <div class="g--flex-center" style="gap: 8px; flex-wrap: wrap;">
                 @for (fil of filaments; track fil.id) {
                   <button
@@ -464,53 +486,51 @@ import {
         </div>
 
         <!-- 3D Viewport & Output Column -->
-        <div class="l-columns__area l-columns__area--span-7">
+        <div class="c-lamp-designer__viewport-column">
           <div class="l-columns l-columns--1" style="gap: 16px;">
             
             <!-- 3D Canvas Card -->
-            <div class="c-card" style="padding: 0; overflow: hidden; position: relative;">
+            <div class="c-card c-lamp-designer__viewport-card" style="padding: 0;">
               <!-- Viewport Overlay Badges & Controls -->
-              <div style="position: absolute; top: 12px; left: 12px; z-index: 10; display: flex; gap: 8px; flex-wrap: wrap;">
-                <span class="c-badge" style="background: rgba(15, 23, 42, 0.75); color: #fff; backdrop-filter: blur(4px);">
-                  Bed: 256×256 mm
-                </span>
-                <span class="c-badge" style="background: rgba(15, 23, 42, 0.75); color: #fff; backdrop-filter: blur(4px);">
-                  Triangles: {{ metrics()?.triangleCount | number }}
-                </span>
-              </div>
+              <div class="c-lamp-designer__viewport-hud">
+                <div class="c-lamp-designer__hud-group">
+                  <span class="c-lamp-designer__hud-badge">
+                    Bed: 256×256 mm
+                  </span>
+                  <span class="c-lamp-designer__hud-badge">
+                    Triangles: {{ metrics()?.triangleCount | number }}
+                  </span>
+                </div>
 
-              <!-- Top Right Viewport Tools -->
-              <div style="position: absolute; top: 12px; right: 12px; z-index: 10; display: flex; gap: 6px;">
-                <button
-                  type="button"
-                  class="c-button c-button--small"
-                  [class.c-button--primary]="lampLit()"
-                  [class.c-button--outline]="!lampLit()"
-                  (click)="toggleLampLit()"
-                  title="Toggle Bulb Illumination">
-                  💡 {{ lampLit() ? 'Bulb ON' : 'Bulb OFF' }}
-                </button>
-                <button
-                  type="button"
-                  class="c-button c-button--small"
-                  [class.c-button--primary]="wireframe()"
-                  [class.c-button--outline]="!wireframe()"
-                  (click)="toggleWireframe()"
-                  title="Toggle Wireframe Mesh">
-                  Mesh
-                </button>
-                <button
-                  type="button"
-                  class="c-button c-button--small c-button--outline"
-                  (click)="resetCamera()"
-                  title="Reset Camera View">
-                  Reset View
-                </button>
+                <div class="c-lamp-designer__hud-group">
+                  <button
+                    type="button"
+                    class="c-lamp-designer__hud-btn"
+                    [class.c-lamp-designer__hud-btn--active]="lampLit()"
+                    (click)="toggleLampLit()"
+                    title="Toggle Bulb Illumination">
+                    💡 {{ lampLit() ? 'Bulb ON' : 'Bulb OFF' }}
+                  </button>
+                  <button
+                    type="button"
+                    class="c-lamp-designer__hud-btn"
+                    [class.c-lamp-designer__hud-btn--active]="wireframe()"
+                    (click)="toggleWireframe()"
+                    title="Toggle Wireframe Mesh">
+                    Mesh
+                  </button>
+                  <button
+                    type="button"
+                    class="c-lamp-designer__hud-btn"
+                    (click)="resetCamera()"
+                    title="Reset Camera View">
+                    Reset View
+                  </button>
+                </div>
               </div>
 
               <!-- WebGL Canvas Container -->
-              <div #rendererContainer style="width: 100%; height: 520px; background: radial-gradient(circle at 50% 40%, #1e293b 0%, #0f172a 100%);">
-              </div>
+              <div #rendererContainer class="c-lamp-designer__canvas"></div>
             </div>
 
             <!-- Print Telemetry & Specifications -->
@@ -582,19 +602,6 @@ import {
       </div>
     </div>
   `,
-  styles: [
-    `
-      @media (max-width: 900px) {
-        .lamp-workspace {
-          grid-template-columns: 1fr !important;
-        }
-        .l-columns__area--span-5,
-        .l-columns__area--span-7 {
-          grid-column: span 1 !important;
-        }
-      }
-    `,
-  ],
 })
 export class ParametricLampDesignerComponent implements AfterViewInit, OnDestroy {
   @ViewChild('rendererContainer') rendererContainer!: ElementRef<HTMLDivElement>;
@@ -616,17 +623,10 @@ export class ParametricLampDesignerComponent implements AfterViewInit, OnDestroy
     return this.filaments.find((f) => f.id === id) || this.filaments[0];
   });
 
-  readonly metrics = computed<LampMetrics | null>(() => {
-    // Generate lightweight calculation
-    try {
-      const geom = generateLampShadeGeometry(this.config());
-      const m = computeLampMetrics(geom, this.config());
-      geom.dispose();
-      return m;
-    } catch {
-      return null;
-    }
-  });
+  // Dedicated single-pass metrics signal (DEFECT-31-02 deduplication)
+  readonly metrics = signal<LampMetrics | null>(
+    calculateLampMetrics(DEFAULT_LAMP_CONFIG)
+  );
 
   // Three.js instances
   private scene?: THREE.Scene;
@@ -636,7 +636,9 @@ export class ParametricLampDesignerComponent implements AfterViewInit, OnDestroy
   private shadeMesh?: THREE.Mesh;
   private bulbLight?: THREE.PointLight;
   private bulbMesh?: THREE.Mesh;
+  private gridHelper?: THREE.GridHelper;
   private animFrameId?: number;
+  private worker?: Worker;
 
   ngAfterViewInit(): void {
     this.initThree();
@@ -648,16 +650,24 @@ export class ParametricLampDesignerComponent implements AfterViewInit, OnDestroy
     if (this.animFrameId) {
       cancelAnimationFrame(this.animFrameId);
     }
+    if (this.worker) {
+      this.worker.terminate();
+      this.worker = undefined;
+    }
     if (this.controls) {
       this.controls.dispose();
     }
     if (this.shadeMesh) {
       this.shadeMesh.geometry.dispose();
-      if (Array.isArray(this.shadeMesh.material)) {
-        this.shadeMesh.material.forEach((m) => m.dispose());
-      } else {
-        this.shadeMesh.material.dispose();
-      }
+      this.disposeMaterial(this.shadeMesh.material);
+    }
+    if (this.bulbMesh) {
+      this.bulbMesh.geometry.dispose();
+      this.disposeMaterial(this.bulbMesh.material);
+    }
+    if (this.gridHelper) {
+      this.gridHelper.geometry.dispose();
+      this.disposeMaterial(this.gridHelper.material);
     }
     if (this.renderer) {
       this.renderer.dispose();
@@ -725,10 +735,22 @@ export class ParametricLampDesignerComponent implements AfterViewInit, OnDestroy
   }
 
   async downloadStl(): Promise<void> {
-    const geom = generateLampShadeGeometry(this.config());
     const baseName = `PrivKnife_Shade_${this.config().curveType}_${this.config().height}mm_${this.config().socketPreset.toUpperCase()}`;
-    const buffer = exportBinarySTL(geom, baseName);
-    geom.dispose();
+    let buffer: ArrayBuffer | undefined;
+
+    if (typeof Worker !== 'undefined') {
+      try {
+        buffer = await this.executeWorkerTask('export-stl');
+      } catch {
+        // Fallback to synchronous in test or restricted environments
+      }
+    }
+
+    if (!buffer) {
+      const geom = generateLampShadeGeometry(this.config());
+      buffer = exportBinarySTL(geom, baseName);
+      geom.dispose();
+    }
 
     const blob = new Blob([buffer], { type: 'model/stl' });
     const url = URL.createObjectURL(blob);
@@ -737,10 +759,25 @@ export class ParametricLampDesignerComponent implements AfterViewInit, OnDestroy
   }
 
   async download3mf(): Promise<void> {
-    const geom = generateLampShadeGeometry(this.config());
     const baseName = `PrivKnife_Shade_${this.config().curveType}_${this.config().height}mm_${this.config().socketPreset.toUpperCase()}`;
-    const blob = await export3mf(geom, this.config());
-    geom.dispose();
+    let blob: Blob | undefined;
+
+    if (typeof Worker !== 'undefined') {
+      try {
+        const buffer = await this.executeWorkerTask('export-3mf');
+        blob = new Blob([buffer], {
+          type: 'application/vnd.ms-package.3dmanufacturing-3dmodel+xml',
+        });
+      } catch {
+        // Fallback
+      }
+    }
+
+    if (!blob) {
+      const geom = generateLampShadeGeometry(this.config());
+      blob = await export3mf(geom, this.config());
+      geom.dispose();
+    }
 
     const url = URL.createObjectURL(blob);
     this.triggerDownload(url, `${baseName}.3mf`);
@@ -766,15 +803,71 @@ export class ParametricLampDesignerComponent implements AfterViewInit, OnDestroy
     document.body.removeChild(a);
   }
 
+  private executeWorkerTask(type: 'export-stl' | 'export-3mf'): Promise<ArrayBuffer> {
+    return new Promise((resolve, reject) => {
+      try {
+        if (!this.worker) {
+          this.worker = new Worker(new URL('./worker', import.meta.url), { type: 'module' });
+        }
+        const id = Date.now();
+        const handler = (e: MessageEvent<LampWorkerResponse>) => {
+          if (e.data.id === id) {
+            if (e.data.type === 'result' && e.data.buffer) {
+              this.worker?.removeEventListener('message', handler);
+              resolve(e.data.buffer);
+            } else if (e.data.type === 'error') {
+              this.worker?.removeEventListener('message', handler);
+              reject(new Error(e.data.error || 'Worker task failed'));
+            }
+          }
+        };
+        this.worker.addEventListener('message', handler);
+        this.worker.postMessage({ id, type, config: this.config() } as LampWorkerRequest);
+      } catch (err) {
+        reject(err);
+      }
+    });
+  }
+
   private initThree(): void {
     const container = this.rendererContainer.nativeElement;
     const width = container.clientWidth || 640;
     const height = container.clientHeight || 520;
 
     this.scene = new THREE.Scene();
-
     this.camera = new THREE.PerspectiveCamera(40, width / height, 1, 2000);
     this.camera.position.set(0, 180, 360);
+
+    // Ambient light
+    const ambientLight = new THREE.AmbientLight(0xffffff, 0.45);
+    this.scene.add(ambientLight);
+
+    // Key direct light
+    const dirLight = new THREE.DirectionalLight(0xffffff, 0.65);
+    dirLight.position.set(200, 400, 250);
+    this.scene.add(dirLight);
+
+    // Fill light
+    const fillLight = new THREE.DirectionalLight(0x94a3b8, 0.35);
+    fillLight.position.set(-200, 150, -200);
+    this.scene.add(fillLight);
+
+    // Internal Warm LED bulb point light
+    this.bulbLight = new THREE.PointLight(0xffaa44, 2.5, 450, 1.2);
+    this.bulbLight.position.set(0, this.config().height * 0.5, 0);
+    this.scene.add(this.bulbLight);
+
+    // Bulb visual sphere
+    const bulbGeom = new THREE.SphereGeometry(14, 24, 16);
+    const bulbMat = new THREE.MeshBasicMaterial({ color: 0xffea88 });
+    this.bulbMesh = new THREE.Mesh(bulbGeom, bulbMat);
+    this.bulbMesh.position.copy(this.bulbLight.position);
+    this.scene.add(this.bulbMesh);
+
+    // 3D Printer Bed Grid (256x256mm)
+    this.gridHelper = new THREE.GridHelper(256, 16, 0x38bdf8, 0x334155);
+    this.gridHelper.position.y = 0;
+    this.scene.add(this.gridHelper);
 
     try {
       this.renderer = new THREE.WebGLRenderer({
@@ -792,37 +885,6 @@ export class ParametricLampDesignerComponent implements AfterViewInit, OnDestroy
       this.controls.dampingFactor = 0.05;
       this.controls.target.set(0, this.config().height * 0.5, 0);
       this.controls.update();
-
-      // Ambient light
-      const ambientLight = new THREE.AmbientLight(0xffffff, 0.45);
-      this.scene.add(ambientLight);
-
-      // Key direct light
-      const dirLight = new THREE.DirectionalLight(0xffffff, 0.65);
-      dirLight.position.set(200, 400, 250);
-      this.scene.add(dirLight);
-
-      // Fill light
-      const fillLight = new THREE.DirectionalLight(0x94a3b8, 0.35);
-      fillLight.position.set(-200, 150, -200);
-      this.scene.add(fillLight);
-
-      // Internal Warm LED bulb point light
-      this.bulbLight = new THREE.PointLight(0xffaa44, 2.5, 450, 1.2);
-      this.bulbLight.position.set(0, this.config().height * 0.5, 0);
-      this.scene.add(this.bulbLight);
-
-      // Bulb visual sphere
-      const bulbGeom = new THREE.SphereGeometry(14, 24, 16);
-      const bulbMat = new THREE.MeshBasicMaterial({ color: 0xffea88 });
-      this.bulbMesh = new THREE.Mesh(bulbGeom, bulbMat);
-      this.bulbMesh.position.copy(this.bulbLight.position);
-      this.scene.add(this.bulbMesh);
-
-      // 3D Printer Bed Grid (256x256mm)
-      const grid = new THREE.GridHelper(256, 16, 0x38bdf8, 0x334155);
-      grid.position.y = 0;
-      this.scene.add(grid);
     } catch {
       // In headless test environments where WebGL is mocked or unavailable
     }
@@ -834,11 +896,13 @@ export class ParametricLampDesignerComponent implements AfterViewInit, OnDestroy
     if (this.shadeMesh) {
       this.scene.remove(this.shadeMesh);
       this.shadeMesh.geometry.dispose();
+      this.disposeMaterial(this.shadeMesh.material);
       this.shadeMesh = undefined;
     }
 
     try {
       const geom = generateLampShadeGeometry(this.config());
+      this.metrics.set(calculateLampMetrics(this.config(), geom));
       const mat = this.createShadeMaterial();
 
       this.shadeMesh = new THREE.Mesh(geom, mat);
@@ -878,8 +942,18 @@ export class ParametricLampDesignerComponent implements AfterViewInit, OnDestroy
 
   private updateMaterial(): void {
     if (this.shadeMesh) {
+      this.disposeMaterial(this.shadeMesh.material);
       const newMat = this.createShadeMaterial();
       this.shadeMesh.material = newMat;
+    }
+  }
+
+  private disposeMaterial(mat: THREE.Material | THREE.Material[] | undefined): void {
+    if (!mat) return;
+    if (Array.isArray(mat)) {
+      mat.forEach((m) => m.dispose());
+    } else {
+      mat.dispose();
     }
   }
 
