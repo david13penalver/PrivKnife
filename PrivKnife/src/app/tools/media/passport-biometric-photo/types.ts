@@ -73,3 +73,19 @@ export interface PassportPreset {
   description: string;
   options: Partial<PassportBiometricPhotoOptions>;
 }
+
+export interface PassportWorkerRequest {
+  imageSource: string | Blob;
+  options: PassportBiometricPhotoOptions;
+  format: PassportExportFormat;
+}
+
+export interface PassportWorkerResponse {
+  success: boolean;
+  blob?: Blob;
+  fileName?: string;
+  fileSize?: number;
+  mimeType?: string;
+  metrics?: PassportMetrics;
+  error?: string;
+}

@@ -100,6 +100,94 @@ describe('PassportBiometricPhotoComponent (Seam 2 & 4)', () => {
       expect(component.panX()).toBe(0);
       expect(component.panY()).toBe(0);
     });
+
+    it('should update panX and panY individually', () => {
+      component.setPanX(45);
+      expect(component.panX()).toBe(45);
+
+      component.setPanY(-30);
+      expect(component.panY()).toBe(-30);
+
+      // Clamp limits [-200, 200]
+      component.setPanX(300);
+      expect(component.panX()).toBe(200);
+
+      component.setPanY(-250);
+      expect(component.panY()).toBe(-200);
+    });
+
+    it('should update pan coordinates via pointer drag events', () => {
+      component.setPan(0, 0);
+      const canvasEl = fixture.nativeElement.querySelector('canvas');
+      expect(canvasEl).toBeTruthy();
+
+      component.onPointerDown({ clientX: 100, clientY: 100, pointerId: 1 } as any);
+      expect(component.isDragging()).toBe(true);
+
+      component.onPointerMove({ clientX: 125, clientY: 85, pointerId: 1 } as any);
+      expect(component.panX()).toBe(25);
+      expect(component.panY()).toBe(-15);
+
+      component.onPointerUp({ pointerId: 1 } as any);
+      expect(component.isDragging()).toBe(false);
+    });
+  });
+
+  describe('Biometric Crop Guide & Preview Mode Toggle (DEFECT-43-02)', () => {
+    it('should initialize in crop_guide preview mode', () => {
+      expect(component.previewMode()).toBe('crop_guide');
+    });
+
+    it('should toggle between crop_guide and print_sheet mode', () => {
+      component.setPreviewMode('print_sheet');
+      expect(component.previewMode()).toBe('print_sheet');
+      fixture.detectChanges();
+
+      const overlay = fixture.nativeElement.querySelector('.c-passport__biometric-overlay');
+      expect(overlay).toBeNull();
+
+      component.setPreviewMode('crop_guide');
+      expect(component.previewMode()).toBe('crop_guide');
+      fixture.detectChanges();
+
+      const overlayAfter = fixture.nativeElement.querySelector('.c-passport__biometric-overlay');
+      expect(overlayAfter).not.toBeNull();
+    });
+
+    it('should compute guidePercentages for active specification', () => {
+      const guide = component.guidePercentages();
+      expect(guide.chinTopPct).toBeCloseTo(82, 0);
+      expect(guide.crownMaxTopPct).toBeGreaterThan(0);
+      expect(guide.crownMinTopPct).toBeGreaterThan(guide.crownMaxTopPct);
+    });
+  });
+
+  describe('BEM Architecture & Form Layout (DEFECT-43-05)', () => {
+    it('should use .l-columns__area instead of .l-columns__column', () => {
+      const columns = fixture.nativeElement.querySelectorAll('.l-columns__column');
+      expect(columns.length).toBe(0);
+
+      const areas = fixture.nativeElement.querySelectorAll('.l-columns__area');
+      expect(areas.length).toBeGreaterThanOrEqual(2);
+    });
+
+    it('should wrap .l-extremo children with .l-extremo__area-izquierda and __area-derecha', () => {
+      const extremos = fixture.nativeElement.querySelectorAll('.l-extremo');
+      expect(extremos.length).toBeGreaterThan(0);
+
+      const izq = fixture.nativeElement.querySelectorAll('.l-extremo__area-izquierda');
+      const der = fixture.nativeElement.querySelectorAll('.l-extremo__area-derecha');
+      expect(izq.length).toBeGreaterThanOrEqual(extremos.length);
+      expect(der.length).toBeGreaterThanOrEqual(extremos.length);
+    });
+
+    it('should use .c-input__slider and .c-input__switch classes', () => {
+      const sliders = fixture.nativeElement.querySelectorAll('.c-input__slider');
+      expect(sliders.length).toBeGreaterThanOrEqual(4); // zoom, tilt, panX, panY, bright, contrast
+
+      const switchEl = fixture.nativeElement.querySelector('.c-input__switch');
+      expect(switchEl).not.toBeNull();
+    });
   });
 
   describe('Sample Portraits & Image Uploads', () => {

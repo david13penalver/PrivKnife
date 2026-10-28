@@ -16,8 +16,11 @@ import {
   BackgroundColorOption,
   CountryPreset,
   PassportBiometricPhotoOptions,
+  PassportBiometricPhotoResult,
   PassportExportFormat,
   PassportMetrics,
+  PassportWorkerRequest,
+  PassportWorkerResponse,
   PrintSheetSize,
 } from './types';
 import {
@@ -29,554 +32,18 @@ import {
 } from './test-fixtures';
 import {
   calculatePassportMetrics,
+  computeBiometricGuidePercentages,
   processPassportPhoto,
   renderPassportSheet,
+  renderSinglePhotoPreview,
 } from './engine';
 
 @Component({
   selector: 'app-passport-biometric-photo',
   standalone: true,
   imports: [CommonModule, FormsModule, Card, Dropzone],
-  template: `
-    <div class="l-page">
-      <!-- Header -->
-      <div class="l-page__header c-header">
-        <div class="c-header__title-group">
-          <h1 class="c-header__title">Passport, Visa & ID Biometric Photo Maker</h1>
-          <p class="c-header__subtitle">
-            Create compliant passport, visa, and ID photos with official ICAO / US / Schengen biometric head guides and multi-photo print sheets (4×6″, A4, single).
-          </p>
-        </div>
-        <div class="c-badge c-badge--privacy">
-          🛡️ 100% In-Browser • Never Leaves Your Device
-        </div>
-      </div>
-
-      <!-- Quick Country Presets Bar -->
-      <div class="preset-strip g--margin-bottom-4">
-        <span class="preset-label">Standard Presets:</span>
-        <div class="preset-buttons">
-          @for (presetKey of presetKeys; track presetKey) {
-            <button
-              type="button"
-              class="c-button c-button--small"
-              [class.c-button--primary]="countryPreset() === presetKey"
-              [class.c-button--outline]="countryPreset() !== presetKey"
-              (click)="setCountryPreset(presetKey)"
-            >
-              {{ PASSPORT_SPECS[presetKey].country }} ({{ PASSPORT_SPECS[presetKey].widthMm }}×{{ PASSPORT_SPECS[presetKey].heightMm }}mm)
-            </button>
-          }
-        </div>
-      </div>
-
-      <!-- Main Layout Columns -->
-      <div class="l-columns l-columns--2">
-        <!-- Controls Column -->
-        <div class="l-columns__column">
-          <!-- Portrait Input Card -->
-          <app-card title="1. Select or Upload Portrait" class="g--margin-bottom-4">
-            <!-- Sample Selector -->
-            <div class="sample-selector g--margin-bottom-3">
-              <span class="c-form-label">Try Sample Portrait:</span>
-              <div class="sample-pills">
-                @for (sample of samplePortraits; track sample.id) {
-                  <button
-                    type="button"
-                    class="c-button c-button--small c-button--outline"
-                    [class.is-active]="fileName() === sample.name"
-                    (click)="selectSamplePortrait(sample)"
-                  >
-                    {{ sample.name }}
-                  </button>
-                }
-              </div>
-            </div>
-
-            <!-- Dropzone -->
-            <app-dropzone
-              title="Drop your portrait here or click to browse"
-              subtitle="JPG, PNG, WebP supported (max 25MB)"
-              accept="image/*"
-              [maxSizeMb]="25"
-              (filesSelected)="onFilesDropped($event)"
-            />
-            <div class="file-name-meta g--margin-top-2">
-              <small class="g--text-muted">Active Image: <strong>{{ fileName() }}</strong></small>
-            </div>
-          </app-card>
-
-          <!-- Framing & Biometric Adjustments Card -->
-          <app-card title="2. Framing & Adjustments" class="g--margin-bottom-4">
-            <!-- Zoom Slider -->
-            <div class="c-form-group g--margin-bottom-3">
-              <div class="l-extremo">
-                <label class="c-form-label">Scale / Zoom Level</label>
-                <span class="c-form-value">{{ zoomLevel().toFixed(2) }}x</span>
-              </div>
-              <input
-                type="range"
-                class="c-range"
-                [min]="0.5"
-                [max]="3.0"
-                [step]="0.05"
-                [ngModel]="zoomLevel()"
-                (ngModelChange)="setZoomLevel($event)"
-              />
-            </div>
-
-            <!-- Tilt Angle Slider -->
-            <div class="c-form-group g--margin-bottom-3">
-              <div class="l-extremo">
-                <label class="c-form-label">Head Tilt Correction</label>
-                <span class="c-form-value">{{ tiltAngleDeg().toFixed(1) }}°</span>
-              </div>
-              <input
-                type="range"
-                class="c-range"
-                [min]="-15"
-                [max]="15"
-                [step]="0.5"
-                [ngModel]="tiltAngleDeg()"
-                (ngModelChange)="setTiltAngle($event)"
-              />
-            </div>
-
-            <!-- Brightness & Contrast -->
-            <div class="l-columns l-columns--2 g--margin-bottom-3">
-              <div class="c-form-group">
-                <div class="l-extremo">
-                  <label class="c-form-label">Brightness</label>
-                  <span class="c-form-value">{{ brightness() }}</span>
-                </div>
-                <input
-                  type="range"
-                  class="c-range"
-                  [min]="-50"
-                  [max]="50"
-                  [step]="2"
-                  [ngModel]="brightness()"
-                  (ngModelChange)="setBrightness($event)"
-                />
-              </div>
-
-              <div class="c-form-group">
-                <div class="l-extremo">
-                  <label class="c-form-label">Contrast</label>
-                  <span class="c-form-value">{{ contrast() }}</span>
-                </div>
-                <input
-                  type="range"
-                  class="c-range"
-                  [min]="-50"
-                  [max]="50"
-                  [step]="2"
-                  [ngModel]="contrast()"
-                  (ngModelChange)="setContrast($event)"
-                />
-              </div>
-            </div>
-
-            <!-- Background Color Tint -->
-            <div class="c-form-group g--margin-bottom-3">
-              <label class="c-form-label">Background Tint</label>
-              <div class="bg-options">
-                <button
-                  type="button"
-                  class="c-button c-button--small"
-                  [class.c-button--primary]="backgroundColor() === 'pure_white'"
-                  [class.c-button--outline]="backgroundColor() !== 'pure_white'"
-                  (click)="setBackgroundColor('pure_white')"
-                >
-                  Pure White
-                </button>
-                <button
-                  type="button"
-                  class="c-button c-button--small"
-                  [class.c-button--primary]="backgroundColor() === 'off_white'"
-                  [class.c-button--outline]="backgroundColor() !== 'off_white'"
-                  (click)="setBackgroundColor('off_white')"
-                >
-                  Off-White
-                </button>
-                <button
-                  type="button"
-                  class="c-button c-button--small"
-                  [class.c-button--primary]="backgroundColor() === 'light_grey'"
-                  [class.c-button--outline]="backgroundColor() !== 'light_grey'"
-                  (click)="setBackgroundColor('light_grey')"
-                >
-                  Light Grey
-                </button>
-                <button
-                  type="button"
-                  class="c-button c-button--small"
-                  [class.c-button--primary]="backgroundColor() === 'light_blue'"
-                  [class.c-button--outline]="backgroundColor() !== 'light_blue'"
-                  (click)="setBackgroundColor('light_blue')"
-                >
-                  Light Blue
-                </button>
-                <button
-                  type="button"
-                  class="c-button c-button--small"
-                  [class.c-button--primary]="backgroundColor() === 'original'"
-                  [class.c-button--outline]="backgroundColor() !== 'original'"
-                  (click)="setBackgroundColor('original')"
-                >
-                  Original
-                </button>
-              </div>
-            </div>
-
-            <!-- Cut Guidelines & Reset -->
-            <div class="l-extremo g--align-center">
-              <label class="c-checkbox-label">
-                <input
-                  type="checkbox"
-                  [checked]="cutGuideLines()"
-                  (change)="toggleCutGuideLines()"
-                />
-                Show Scissor Cut Guidelines
-              </label>
-
-              <button
-                type="button"
-                class="c-button c-button--small c-button--outline"
-                (click)="resetAdjustments()"
-              >
-                Reset All
-              </button>
-            </div>
-          </app-card>
-
-          <!-- Sheet & Print Layout Card -->
-          <app-card title="3. Sheet & Print Format" class="g--margin-bottom-4">
-            <div class="c-form-group g--margin-bottom-3">
-              <label class="c-form-label">Print Sheet Size</label>
-              <div class="sheet-buttons">
-                <button
-                  type="button"
-                  class="c-button c-button--small"
-                  [class.c-button--primary]="printSheetSize() === '4x6_inches'"
-                  [class.c-button--outline]="printSheetSize() !== '4x6_inches'"
-                  (click)="setPrintSheetSize('4x6_inches')"
-                >
-                  4×6″ Photo Paper (10×15 cm)
-                </button>
-                <button
-                  type="button"
-                  class="c-button c-button--small"
-                  [class.c-button--primary]="printSheetSize() === 'a4'"
-                  [class.c-button--outline]="printSheetSize() !== 'a4'"
-                  (click)="setPrintSheetSize('a4')"
-                >
-                  A4 Paper
-                </button>
-                <button
-                  type="button"
-                  class="c-button c-button--small"
-                  [class.c-button--primary]="printSheetSize() === 'a6'"
-                  [class.c-button--outline]="printSheetSize() !== 'a6'"
-                  (click)="setPrintSheetSize('a6')"
-                >
-                  A6 Paper
-                </button>
-                <button
-                  type="button"
-                  class="c-button c-button--small"
-                  [class.c-button--primary]="printSheetSize() === 'single_digital'"
-                  [class.c-button--outline]="printSheetSize() !== 'single_digital'"
-                  (click)="setPrintSheetSize('single_digital')"
-                >
-                  Single Digital Photo
-                </button>
-              </div>
-            </div>
-
-            <!-- Export DPI -->
-            <div class="c-form-group">
-              <label class="c-form-label">Export Resolution</label>
-              <div class="dpi-buttons">
-                <button
-                  type="button"
-                  class="c-button c-button--small"
-                  [class.c-button--primary]="exportDpi() === 300"
-                  [class.c-button--outline]="exportDpi() !== 300"
-                  (click)="setExportDpi(300)"
-                >
-                  300 DPI (Standard Print)
-                </button>
-                <button
-                  type="button"
-                  class="c-button c-button--small"
-                  [class.c-button--primary]="exportDpi() === 600"
-                  [class.c-button--outline]="exportDpi() !== 600"
-                  (click)="setExportDpi(600)"
-                >
-                  600 DPI (Ultra Fine)
-                </button>
-              </div>
-            </div>
-          </app-card>
-        </div>
-
-        <!-- Preview & Export Column -->
-        <div class="l-columns__column">
-          <!-- Live Canvas Biometric Preview Card -->
-          <app-card title="Live Biometric Guideline View" class="g--margin-bottom-4">
-            <div class="preview-container">
-              <div class="canvas-wrapper">
-                <canvas #previewCanvas class="c-preview-canvas"></canvas>
-
-                <!-- Biometric Guideline Overlay (ICAO Head Sizing) -->
-                <div class="biometric-overlay">
-                  <div class="biometric-line biometric-line--crown">
-                    <span class="biometric-tag">Crown of Head (Min / Max)</span>
-                  </div>
-                  <div class="biometric-line biometric-line--eye">
-                    <span class="biometric-tag">Eye Level Centerline</span>
-                  </div>
-                  <div class="biometric-line biometric-line--chin">
-                    <span class="biometric-tag">Chin Baseline</span>
-                  </div>
-                  <div class="biometric-axis"></div>
-                </div>
-              </div>
-            </div>
-
-            <p class="preview-hint g--text-center g--margin-top-2">
-              💡 <em>Align the head between Crown and Chin lines with eyes centered horizontally.</em>
-            </p>
-          </app-card>
-
-          <!-- Biometric Specification Summary -->
-          <app-card title="Official Biometric Specs & Yield" class="g--margin-bottom-4">
-            <div class="metrics-grid">
-              <div class="metric-item">
-                <span class="metric-label">Photo Size:</span>
-                <span class="metric-val">{{ currentMetrics().photoWidthMm }} × {{ currentMetrics().photoHeightMm }} mm</span>
-              </div>
-              <div class="metric-item">
-                <span class="metric-label">Pixel Dimension (300 DPI):</span>
-                <span class="metric-val">{{ currentMetrics().photoWidthPx }} × {{ currentMetrics().photoHeightPx }} px</span>
-              </div>
-              <div class="metric-item">
-                <span class="metric-label">Head Height Req:</span>
-                <span class="metric-val">{{ currentSpec().minHeadHeightMm }} – {{ currentSpec().maxHeadHeightMm }} mm</span>
-              </div>
-              <div class="metric-item">
-                <span class="metric-label">Sheet Yield:</span>
-                <span class="metric-val font-bold text-success">{{ currentMetrics().photosPerSheet }} photos per sheet</span>
-              </div>
-            </div>
-
-            <div class="compliance-notes g--margin-top-3">
-              <h4 class="notes-title">Compliance Rules ({{ currentSpec().name }}):</h4>
-              <ul class="notes-list">
-                @for (note of currentSpec().complianceNotes; track note) {
-                  <li>{{ note }}</li>
-                }
-              </ul>
-            </div>
-          </app-card>
-
-          <!-- Export & Download Deliverable -->
-          <app-card title="4. Export Deliverable">
-            <div class="c-form-group g--margin-bottom-3">
-              <label class="c-form-label">Export Deliverable Format</label>
-              <div class="format-buttons">
-                <button
-                  type="button"
-                  class="c-button c-button--small"
-                  [class.c-button--primary]="exportFormat() === 'jpg'"
-                  [class.c-button--outline]="exportFormat() !== 'jpg'"
-                  (click)="setExportFormat('jpg')"
-                >
-                  Print-Ready JPG
-                </button>
-                <button
-                  type="button"
-                  class="c-button c-button--small"
-                  [class.c-button--primary]="exportFormat() === 'pdf'"
-                  [class.c-button--outline]="exportFormat() !== 'pdf'"
-                  (click)="setExportFormat('pdf')"
-                >
-                  Print-Ready PDF
-                </button>
-                <button
-                  type="button"
-                  class="c-button c-button--small"
-                  [class.c-button--primary]="exportFormat() === 'png'"
-                  [class.c-button--outline]="exportFormat() !== 'png'"
-                  (click)="setExportFormat('png')"
-                >
-                  Lossless PNG
-                </button>
-              </div>
-            </div>
-
-            @if (generationError()) {
-              <div class="c-alert c-alert--danger g--margin-bottom-3">
-                {{ generationError() }}
-              </div>
-            }
-
-            <div class="action-bar">
-              <button
-                type="button"
-                class="c-button c-button--primary c-button--large g--width-full"
-                [disabled]="isGenerating()"
-                (click)="generateDeliverable()"
-              >
-                @if (isGenerating()) {
-                  <span>Rendering Print Sheet...</span>
-                } @else {
-                  <span>Download {{ exportFormat().toUpperCase() }} Sheet ({{ currentMetrics().photosPerSheet }} Photos)</span>
-                }
-              </button>
-            </div>
-          </app-card>
-        </div>
-      </div>
-    </div>
-  `,
-  styles: [
-    `
-      .preset-strip {
-        display: flex;
-        align-items: center;
-        gap: 0.75rem;
-        flex-wrap: wrap;
-        padding: 0.75rem 1rem;
-        background: #f8fafc;
-        border-radius: 8px;
-        border: 1px solid #e2e8f0;
-      }
-      .preset-label {
-        font-weight: 600;
-        font-size: 0.875rem;
-        color: #475569;
-      }
-      .preset-buttons,
-      .sample-pills,
-      .bg-options,
-      .sheet-buttons,
-      .dpi-buttons,
-      .format-buttons {
-        display: flex;
-        gap: 0.5rem;
-        flex-wrap: wrap;
-      }
-      .preview-container {
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        background: #1e293b;
-        border-radius: 8px;
-        padding: 1.5rem;
-        overflow: hidden;
-      }
-      .canvas-wrapper {
-        position: relative;
-        display: inline-block;
-        box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.4);
-      }
-      .c-preview-canvas {
-        display: block;
-        max-width: 100%;
-        max-height: 400px;
-        background: #ffffff;
-        border-radius: 4px;
-      }
-      .biometric-overlay {
-        position: absolute;
-        inset: 0;
-        pointer-events: none;
-      }
-      .biometric-line {
-        position: absolute;
-        left: 0;
-        right: 0;
-        border-top: 1px dashed rgba(239, 68, 68, 0.75);
-      }
-      .biometric-line--crown {
-        top: 20%;
-      }
-      .biometric-line--eye {
-        top: 45%;
-        border-top-color: rgba(59, 130, 246, 0.75);
-      }
-      .biometric-line--chin {
-        top: 75%;
-      }
-      .biometric-axis {
-        position: absolute;
-        top: 0;
-        bottom: 0;
-        left: 50%;
-        border-left: 1px dashed rgba(16, 185, 129, 0.6);
-      }
-      .biometric-tag {
-        position: absolute;
-        right: 6px;
-        top: -16px;
-        font-size: 0.65rem;
-        background: rgba(15, 23, 42, 0.8);
-        color: #f8fafc;
-        padding: 1px 4px;
-        border-radius: 3px;
-      }
-      .metrics-grid {
-        display: grid;
-        grid-template-columns: repeat(2, 1fr);
-        gap: 0.75rem;
-      }
-      .metric-item {
-        background: #f8fafc;
-        padding: 0.5rem 0.75rem;
-        border-radius: 6px;
-        border: 1px solid #e2e8f0;
-      }
-      .metric-label {
-        display: block;
-        font-size: 0.75rem;
-        color: #64748b;
-      }
-      .metric-val {
-        font-weight: 600;
-        font-size: 0.875rem;
-        color: #1e293b;
-      }
-      .font-bold {
-        font-weight: 700;
-      }
-      .text-success {
-        color: #16a34a;
-      }
-      .notes-title {
-        font-size: 0.85rem;
-        font-weight: 600;
-        margin-bottom: 0.5rem;
-        color: #334155;
-      }
-      .notes-list {
-        font-size: 0.8rem;
-        color: #475569;
-        padding-left: 1.25rem;
-        margin: 0;
-        line-height: 1.4;
-      }
-      .c-alert--danger {
-        padding: 0.75rem;
-        background: #fef2f2;
-        color: #b91c1c;
-        border: 1px solid #fecaca;
-        border-radius: 6px;
-        font-size: 0.875rem;
-      }
-    `,
-  ],
+  templateUrl: './passport-biometric-photo.component.html',
+  styleUrl: './passport-biometric-photo.component.scss',
 })
 export class PassportBiometricPhotoComponent implements OnInit, OnDestroy {
   @ViewChild('previewCanvas') previewCanvasRef?: ElementRef<HTMLCanvasElement>;
@@ -605,15 +72,23 @@ export class PassportBiometricPhotoComponent implements OnInit, OnDestroy {
   readonly cutGuideLines = signal<boolean>(true);
   readonly exportDpi = signal<number>(300);
   readonly exportFormat = signal<PassportExportFormat>('jpg');
+  readonly previewMode = signal<'crop_guide' | 'print_sheet'>('crop_guide');
 
   readonly imageSource = signal<string>(DUMMY_PORTRAIT_DATA_URL);
   readonly fileBlob = signal<File | Blob | null>(null);
-  readonly fileName = signal<string>('sample-portrait.jpg');
+  readonly fileName = signal<string>('Sample Portrait (Neutral)');
 
   readonly isGenerating = signal<boolean>(false);
   readonly generationError = signal<string | null>(null);
+  readonly isDragging = signal<boolean>(false);
+
+  private dragStartX = 0;
+  private dragStartY = 0;
+  private initialPanX = 0;
+  private initialPanY = 0;
 
   private createdObjectUrls: string[] = [];
+  private worker: Worker | null = null;
 
   readonly currentOptions = computed<PassportBiometricPhotoOptions>(() => ({
     countryPreset: this.countryPreset(),
@@ -637,14 +112,21 @@ export class PassportBiometricPhotoComponent implements OnInit, OnDestroy {
     () => this.PASSPORT_SPECS[this.countryPreset()]
   );
 
+  readonly guidePercentages = computed(() =>
+    computeBiometricGuidePercentages(this.currentSpec())
+  );
+
   ngOnInit(): void {
-    // Initial preview render
     setTimeout(() => {
       this.refreshPreviewCanvas();
     }, 50);
   }
 
   ngOnDestroy(): void {
+    if (this.worker) {
+      this.worker.terminate();
+      this.worker = null;
+    }
     for (const url of this.createdObjectUrls) {
       URL.revokeObjectURL(url);
     }
@@ -658,6 +140,11 @@ export class PassportBiometricPhotoComponent implements OnInit, OnDestroy {
 
   setPrintSheetSize(size: PrintSheetSize): void {
     this.printSheetSize.set(size);
+    this.refreshPreviewCanvas();
+  }
+
+  setPreviewMode(mode: 'crop_guide' | 'print_sheet'): void {
+    this.previewMode.set(mode);
     this.refreshPreviewCanvas();
   }
 
@@ -687,9 +174,17 @@ export class PassportBiometricPhotoComponent implements OnInit, OnDestroy {
   }
 
   setPan(x: number, y: number): void {
-    this.panX.set(x);
-    this.panY.set(y);
+    this.panX.set(Math.min(200, Math.max(-200, x)));
+    this.panY.set(Math.min(200, Math.max(-200, y)));
     this.refreshPreviewCanvas();
+  }
+
+  setPanX(x: number): void {
+    this.setPan(x, this.panY());
+  }
+
+  setPanY(y: number): void {
+    this.setPan(this.panX(), y);
   }
 
   setExportDpi(dpi: number): void {
@@ -739,13 +234,62 @@ export class PassportBiometricPhotoComponent implements OnInit, OnDestroy {
     this.refreshPreviewCanvas();
   }
 
+  onPointerDown(event: PointerEvent): void {
+    const canvas = this.previewCanvasRef?.nativeElement;
+    if (!canvas) return;
+
+    this.isDragging.set(true);
+    this.dragStartX = event.clientX;
+    this.dragStartY = event.clientY;
+    this.initialPanX = this.panX();
+    this.initialPanY = this.panY();
+
+    if (canvas.setPointerCapture) {
+      try {
+        canvas.setPointerCapture(event.pointerId);
+      } catch {
+        // Fallback for non-supported environments
+      }
+    }
+  }
+
+  onPointerMove(event: PointerEvent): void {
+    if (!this.isDragging()) return;
+
+    const dx = event.clientX - this.dragStartX;
+    const dy = event.clientY - this.dragStartY;
+
+    this.setPan(this.initialPanX + dx, this.initialPanY + dy);
+  }
+
+  onPointerUp(event: PointerEvent): void {
+    if (!this.isDragging()) return;
+    this.isDragging.set(false);
+
+    const canvas = this.previewCanvasRef?.nativeElement;
+    if (canvas && canvas.releasePointerCapture) {
+      try {
+        canvas.releasePointerCapture(event.pointerId);
+      } catch {
+        // Fallback
+      }
+    }
+  }
+
+  onPointerCancel(event: PointerEvent): void {
+    this.onPointerUp(event);
+  }
+
   private async refreshPreviewCanvas(): Promise<void> {
     if (!this.previewCanvasRef?.nativeElement) return;
     try {
-      const { canvas } = await renderPassportSheet(
-        this.fileBlob() || this.imageSource(),
-        this.currentOptions()
-      );
+      const source = this.fileBlob() || this.imageSource();
+      const options = this.currentOptions();
+
+      const { canvas } =
+        this.previewMode() === 'crop_guide'
+          ? await renderSinglePhotoPreview(source, options)
+          : await renderPassportSheet(source, options);
 
       const target = this.previewCanvasRef.nativeElement;
       target.width = canvas.width;
@@ -756,7 +300,7 @@ export class PassportBiometricPhotoComponent implements OnInit, OnDestroy {
         ctx.drawImage(canvas, 0, 0);
       }
     } catch {
-      // Ignored for headless or during rapid adjustment
+      // Ignored for headless or rapid adjustments
     }
   }
 
@@ -766,11 +310,29 @@ export class PassportBiometricPhotoComponent implements OnInit, OnDestroy {
 
     try {
       const source = this.fileBlob() || this.imageSource();
-      const result = await processPassportPhoto(
-        source,
-        this.currentOptions(),
-        this.exportFormat()
-      );
+      let result: PassportBiometricPhotoResult;
+
+      if (typeof Worker !== 'undefined') {
+        try {
+          result = await this.runWorkerProcess(
+            source,
+            this.currentOptions(),
+            this.exportFormat()
+          );
+        } catch {
+          result = await processPassportPhoto(
+            source,
+            this.currentOptions(),
+            this.exportFormat()
+          );
+        }
+      } else {
+        result = await processPassportPhoto(
+          source,
+          this.currentOptions(),
+          this.exportFormat()
+        );
+      }
 
       if (result.success && result.blob) {
         this.triggerDownload(result.blob, result.fileName);
@@ -780,6 +342,58 @@ export class PassportBiometricPhotoComponent implements OnInit, OnDestroy {
     } finally {
       this.isGenerating.set(false);
     }
+  }
+
+  private runWorkerProcess(
+    imageSource: string | Blob,
+    options: PassportBiometricPhotoOptions,
+    format: PassportExportFormat
+  ): Promise<PassportBiometricPhotoResult> {
+    return new Promise((resolve, reject) => {
+      try {
+        const worker = new Worker(new URL('./worker', import.meta.url), {
+          type: 'module',
+        });
+        this.worker = worker;
+
+        worker.onmessage = (event: MessageEvent<PassportWorkerResponse>) => {
+          worker.terminate();
+          if (this.worker === worker) {
+            this.worker = null;
+          }
+          if (event.data.success && event.data.blob) {
+            resolve({
+              success: true,
+              blob: event.data.blob,
+              fileName:
+                event.data.fileName ||
+                `passport-photo-${options.countryPreset}.${format}`,
+              fileSize: event.data.fileSize || event.data.blob.size,
+              mimeType: event.data.mimeType || 'application/octet-stream',
+              metrics: event.data.metrics!,
+            });
+          } else {
+            reject(new Error(event.data.error || 'Worker generation failed'));
+          }
+        };
+
+        worker.onerror = (err) => {
+          worker.terminate();
+          if (this.worker === worker) {
+            this.worker = null;
+          }
+          reject(err);
+        };
+
+        worker.postMessage({
+          imageSource,
+          options,
+          format,
+        } as PassportWorkerRequest);
+      } catch (err) {
+        reject(err);
+      }
+    });
   }
 
   private triggerDownload(blob: Blob, fileName: string): void {
@@ -793,5 +407,13 @@ export class PassportBiometricPhotoComponent implements OnInit, OnDestroy {
     document.body.appendChild(a);
     a.click();
     document.body.removeChild(a);
+
+    setTimeout(() => {
+      URL.revokeObjectURL(url);
+      const idx = this.createdObjectUrls.indexOf(url);
+      if (idx !== -1) {
+        this.createdObjectUrls.splice(idx, 1);
+      }
+    }, 100);
   }
 }

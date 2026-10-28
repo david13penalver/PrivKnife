@@ -202,9 +202,79 @@ export const PASSPORT_PRESETS: PassportPreset[] = [
   },
 ];
 
-// 1x1 transparent pixel base64 PNG data URL for test fixtures
-export const DUMMY_PORTRAIT_DATA_URL =
-  'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8z8BQDwAEhQGAhKmMIQAAAABJRU5ErkJggg==';
+const makeSvgDataUrl = (svgContent: string): string =>
+  `data:image/svg+xml;charset=utf-8,${encodeURIComponent(svgContent.trim())}`;
+
+const NEUTRAL_PORTRAIT_SVG = `
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 800" width="600" height="800">
+  <rect width="600" height="800" fill="#f8fafc"/>
+  <path d="M 110 800 C 110 650 180 580 300 580 C 420 580 490 650 490 800 Z" fill="#334155"/>
+  <path d="M 240 580 Q 300 630 360 580" fill="#475569"/>
+  <rect x="260" y="470" width="80" height="120" rx="10" fill="#fbd38d"/>
+  <ellipse cx="300" cy="505" rx="55" ry="15" fill="#f6ad55" opacity="0.6"/>
+  <ellipse cx="300" cy="370" rx="125" ry="155" fill="#fbd38d"/>
+  <path d="M 175 360 C 160 210 230 180 300 180 C 370 180 440 210 425 360 C 400 240 370 215 300 215 C 230 215 200 240 175 360 Z" fill="#1e293b"/>
+  <path d="M 215 320 Q 245 310 270 322" stroke="#1e293b" stroke-width="5" stroke-linecap="round" fill="none"/>
+  <path d="M 330 322 Q 355 310 385 320" stroke="#1e293b" stroke-width="5" stroke-linecap="round" fill="none"/>
+  <ellipse cx="245" cy="345" rx="18" ry="10" fill="#ffffff"/>
+  <circle cx="245" cy="345" r="7" fill="#1e293b"/>
+  <circle cx="247" cy="343" r="2" fill="#ffffff"/>
+  <ellipse cx="355" cy="345" rx="18" ry="10" fill="#ffffff"/>
+  <circle cx="355" cy="345" r="7" fill="#1e293b"/>
+  <circle cx="357" cy="343" r="2" fill="#ffffff"/>
+  <path d="M 296 345 L 292 405 Q 300 412 308 405 Z" fill="#ed8936"/>
+  <path d="M 265 445 Q 300 452 335 445" stroke="#dd6b20" stroke-width="4" stroke-linecap="round" fill="none"/>
+  <path d="M 275 445 Q 300 460 325 445" fill="#e53e3e" opacity="0.3"/>
+</svg>`;
+
+const FORMAL_PORTRAIT_SVG = `
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 800" width="600" height="800">
+  <rect width="600" height="800" fill="#f8fafc"/>
+  <path d="M 90 800 C 90 640 160 570 300 570 C 440 570 510 640 510 800 Z" fill="#0f172a"/>
+  <polygon points="250,570 350,570 300,670" fill="#ffffff"/>
+  <polygon points="290,590 310,590 318,740 300,780 282,740" fill="#991b1b"/>
+  <path d="M 230 570 L 270 690 L 210 740 Z" fill="#1e293b"/>
+  <path d="M 370 570 L 330 690 L 390 740 Z" fill="#1e293b"/>
+  <rect x="260" y="470" width="80" height="110" rx="10" fill="#fcd34d"/>
+  <ellipse cx="300" cy="505" rx="55" ry="15" fill="#f59e0b" opacity="0.6"/>
+  <ellipse cx="300" cy="370" rx="125" ry="155" fill="#fcd34d"/>
+  <path d="M 170 350 C 160 200 230 170 300 170 C 370 170 435 200 430 350 C 410 230 380 205 300 205 C 220 205 190 230 170 350 Z" fill="#0f172a"/>
+  <path d="M 215 320 Q 245 310 270 322" stroke="#0f172a" stroke-width="5" stroke-linecap="round" fill="none"/>
+  <path d="M 330 322 Q 355 310 385 320" stroke="#0f172a" stroke-width="5" stroke-linecap="round" fill="none"/>
+  <ellipse cx="245" cy="345" rx="18" ry="10" fill="#ffffff"/>
+  <circle cx="245" cy="345" r="7" fill="#0f172a"/>
+  <circle cx="247" cy="343" r="2" fill="#ffffff"/>
+  <ellipse cx="355" cy="345" rx="18" ry="10" fill="#ffffff"/>
+  <circle cx="355" cy="345" r="7" fill="#0f172a"/>
+  <circle cx="357" cy="343" r="2" fill="#ffffff"/>
+  <path d="M 296 345 L 292 405 Q 300 412 308 405 Z" fill="#d97706"/>
+  <path d="M 265 445 Q 300 452 335 445" stroke="#b45309" stroke-width="4" stroke-linecap="round" fill="none"/>
+</svg>`;
+
+const CHILD_PORTRAIT_SVG = `
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 800" width="600" height="800">
+  <rect width="600" height="800" fill="#f8fafc"/>
+  <path d="M 130 800 C 130 670 190 620 300 620 C 410 620 470 670 470 800 Z" fill="#0284c7"/>
+  <path d="M 250 620 Q 300 655 350 620" stroke="#0369a1" stroke-width="8" fill="none"/>
+  <rect x="265" y="500" width="70" height="130" rx="10" fill="#fed7aa"/>
+  <ellipse cx="300" cy="530" rx="50" ry="15" fill="#f97316" opacity="0.4"/>
+  <ellipse cx="300" cy="400" rx="135" ry="145" fill="#fed7aa"/>
+  <circle cx="220" cy="425" r="24" fill="#fb7185" opacity="0.35"/>
+  <circle cx="380" cy="425" r="24" fill="#fb7185" opacity="0.35"/>
+  <path d="M 160 380 C 150 230 210 195 300 195 C 390 195 450 230 440 380 C 420 270 390 260 300 260 C 210 260 180 270 160 380 Z" fill="#78350f"/>
+  <path d="M 215 355 Q 245 348 268 357" stroke="#78350f" stroke-width="4" stroke-linecap="round" fill="none"/>
+  <path d="M 332 357 Q 355 348 385 355" stroke="#78350f" stroke-width="4" stroke-linecap="round" fill="none"/>
+  <ellipse cx="245" cy="375" rx="19" ry="13" fill="#ffffff"/>
+  <circle cx="245" cy="375" r="8" fill="#451a03"/>
+  <circle cx="248" cy="372" r="3" fill="#ffffff"/>
+  <ellipse cx="355" cy="375" rx="19" ry="13" fill="#ffffff"/>
+  <circle cx="355" cy="375" r="8" fill="#451a03"/>
+  <circle cx="358" cy="372" r="3" fill="#ffffff"/>
+  <ellipse cx="300" cy="425" rx="7" ry="5" fill="#ea580c"/>
+  <path d="M 270 460 Q 300 480 330 460" stroke="#c2410c" stroke-width="4" stroke-linecap="round" fill="none"/>
+</svg>`;
+
+export const DUMMY_PORTRAIT_DATA_URL = makeSvgDataUrl(NEUTRAL_PORTRAIT_SVG);
 
 export interface SamplePortrait {
   id: string;
@@ -216,17 +286,17 @@ export const SAMPLE_PORTRAITS: SamplePortrait[] = [
   {
     id: 'neutral_portrait',
     name: 'Sample Portrait (Neutral)',
-    dataUrl: DUMMY_PORTRAIT_DATA_URL,
+    dataUrl: makeSvgDataUrl(NEUTRAL_PORTRAIT_SVG),
   },
   {
     id: 'formal_portrait',
     name: 'Formal Studio Portrait',
-    dataUrl: DUMMY_PORTRAIT_DATA_URL,
+    dataUrl: makeSvgDataUrl(FORMAL_PORTRAIT_SVG),
   },
   {
     id: 'child_portrait',
     name: 'Child / Infant Portrait',
-    dataUrl: DUMMY_PORTRAIT_DATA_URL,
+    dataUrl: makeSvgDataUrl(CHILD_PORTRAIT_SVG),
   },
 ];
 

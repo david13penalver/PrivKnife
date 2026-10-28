@@ -1,0 +1,522 @@
+<div class="l-page">
+  <!-- Header -->
+  <div class="l-page__header c-header">
+    <div class="c-header__title-group">
+      <h1 class="c-header__title">Passport, Visa & ID Biometric Photo Maker</h1>
+      <p class="c-header__subtitle">
+        Create compliant passport, visa, and ID photos with official ICAO / US / Schengen biometric head guides and multi-photo print sheets (4×6″, A4, single).
+      </p>
+    </div>
+    <div class="c-badge c-badge--privacy">
+      🛡️ 100% In-Browser • Never Leaves Your Device
+    </div>
+  </div>
+
+  <!-- Quick Country Presets Bar -->
+  <div class="c-passport__preset-strip g--margin-bottom-4">
+    <span class="c-passport__preset-label">Standard Presets:</span>
+    <div class="c-passport__button-group">
+      @for (presetKey of presetKeys; track presetKey) {
+        <button
+          type="button"
+          class="c-button c-button--small"
+          [class.c-button--primary]="countryPreset() === presetKey"
+          [class.c-button--outline]="countryPreset() !== presetKey"
+          (click)="setCountryPreset(presetKey)"
+        >
+          {{ PASSPORT_SPECS[presetKey].country }} ({{ PASSPORT_SPECS[presetKey].widthMm }}×{{ PASSPORT_SPECS[presetKey].heightMm }}mm)
+        </button>
+      }
+    </div>
+  </div>
+
+  <!-- Main Layout Columns -->
+  <div class="l-columns l-columns--2">
+    <!-- Controls Column -->
+    <div class="l-columns__area">
+      <!-- Portrait Input Card -->
+      <app-card title="1. Select or Upload Portrait" class="g--margin-bottom-4">
+        <!-- Sample Selector -->
+        <div class="c-passport__sample-selector g--margin-bottom-3">
+          <label class="c-input__label g--margin-bottom-1">Try Sample Portrait:</label>
+          <div class="c-passport__sample-pills">
+            @for (sample of samplePortraits; track sample.id) {
+              <button
+                type="button"
+                class="c-button c-button--small"
+                [class.c-button--primary]="fileName() === sample.name"
+                [class.c-button--outline]="fileName() !== sample.name"
+                (click)="selectSamplePortrait(sample)"
+              >
+                {{ sample.name }}
+              </button>
+            }
+          </div>
+        </div>
+
+        <!-- Dropzone -->
+        <app-dropzone
+          title="Drop your portrait here or click to browse"
+          subtitle="JPG, PNG, WebP supported (max 25MB)"
+          accept="image/*"
+          [maxSizeMb]="25"
+          (filesSelected)="onFilesDropped($event)"
+        />
+        <div class="file-name-meta g--margin-top-2">
+          <small class="g--text-muted">Active Image: <strong>{{ fileName() }}</strong></small>
+        </div>
+      </app-card>
+
+      <!-- Framing & Biometric Adjustments Card -->
+      <app-card title="2. Framing & Adjustments" class="g--margin-bottom-4">
+        <!-- Zoom Slider -->
+        <div class="c-input g--margin-bottom-3">
+          <div class="l-extremo">
+            <div class="l-extremo__area-izquierda">
+              <label class="c-input__label" for="zoomRange">Scale / Zoom Level</label>
+            </div>
+            <div class="l-extremo__area-derecha">
+              <span class="c-input__value">{{ zoomLevel().toFixed(2) }}x</span>
+            </div>
+          </div>
+          <input
+            id="zoomRange"
+            type="range"
+            class="c-input__slider"
+            [min]="0.5"
+            [max]="3.0"
+            [step]="0.05"
+            [ngModel]="zoomLevel()"
+            (ngModelChange)="setZoomLevel($event)"
+          />
+        </div>
+
+        <!-- Tilt Angle Slider -->
+        <div class="c-input g--margin-bottom-3">
+          <div class="l-extremo">
+            <div class="l-extremo__area-izquierda">
+              <label class="c-input__label" for="tiltRange">Head Tilt Correction</label>
+            </div>
+            <div class="l-extremo__area-derecha">
+              <span class="c-input__value">{{ tiltAngleDeg().toFixed(1) }}°</span>
+            </div>
+          </div>
+          <input
+            id="tiltRange"
+            type="range"
+            class="c-input__slider"
+            [min]="-15"
+            [max]="15"
+            [step]="0.5"
+            [ngModel]="tiltAngleDeg()"
+            (ngModelChange)="setTiltAngle($event)"
+          />
+        </div>
+
+        <!-- Horizontal Pan (panX) Slider -->
+        <div class="c-input g--margin-bottom-3">
+          <div class="l-extremo">
+            <div class="l-extremo__area-izquierda">
+              <label class="c-input__label" for="panXRange">Horizontal Pan (X)</label>
+            </div>
+            <div class="l-extremo__area-derecha">
+              <span class="c-input__value">{{ panX() }} px</span>
+            </div>
+          </div>
+          <input
+            id="panXRange"
+            type="range"
+            class="c-input__slider"
+            [min]="-200"
+            [max]="200"
+            [step]="2"
+            [ngModel]="panX()"
+            (ngModelChange)="setPanX($event)"
+          />
+        </div>
+
+        <!-- Vertical Pan (panY) Slider -->
+        <div class="c-input g--margin-bottom-3">
+          <div class="l-extremo">
+            <div class="l-extremo__area-izquierda">
+              <label class="c-input__label" for="panYRange">Vertical Pan (Y)</label>
+            </div>
+            <div class="l-extremo__area-derecha">
+              <span class="c-input__value">{{ panY() }} px</span>
+            </div>
+          </div>
+          <input
+            id="panYRange"
+            type="range"
+            class="c-input__slider"
+            [min]="-200"
+            [max]="200"
+            [step]="2"
+            [ngModel]="panY()"
+            (ngModelChange)="setPanY($event)"
+          />
+        </div>
+
+        <!-- Brightness & Contrast -->
+        <div class="l-columns l-columns--2 g--margin-bottom-3">
+          <div class="l-columns__area">
+            <div class="c-input">
+              <div class="l-extremo">
+                <div class="l-extremo__area-izquierda">
+                  <label class="c-input__label" for="brightRange">Brightness</label>
+                </div>
+                <div class="l-extremo__area-derecha">
+                  <span class="c-input__value">{{ brightness() }}</span>
+                </div>
+              </div>
+              <input
+                id="brightRange"
+                type="range"
+                class="c-input__slider"
+                [min]="-50"
+                [max]="50"
+                [step]="2"
+                [ngModel]="brightness()"
+                (ngModelChange)="setBrightness($event)"
+              />
+            </div>
+          </div>
+
+          <div class="l-columns__area">
+            <div class="c-input">
+              <div class="l-extremo">
+                <div class="l-extremo__area-izquierda">
+                  <label class="c-input__label" for="contrastRange">Contrast</label>
+                </div>
+                <div class="l-extremo__area-derecha">
+                  <span class="c-input__value">{{ contrast() }}</span>
+                </div>
+              </div>
+              <input
+                id="contrastRange"
+                type="range"
+                class="c-input__slider"
+                [min]="-50"
+                [max]="50"
+                [step]="2"
+                [ngModel]="contrast()"
+                (ngModelChange)="setContrast($event)"
+              />
+            </div>
+          </div>
+        </div>
+
+        <!-- Background Color Tint -->
+        <div class="c-input g--margin-bottom-3">
+          <label class="c-input__label g--margin-bottom-1">Background Tint</label>
+          <div class="c-passport__bg-options">
+            <button
+              type="button"
+              class="c-button c-button--small"
+              [class.c-button--primary]="backgroundColor() === 'pure_white'"
+              [class.c-button--outline]="backgroundColor() !== 'pure_white'"
+              (click)="setBackgroundColor('pure_white')"
+            >
+              Pure White
+            </button>
+            <button
+              type="button"
+              class="c-button c-button--small"
+              [class.c-button--primary]="backgroundColor() === 'off_white'"
+              [class.c-button--outline]="backgroundColor() !== 'off_white'"
+              (click)="setBackgroundColor('off_white')"
+            >
+              Off-White
+            </button>
+            <button
+              type="button"
+              class="c-button c-button--small"
+              [class.c-button--primary]="backgroundColor() === 'light_grey'"
+              [class.c-button--outline]="backgroundColor() !== 'light_grey'"
+              (click)="setBackgroundColor('light_grey')"
+            >
+              Light Grey
+            </button>
+            <button
+              type="button"
+              class="c-button c-button--small"
+              [class.c-button--primary]="backgroundColor() === 'light_blue'"
+              [class.c-button--outline]="backgroundColor() !== 'light_blue'"
+              (click)="setBackgroundColor('light_blue')"
+            >
+              Light Blue
+            </button>
+            <button
+              type="button"
+              class="c-button c-button--small"
+              [class.c-button--primary]="backgroundColor() === 'original'"
+              [class.c-button--outline]="backgroundColor() !== 'original'"
+              (click)="setBackgroundColor('original')"
+            >
+              Original
+            </button>
+          </div>
+        </div>
+
+        <!-- Cut Guidelines & Reset -->
+        <div class="l-extremo g--align-center">
+          <div class="l-extremo__area-izquierda">
+            <label class="c-input__switch">
+              <input
+                type="checkbox"
+                [checked]="cutGuideLines()"
+                (change)="toggleCutGuideLines()"
+              />
+              <span>Show Scissor Cut Guidelines</span>
+            </label>
+          </div>
+
+          <div class="l-extremo__area-derecha">
+            <button
+              type="button"
+              class="c-button c-button--small c-button--outline"
+              (click)="resetAdjustments()"
+            >
+              Reset All
+            </button>
+          </div>
+        </div>
+      </app-card>
+
+      <!-- Sheet & Print Layout Card -->
+      <app-card title="3. Sheet & Print Format" class="g--margin-bottom-4">
+        <div class="c-input g--margin-bottom-3">
+          <label class="c-input__label g--margin-bottom-1">Print Sheet Size</label>
+          <div class="c-passport__sheet-buttons">
+            <button
+              type="button"
+              class="c-button c-button--small"
+              [class.c-button--primary]="printSheetSize() === '4x6_inches'"
+              [class.c-button--outline]="printSheetSize() !== '4x6_inches'"
+              (click)="setPrintSheetSize('4x6_inches')"
+            >
+              4×6″ Photo Paper (10×15 cm)
+            </button>
+            <button
+              type="button"
+              class="c-button c-button--small"
+              [class.c-button--primary]="printSheetSize() === 'a4'"
+              [class.c-button--outline]="printSheetSize() !== 'a4'"
+              (click)="setPrintSheetSize('a4')"
+            >
+              A4 Paper
+            </button>
+            <button
+              type="button"
+              class="c-button c-button--small"
+              [class.c-button--primary]="printSheetSize() === 'a6'"
+              [class.c-button--outline]="printSheetSize() !== 'a6'"
+              (click)="setPrintSheetSize('a6')"
+            >
+              A6 Paper
+            </button>
+            <button
+              type="button"
+              class="c-button c-button--small"
+              [class.c-button--primary]="printSheetSize() === 'single_digital'"
+              [class.c-button--outline]="printSheetSize() !== 'single_digital'"
+              (click)="setPrintSheetSize('single_digital')"
+            >
+              Single Digital Photo
+            </button>
+          </div>
+        </div>
+
+        <!-- Export DPI -->
+        <div class="c-input">
+          <label class="c-input__label g--margin-bottom-1">Export Resolution</label>
+          <div class="c-passport__dpi-buttons">
+            <button
+              type="button"
+              class="c-button c-button--small"
+              [class.c-button--primary]="exportDpi() === 300"
+              [class.c-button--outline]="exportDpi() !== 300"
+              (click)="setExportDpi(300)"
+            >
+              300 DPI (Standard Print)
+            </button>
+            <button
+              type="button"
+              class="c-button c-button--small"
+              [class.c-button--primary]="exportDpi() === 600"
+              [class.c-button--outline]="exportDpi() !== 600"
+              (click)="setExportDpi(600)"
+            >
+              600 DPI (Ultra Fine)
+            </button>
+          </div>
+        </div>
+      </app-card>
+    </div>
+
+    <!-- Preview & Export Column -->
+    <div class="l-columns__area">
+      <!-- Live Canvas Biometric Preview Card -->
+      <app-card title="Live Biometric Guideline View" class="g--margin-bottom-4">
+        <!-- View Mode Switcher -->
+        <div class="c-passport__preview-mode-bar">
+          <button
+            type="button"
+            class="c-button c-button--small"
+            [class.c-button--primary]="previewMode() === 'crop_guide'"
+            [class.c-button--outline]="previewMode() !== 'crop_guide'"
+            (click)="setPreviewMode('crop_guide')"
+          >
+            Biometric Crop Guide
+          </button>
+          <button
+            type="button"
+            class="c-button c-button--small"
+            [class.c-button--primary]="previewMode() === 'print_sheet'"
+            [class.c-button--outline]="previewMode() !== 'print_sheet'"
+            (click)="setPreviewMode('print_sheet')"
+          >
+            Print Sheet Grid ({{ currentMetrics().photosPerSheet }} Photos)
+          </button>
+        </div>
+
+        <div class="c-passport__preview-container">
+          <div class="c-passport__canvas-wrapper">
+            <canvas
+              #previewCanvas
+              class="c-passport__canvas"
+              [class.c-passport__canvas--dragging]="isDragging()"
+              (pointerdown)="onPointerDown($event)"
+              (pointermove)="onPointerMove($event)"
+              (pointerup)="onPointerUp($event)"
+              (pointercancel)="onPointerCancel($event)"
+            ></canvas>
+
+            <!-- Biometric Guideline Overlay (Accurate Head Sizing) -->
+            @if (previewMode() === 'crop_guide') {
+              <div class="c-passport__biometric-overlay">
+                <div
+                  class="c-passport__biometric-line c-passport__biometric-line--crown-max"
+                  [style.top.%]="guidePercentages().crownMaxTopPct"
+                >
+                  <span class="c-passport__biometric-tag">Crown Max ({{ currentSpec().maxHeadHeightMm }}mm)</span>
+                </div>
+                <div
+                  class="c-passport__biometric-line c-passport__biometric-line--crown-min"
+                  [style.top.%]="guidePercentages().crownMinTopPct"
+                >
+                  <span class="c-passport__biometric-tag">Crown Min ({{ currentSpec().minHeadHeightMm }}mm)</span>
+                </div>
+                <div
+                  class="c-passport__biometric-line c-passport__biometric-line--eye"
+                  [style.top.%]="guidePercentages().eyeLevelPct"
+                >
+                  <span class="c-passport__biometric-tag">Eye Centerline</span>
+                </div>
+                <div
+                  class="c-passport__biometric-line c-passport__biometric-line--chin"
+                  [style.top.%]="guidePercentages().chinTopPct"
+                >
+                  <span class="c-passport__biometric-tag">Chin Baseline</span>
+                </div>
+                <div class="c-passport__biometric-axis"></div>
+              </div>
+            }
+          </div>
+        </div>
+
+        <p class="preview-hint g--text-center g--margin-top-2">
+          💡 <em>Drag on the photo or use Pan sliders to align the head within Crown and Chin lines.</em>
+        </p>
+      </app-card>
+
+      <!-- Biometric Specification Summary -->
+      <app-card title="Official Biometric Specs & Yield" class="g--margin-bottom-4">
+        <div class="c-passport__metrics-grid">
+          <div class="c-passport__metric-item">
+            <span class="c-passport__metric-label">Photo Size:</span>
+            <span class="c-passport__metric-val">{{ currentMetrics().photoWidthMm }} × {{ currentMetrics().photoHeightMm }} mm</span>
+          </div>
+          <div class="c-passport__metric-item">
+            <span class="c-passport__metric-label">Pixel Dimension (300 DPI):</span>
+            <span class="c-passport__metric-val">{{ currentMetrics().photoWidthPx }} × {{ currentMetrics().photoHeightPx }} px</span>
+          </div>
+          <div class="c-passport__metric-item">
+            <span class="c-passport__metric-label">Head Height Req:</span>
+            <span class="c-passport__metric-val">{{ currentSpec().minHeadHeightMm }} – {{ currentSpec().maxHeadHeightMm }} mm</span>
+          </div>
+          <div class="c-passport__metric-item">
+            <span class="c-passport__metric-label">Sheet Yield:</span>
+            <span class="c-passport__metric-val">{{ currentMetrics().photosPerSheet }} photos per sheet</span>
+          </div>
+        </div>
+
+        <div class="compliance-notes g--margin-top-3">
+          <h4 class="c-passport__notes-title">Compliance Rules ({{ currentSpec().name }}):</h4>
+          <ul class="c-passport__notes-list">
+            @for (note of currentSpec().complianceNotes; track note) {
+              <li>{{ note }}</li>
+            }
+          </ul>
+        </div>
+      </app-card>
+
+      <!-- Export & Download Deliverable -->
+      <app-card title="4. Export Deliverable">
+        <div class="c-input g--margin-bottom-3">
+          <label class="c-input__label g--margin-bottom-1">Export Deliverable Format</label>
+          <div class="c-passport__format-buttons">
+            <button
+              type="button"
+              class="c-button c-button--small"
+              [class.c-button--primary]="exportFormat() === 'jpg'"
+              [class.c-button--outline]="exportFormat() !== 'jpg'"
+              (click)="setExportFormat('jpg')"
+            >
+              Print-Ready JPG
+            </button>
+            <button
+              type="button"
+              class="c-button c-button--small"
+              [class.c-button--primary]="exportFormat() === 'pdf'"
+              [class.c-button--outline]="exportFormat() !== 'pdf'"
+              (click)="setExportFormat('pdf')"
+            >
+              Print-Ready PDF
+            </button>
+            <button
+              type="button"
+              class="c-button c-button--small"
+              [class.c-button--primary]="exportFormat() === 'png'"
+              [class.c-button--outline]="exportFormat() !== 'png'"
+              (click)="setExportFormat('png')"
+            >
+              Lossless PNG
+            </button>
+          </div>
+        </div>
+
+        @if (generationError()) {
+          <div class="c-passport__alert c-passport__alert--danger g--margin-bottom-3">
+            {{ generationError() }}
+          </div>
+        }
+
+        <div class="action-bar">
+          <button
+            type="button"
+            class="c-button c-button--primary c-button--large g--width-full"
+            [disabled]="isGenerating()"
+            (click)="generateDeliverable()"
+          >
+            @if (isGenerating()) {
+              <span>Rendering Print Sheet...</span>
+            } @else {
+              <span>Download {{ exportFormat().toUpperCase() }} Sheet ({{ currentMetrics().photosPerSheet }} Photos)</span>
+            }
+          </button>
+        </div>
+      </app-card>
+    </div>
+  </div>
+</div>

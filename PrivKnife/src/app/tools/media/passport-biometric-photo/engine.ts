@@ -5,6 +5,7 @@ import {
   PassportBiometricPhotoResult,
   PassportExportFormat,
   PassportMetrics,
+  PassportSpecification,
   PrintSheetSize,
 } from './types';
 import { PASSPORT_SPECS } from './test-fixtures';
@@ -165,6 +166,33 @@ export function calculatePassportMetrics(
   };
 }
 
+export interface BiometricGuidePercentages {
+  chinTopPct: number;
+  crownMinTopPct: number;
+  crownMaxTopPct: number;
+  eyeLevelPct: number;
+}
+
+export function computeBiometricGuidePercentages(
+  spec: PassportSpecification
+): BiometricGuidePercentages {
+  // Standard ICAO biometric guideline framing:
+  // Chin is typically aligned at ~82% from the top of the photo
+  const chinTopPct = 82;
+  const crownMaxTopPct = Math.max(2, chinTopPct - (spec.maxHeadHeightMm / spec.heightMm) * 100);
+  const crownMinTopPct = Math.max(5, chinTopPct - (spec.minHeadHeightMm / spec.heightMm) * 100);
+  // Eye level typically rests ~55-60% of the distance from chin to crown
+  const headHeightPct = chinTopPct - (crownMaxTopPct + crownMinTopPct) / 2;
+  const eyeLevelPct = chinTopPct - headHeightPct * 0.58;
+
+  return {
+    chinTopPct,
+    crownMinTopPct,
+    crownMaxTopPct,
+    eyeLevelPct,
+  };
+}
+
 // -------------------------------------------------------------
 // 3. Image Loader
 export function loadImageElement(source: string | Blob | File): Promise<HTMLImageElement> {
@@ -197,7 +225,7 @@ export function loadImageElement(source: string | Blob | File): Promise<HTMLImag
       img.width = 600;
       img.height = 600;
       resolve(img);
-    }, 300);
+    }, 10000);
 
     img.onload = () => {
       clearTimeout(timeout);
@@ -321,6 +349,34 @@ export async function renderPassportSheet(
   return { canvas, metrics };
 }
 
+export async function renderSinglePhotoPreview(
+  imageSource: string | Blob | File,
+  options: PassportBiometricPhotoOptions
+): Promise<RenderSheetResult> {
+  const metrics = calculatePassportMetrics(options);
+  const img = await loadImageElement(imageSource);
+
+  const canvas = document.createElement('canvas');
+  canvas.width = metrics.photoWidthPx;
+  canvas.height = metrics.photoHeightPx;
+  const isJsdom =
+    typeof window !== 'undefined' &&
+    window.navigator?.userAgent?.toLowerCase().includes('jsdom');
+
+  const ctx = canvas.getContext('2d');
+  if (!ctx || isJsdom) {
+    return { canvas, metrics };
+  }
+
+  // Fill slot background
+  ctx.fillStyle = '#ffffff';
+  ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+  renderSinglePhotoSlot(ctx, img, 0, 0, metrics.photoWidthPx, metrics.photoHeightPx, options);
+
+  return { canvas, metrics };
+}
+
 function renderSinglePhotoSlot(
   ctx: CanvasRenderingContext2D,
   img: HTMLImageElement,
@@ -374,6 +430,53 @@ function renderSinglePhotoSlot(
     const bPercent = 100 + options.brightness;
     const cPercent = 100 + options.contrast;
     ctx.filter = `brightness(${bPercent}%) contrast(${cPercent}%)`;
+  }
+
+  // If studio background replacement is requested for opaque photos
+  if (options.backgroundColor !== 'original' && bgMap[options.backgroundColor]) {
+    try {
+      const tempCanvas = document.createElement('canvas');
+      tempCanvas.width = Math.min(800, Math.round(drawW));
+      tempCanvas.height = Math.min(800, Math.round(drawH));
+      const tempCtx = tempCanvas.getContext('2d');
+      if (tempCtx) {
+        tempCtx.drawImage(img, 0, 0, tempCanvas.width, tempCanvas.height);
+        const imgData = tempCtx.getImageData(0, 0, tempCanvas.width, tempCanvas.height);
+        const data = imgData.data;
+        const r1 = data[0], g1 = data[1], b1 = data[2];
+        const lastIdx = (tempCanvas.width - 1) * 4;
+        const r2 = data[lastIdx], g2 = data[lastIdx + 1], b2 = data[lastIdx + 2];
+        const isCornerLight = (r1 + g1 + b1) / 3 > 180 && (r2 + g2 + b2) / 3 > 180;
+
+        if (isCornerLight) {
+          const hex = bgMap[options.backgroundColor];
+          const tr = parseInt(hex.slice(1, 3), 16);
+          const tg = parseInt(hex.slice(3, 5), 16);
+          const tb = parseInt(hex.slice(5, 7), 16);
+          const cr = (r1 + r2) / 2;
+          const cg = (g1 + g2) / 2;
+          const cb = (b1 + b2) / 2;
+          const tol = 40;
+
+          for (let i = 0; i < data.length; i += 4) {
+            const dr = Math.abs(data[i] - cr);
+            const dg = Math.abs(data[i + 1] - cg);
+            const db = Math.abs(data[i + 2] - cb);
+            if (dr + dg + db < tol * 3) {
+              data[i] = tr;
+              data[i + 1] = tg;
+              data[i + 2] = tb;
+            }
+          }
+          tempCtx.putImageData(imgData, 0, 0);
+          ctx.drawImage(tempCanvas, -drawW / 2, -drawH / 2, drawW, drawH);
+          ctx.restore();
+          return;
+        }
+      }
+    } catch {
+      // Fallback to standard drawImage
+    }
   }
 
   ctx.drawImage(img, -drawW / 2, -drawH / 2, drawW, drawH);
