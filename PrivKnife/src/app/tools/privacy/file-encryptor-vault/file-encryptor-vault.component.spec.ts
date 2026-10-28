@@ -45,6 +45,7 @@ describe('FileEncryptorVaultComponent (Seam 2 & 4)', () => {
       expect(component.embedOriginalFilename()).toBe(true);
       expect(component.containerFormat()).toBe('priv');
       expect(component.password()).toBe('');
+      expect(component.confirmPassword()).toBe('');
       expect(component.selectedFile()).toBeNull();
       expect(component.lastResult()).toBeNull();
     });
@@ -67,6 +68,23 @@ describe('FileEncryptorVaultComponent (Seam 2 & 4)', () => {
       expect(component.pbkdf2Iterations()).toBe(300000);
     });
 
+    it('should update confirm password and detect mismatch', () => {
+      component.setPassword('SecretPassword123');
+      component.setConfirmPassword('DifferentPassword456');
+      expect(component.isPasswordMismatch()).toBe(true);
+
+      component.setConfirmPassword('SecretPassword123');
+      expect(component.isPasswordMismatch()).toBe(false);
+    });
+
+    it('should toggle embed original filename option', () => {
+      component.setEmbedOriginalFilename(false);
+      expect(component.embedOriginalFilename()).toBe(false);
+
+      component.setEmbedOriginalFilename(true);
+      expect(component.embedOriginalFilename()).toBe(true);
+    });
+
     it('should update container format', () => {
       component.setContainerFormat('enc');
       expect(component.containerFormat()).toBe('enc');
@@ -74,13 +92,40 @@ describe('FileEncryptorVaultComponent (Seam 2 & 4)', () => {
   });
 
   describe('File Handling & Auto-Detection', () => {
-    it('should accept plaintext file and retain encrypt mode', async () => {
+    it('should accept plaintext file without leaking unused blob URLs', async () => {
+      const createObjectURLSpy = vi.spyOn(URL, 'createObjectURL');
       const file = createSyntheticPlaintextFile('tax-return.pdf', 2048);
       await component.handleFileSelected(file);
 
       expect(component.selectedFile()).toBeTruthy();
       expect(component.selectedFile()?.name).toBe('tax-return.pdf');
       expect(component.operationMode()).toBe('encrypt');
+      // DEFECT-48-03: Must NOT call createObjectURL on file upload
+      expect(createObjectURLSpy).not.toHaveBeenCalled();
+      createObjectURLSpy.mockRestore();
+    });
+
+    it('should reset stale lastResult when selecting a new file', async () => {
+      const file1 = createSyntheticPlaintextFile('first.pdf', 1024);
+      await component.handleFileSelected(file1);
+      component.setPassword(TEST_VAULT_PASSWORD);
+      component.setIterations(1000);
+      await component.executeVaultAction();
+
+      expect(component.lastResult()).toBeTruthy();
+
+      const file2 = createSyntheticPlaintextFile('second.pdf', 1024);
+      await component.handleFileSelected(file2);
+
+      expect(component.selectedFile()?.name).toBe('second.pdf');
+      expect(component.lastResult()).toBeNull();
+    });
+
+    it('should load sample confidential file when loadSampleConfidentialFile is called', async () => {
+      await component.loadSampleConfidentialFile();
+
+      expect(component.selectedFile()).toBeTruthy();
+      expect(component.selectedFile()?.name).toBe('secret-financials.json');
     });
 
     it('should auto-switch to decrypt mode when a .priv file is dropped', async () => {
@@ -138,6 +183,7 @@ describe('FileEncryptorVaultComponent (Seam 2 & 4)', () => {
       component.setPassword(TEST_VAULT_PASSWORD);
       component.setIterations(1000);
       await component.executeVaultAction();
+      component.downloadDeliverable();
 
       component.resetToDefaults();
       expect(revokeSpy).toHaveBeenCalled();

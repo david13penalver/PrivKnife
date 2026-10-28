@@ -35,3 +35,21 @@ export interface FileEncryptorVaultResult {
     authTagVerified?: boolean;
   };
 }
+
+export interface FileEncryptorVaultWorkerRequest {
+  type: 'encrypt' | 'decrypt';
+  id?: string;
+  sourceBuffer: ArrayBuffer;
+  password: string;
+  options: FileEncryptorVaultOptions;
+  originalFileName: string;
+}
+
+export interface FileEncryptorVaultWorkerResponse {
+  type: 'encrypt' | 'decrypt' | 'progress';
+  id?: string;
+  progress?: number;
+  result?: FileEncryptorVaultResult;
+  success?: boolean;
+  error?: string;
+}

@@ -130,5 +130,44 @@ describe('Zero-Knowledge File Encryptor & Vault Engine (Seam 1)', () => {
         decryptVaultToFile(corrupted, TEST_VAULT_PASSWORD)
       ).rejects.toThrow(/corrupt|invalid|header/i);
     });
+
+    it('should reject decryption if container metadata header is tampered with (AAD binding)', async () => {
+      const original = createSyntheticPlaintextFile('tamper-test.pdf', 1024);
+      const encrypted = await encryptFileToVault(
+        original,
+        TEST_VAULT_PASSWORD,
+        FAST_TEST_ENCRYPT_OPTIONS,
+        'tamper-test.pdf'
+      );
+
+      const containerBytes = new Uint8Array(await encrypted.blob.arrayBuffer());
+      // Find the metadata offset (magic 4 + ver 1 + iter 4 + salt 1+16 + iv 1+12 + metaLen 2 = 39)
+      const metaOffset = 4 + 1 + 4 + 1 + 16 + 1 + 12 + 2;
+      // Mutate one byte in metadata JSON
+      containerBytes[metaOffset + 5] ^= 0xff;
+
+      const tamperedBlob = new Blob([containerBytes], { type: 'application/octet-stream' });
+      await expect(
+        decryptVaultToFile(tamperedBlob, TEST_VAULT_PASSWORD)
+      ).rejects.toThrow(/decryption failed|authentication/i);
+    });
+
+    it('should redact original filename to redacted.bin when embedOriginalFilename is false', async () => {
+      const original = createSyntheticPlaintextFile('top-secret-tax-file.pdf', 512);
+      const encrypted = await encryptFileToVault(
+        original,
+        TEST_VAULT_PASSWORD,
+        { ...FAST_TEST_ENCRYPT_OPTIONS, embedOriginalFilename: false },
+        'top-secret-tax-file.pdf'
+      );
+
+      const containerBytes = new Uint8Array(await encrypted.blob.arrayBuffer());
+      const containerText = new TextDecoder('utf-8', { fatal: false }).decode(containerBytes);
+      expect(containerText).not.toContain('top-secret-tax-file.pdf');
+      expect(containerText).toContain('redacted.bin');
+
+      const decrypted = await decryptVaultToFile(encrypted.blob, TEST_VAULT_PASSWORD);
+      expect(decrypted.fileName).toBe('redacted.bin');
+    });
   });
 });

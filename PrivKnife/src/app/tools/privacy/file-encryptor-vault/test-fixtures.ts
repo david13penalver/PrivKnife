@@ -33,6 +33,23 @@ export const DEFAULT_DECRYPT_OPTIONS: FileEncryptorVaultOptions = {
 export const TEST_VAULT_PASSWORD = 'CorrectHorseBatteryStaple#2026!';
 export const WRONG_VAULT_PASSWORD = 'InvalidIncorrectPassword999';
 
+export const SAMPLE_CONFIDENTIAL_PAYLOAD = `CONFIDENTIAL CLIENT FINANCIAL DISCLOSURE #2026-048
+Prepared for: ACME Privacy & Wealth Advisory
+Date: 2026-10-28
+
+PORTFOLIO SUMMARY:
+1. Swiss Franc Liquid Reserve:       CHF 2,450,000.00
+2. Sovereign Bond Holdings (AAA):    EUR 5,800,000.00
+3. Cold-Storage Cryptographic Keys:  BTC 124.50000000
+
+SECURITY CLASSIFICATION: TOP SECRET // ZERO KNOWLEDGE`;
+
+export function createSampleConfidentialFile(): File {
+  return new File([SAMPLE_CONFIDENTIAL_PAYLOAD], 'secret-financials.json', {
+    type: 'application/json',
+  });
+}
+
 export function createSyntheticPlaintextFile(
   name: string = 'confidential-records.pdf',
   byteSize: number = 2048

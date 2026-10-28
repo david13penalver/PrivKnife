@@ -120,10 +120,27 @@ async function deriveAesGcmKey(
   );
 }
 
-function bufferToHex(buffer: Uint8Array): string {
+export function bufferToHex(buffer: Uint8Array): string {
   return Array.from(buffer)
     .map((b) => b.toString(16).padStart(2, '0'))
     .join('');
+}
+
+export function createSampleConfidentialFile(): File {
+  const content = `CONFIDENTIAL CLIENT FINANCIAL DISCLOSURE #2026-048
+Prepared for: ACME Privacy & Wealth Advisory
+Date: 2026-10-28
+
+PORTFOLIO SUMMARY:
+1. Swiss Franc Liquid Reserve:       CHF 2,450,000.00
+2. Sovereign Bond Holdings (AAA):    EUR 5,800,000.00
+3. Cold-Storage Cryptographic Keys:  BTC 124.50000000
+
+SECURITY CLASSIFICATION: TOP SECRET // ZERO KNOWLEDGE`;
+
+  return new File([content], 'secret-financials.json', {
+    type: 'application/json',
+  });
 }
 
 // -------------------------------------------------------------
@@ -166,20 +183,9 @@ export async function encryptFileToVault(
   // Derive AES-256-GCM key via PBKDF2
   const key = await deriveAesGcmKey(password, salt, options.pbkdf2Iterations);
 
-  // Encrypt payload
-  const ciphertextBuffer = await crypto.subtle.encrypt(
-    {
-      name: 'AES-GCM',
-      iv: iv as unknown as BufferSource,
-      tagLength: 128,
-    },
-    key,
-    plaintextBuffer as unknown as BufferSource
-  );
-
   // Prepare metadata payload
   const metadata: ContainerMetadata = {
-    originalName: options.embedOriginalFilename ? originalFileName : 'file.bin',
+    originalName: options.embedOriginalFilename ? originalFileName : 'redacted.bin',
     originalSize,
     mimeType: originalMime,
     encryptedAt: Date.now(),
@@ -187,6 +193,18 @@ export async function encryptFileToVault(
 
   const metaJson = JSON.stringify(metadata);
   const metaBytes = new TextEncoder().encode(metaJson);
+
+  // Encrypt payload with Additional Authenticated Data (AAD)
+  const ciphertextBuffer = await crypto.subtle.encrypt(
+    {
+      name: 'AES-GCM',
+      iv: iv as unknown as BufferSource,
+      additionalData: metaBytes as unknown as BufferSource,
+      tagLength: 128,
+    },
+    key,
+    plaintextBuffer as unknown as BufferSource
+  );
 
   // Construct binary container:
   // [4 bytes Magic "PRIV"]
@@ -361,6 +379,7 @@ export async function decryptVaultToFile(
       {
         name: 'AES-GCM',
         iv: iv as unknown as BufferSource,
+        additionalData: metaBytes as unknown as BufferSource,
         tagLength: 128,
       },
       key,
