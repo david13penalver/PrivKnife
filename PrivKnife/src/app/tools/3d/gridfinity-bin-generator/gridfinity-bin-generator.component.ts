@@ -18,6 +18,8 @@ import {
   GridfinityBinGeneratorOptions,
   GridfinityBinMetrics,
   PresetGridfinityBin,
+  GridfinityWorkerRequest,
+  GridfinityWorkerResponse,
 } from './types';
 import {
   calculateGridfinityMetrics,
@@ -64,7 +66,7 @@ import {
               <h2 class="c-card__title">1. Curated Presets</h2>
             </div>
             <div class="c-card__body">
-              <div class="gridfinity-presets">
+              <div class="presets-grid">
                 @for (preset of presets; track preset.id) {
                   <button
                     type="button"
@@ -96,7 +98,7 @@ import {
                     @for (val of [1, 2, 3, 4, 5, 6]; track val) {
                       <button
                         type="button"
-                        class="c-button c-button--small"
+                        class="c-button c-button--small unit-btn"
                         [class.c-button--primary]="gridX() === val"
                         [class.c-button--outline]="gridX() !== val"
                         (click)="setGridX(val)"
@@ -115,7 +117,7 @@ import {
                     @for (val of [1, 2, 3, 4, 5, 6]; track val) {
                       <button
                         type="button"
-                        class="c-button c-button--small"
+                        class="c-button c-button--small unit-btn"
                         [class.c-button--primary]="gridY() === val"
                         [class.c-button--outline]="gridY() !== val"
                         (click)="setGridY(val)"
@@ -134,7 +136,7 @@ import {
                 </label>
                 <input
                   type="range"
-                  class="c-input c-input--slider"
+                  class="c-input c-input__slider"
                   min="2"
                   max="14"
                   step="1"
@@ -191,7 +193,7 @@ import {
                   <label class="c-input__label">X Compartments: <strong>{{ subdivisionsX() }}</strong></label>
                   <input
                     type="range"
-                    class="c-input c-input--slider"
+                    class="c-input c-input__slider"
                     min="1"
                     max="6"
                     step="1"
@@ -204,7 +206,7 @@ import {
                   <label class="c-input__label">Y Compartments: <strong>{{ subdivisionsY() }}</strong></label>
                   <input
                     type="range"
-                    class="c-input c-input--slider"
+                    class="c-input c-input__slider"
                     min="1"
                     max="6"
                     step="1"
@@ -219,6 +221,7 @@ import {
                 <label class="c-input__checkbox-label">
                   <input
                     type="checkbox"
+                    data-testid="finger-scoop-toggle"
                     [checked]="fingerScoop()"
                     (change)="toggleFingerScoop()"
                   />
@@ -226,11 +229,28 @@ import {
                 </label>
               </div>
 
+              @if (fingerScoop()) {
+                <div class="control-group g--margin-top-2 g--margin-left-4">
+                  <label class="c-input__label">Scoop Radius: <strong>{{ fingerScoopRadiusMm() }} mm</strong></label>
+                  <input
+                    type="range"
+                    class="c-input c-input__slider"
+                    data-testid="scoop-radius-slider"
+                    min="6"
+                    max="20"
+                    step="1"
+                    [value]="fingerScoopRadiusMm()"
+                    (input)="onFingerScoopRadiusChange($event)"
+                  />
+                </div>
+              }
+
               <!-- Label Tab Toggle -->
               <div class="control-row g--margin-top-3">
                 <label class="c-input__checkbox-label">
                   <input
                     type="checkbox"
+                    data-testid="label-tab-toggle"
                     [checked]="labelTab()"
                     (change)="toggleLabelTab()"
                   />
@@ -238,15 +258,59 @@ import {
                 </label>
               </div>
 
+              @if (labelTab()) {
+                <div class="param-grid g--margin-top-2 g--margin-left-4">
+                  <div class="control-group">
+                    <label class="c-input__label">Tab Width: <strong>{{ labelTabWidthMm() }} mm</strong></label>
+                    <input
+                      type="range"
+                      class="c-input c-input__slider"
+                      data-testid="label-width-slider"
+                      min="12"
+                      max="42"
+                      step="1"
+                      [value]="labelTabWidthMm()"
+                      (input)="onLabelTabWidthChange($event)"
+                    />
+                  </div>
+                  <div class="control-group">
+                    <label class="c-input__label">Tab Angle: <strong>{{ labelAngleDeg() }}°</strong></label>
+                    <input
+                      type="range"
+                      class="c-input c-input__slider"
+                      data-testid="label-angle-slider"
+                      min="30"
+                      max="60"
+                      step="5"
+                      [value]="labelAngleDeg()"
+                      (input)="onLabelAngleChange($event)"
+                    />
+                  </div>
+                </div>
+              }
+
               <!-- Magnet / Screw Base Features -->
               <div class="control-row g--margin-top-3">
                 <label class="c-input__checkbox-label">
                   <input
                     type="checkbox"
+                    data-testid="base-magnet-holes"
                     [checked]="baseMagnetHoles()"
                     (change)="toggleMagnetHoles()"
                   />
                   <span>Base Magnet Pockets (6×2mm neodymium press-fit pockets)</span>
+                </label>
+              </div>
+
+              <div class="control-row g--margin-top-3">
+                <label class="c-input__checkbox-label">
+                  <input
+                    type="checkbox"
+                    data-testid="base-screw-holes"
+                    [checked]="baseScrewHoles()"
+                    (change)="toggleScrewHoles()"
+                  />
+                  <span>M3 Counterbore Screw Holes (Bolt directly to baseplates)</span>
                 </label>
               </div>
             </div>
@@ -282,10 +346,17 @@ import {
               <div
                 #viewportContainer
                 class="c-preview gridfinity-viewport"
+                tabindex="0"
+                role="region"
+                aria-label="Interactive 3D model viewport"
                 (mousedown)="onMouseDown($event)"
                 (mousemove)="onMouseMove($event)"
                 (mouseup)="onMouseUp()"
                 (mouseleave)="onMouseUp()"
+                (wheel)="onWheel($event)"
+                (touchstart)="onTouchStart($event)"
+                (touchmove)="onTouchMove($event)"
+                (touchend)="onTouchEnd()"
               >
                 <div class="viewport-hints">
                   <span>🖱️ Click & Drag to Rotate • Scroll to Zoom</span>
@@ -352,162 +423,7 @@ import {
       </div>
     </div>
   `,
-  styles: [
-    `
-      .gridfinity-presets {
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
-        gap: 12px;
-      }
-
-      .gridfinity-preset-btn {
-        display: flex;
-        flex-direction: column;
-        align-items: flex-start;
-        text-align: left;
-        padding: 12px;
-        height: auto;
-      }
-
-      .gridfinity-preset-desc {
-        font-size: 0.8rem;
-        opacity: 0.8;
-        margin-top: 4px;
-        font-weight: normal;
-      }
-
-      .param-grid {
-        display: grid;
-        grid-template-columns: 1fr 1fr;
-        gap: 16px;
-      }
-
-      .unit-btn-row {
-        display: flex;
-        gap: 6px;
-        margin-top: 6px;
-      }
-
-      .lip-button-row {
-        display: flex;
-        flex-wrap: wrap;
-        gap: 6px;
-        margin-top: 6px;
-      }
-
-      .c-input--slider {
-        width: 100%;
-        margin-top: 4px;
-      }
-
-      .c-input__checkbox-label {
-        display: flex;
-        align-items: center;
-        gap: 8px;
-        cursor: pointer;
-        font-size: 0.9rem;
-      }
-
-      .badge-dim {
-        font-size: 0.85rem;
-        background: rgba(255, 255, 255, 0.08);
-        padding: 4px 10px;
-        border-radius: 4px;
-        color: #94a3b8;
-      }
-
-      .gridfinity-viewport {
-        position: relative;
-        width: 100%;
-        height: 380px;
-        background: #0f172a;
-        border-radius: 8px;
-        overflow: hidden;
-        cursor: grab;
-      }
-
-      .gridfinity-viewport:active {
-        cursor: grabbing;
-      }
-
-      .viewport-hints {
-        position: absolute;
-        bottom: 8px;
-        left: 8px;
-        font-size: 0.75rem;
-        color: rgba(255, 255, 255, 0.5);
-        pointer-events: none;
-        user-select: none;
-      }
-
-      .metrics-grid {
-        display: grid;
-        grid-template-columns: repeat(2, 1fr);
-        gap: 10px;
-      }
-
-      .metric-card {
-        background: rgba(255, 255, 255, 0.04);
-        border: 1px solid rgba(255, 255, 255, 0.08);
-        border-radius: 6px;
-        padding: 8px 12px;
-        display: flex;
-        flex-direction: column;
-      }
-
-      .metric-label {
-        font-size: 0.75rem;
-        color: #9ca3af;
-      }
-
-      .metric-value {
-        font-size: 0.95rem;
-        color: #f3f4f6;
-        margin-top: 2px;
-      }
-
-      .slicer-box {
-        background: rgba(59, 130, 246, 0.08);
-        border: 1px solid rgba(59, 130, 246, 0.2);
-        border-radius: 6px;
-        padding: 10px 14px;
-      }
-
-      .slicer-title {
-        font-size: 0.85rem;
-        margin: 0 0 6px 0;
-        color: #93c5fd;
-      }
-
-      .slicer-list {
-        margin: 0;
-        padding-left: 18px;
-        font-size: 0.8rem;
-        color: #cbd5e1;
-        line-height: 1.4;
-      }
-
-      .export-actions {
-        display: flex;
-        gap: 8px;
-      }
-
-      @media (max-width: 768px) {
-        .param-grid {
-          grid-template-columns: 1fr;
-        }
-
-        .metrics-grid {
-          grid-template-columns: 1fr;
-        }
-
-        .export-actions {
-          flex-direction: column;
-          width: 100%;
-        }
-      }
-    `,
-  ],
+  styleUrls: ['./gridfinity-bin-generator.component.scss'],
 })
 export class GridfinityBinGeneratorComponent implements OnInit, OnDestroy {
   @ViewChild('viewportContainer') viewportContainer!: ElementRef<HTMLDivElement>;
@@ -537,6 +453,9 @@ export class GridfinityBinGeneratorComponent implements OnInit, OnDestroy {
   // Tracked object URLs for disposal
   private activeDownloadUrls: string[] = [];
 
+  // Dedicated worker ref
+  private worker: Worker | null = null;
+
   // Three.js internal engine refs
   private scene: THREE.Scene | null = null;
   private camera: THREE.PerspectiveCamera | null = null;
@@ -544,7 +463,7 @@ export class GridfinityBinGeneratorComponent implements OnInit, OnDestroy {
   private currentMesh: THREE.Mesh | null = null;
   private animationFrameId: number | null = null;
 
-  // Mouse rotation orbit state
+  // Mouse & Touch rotation orbit state
   private isDragging = false;
   private prevMouseX = 0;
   private prevMouseY = 0;
@@ -561,6 +480,11 @@ export class GridfinityBinGeneratorComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy(): void {
+    if (this.worker) {
+      this.worker.terminate();
+      this.worker = null;
+    }
+
     if (this.animationFrameId !== null) {
       cancelAnimationFrame(this.animationFrameId);
     }
@@ -574,7 +498,7 @@ export class GridfinityBinGeneratorComponent implements OnInit, OnDestroy {
       }
     }
 
-    if (this.renderer) {
+    if (this.renderer && typeof this.renderer.dispose === 'function') {
       this.renderer.dispose();
     }
 
@@ -599,36 +523,25 @@ export class GridfinityBinGeneratorComponent implements OnInit, OnDestroy {
     if (preset.options.labelTab !== undefined) this.labelTab.set(preset.options.labelTab);
     if (preset.options.baseMagnetHoles !== undefined)
       this.baseMagnetHoles.set(preset.options.baseMagnetHoles);
+    if (preset.options.baseScrewHoles !== undefined)
+      this.baseScrewHoles.set(preset.options.baseScrewHoles);
+    if (preset.options.fingerScoopRadiusMm !== undefined)
+      this.fingerScoopRadiusMm.set(preset.options.fingerScoopRadiusMm);
+    if (preset.options.labelTabWidthMm !== undefined)
+      this.labelTabWidthMm.set(preset.options.labelTabWidthMm);
+    if (preset.options.labelAngleDeg !== undefined)
+      this.labelAngleDeg.set(preset.options.labelAngleDeg);
 
     this.rebuildMesh();
   }
 
-  resetToDefaults(): void {
-    this.gridX.set(DEFAULT_GRIDFINITY_OPTIONS.gridX);
-    this.gridY.set(DEFAULT_GRIDFINITY_OPTIONS.gridY);
-    this.heightUnits.set(DEFAULT_GRIDFINITY_OPTIONS.heightUnits);
-    this.subdivisionsX.set(DEFAULT_GRIDFINITY_OPTIONS.subdivisionsX);
-    this.subdivisionsY.set(DEFAULT_GRIDFINITY_OPTIONS.subdivisionsY);
-    this.lipStyle.set(DEFAULT_GRIDFINITY_OPTIONS.lipStyle);
-    this.fingerScoop.set(DEFAULT_GRIDFINITY_OPTIONS.fingerScoop);
-    this.fingerScoopRadiusMm.set(DEFAULT_GRIDFINITY_OPTIONS.fingerScoopRadiusMm);
-    this.labelTab.set(DEFAULT_GRIDFINITY_OPTIONS.labelTab);
-    this.labelTabWidthMm.set(DEFAULT_GRIDFINITY_OPTIONS.labelTabWidthMm);
-    this.labelAngleDeg.set(DEFAULT_GRIDFINITY_OPTIONS.labelAngleDeg);
-    this.baseMagnetHoles.set(DEFAULT_GRIDFINITY_OPTIONS.baseMagnetHoles);
-    this.baseScrewHoles.set(DEFAULT_GRIDFINITY_OPTIONS.baseScrewHoles);
-    this.wallThicknessMm.set(DEFAULT_GRIDFINITY_OPTIONS.wallThicknessMm || 1.2);
-
+  setGridX(units: number): void {
+    this.gridX.set(units);
     this.rebuildMesh();
   }
 
-  setGridX(val: number): void {
-    this.gridX.set(val);
-    this.rebuildMesh();
-  }
-
-  setGridY(val: number): void {
-    this.gridY.set(val);
+  setGridY(units: number): void {
+    this.gridY.set(units);
     this.rebuildMesh();
   }
 
@@ -657,6 +570,24 @@ export class GridfinityBinGeneratorComponent implements OnInit, OnDestroy {
     this.rebuildMesh();
   }
 
+  onFingerScoopRadiusChange(event: Event): void {
+    const val = parseFloat((event.target as HTMLInputElement).value);
+    this.fingerScoopRadiusMm.set(val);
+    this.rebuildMesh();
+  }
+
+  onLabelTabWidthChange(event: Event): void {
+    const val = parseFloat((event.target as HTMLInputElement).value);
+    this.labelTabWidthMm.set(val);
+    this.rebuildMesh();
+  }
+
+  onLabelAngleChange(event: Event): void {
+    const val = parseFloat((event.target as HTMLInputElement).value);
+    this.labelAngleDeg.set(val);
+    this.rebuildMesh();
+  }
+
   onHeightChange(event: Event): void {
     const val = parseInt((event.target as HTMLInputElement).value, 10);
     this.heightUnits.set(val);
@@ -672,6 +603,24 @@ export class GridfinityBinGeneratorComponent implements OnInit, OnDestroy {
   onSubdivisionsYChange(event: Event): void {
     const val = parseInt((event.target as HTMLInputElement).value, 10);
     this.subdivisionsY.set(val);
+    this.rebuildMesh();
+  }
+
+  resetToDefaults(): void {
+    this.gridX.set(DEFAULT_GRIDFINITY_OPTIONS.gridX);
+    this.gridY.set(DEFAULT_GRIDFINITY_OPTIONS.gridY);
+    this.heightUnits.set(DEFAULT_GRIDFINITY_OPTIONS.heightUnits);
+    this.subdivisionsX.set(DEFAULT_GRIDFINITY_OPTIONS.subdivisionsX);
+    this.subdivisionsY.set(DEFAULT_GRIDFINITY_OPTIONS.subdivisionsY);
+    this.lipStyle.set(DEFAULT_GRIDFINITY_OPTIONS.lipStyle);
+    this.fingerScoop.set(DEFAULT_GRIDFINITY_OPTIONS.fingerScoop);
+    this.fingerScoopRadiusMm.set(DEFAULT_GRIDFINITY_OPTIONS.fingerScoopRadiusMm);
+    this.labelTab.set(DEFAULT_GRIDFINITY_OPTIONS.labelTab);
+    this.labelTabWidthMm.set(DEFAULT_GRIDFINITY_OPTIONS.labelTabWidthMm);
+    this.labelAngleDeg.set(DEFAULT_GRIDFINITY_OPTIONS.labelAngleDeg);
+    this.baseMagnetHoles.set(DEFAULT_GRIDFINITY_OPTIONS.baseMagnetHoles);
+    this.baseScrewHoles.set(DEFAULT_GRIDFINITY_OPTIONS.baseScrewHoles);
+    this.wallThicknessMm.set(DEFAULT_GRIDFINITY_OPTIONS.wallThicknessMm ?? 1.2);
     this.rebuildMesh();
   }
 
@@ -695,18 +644,62 @@ export class GridfinityBinGeneratorComponent implements OnInit, OnDestroy {
       wallThicknessMm: this.wallThicknessMm(),
     };
 
+    if (typeof Worker !== 'undefined') {
+      try {
+        await new Promise<void>((resolve, reject) => {
+          const worker = new Worker(new URL('./worker.ts', import.meta.url), { type: 'module' });
+          this.worker = worker;
+
+          worker.onmessage = (e: MessageEvent<GridfinityWorkerResponse>) => {
+            if (e.data.type === 'result' && e.data.buffer) {
+              const blob = new Blob([e.data.buffer], {
+                type: e.data.mimeType || 'application/octet-stream',
+              });
+              this.triggerDownload(blob, e.data.fileName || `gridfinity-bin.${format}`);
+              worker.terminate();
+              this.worker = null;
+              resolve();
+            } else if (e.data.type === 'error') {
+              worker.terminate();
+              this.worker = null;
+              reject(new Error(e.data.error || 'Worker export failed'));
+            }
+          };
+
+          worker.onerror = (err) => {
+            worker.terminate();
+            this.worker = null;
+            reject(err);
+          };
+
+          worker.postMessage({ id: Date.now(), options, format } as GridfinityWorkerRequest);
+        });
+        return;
+      } catch {
+        // Fallback to direct synchronous execution if worker fails
+      }
+    }
+
     const result = await processGridfinity(options, format);
     if (!result.success || !result.blob) return;
 
-    const url = URL.createObjectURL(result.blob);
+    this.triggerDownload(result.blob, result.fileName);
+  }
+
+  private triggerDownload(blob: Blob, fileName: string): void {
+    const url = URL.createObjectURL(blob);
     this.activeDownloadUrls.push(url);
 
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = result.fileName;
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
+    try {
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = fileName;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+    } finally {
+      URL.revokeObjectURL(url);
+    }
   }
 
   // --- THREE.JS VIEWPORT & RENDERING ---
@@ -815,7 +808,7 @@ export class GridfinityBinGeneratorComponent implements OnInit, OnDestroy {
     }
   }
 
-  // --- MOUSE ORBIT CONTROLS ---
+  // --- MOUSE & TOUCH ORBIT CONTROLS & WHEEL ZOOM ---
 
   onMouseDown(event: MouseEvent): void {
     this.isDragging = true;
@@ -838,6 +831,42 @@ export class GridfinityBinGeneratorComponent implements OnInit, OnDestroy {
   }
 
   onMouseUp(): void {
+    this.isDragging = false;
+  }
+
+  onWheel(event: WheelEvent): void {
+    event.preventDefault();
+    if (!this.camera) return;
+    const zoomFactor = event.deltaY > 0 ? 1.08 : 0.92;
+    this.camera.position.x *= zoomFactor;
+    this.camera.position.y *= zoomFactor;
+    this.camera.position.z *= zoomFactor;
+  }
+
+  onTouchStart(event: TouchEvent): void {
+    if (event.touches.length === 1) {
+      this.isDragging = true;
+      this.prevMouseX = event.touches[0].clientX;
+      this.prevMouseY = event.touches[0].clientY;
+    }
+  }
+
+  onTouchMove(event: TouchEvent): void {
+    if (!this.isDragging || event.touches.length !== 1) return;
+    event.preventDefault();
+    const touch = event.touches[0];
+    const deltaX = touch.clientX - this.prevMouseX;
+    const deltaY = touch.clientY - this.prevMouseY;
+
+    this.meshRotationY += deltaX * 0.01;
+    this.meshRotationX += deltaY * 0.01;
+    this.meshRotationX = Math.max(0.1, Math.min(Math.PI / 2.2, this.meshRotationX));
+
+    this.prevMouseX = touch.clientX;
+    this.prevMouseY = touch.clientY;
+  }
+
+  onTouchEnd(): void {
     this.isDragging = false;
   }
 }

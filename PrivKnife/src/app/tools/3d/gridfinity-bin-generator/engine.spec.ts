@@ -81,6 +81,112 @@ describe('GridfinityBinGenerator Engine (Seam 1)', () => {
       expect(pos.count).toBeGreaterThan(100);
       geom.dispose();
     });
+
+    it('should generate additional triangles when baseMagnetHoles is enabled (DEFECT-33-01)', () => {
+      const geomWithoutMagnets = generateGridfinityGeometry({
+        ...DEFAULT_GRIDFINITY_OPTIONS,
+        baseMagnetHoles: false,
+        baseScrewHoles: false,
+      });
+      const geomWithMagnets = generateGridfinityGeometry({
+        ...DEFAULT_GRIDFINITY_OPTIONS,
+        baseMagnetHoles: true,
+        baseScrewHoles: false,
+      });
+
+      const trisWithout = geomWithoutMagnets.getIndex()!.count / 3;
+      const trisWith = geomWithMagnets.getIndex()!.count / 3;
+
+      expect(trisWith).toBeGreaterThan(trisWithout);
+      geomWithoutMagnets.dispose();
+      geomWithMagnets.dispose();
+    });
+
+    it('should generate additional triangles when baseScrewHoles is enabled (DEFECT-33-01)', () => {
+      const geomMagnetsOnly = generateGridfinityGeometry({
+        ...DEFAULT_GRIDFINITY_OPTIONS,
+        baseMagnetHoles: true,
+        baseScrewHoles: false,
+      });
+      const geomMagnetsAndScrews = generateGridfinityGeometry({
+        ...DEFAULT_GRIDFINITY_OPTIONS,
+        baseMagnetHoles: true,
+        baseScrewHoles: true,
+      });
+
+      const trisMagnetsOnly = geomMagnetsOnly.getIndex()!.count / 3;
+      const trisWithScrews = geomMagnetsAndScrews.getIndex()!.count / 3;
+
+      expect(trisWithScrews).toBeGreaterThan(trisMagnetsOnly);
+      geomMagnetsOnly.dispose();
+      geomMagnetsAndScrews.dispose();
+    });
+
+    it('should emit zero degenerate (zero-area) triangles when labelTab is enabled (DEFECT-33-01)', () => {
+      const geom = generateGridfinityGeometry({
+        ...DEFAULT_GRIDFINITY_OPTIONS,
+        labelTab: true,
+        labelTabWidthMm: 24,
+        labelAngleDeg: 45,
+      });
+
+      const pos = geom.getAttribute('position');
+      const idx = geom.getIndex()!;
+      let zeroAreaTriangles = 0;
+
+      for (let t = 0; t < idx.count; t += 3) {
+        const i0 = idx.getX(t);
+        const i1 = idx.getX(t + 1);
+        const i2 = idx.getX(t + 2);
+
+        const ax = pos.getX(i0), ay = pos.getY(i0), az = pos.getZ(i0);
+        const bx = pos.getX(i1), by = pos.getY(i1), bz = pos.getZ(i1);
+        const cx = pos.getX(i2), cy = pos.getY(i2), cz = pos.getZ(i2);
+
+        // Vector AB and AC
+        const abx = bx - ax, aby = by - ay, abz = bz - az;
+        const acx = cx - ax, acy = cy - ay, acz = cz - az;
+
+        // Cross product
+        const cpx = aby * acz - abz * acy;
+        const cpy = abz * acx - abx * acz;
+        const cpz = abx * acy - aby * acx;
+
+        const area = 0.5 * Math.sqrt(cpx * cpx + cpy * cpy + cpz * cpz);
+        if (area < 1e-6) {
+          zeroAreaTriangles++;
+        }
+      }
+
+      expect(zeroAreaTriangles).toBe(0);
+      geom.dispose();
+    });
+
+    it('should alter vertex coordinates when labelAngleDeg or fingerScoopRadiusMm changes', () => {
+      const geom45 = generateGridfinityGeometry({
+        ...DEFAULT_GRIDFINITY_OPTIONS,
+        labelTab: true,
+        labelAngleDeg: 45,
+      });
+      const geom30 = generateGridfinityGeometry({
+        ...DEFAULT_GRIDFINITY_OPTIONS,
+        labelTab: true,
+        labelAngleDeg: 30,
+      });
+
+      const pos45 = geom45.getAttribute('position').array as Float32Array;
+      const pos30 = geom30.getAttribute('position').array as Float32Array;
+
+      let differences = 0;
+      for (let i = 0; i < Math.min(pos45.length, pos30.length); i++) {
+        if (Math.abs(pos45[i] - pos30[i]) > 0.01) {
+          differences++;
+        }
+      }
+      expect(differences).toBeGreaterThan(0);
+      geom45.dispose();
+      geom30.dispose();
+    });
   });
 
   describe('calculateGridfinityMetrics', () => {

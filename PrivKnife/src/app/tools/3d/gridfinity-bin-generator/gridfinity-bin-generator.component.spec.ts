@@ -97,6 +97,21 @@ describe('GridfinityBinGeneratorComponent (Seam 2 & 4)', () => {
       createObjectURLSpy.mockRestore();
       revokeObjectURLSpy.mockRestore();
     });
+
+    it('should revoke object URL immediately after download trigger (Directive 4 & DEFECT-33-05)', async () => {
+      const createObjectURLSpy = vi
+        .spyOn(URL, 'createObjectURL')
+        .mockReturnValue('blob:test-immediate-revoke-url');
+      const revokeObjectURLSpy = vi.spyOn(URL, 'revokeObjectURL').mockImplementation(() => {});
+
+      await component.downloadFormat('stl');
+
+      expect(createObjectURLSpy).toHaveBeenCalled();
+      expect(revokeObjectURLSpy).toHaveBeenCalledWith('blob:test-immediate-revoke-url');
+
+      createObjectURLSpy.mockRestore();
+      revokeObjectURLSpy.mockRestore();
+    });
   });
 
   describe('Reset & Memory Hygiene', () => {
@@ -117,6 +132,102 @@ describe('GridfinityBinGeneratorComponent (Seam 2 & 4)', () => {
 
       expect(revokeSpy).toHaveBeenCalledWith('blob:dummy-gridfinity-url');
       revokeSpy.mockRestore();
+    });
+  });
+
+  describe('Secondary Controls & Configuration (DEFECT-33-01 & DEFECT-33-05)', () => {
+    it('should render and toggle baseScrewHoles checkbox', () => {
+      const compiled = fixture.nativeElement as HTMLElement;
+      expect(component.baseScrewHoles()).toBe(false);
+
+      component.toggleScrewHoles();
+      fixture.detectChanges();
+      expect(component.baseScrewHoles()).toBe(true);
+
+      const checkbox = compiled.querySelector<HTMLInputElement>('input[data-testid="base-screw-holes"]');
+      expect(checkbox).toBeTruthy();
+      expect(checkbox?.checked).toBe(true);
+    });
+
+    it('should render fingerScoopRadiusMm slider when fingerScoop is enabled', () => {
+      component.fingerScoop.set(true);
+      fixture.detectChanges();
+      const compiled = fixture.nativeElement as HTMLElement;
+      const scoopSlider = compiled.querySelector<HTMLInputElement>('input[data-testid="scoop-radius-slider"]');
+      expect(scoopSlider).toBeTruthy();
+
+      component.onFingerScoopRadiusChange({ target: { value: '15' } } as unknown as Event);
+      expect(component.fingerScoopRadiusMm()).toBe(15);
+    });
+
+    it('should render labelTabWidthMm and labelAngleDeg sliders when labelTab is enabled', () => {
+      component.labelTab.set(true);
+      fixture.detectChanges();
+      const compiled = fixture.nativeElement as HTMLElement;
+      const widthSlider = compiled.querySelector<HTMLInputElement>('input[data-testid="label-width-slider"]');
+      const angleSlider = compiled.querySelector<HTMLInputElement>('input[data-testid="label-angle-slider"]');
+      expect(widthSlider).toBeTruthy();
+      expect(angleSlider).toBeTruthy();
+
+      component.onLabelTabWidthChange({ target: { value: '30' } } as unknown as Event);
+      expect(component.labelTabWidthMm()).toBe(30);
+
+      component.onLabelAngleChange({ target: { value: '60' } } as unknown as Event);
+      expect(component.labelAngleDeg()).toBe(60);
+    });
+  });
+
+  describe('3D Viewport Interaction: Touch Orbit & Wheel Zoom (DEFECT-33-04)', () => {
+    it('should handle wheel zoom on viewport', () => {
+      const initialZ = (component as any).camera?.position.z || 100;
+      const wheelEvent = new WheelEvent('wheel', { deltaY: 100, bubbles: true });
+      component.onWheel(wheelEvent);
+      if ((component as any).camera) {
+        expect((component as any).camera.position.z).toBeGreaterThan(initialZ);
+      }
+    });
+
+    it('should handle touch drag rotation on viewport', () => {
+      const initialRotX = (component as any).meshRotationX;
+      const initialRotY = (component as any).meshRotationY;
+
+      component.onTouchStart({
+        touches: [{ clientX: 100, clientY: 100 }],
+        preventDefault: () => {},
+      } as unknown as TouchEvent);
+
+      component.onTouchMove({
+        touches: [{ clientX: 120, clientY: 130 }],
+        preventDefault: () => {},
+      } as unknown as TouchEvent);
+
+      expect((component as any).meshRotationX).not.toBe(initialRotX);
+      expect((component as any).meshRotationY).not.toBe(initialRotY);
+
+      component.onTouchEnd();
+      expect((component as any).isDragging).toBe(false);
+    });
+  });
+
+  describe('Responsive Layout & Touch Target BEM Classes (DEFECT-33-02, DEFECT-33-03, DEFECT-33-05)', () => {
+    it('should use .c-input__slider on range inputs for touch target compliance', () => {
+      fixture.detectChanges();
+      const compiled = fixture.nativeElement as HTMLElement;
+      const sliders = compiled.querySelectorAll<HTMLInputElement>('input[type="range"]');
+      expect(sliders.length).toBeGreaterThan(0);
+      sliders.forEach((slider) => {
+        expect(slider.classList.contains('c-input__slider')).toBe(true);
+      });
+    });
+
+    it('should have unit-btn-row with 6 unit buttons styled for mobile wrapping', () => {
+      fixture.detectChanges();
+      const compiled = fixture.nativeElement as HTMLElement;
+      const unitRows = compiled.querySelectorAll('.unit-btn-row');
+      expect(unitRows.length).toBeGreaterThanOrEqual(2);
+      unitRows.forEach((row) => {
+        expect(row.children.length).toBe(6);
+      });
     });
   });
 

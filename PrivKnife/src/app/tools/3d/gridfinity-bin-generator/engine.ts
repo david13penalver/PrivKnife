@@ -63,6 +63,9 @@ export function generateGridfinityGeometry(
     fingerScoopRadiusMm,
     labelTab,
     labelTabWidthMm,
+    labelAngleDeg = 45,
+    baseMagnetHoles = false,
+    baseScrewHoles = false,
     wallThicknessMm = 1.2,
   } = options;
 
@@ -75,6 +78,18 @@ export function generateGridfinityGeometry(
   const positions: number[] = [];
   const normals: number[] = [];
   const indices: number[] = [];
+
+  // Helper to add a triangle face given 3 corner vertices [x, y, z] (CCW)
+  function addTriangle(
+    v0: [number, number, number],
+    v1: [number, number, number],
+    v2: [number, number, number]
+  ): void {
+    const startIdx = positions.length / 3;
+    positions.push(...v0, ...v1, ...v2);
+    normals.push(0, 0, 1, 0, 0, 1, 0, 0, 1);
+    indices.push(startIdx, startIdx + 1, startIdx + 2);
+  }
 
   // Helper to add a quad face given 4 corner vertices [x, y, z] (CCW)
   function addQuad(
@@ -141,8 +156,143 @@ export function generateGridfinityGeometry(
       const mMinY = cellCenterY - tHalfSize;
       const mMaxY = cellCenterY + tHalfSize;
 
-      // Bottom face
-      addQuad([bMinX, bMinY, 0], [bMaxX, bMinY, 0], [bMaxX, bMaxY, 0], [bMinX, bMaxY, 0]);
+      // Bottom face / Corner magnet & screw pockets
+      if (!baseMagnetHoles && !baseScrewHoles) {
+        // Solid bottom face
+        addQuad([bMinX, bMinY, 0], [bMaxX, bMinY, 0], [bMaxX, bMaxY, 0], [bMinX, bMaxY, 0]);
+      } else {
+        // Corner pocket centers at (cellCenterX ± 13.0, cellCenterY ± 13.0)
+        const s = 5.6;
+        const cornerCenters: [number, number][] = [
+          [cellCenterX - 13.0, cellCenterY - 13.0],
+          [cellCenterX + 13.0, cellCenterY - 13.0],
+          [cellCenterX + 13.0, cellCenterY + 13.0],
+          [cellCenterX - 13.0, cellCenterY + 13.0],
+        ];
+
+        // 5 boundary strips covering the area between corner pocket squares
+        const midX0 = cellCenterX - (13.0 - s); // cx - 7.4
+        const midX1 = cellCenterX + (13.0 - s); // cx + 7.4
+        const midY0 = cellCenterY - (13.0 - s); // cy - 7.4
+        const midY1 = cellCenterY + (13.0 - s); // cy + 7.4
+
+        // Center square
+        addQuad([midX0, midY0, 0], [midX1, midY0, 0], [midX1, midY1, 0], [midX0, midY1, 0]);
+        // Left strip
+        addQuad([bMinX, midY0, 0], [midX0, midY0, 0], [midX0, midY1, 0], [bMinX, midY1, 0]);
+        // Right strip
+        addQuad([midX1, midY0, 0], [bMaxX, midY0, 0], [bMaxX, midY1, 0], [midX1, midY1, 0]);
+        // Bottom strip
+        addQuad([midX0, bMinY, 0], [midX1, bMinY, 0], [midX1, midY0, 0], [midX0, midY0, 0]);
+        // Top strip
+        addQuad([midX0, midY1, 0], [midX1, midY1, 0], [midX1, bMaxY, 0], [midX0, bMaxY, 0]);
+
+        const rMag = 3.25; // 6.5mm diameter magnet pocket
+        const rScrew = 1.6; // 3.2mm diameter M3 screw counterbore
+        const magDepth = 2.4;
+        const screwDepth = 4.5;
+        const rHole = baseMagnetHoles ? rMag : rScrew;
+        const SIDES = 8;
+
+        for (const [px, py] of cornerCenters) {
+          // 8 outer perimeter points of the square around the pocket
+          const sqPts: [number, number, number][] = [
+            [px + s, py, 0],
+            [px + s, py + s, 0],
+            [px, py + s, 0],
+            [px - s, py + s, 0],
+            [px - s, py, 0],
+            [px - s, py - s, 0],
+            [px, py - s, 0],
+            [px + s, py - s, 0],
+          ];
+
+          // 8 points on the hole rim at z = 0
+          const rimPts: [number, number, number][] = [];
+          for (let k = 0; k < SIDES; k++) {
+            const th = (2 * Math.PI * k) / SIDES;
+            rimPts.push([px + rHole * Math.cos(th), py + rHole * Math.sin(th), 0]);
+          }
+
+          // Annular bottom face surrounding the pocket hole
+          for (let k = 0; k < SIDES; k++) {
+            const nextK = (k + 1) % SIDES;
+            addQuad(sqPts[k], sqPts[nextK], rimPts[nextK], rimPts[k]);
+          }
+
+          if (baseMagnetHoles && !baseScrewHoles) {
+            // Magnet pocket walls (z = 0 to magDepth)
+            for (let k = 0; k < SIDES; k++) {
+              const nextK = (k + 1) % SIDES;
+              const p0 = rimPts[k];
+              const p1 = rimPts[nextK];
+              const p0Top: [number, number, number] = [p0[0], p0[1], magDepth];
+              const p1Top: [number, number, number] = [p1[0], p1[1], magDepth];
+              addQuad(p0, p0Top, p1Top, p1);
+            }
+            // Magnet pocket ceiling
+            for (let k = 0; k < SIDES; k++) {
+              const nextK = (k + 1) % SIDES;
+              const p0 = rimPts[k];
+              const p1 = rimPts[nextK];
+              addTriangle(
+                [px, py, magDepth],
+                [p0[0], p0[1], magDepth],
+                [p1[0], p1[1], magDepth]
+              );
+            }
+          } else if (!baseMagnetHoles && baseScrewHoles) {
+            // Screw hole walls (z = 0 to screwDepth)
+            for (let k = 0; k < SIDES; k++) {
+              const nextK = (k + 1) % SIDES;
+              const p0 = rimPts[k];
+              const p1 = rimPts[nextK];
+              const p0Top: [number, number, number] = [p0[0], p0[1], screwDepth];
+              const p1Top: [number, number, number] = [p1[0], p1[1], screwDepth];
+              addQuad(p0, p0Top, p1Top, p1);
+            }
+            // Screw hole ceiling
+            for (let k = 0; k < SIDES; k++) {
+              const nextK = (k + 1) % SIDES;
+              const p0 = rimPts[k];
+              const p1 = rimPts[nextK];
+              addTriangle(
+                [px, py, screwDepth],
+                [p0[0], p0[1], screwDepth],
+                [p1[0], p1[1], screwDepth]
+              );
+            }
+          } else if (baseMagnetHoles && baseScrewHoles) {
+            // Both: Magnet pocket (z = 0 to 2.4), then step to screw bore (z = 2.4 to 4.5)
+            const screwPts2_4: [number, number, number][] = [];
+            for (let k = 0; k < SIDES; k++) {
+              const th = (2 * Math.PI * k) / SIDES;
+              screwPts2_4.push([px + rScrew * Math.cos(th), py + rScrew * Math.sin(th), magDepth]);
+            }
+
+            for (let k = 0; k < SIDES; k++) {
+              const nextK = (k + 1) % SIDES;
+              const p0 = rimPts[k];
+              const p1 = rimPts[nextK];
+              const p0MagTop: [number, number, number] = [p0[0], p0[1], magDepth];
+              const p1MagTop: [number, number, number] = [p1[0], p1[1], magDepth];
+              // Magnet wall
+              addQuad(p0, p0MagTop, p1MagTop, p1);
+
+              // Annular shoulder step at z = 2.4
+              addQuad(p0MagTop, screwPts2_4[k], screwPts2_4[nextK], p1MagTop);
+
+              // Screw wall from 2.4 to 4.5
+              const s0Top: [number, number, number] = [screwPts2_4[k][0], screwPts2_4[k][1], screwDepth];
+              const s1Top: [number, number, number] = [screwPts2_4[nextK][0], screwPts2_4[nextK][1], screwDepth];
+              addQuad(screwPts2_4[k], s0Top, s1Top, screwPts2_4[nextK]);
+
+              // Screw ceiling at 4.5
+              addTriangle([px, py, screwDepth], s0Top, s1Top);
+            }
+          }
+        }
+      }
 
       // 4 Tapered Chamfer Sides (0 -> 2.15mm)
       addQuad([bMinX, bMinY, 0], [mMinX, mMinY, 2.15], [mMaxX, mMinY, 2.15], [bMaxX, bMinY, 0]);
@@ -220,11 +370,12 @@ export function generateGridfinityGeometry(
   }
 
   // 5. LABEL TAB
-  // If labelTab is enabled: creates a 45° angled shelf along the top rear rim for label stickers
+  // If labelTab is enabled: creates an angled shelf along the top rear rim for label stickers
   if (labelTab) {
     const tabW = Math.min(innerW * 0.9, Math.max(12, labelTabWidthMm || 24));
-    const tabDepth = 10;
+    const angleRad = ((labelAngleDeg || 45) * Math.PI) / 180;
     const tabHeight = 8;
+    const tabDepth = tabHeight / Math.tan(angleRad);
     const tabMinX = -tabW / 2;
     const tabMaxX = tabW / 2;
     const tabRearY = halfL - wallT;
@@ -240,20 +391,18 @@ export function generateGridfinityGeometry(
       [tabMinX, tabRearY, tabTopZ]
     );
 
-    // Left cap
-    addQuad(
+    // Left cap (single triangle, zero degenerate vertices)
+    addTriangle(
       [tabMinX, tabRearY, tabBottomZ],
       [tabMinX, tabFrontY, tabBottomZ],
-      [tabMinX, tabRearY, tabTopZ],
-      [tabMinX, tabRearY, tabBottomZ]
+      [tabMinX, tabRearY, tabTopZ]
     );
 
-    // Right cap
-    addQuad(
+    // Right cap (single triangle, zero degenerate vertices)
+    addTriangle(
       [tabMaxX, tabFrontY, tabBottomZ],
       [tabMaxX, tabRearY, tabBottomZ],
-      [tabMaxX, tabRearY, tabTopZ],
-      [tabMaxX, tabFrontY, tabBottomZ]
+      [tabMaxX, tabRearY, tabTopZ]
     );
   }
 

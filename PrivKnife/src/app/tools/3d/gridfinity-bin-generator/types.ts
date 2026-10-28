@@ -46,3 +46,21 @@ export interface PresetGridfinityBin {
   description: string;
   options: Partial<GridfinityBinGeneratorOptions>;
 }
+
+export interface GridfinityWorkerRequest {
+  id: number;
+  options: GridfinityBinGeneratorOptions;
+  format: 'stl' | '3mf';
+}
+
+export interface GridfinityWorkerResponse {
+  id: number;
+  type: 'progress' | 'result' | 'error';
+  percent?: number;
+  buffer?: ArrayBuffer;
+  fileName?: string;
+  fileSize?: number;
+  mimeType?: string;
+  metrics?: GridfinityBinMetrics;
+  error?: string;
+}
