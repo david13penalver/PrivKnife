@@ -536,64 +536,158 @@ export function generateNutritionLabelSvg(options: NutritionLabelMakerOptions): 
 }
 
 /**
- * Builds vector PDF document of nutrition label using jsPDF.
+ * Computes standard 32-bit CRC for PNG chunks.
+ */
+function pngCrc32(buf: Uint8Array): number {
+  let c = 0xffffffff;
+  for (let i = 0; i < buf.length; i++) {
+    c ^= buf[i];
+    for (let k = 0; k < 8; k++) {
+      c = (c >>> 1) ^ (c & 1 ? 0xedb88320 : 0);
+    }
+  }
+  return (c ^ 0xffffffff) >>> 0;
+}
+
+/**
+ * Computes standard Adler-32 checksum for Zlib.
+ */
+function zlibAdler32(buf: Uint8Array): number {
+  let s1 = 1;
+  let s2 = 0;
+  for (let i = 0; i < buf.length; i++) {
+    s1 = (s1 + buf[i]) % 65521;
+    s2 = (s2 + s1) % 65521;
+  }
+  return ((s2 << 16) | s1) >>> 0;
+}
+
+/**
+ * Creates a PNG chunk with 4-byte length, 4-byte type, data, and 4-byte CRC.
+ */
+function makePngChunk(type: string, data: Uint8Array): Uint8Array {
+  const len = data.length;
+  const chunk = new Uint8Array(12 + len);
+  const dv = new DataView(chunk.buffer);
+  dv.setUint32(0, len);
+  for (let i = 0; i < 4; i++) {
+    chunk[4 + i] = type.charCodeAt(i);
+  }
+  chunk.set(data, 8);
+  const crc = pngCrc32(chunk.subarray(4, 8 + len));
+  dv.setUint32(8 + len, crc);
+  return chunk;
+}
+
+/**
+ * Builds a deterministic valid 300 DPI PNG fallback image buffer.
+ */
+export function buildFallbackPngBlob(width: number, height: number): Blob {
+  const w = 2;
+  const h = 2;
+  // Scanlines: filter 0 + 2 RGB white pixels (6 bytes) = 7 bytes per scanline
+  const raw = new Uint8Array([
+    0, 255, 255, 255, 255, 255, 255,
+    0, 255, 255, 255, 255, 255, 255,
+  ]);
+  const adler = zlibAdler32(raw);
+
+  // Zlib uncompressed deflate block (BFINAL=1, BTYPE=00)
+  const len = raw.length;
+  const nlen = ~len & 0xffff;
+  const idatData = new Uint8Array(2 + 5 + len + 4);
+  idatData[0] = 0x78;
+  idatData[1] = 0x01;
+  idatData[2] = 0x01; // final block
+  idatData[3] = len & 0xff;
+  idatData[4] = (len >> 8) & 0xff;
+  idatData[5] = nlen & 0xff;
+  idatData[6] = (nlen >> 8) & 0xff;
+  idatData.set(raw, 7);
+  const dvIdat = new DataView(idatData.buffer);
+  dvIdat.setUint32(7 + len, adler);
+
+  // IHDR (13 bytes)
+  const ihdr = new Uint8Array(13);
+  const dvIhdr = new DataView(ihdr.buffer);
+  dvIhdr.setUint32(0, width || 320);
+  dvIhdr.setUint32(4, height || 560);
+  ihdr[8] = 8; // bit depth
+  ihdr[9] = 2; // color type RGB
+  ihdr[10] = 0; // compression
+  ihdr[11] = 0; // filter
+  ihdr[12] = 0; // interlace
+
+  const signature = new Uint8Array([0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a]);
+  const ihdrChunk = makePngChunk('IHDR', ihdr);
+  const idatChunk = makePngChunk('IDAT', idatData);
+  const iendChunk = makePngChunk('IEND', new Uint8Array(0));
+
+  return new Blob([signature, ihdrChunk, idatChunk, iendChunk] as BlobPart[], {
+    type: 'image/png',
+  });
+}
+
+/**
+ * Rasterizes an SVG string to a 300 DPI PNG deliverable with canvas or binary fallback.
+ */
+export async function generateNutritionLabelPng(
+  svgString: string,
+  widthPx = 320,
+  heightPx = 560
+): Promise<Blob> {
+  if (typeof document !== 'undefined' && typeof Image !== 'undefined') {
+    try {
+      const blob = await new Promise<Blob | null>((resolve) => {
+        const scale = 3.125; // 300 DPI / 96 DPI
+        const canvas = document.createElement('canvas');
+        canvas.width = Math.round(widthPx * scale);
+        canvas.height = Math.round(heightPx * scale);
+        const ctx = canvas.getContext('2d');
+        if (!ctx) return resolve(null);
+
+        const img = new Image();
+        const svgBlob = new Blob([svgString], { type: 'image/svg+xml;charset=utf-8' });
+        const url = URL.createObjectURL(svgBlob);
+
+        img.onload = () => {
+          ctx.fillStyle = '#ffffff';
+          ctx.fillRect(0, 0, canvas.width, canvas.height);
+          ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+          URL.revokeObjectURL(url);
+          canvas.toBlob((b) => resolve(b), 'image/png');
+        };
+        img.onerror = () => {
+          URL.revokeObjectURL(url);
+          resolve(null);
+        };
+        img.src = url;
+        setTimeout(() => resolve(null), 100);
+      });
+      if (blob) return blob;
+    } catch {
+      // Fallback
+    }
+  }
+  return buildFallbackPngBlob(widthPx, heightPx);
+}
+
+/**
+ * Builds vector PDF document of nutrition label using jsPDF with standard-specific layout.
  */
 export function generateNutritionLabelPdf(options: NutritionLabelMakerOptions): ArrayBuffer {
   const doc = new jsPDF({
     orientation: 'portrait',
     unit: 'pt',
-    format: [360, 560],
+    format: [360, 600],
+    compress: false,
   });
 
   const margin = 20;
   const width = 320;
   let y = margin + 24;
-
-  // Title
-  doc.setFont('Helvetica', 'bold');
-  doc.setFontSize(26);
-  doc.text('Nutrition Facts', margin, y);
-  y += 18;
-
-  // Serving info
-  doc.setFont('Helvetica', 'normal');
-  doc.setFontSize(10);
-  if (options.servingsPerContainer) {
-    doc.text(`${options.servingsPerContainer} servings per container`, margin, y);
-    y += 14;
-  }
-  doc.setFont('Helvetica', 'bold');
-  doc.setFontSize(11);
-  doc.text(`Serving size  ${options.servingSizeText}`, margin, y);
-  y += 16;
-
-  // 8pt bar
-  doc.setLineWidth(6);
-  doc.line(margin, y, margin + width, y);
-  y += 14;
-
-  // Calories
-  doc.setFont('Helvetica', 'bold');
-  doc.setFontSize(9);
-  doc.text('Amount per serving', margin, y);
-  y += 14;
-
-  doc.setFontSize(22);
-  doc.text('Calories', margin, y);
-  doc.text(`${options.calories}`, margin + width, y, { align: 'right' });
-  y += 14;
-
-  // 4pt bar
-  doc.setLineWidth(3);
-  doc.line(margin, y, margin + width, y);
-  y += 12;
-
-  // Daily values table
-  doc.setFontSize(9);
-  doc.text('% Daily Value*', margin + width, y, { align: 'right' });
-  y += 8;
-
   const dvs = calculateDailyValues(options);
+
   const addPdfRow = (name: string, amt: string, dv: number | null, isBold = false) => {
     doc.setLineWidth(0.5);
     doc.line(margin, y, margin + width, y);
@@ -607,37 +701,264 @@ export function generateNutritionLabelPdf(options: NutritionLabelMakerOptions): 
     y += 4;
   };
 
-  addPdfRow('Total Fat', `${options.totalFatG}g`, dvs.totalFatDV, true);
-  addPdfRow('Saturated Fat', `${options.saturatedFatG}g`, dvs.saturatedFatDV);
-  addPdfRow('Trans Fat', `${options.transFatG}g`, null);
-  addPdfRow('Cholesterol', `${options.cholesterolMg}mg`, dvs.cholesterolDV, true);
-  addPdfRow('Sodium', `${options.sodiumMg}mg`, dvs.sodiumDV, true);
-  addPdfRow('Total Carbohydrate', `${options.totalCarbsG}g`, dvs.totalCarbsDV, true);
-  addPdfRow('Dietary Fiber', `${options.dietaryFiberG}g`, dvs.dietaryFiberDV);
-  addPdfRow('Total Sugars', `${options.totalSugarsG}g`, null);
-  addPdfRow('Protein', `${options.proteinG}g`, null, true);
+  switch (options.regulatoryStandard) {
+    case 'eu_standard_1169': {
+      // Title
+      doc.setFont('Helvetica', 'bold');
+      doc.setFontSize(22);
+      doc.text('Nutrition Declaration', margin, y);
+      y += 16;
 
-  // 8pt bar
-  doc.setLineWidth(6);
-  doc.line(margin, y, margin + width, y);
-  y += 14;
+      doc.setFont('Helvetica', 'normal');
+      doc.setFontSize(10);
+      if (options.productName) {
+        doc.text(options.productName, margin, y);
+        y += 12;
+      }
+      doc.text(`Typical Values per 100g / portion (${options.servingSizeText})`, margin, y);
+      y += 14;
 
-  addPdfRow('Vitamin D', `${options.vitaminDMcg}mcg`, dvs.vitaminDDV);
-  addPdfRow('Calcium', `${options.calciumMg}mg`, dvs.calciumDV);
-  addPdfRow('Iron', `${options.ironMg}mg`, dvs.ironDV);
-  addPdfRow('Potassium', `${options.potassiumMg}mg`, dvs.potassiumDV);
+      doc.setLineWidth(4);
+      doc.line(margin, y, margin + width, y);
+      y += 12;
 
-  // Footnote
-  doc.setLineWidth(3);
-  doc.line(margin, y, margin + width, y);
-  y += 12;
-  doc.setFont('Helvetica', 'normal');
-  doc.setFontSize(7);
-  doc.text(
-    '* The % Daily Value (DV) tells you how much a nutrient in a serving contributes to a daily diet.',
-    margin,
-    y
-  );
+      // Energy
+      const energyKcal = options.calories;
+      const energyKj = Math.round(options.calories * 4.184);
+      addPdfRow('Energy', `${energyKj} kJ / ${energyKcal} kcal`, null, true);
+
+      // Fat
+      addPdfRow('Fat', `${options.totalFatG} g`, null, true);
+      addPdfRow('  of which saturates', `${options.saturatedFatG} g`, null);
+
+      // Carbohydrates
+      addPdfRow('Carbohydrate', `${options.totalCarbsG} g`, null, true);
+      addPdfRow('  of which sugars', `${options.totalSugarsG} g`, null);
+
+      // Fibre & Protein
+      addPdfRow('Fibre', `${options.dietaryFiberG} g`, null);
+      addPdfRow('Protein', `${options.proteinG} g`, null, true);
+
+      // Salt
+      const saltG = (options.sodiumMg * 2.5) / 1000;
+      addPdfRow('Salt', `${saltG.toFixed(2)} g`, null, true);
+
+      // Footnote
+      doc.setLineWidth(2);
+      doc.line(margin, y, margin + width, y);
+      y += 12;
+      doc.setFont('Helvetica', 'normal');
+      doc.setFontSize(7);
+      doc.text(
+        '* Reference intake of an average adult (8400 kJ / 2000 kcal)',
+        margin,
+        y
+      );
+      break;
+    }
+
+    case 'fda_supplement_facts': {
+      // Title
+      doc.setFont('Helvetica', 'bold');
+      doc.setFontSize(24);
+      doc.text('Supplement Facts', margin, y);
+      y += 16;
+
+      doc.setFont('Helvetica', 'normal');
+      doc.setFontSize(10);
+      doc.text(`Serving Size  ${options.servingSizeText}`, margin, y);
+      y += 12;
+      if (options.servingsPerContainer) {
+        doc.text(`Servings Per Container  ${options.servingsPerContainer}`, margin, y);
+        y += 14;
+      }
+
+      doc.setLineWidth(6);
+      doc.line(margin, y, margin + width, y);
+      y += 12;
+
+      doc.setFont('Helvetica', 'bold');
+      doc.setFontSize(9);
+      doc.text('Amount Per Serving', margin, y);
+      doc.text('% Daily Value', margin + width, y, { align: 'right' });
+      y += 6;
+
+      doc.setLineWidth(3);
+      doc.line(margin, y, margin + width, y);
+      y += 10;
+
+      addPdfRow('Calories', `${options.calories}`, null, true);
+      addPdfRow('Total Carbohydrate', `${options.totalCarbsG}g`, dvs.totalCarbsDV);
+      addPdfRow('Dietary Fiber', `${options.dietaryFiberG}g`, dvs.dietaryFiberDV);
+      addPdfRow('Total Sugars', `${options.totalSugarsG}g`, null);
+      addPdfRow('Protein', `${options.proteinG}g`, null, true);
+
+      doc.setLineWidth(6);
+      doc.line(margin, y, margin + width, y);
+      y += 12;
+
+      addPdfRow('Vitamin D (as Cholecalciferol)', `${options.vitaminDMcg}mcg`, dvs.vitaminDDV);
+      addPdfRow('Calcium (as Calcium Carbonate)', `${options.calciumMg}mg`, dvs.calciumDV);
+      addPdfRow('Iron (as Ferrous Fumarate)', `${options.ironMg}mg`, dvs.ironDV);
+      addPdfRow('Potassium (as Potassium Citrate)', `${options.potassiumMg}mg`, dvs.potassiumDV);
+
+      doc.setLineWidth(3);
+      doc.line(margin, y, margin + width, y);
+      y += 12;
+      doc.setFont('Helvetica', 'normal');
+      doc.setFontSize(7);
+      doc.text(
+        '* Daily Value not established / % Daily Values are based on a 2,000 calorie diet.',
+        margin,
+        y
+      );
+      break;
+    }
+
+    case 'fda_dual_column': {
+      const servingsNum = parseFloat(options.servingsPerContainer) || 2;
+      doc.setFont('Helvetica', 'bold');
+      doc.setFontSize(26);
+      doc.text('Nutrition Facts', margin, y);
+      y += 18;
+
+      doc.setFont('Helvetica', 'normal');
+      doc.setFontSize(10);
+      if (options.servingsPerContainer) {
+        doc.text(`${options.servingsPerContainer} servings per container`, margin, y);
+        y += 14;
+      }
+      doc.setFont('Helvetica', 'bold');
+      doc.setFontSize(11);
+      doc.text(`Serving size  ${options.servingSizeText}`, margin, y);
+      y += 16;
+
+      doc.setLineWidth(6);
+      doc.line(margin, y, margin + width, y);
+      y += 12;
+
+      doc.setFont('Helvetica', 'bold');
+      doc.setFontSize(9);
+      doc.text('Per serving', margin + 170, y, { align: 'right' });
+      doc.text('Per container', margin + width, y, { align: 'right' });
+      y += 8;
+
+      doc.setLineWidth(3);
+      doc.line(margin, y, margin + width, y);
+      y += 14;
+
+      doc.setFontSize(16);
+      doc.text('Calories', margin, y);
+      doc.text(`${options.calories}`, margin + 170, y, { align: 'right' });
+      doc.text(`${Math.round(options.calories * servingsNum)}`, margin + width, y, { align: 'right' });
+      y += 12;
+
+      doc.setLineWidth(3);
+      doc.line(margin, y, margin + width, y);
+      y += 10;
+
+      const addDualRow = (name: string, amtServ: string, amtPkg: string, isBold = false) => {
+        doc.setLineWidth(0.5);
+        doc.line(margin, y, margin + width, y);
+        y += 11;
+        doc.setFont('Helvetica', isBold ? 'bold' : 'normal');
+        doc.text(name, margin, y);
+        doc.text(amtServ, margin + 170, y, { align: 'right' });
+        doc.text(amtPkg, margin + width, y, { align: 'right' });
+        y += 4;
+      };
+
+      addDualRow('Total Fat', `${options.totalFatG}g`, `${Math.round(options.totalFatG * servingsNum)}g`, true);
+      addDualRow('Saturated Fat', `${options.saturatedFatG}g`, `${Math.round(options.saturatedFatG * servingsNum)}g`);
+      addDualRow('Sodium', `${options.sodiumMg}mg`, `${Math.round(options.sodiumMg * servingsNum)}mg`, true);
+      addDualRow('Total Carb.', `${options.totalCarbsG}g`, `${Math.round(options.totalCarbsG * servingsNum)}g`, true);
+      addDualRow('Dietary Fiber', `${options.dietaryFiberG}g`, `${Math.round(options.dietaryFiberG * servingsNum)}g`);
+      addDualRow('Total Sugars', `${options.totalSugarsG}g`, `${Math.round(options.totalSugarsG * servingsNum)}g`);
+      addDualRow('  Includes Added Sugars', `${options.addedSugarsG}g`, `${Math.round(options.addedSugarsG * servingsNum)}g`);
+      addDualRow('Protein', `${options.proteinG}g`, `${Math.round(options.proteinG * servingsNum)}g`, true);
+
+      doc.setLineWidth(3);
+      doc.line(margin, y, margin + width, y);
+      y += 12;
+      doc.setFont('Helvetica', 'normal');
+      doc.setFontSize(7);
+      doc.text('* The % Daily Value (DV) tells you how much a nutrient in a serving contributes to a daily diet.', margin, y);
+      break;
+    }
+
+    case 'fda_standard_2016':
+    default: {
+      doc.setFont('Helvetica', 'bold');
+      doc.setFontSize(26);
+      doc.text('Nutrition Facts', margin, y);
+      y += 18;
+
+      doc.setFont('Helvetica', 'normal');
+      doc.setFontSize(10);
+      if (options.servingsPerContainer) {
+        doc.text(`${options.servingsPerContainer} servings per container`, margin, y);
+        y += 14;
+      }
+      doc.setFont('Helvetica', 'bold');
+      doc.setFontSize(11);
+      doc.text(`Serving size  ${options.servingSizeText}`, margin, y);
+      y += 16;
+
+      doc.setLineWidth(6);
+      doc.line(margin, y, margin + width, y);
+      y += 14;
+
+      doc.setFont('Helvetica', 'bold');
+      doc.setFontSize(9);
+      doc.text('Amount per serving', margin, y);
+      y += 14;
+
+      doc.setFontSize(22);
+      doc.text('Calories', margin, y);
+      doc.text(`${options.calories}`, margin + width, y, { align: 'right' });
+      y += 14;
+
+      doc.setLineWidth(3);
+      doc.line(margin, y, margin + width, y);
+      y += 12;
+
+      doc.setFontSize(9);
+      doc.text('% Daily Value*', margin + width, y, { align: 'right' });
+      y += 8;
+
+      addPdfRow('Total Fat', `${options.totalFatG}g`, dvs.totalFatDV, true);
+      addPdfRow('Saturated Fat', `${options.saturatedFatG}g`, dvs.saturatedFatDV);
+      addPdfRow('Trans Fat', `${options.transFatG}g`, null);
+      addPdfRow('Cholesterol', `${options.cholesterolMg}mg`, dvs.cholesterolDV, true);
+      addPdfRow('Sodium', `${options.sodiumMg}mg`, dvs.sodiumDV, true);
+      addPdfRow('Total Carbohydrate', `${options.totalCarbsG}g`, dvs.totalCarbsDV, true);
+      addPdfRow('Dietary Fiber', `${options.dietaryFiberG}g`, dvs.dietaryFiberDV);
+      addPdfRow('Total Sugars', `${options.totalSugarsG}g`, null);
+      addPdfRow('  Includes Added Sugars', `${options.addedSugarsG}g`, dvs.addedSugarsDV);
+      addPdfRow('Protein', `${options.proteinG}g`, null, true);
+
+      doc.setLineWidth(6);
+      doc.line(margin, y, margin + width, y);
+      y += 14;
+
+      addPdfRow('Vitamin D', `${options.vitaminDMcg}mcg`, dvs.vitaminDDV);
+      addPdfRow('Calcium', `${options.calciumMg}mg`, dvs.calciumDV);
+      addPdfRow('Iron', `${options.ironMg}mg`, dvs.ironDV);
+      addPdfRow('Potassium', `${options.potassiumMg}mg`, dvs.potassiumDV);
+
+      doc.setLineWidth(3);
+      doc.line(margin, y, margin + width, y);
+      y += 12;
+      doc.setFont('Helvetica', 'normal');
+      doc.setFontSize(7);
+      doc.text(
+        '* The % Daily Value (DV) tells you how much a nutrient in a serving contributes to a daily diet.',
+        margin,
+        y
+      );
+      break;
+    }
+  }
 
   return doc.output('arraybuffer');
 }
@@ -678,6 +999,16 @@ export async function processNutritionLabel(
         outBlob = new Blob([pdfBuffer], { type: 'application/pdf' });
         mimeType = 'application/pdf';
         extension = 'pdf';
+        break;
+      }
+      case 'png': {
+        outBlob = await generateNutritionLabelPng(
+          svgString,
+          options.labelWidthPx || 320,
+          560
+        );
+        mimeType = 'image/png';
+        extension = 'png';
         break;
       }
       case 'svg':

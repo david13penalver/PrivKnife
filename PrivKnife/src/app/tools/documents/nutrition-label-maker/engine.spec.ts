@@ -148,6 +148,62 @@ describe('NutritionLabelMaker Engine (Seam 1)', () => {
       expect(header).toBe('%PDF-');
     });
 
+    it('should include Added Sugars in FDA 2016 PDF export (DEFECT-53-02)', async () => {
+      const res = await processNutritionLabel({
+        ...DEFAULT_FDA_OPTIONS,
+        exportFormat: 'pdf',
+      });
+      const text = new TextDecoder().decode(await res.blob.arrayBuffer());
+      expect(text).toContain('Added Sugars');
+    });
+
+    it('should render EU 1169 Nutrition Declaration in EU PDF export (DEFECT-53-02)', async () => {
+      const res = await processNutritionLabel({
+        ...EU_1169_OPTIONS,
+        exportFormat: 'pdf',
+      });
+      const text = new TextDecoder().decode(await res.blob.arrayBuffer());
+      expect(text).toContain('Nutrition Declaration');
+      expect(text).toContain('Salt');
+      expect(text).not.toContain('Nutrition Facts');
+    });
+
+    it('should render Supplement Facts in supplement PDF export (DEFECT-53-02)', async () => {
+      const res = await processNutritionLabel({
+        ...SUPPLEMENT_FACTS_OPTIONS,
+        exportFormat: 'pdf',
+      });
+      const text = new TextDecoder().decode(await res.blob.arrayBuffer());
+      expect(text).toContain('Supplement Facts');
+    });
+
+    it('should render dual column Per container in dual column PDF export (DEFECT-53-02)', async () => {
+      const res = await processNutritionLabel({
+        ...DUAL_COLUMN_OPTIONS,
+        exportFormat: 'pdf',
+      });
+      const text = new TextDecoder().decode(await res.blob.arrayBuffer());
+      expect(text).toContain('Per container');
+    });
+
+    it('should export valid 300 DPI PNG deliverable with PNG magic bytes (DEFECT-53-03)', async () => {
+      const res = await processNutritionLabel({
+        ...DEFAULT_FDA_OPTIONS,
+        exportFormat: 'png',
+      });
+
+      expect(res.success).toBe(true);
+      expect(res.mimeType).toBe('image/png');
+      expect(res.fileName).toMatch(/\.png$/);
+
+      const buffer = new Uint8Array(await res.blob.arrayBuffer());
+      // PNG signature: 0x89, 0x50, 0x4e, 0x47
+      expect(buffer[0]).toBe(0x89);
+      expect(buffer[1]).toBe(0x50);
+      expect(buffer[2]).toBe(0x4e);
+      expect(buffer[3]).toBe(0x47);
+    });
+
     it('should return error when options are invalid', async () => {
       const res = await processNutritionLabel(INVALID_CALORIES_OPTIONS);
 

@@ -140,4 +140,20 @@ describe('NutritionLabelMakerComponent (Seam 2 UI & Privacy)', () => {
     expect(fetchSpy).not.toHaveBeenCalled();
     expect(xhrOpenSpy).not.toHaveBeenCalled();
   });
+
+  it('should include 300 DPI PNG export option and export PNG deliverable (DEFECT-53-03)', async () => {
+    const compiled = fixture.nativeElement as HTMLElement;
+    const select = compiled.querySelector('#exportFormatSelect') as HTMLSelectElement;
+    const pngOption = Array.from(select.options).find((opt) => opt.value === 'png');
+    expect(pngOption).toBeTruthy();
+
+    component.updateExportFormat('png');
+    await component.generateDeliverable();
+    fixture.detectChanges();
+
+    const res = component.result();
+    expect(res?.success).toBe(true);
+    expect(res?.mimeType).toBe('image/png');
+    expect(res?.fileName).toContain('.png');
+  });
 });

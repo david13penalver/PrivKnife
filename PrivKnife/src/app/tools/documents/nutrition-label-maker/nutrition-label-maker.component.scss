@@ -1,0 +1,119 @@
+:host {
+  display: block;
+  max-width: 100%;
+  overflow-x: hidden;
+}
+
+.l-page {
+  max-width: 100%;
+  overflow-x: hidden;
+  box-sizing: border-box;
+}
+
+.c-header__title {
+  overflow-wrap: anywhere;
+  word-break: break-word;
+}
+
+.c-badge {
+  max-width: 100%;
+  overflow-wrap: anywhere;
+}
+
+.l-columns__area {
+  min-width: 0;
+  max-width: 100%;
+}
+
+.c-card {
+  max-width: 100%;
+  box-sizing: border-box;
+}
+
+.l-extremo {
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.c-button {
+  max-width: 100%;
+  white-space: normal;
+  text-align: center;
+}
+
+.c-card__subtitle {
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: var(--color-text, #1e293b);
+}
+
+.c-input,
+.c-input--number,
+.c-input--select {
+  width: 100%;
+  min-height: 38px;
+  font-size: 1rem;
+  padding: 0.45rem 0.65rem;
+  border: 1px solid var(--color-border, #cbd5e1);
+  border-radius: 4px;
+  background: var(--color-surface, #ffffff);
+  color: var(--color-text, #0f172a);
+  box-sizing: border-box;
+}
+
+.c-input--select {
+  padding-right: 2rem;
+  text-overflow: ellipsis;
+}
+
+.c-input__sublabel {
+  font-size: 0.75rem;
+  color: var(--color-text-muted, #64748b);
+  display: block;
+  margin-bottom: 2px;
+}
+
+.c-preview--nutrition-viewer {
+  background-color: var(--color-surface-subtle, #f1f5f9);
+  padding: 24px;
+  border-radius: 8px;
+  justify-content: center;
+  overflow: auto;
+  min-height: 480px;
+
+  @media (max-width: 480px) {
+    padding: 12px;
+  }
+}
+
+.c-preview__svg-container {
+  display: flex;
+  justify-content: center;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+  border-radius: 4px;
+  background: #fff;
+  max-width: 100%;
+}
+
+:host ::ng-deep .c-preview__svg-container svg {
+  max-width: 100%;
+  height: auto;
+  display: block;
+}
+
+@media (max-width: 480px) {
+  .l-columns--4,
+  .l-columns--3 {
+    grid-template-columns: repeat(2, 1fr) !important;
+    gap: 8px;
+  }
+}
+
+@media (max-width: 360px) {
+  .l-columns--4,
+  .l-columns--3,
+  .l-columns--2 {
+    grid-template-columns: 1fr !important;
+    gap: 6px;
+  }
+}
