@@ -48,3 +48,21 @@ export interface PresetLithophane {
   geometryType: LithophaneGeometryType;
   options: Partial<LithophaneMakerOptions>;
 }
+
+export interface LithophaneWorkerRequest {
+  id: number;
+  options: LithophaneMakerOptions;
+  format: 'stl' | '3mf';
+}
+
+export interface LithophaneWorkerResponse {
+  id: number;
+  type: 'progress' | 'result' | 'error';
+  percent?: number;
+  buffer?: ArrayBuffer;
+  fileName?: string;
+  fileSize?: number;
+  mimeType?: string;
+  metrics?: LithophaneMetrics;
+  error?: string;
+}

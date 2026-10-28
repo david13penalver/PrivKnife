@@ -22,6 +22,8 @@ import {
   LithophaneMetrics,
   PresetLithophane,
   BacklightColorMode,
+  LithophaneWorkerRequest,
+  LithophaneWorkerResponse,
 } from './types';
 import {
   calculateLithophaneMetrics,
@@ -121,7 +123,7 @@ import {
                 </label>
                 <input
                   type="range"
-                  class="c-input c-input--slider"
+                  class="c-input c-input__slider"
                   min="0.5"
                   max="2.2"
                   step="0.05"
@@ -200,7 +202,7 @@ import {
                   </label>
                   <input
                     type="range"
-                    class="c-input c-input--slider"
+                    class="c-input c-input__slider"
                     min="30"
                     max="180"
                     step="5"
@@ -216,7 +218,7 @@ import {
                   <label class="c-input__label">Width: <strong>{{ widthMm() }} mm</strong></label>
                   <input
                     type="range"
-                    class="c-input c-input--slider"
+                    class="c-input c-input__slider"
                     min="50"
                     max="220"
                     step="5"
@@ -229,7 +231,7 @@ import {
                   <label class="c-input__label">Height: <strong>{{ heightMm() }} mm</strong></label>
                   <input
                     type="range"
-                    class="c-input c-input--slider"
+                    class="c-input c-input__slider"
                     min="40"
                     max="220"
                     step="5"
@@ -247,7 +249,7 @@ import {
                   </label>
                   <input
                     type="range"
-                    class="c-input c-input--slider"
+                    class="c-input c-input__slider"
                     min="0.4"
                     max="1.6"
                     step="0.1"
@@ -262,7 +264,7 @@ import {
                   </label>
                   <input
                     type="range"
-                    class="c-input c-input--slider"
+                    class="c-input c-input__slider"
                     min="1.8"
                     max="4.5"
                     step="0.1"
@@ -278,7 +280,7 @@ import {
                   <label class="c-input__label">Border Width: <strong>{{ frameBorderWidthMm() }} mm</strong></label>
                   <input
                     type="range"
-                    class="c-input c-input--slider"
+                    class="c-input c-input__slider"
                     min="0"
                     max="10"
                     step="1"
@@ -291,7 +293,7 @@ import {
                   <label class="c-input__label">Border Depth: <strong>{{ frameBorderDepthMm() | number:'1.1-1' }} mm</strong></label>
                   <input
                     type="range"
-                    class="c-input c-input--slider"
+                    class="c-input c-input__slider"
                     min="1.5"
                     max="5.0"
                     step="0.2"
@@ -359,6 +361,10 @@ import {
                 (mousemove)="onMouseMove($event)"
                 (mouseup)="onMouseUp()"
                 (mouseleave)="onMouseUp()"
+                (wheel)="onWheel($event)"
+                (touchstart)="onTouchStart($event)"
+                (touchmove)="onTouchMove($event)"
+                (touchend)="onTouchEnd()"
               >
                 <!-- Loading overlay -->
                 @if (isGenerating()) {
@@ -414,6 +420,13 @@ import {
                 <button
                   type="button"
                   class="c-button c-button--outline"
+                  (click)="downloadPngSnapshot()"
+                >
+                  Snapshot .PNG
+                </button>
+                <button
+                  type="button"
+                  class="c-button c-button--outline"
                   (click)="downloadFormat('3mf')"
                 >
                   Download .3MF (Bambu / Prusa)
@@ -432,171 +445,7 @@ import {
       </div>
     </div>
   `,
-  styles: [
-    `
-      .litho-presets {
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-        gap: 12px;
-      }
-
-      .litho-preset-btn {
-        display: flex;
-        flex-direction: column;
-        align-items: flex-start;
-        text-align: left;
-        padding: 12px;
-        height: auto;
-      }
-
-      .litho-preset-desc {
-        font-size: 0.8rem;
-        opacity: 0.8;
-        margin-top: 4px;
-        font-weight: normal;
-      }
-
-      .sample-actions {
-        display: flex;
-        flex-direction: column;
-        gap: 8px;
-      }
-
-      .sample-btn-group {
-        display: flex;
-        flex-wrap: wrap;
-        gap: 8px;
-      }
-
-      .geom-button-row {
-        display: flex;
-        flex-wrap: wrap;
-        gap: 6px;
-        margin-top: 6px;
-      }
-
-      .param-grid {
-        display: grid;
-        grid-template-columns: 1fr 1fr;
-        gap: 16px;
-      }
-
-      .c-input--slider {
-        width: 100%;
-        margin-top: 4px;
-      }
-
-      .c-input__checkbox-label {
-        display: flex;
-        align-items: center;
-        gap: 8px;
-        cursor: pointer;
-        font-size: 0.9rem;
-      }
-
-      .litho-viewport {
-        position: relative;
-        width: 100%;
-        height: 380px;
-        background: #111827;
-        border-radius: 8px;
-        overflow: hidden;
-        cursor: grab;
-      }
-
-      .litho-viewport:active {
-        cursor: grabbing;
-      }
-
-      .viewport-overlay {
-        position: absolute;
-        inset: 0;
-        background: rgba(17, 24, 39, 0.85);
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        z-index: 10;
-        padding: 24px;
-      }
-
-      .viewport-hints {
-        position: absolute;
-        bottom: 8px;
-        left: 8px;
-        font-size: 0.75rem;
-        color: rgba(255, 255, 255, 0.5);
-        pointer-events: none;
-        user-select: none;
-      }
-
-      .metrics-grid {
-        display: grid;
-        grid-template-columns: repeat(2, 1fr);
-        gap: 10px;
-      }
-
-      .metric-card {
-        background: rgba(255, 255, 255, 0.04);
-        border: 1px solid rgba(255, 255, 255, 0.08);
-        border-radius: 6px;
-        padding: 8px 12px;
-        display: flex;
-        flex-direction: column;
-      }
-
-      .metric-label {
-        font-size: 0.75rem;
-        color: #9ca3af;
-      }
-
-      .metric-value {
-        font-size: 0.95rem;
-        color: #f3f4f6;
-        margin-top: 2px;
-      }
-
-      .slicer-box {
-        background: rgba(59, 130, 246, 0.08);
-        border: 1px solid rgba(59, 130, 246, 0.2);
-        border-radius: 6px;
-        padding: 10px 14px;
-      }
-
-      .slicer-title {
-        font-size: 0.85rem;
-        margin: 0 0 6px 0;
-        color: #93c5fd;
-      }
-
-      .slicer-list {
-        margin: 0;
-        padding-left: 18px;
-        font-size: 0.8rem;
-        color: #cbd5e1;
-        line-height: 1.4;
-      }
-
-      .export-actions {
-        display: flex;
-        gap: 8px;
-      }
-
-      @media (max-width: 768px) {
-        .param-grid {
-          grid-template-columns: 1fr;
-        }
-
-        .metrics-grid {
-          grid-template-columns: 1fr;
-        }
-
-        .export-actions {
-          flex-direction: column;
-          width: 100%;
-        }
-      }
-    `,
-  ],
+  styleUrls: ['./lithophane-maker.component.scss'],
 })
 export class LithophaneMakerComponent implements OnInit, OnDestroy {
   @ViewChild('viewportContainer') viewportContainer!: ElementRef<HTMLDivElement>;
@@ -655,6 +504,14 @@ export class LithophaneMakerComponent implements OnInit, OnDestroy {
   private meshRotationX = 0;
   private meshRotationY = 0;
 
+  // Touch orbit state
+  private isTouching = false;
+  private prevTouchX = 0;
+  private prevTouchY = 0;
+
+  // Dedicated worker ref
+  private worker?: Worker;
+
   ngOnInit(): void {
     // Load initial synthetic image
     this.currentImageBuffer = createSyntheticImageBuffer(70, 56, 'gradient');
@@ -681,8 +538,13 @@ export class LithophaneMakerComponent implements OnInit, OnDestroy {
       }
     }
 
-    if (this.renderer) {
+    if (this.renderer && typeof this.renderer.dispose === 'function') {
       this.renderer.dispose();
+    }
+
+    if (this.worker) {
+      this.worker.terminate();
+      this.worker = undefined;
     }
 
     // Revoke all created Object URLs
@@ -820,11 +682,11 @@ export class LithophaneMakerComponent implements OnInit, OnDestroy {
 
     const img = new Image();
     const objectUrl = URL.createObjectURL(file);
-    this.activeDownloadUrls.push(objectUrl);
 
     img.onload = () => {
+      URL.revokeObjectURL(objectUrl);
       const canvas = document.createElement('canvas');
-      // Downsample to max 160px width for smooth 60fps mesh generation
+      // Downsample to max 140px width for smooth 60fps mesh generation
       const maxDim = 140;
       let targetW = img.width;
       let targetH = img.height;
@@ -858,12 +720,19 @@ export class LithophaneMakerComponent implements OnInit, OnDestroy {
       }
     };
 
+    img.onerror = () => {
+      URL.revokeObjectURL(objectUrl);
+    };
+
     img.src = objectUrl;
   }
 
   // --- DOWNLOAD ACTIONS ---
 
   async downloadFormat(format: 'stl' | '3mf'): Promise<void> {
+    this.isGenerating.set(true);
+    this.progressPercent.set(10);
+
     const options: LithophaneMakerOptions = {
       geometryType: this.geometryType(),
       arcDegrees: this.arcDegrees(),
@@ -881,18 +750,95 @@ export class LithophaneMakerComponent implements OnInit, OnDestroy {
       imageData: this.currentImageBuffer,
     };
 
-    const result = await processLithophane(options, format);
-    if (!result.success || !result.blob) return;
+    let blob: Blob | undefined;
+    let fileName = `privknife-lithophane-${options.geometryType}-${Math.round(options.widthMm)}x${Math.round(options.heightMm)}mm.${format}`;
 
-    const url = URL.createObjectURL(result.blob);
-    this.activeDownloadUrls.push(url);
+    if (typeof Worker !== 'undefined') {
+      try {
+        const response = await this.executeWorkerTask(options, format);
+        if (response.buffer) {
+          blob = new Blob([response.buffer], {
+            type: response.mimeType || (format === '3mf' ? 'model/3mf' : 'model/stl'),
+          });
+          if (response.fileName) fileName = response.fileName;
+        }
+      } catch {
+        // Fallback to synchronous in test or restricted environments
+      }
+    }
 
+    if (!blob) {
+      const result = await processLithophane(options, format, (p) => this.progressPercent.set(p));
+      if (result.success && result.blob) {
+        blob = result.blob;
+        fileName = result.fileName;
+      }
+    }
+
+    this.isGenerating.set(false);
+    this.progressPercent.set(0);
+
+    if (!blob) return;
+
+    const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
-    a.download = result.fileName;
+    a.download = fileName;
     document.body.appendChild(a);
     a.click();
     document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+  }
+
+  private executeWorkerTask(
+    options: LithophaneMakerOptions,
+    format: 'stl' | '3mf'
+  ): Promise<LithophaneWorkerResponse> {
+    return new Promise((resolve, reject) => {
+      try {
+        if (!this.worker) {
+          this.worker = new Worker(new URL('./worker', import.meta.url), { type: 'module' });
+        }
+        const id = Date.now();
+        const handler = (e: MessageEvent<LithophaneWorkerResponse>) => {
+          if (e.data.id === id) {
+            if (e.data.type === 'progress' && typeof e.data.percent === 'number') {
+              this.progressPercent.set(e.data.percent);
+            } else if (e.data.type === 'result') {
+              this.worker?.removeEventListener('message', handler);
+              resolve(e.data);
+            } else if (e.data.type === 'error') {
+              this.worker?.removeEventListener('message', handler);
+              reject(new Error(e.data.error || 'Worker export failed'));
+            }
+          }
+        };
+        this.worker.addEventListener('message', handler);
+        this.worker.postMessage({ id, options, format } as LithophaneWorkerRequest);
+      } catch (err) {
+        reject(err);
+      }
+    });
+  }
+
+  downloadPngSnapshot(): void {
+    if (!this.renderer || !this.scene || !this.camera) return;
+
+    this.renderer.render(this.scene, this.camera);
+    const canvas = this.renderer.domElement;
+    if (typeof canvas.toBlob === 'function') {
+      canvas.toBlob((blob) => {
+        if (!blob) return;
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `privknife-lithophane-${this.geometryType()}-${Math.round(this.widthMm())}x${Math.round(this.heightMm())}mm.png`;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+      }, 'image/png');
+    }
   }
 
   // --- THREE.JS VIEWPORT & RENDERING ---
@@ -1067,5 +1013,41 @@ export class LithophaneMakerComponent implements OnInit, OnDestroy {
 
   onMouseUp(): void {
     this.isDragging = false;
+  }
+
+  // --- TOUCH & WHEEL VIEWPORT CONTROLS ---
+
+  onWheel(event: WheelEvent): void {
+    event.preventDefault();
+    if (!this.camera) return;
+    const zoomDelta = event.deltaY * 0.1;
+    this.camera.position.z = Math.max(60, Math.min(350, this.camera.position.z + zoomDelta));
+  }
+
+  onTouchStart(event: TouchEvent): void {
+    if (event.touches.length === 1) {
+      this.isTouching = true;
+      this.prevTouchX = event.touches[0].clientX;
+      this.prevTouchY = event.touches[0].clientY;
+    }
+  }
+
+  onTouchMove(event: TouchEvent): void {
+    if (!this.isTouching || event.touches.length !== 1) return;
+    event.preventDefault();
+    const touch = event.touches[0];
+    const deltaX = touch.clientX - this.prevTouchX;
+    const deltaY = touch.clientY - this.prevTouchY;
+
+    this.meshRotationY += deltaX * 0.01;
+    this.meshRotationX += deltaY * 0.01;
+    this.meshRotationX = Math.max(-Math.PI / 2.2, Math.min(Math.PI / 2.2, this.meshRotationX));
+
+    this.prevTouchX = touch.clientX;
+    this.prevTouchY = touch.clientY;
+  }
+
+  onTouchEnd(): void {
+    this.isTouching = false;
   }
 }

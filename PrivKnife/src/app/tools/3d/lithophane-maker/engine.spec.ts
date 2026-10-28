@@ -189,5 +189,18 @@ describe('LithophaneMaker Engine (Seam 1)', () => {
       expect(result.error).toBeDefined();
       expect(result.fileSize).toBe(0);
     });
+
+    it('should invoke onProgress callback with monotonically increasing values up to 100', async () => {
+      const progressValues: number[] = [];
+      const onProgress = (p: number) => progressValues.push(p);
+
+      const result = await processLithophane(DEFAULT_LITHOPHANE_OPTIONS, 'stl', onProgress);
+      expect(result.success).toBe(true);
+      expect(progressValues.length).toBeGreaterThan(0);
+      expect(progressValues[progressValues.length - 1]).toBe(100);
+      for (let i = 1; i < progressValues.length; i++) {
+        expect(progressValues[i]).toBeGreaterThanOrEqual(progressValues[i - 1]);
+      }
+    });
   });
 });

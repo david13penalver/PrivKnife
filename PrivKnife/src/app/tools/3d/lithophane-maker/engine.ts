@@ -571,8 +571,10 @@ ${trianglesXml}        </triangles>
  */
 export async function processLithophane(
   options: LithophaneMakerOptions,
-  format: 'stl' | '3mf' = 'stl'
+  format: 'stl' | '3mf' = 'stl',
+  onProgress?: (percent: number) => void
 ): Promise<LithophaneMakerResult> {
+  onProgress?.(10);
   const validation = validateLithophaneOptions(options);
   if (!validation.valid) {
     return {
@@ -597,8 +599,11 @@ export async function processLithophane(
     };
   }
 
+  onProgress?.(25);
   const geometry = generateLithophaneGeometry(options);
+  onProgress?.(55);
   const metrics = calculateLithophaneMetrics(geometry, options);
+  onProgress?.(70);
 
   const baseFileName = `privknife-lithophane-${options.geometryType}-${Math.round(options.widthMm)}x${Math.round(options.heightMm)}mm`;
 
@@ -618,6 +623,7 @@ export async function processLithophane(
   }
 
   geometry.dispose();
+  onProgress?.(100);
 
   return {
     success: true,
