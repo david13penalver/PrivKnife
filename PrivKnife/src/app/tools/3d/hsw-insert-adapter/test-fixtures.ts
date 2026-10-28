@@ -12,6 +12,7 @@ export const DEFAULT_HSW_OPTIONS: HswInsertAdapterOptions = {
   retentionTabs: true,
   plugDepthMm: 8.0,
   flangeRim: true,
+  cellGrid: '1x1',
 };
 
 export const MINIMAL_HSW_OPTIONS: HswInsertAdapterOptions = {

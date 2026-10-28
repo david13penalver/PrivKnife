@@ -123,6 +123,65 @@ describe('HswInsertAdapterComponent (Seam 2 & 4)', () => {
       expect(revokeSpy).toHaveBeenCalledWith('blob:dummy-hsw-url');
       revokeSpy.mockRestore();
     });
+
+    it('should remove mouseup listener on window when component is destroyed (DEFECT-42-05)', () => {
+      const removeSpy = vi.spyOn(window, 'removeEventListener');
+      fixture.destroy();
+      expect(removeSpy).toHaveBeenCalledWith('mouseup', expect.any(Function));
+      removeSpy.mockRestore();
+    });
+
+    it('should reset all signals including hook and magnet options on resetToDefaults() (DEFECT-42-03)', () => {
+      component.applyPreset(HSW_PRESETS[1]); // Heavy tool hook (hookLength: 40)
+      component.hookLengthMm.set(50.0);
+      component.magnetDiameterMm.set(12.0);
+      component.ringDiameterMm.set(50.0);
+      component.cellGrid.set('2x2');
+
+      component.resetToDefaults();
+
+      expect(component.hookLengthMm()).toBe(35.0);
+      expect(component.hookAngleDeg()).toBe(25.0);
+      expect(component.magnetDiameterMm()).toBe(8.0);
+      expect(component.ringDiameterMm()).toBe(30.0);
+      expect(component.cellGrid()).toBe('1x1');
+      expect(component.insertType()).toBe('hex_nut_pocket');
+    });
+  });
+
+  describe('Touch Orbit Controls & UI Grid (DEFECT-42-03 & DEFECT-42-05)', () => {
+    it('should support touch rotation events on canvas', () => {
+      const canvas = fixture.nativeElement.querySelector('canvas') as HTMLCanvasElement;
+      expect(canvas).toBeTruthy();
+
+      const touchStart = new TouchEvent('touchstart', {
+        touches: [{ clientX: 100, clientY: 100 } as Touch],
+      });
+      canvas.dispatchEvent(touchStart);
+
+      const touchMove = new TouchEvent('touchmove', {
+        touches: [{ clientX: 120, clientY: 110 } as Touch],
+      });
+      canvas.dispatchEvent(touchMove);
+
+      const touchEnd = new TouchEvent('touchend', {
+        touches: [],
+      });
+      canvas.dispatchEvent(touchEnd);
+    });
+
+    it('should render multi-cell ganging selector in DOM', () => {
+      const gangingSelector = fixture.nativeElement.querySelector('.grid-selector-group') ||
+        fixture.nativeElement.querySelector('[data-testid="cell-grid-group"]');
+      expect(gangingSelector).toBeTruthy();
+    });
+
+    it('should render export buttons with dedicated action classes', () => {
+      const btnStl = fixture.nativeElement.querySelector('.download-btn-stl');
+      const btn3mf = fixture.nativeElement.querySelector('.download-btn-3mf');
+      expect(btnStl).toBeTruthy();
+      expect(btn3mf).toBeTruthy();
+    });
   });
 
   describe('Privacy & Zero Exfiltration (Directive 1 & 2)', () => {

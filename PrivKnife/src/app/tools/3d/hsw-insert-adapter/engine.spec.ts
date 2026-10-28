@@ -146,6 +146,110 @@ describe('Honeycomb Storage Wall (HSW) Insert & Adapter Engine (Seam 1)', () => 
       result.plugGeometry.dispose();
       result.attachmentGeometry.dispose();
     });
+
+    it('should not intrude into storage_ring inner aperture (DEFECT-42-01)', () => {
+      const ringDia = 30.0;
+      const ringInnerR = ringDia / 2;
+      const ringWall = 3.5;
+      const ringOuterDia = ringDia + ringWall * 2;
+      const standOff = ringOuterDia / 2 + 2.0;
+
+      const result = generateHswMesh({
+        ...DEFAULT_HSW_OPTIONS,
+        insertType: 'storage_ring',
+        ringDiameterMm: ringDia,
+      });
+
+      const pos = result.attachmentGeometry.getAttribute('position');
+      expect(pos).toBeDefined();
+
+      for (let i = 0; i < pos.count; i++) {
+        const x = pos.getX(i);
+        const y = pos.getY(i);
+        const distToCenter = Math.sqrt(x * x + (y - standOff) * (y - standOff));
+        // No vertex may lie strictly inside the inner hole
+        expect(distToCenter).toBeGreaterThanOrEqual(ringInnerR - 0.05);
+      }
+
+      result.plugGeometry.dispose();
+      result.attachmentGeometry.dispose();
+    });
+
+    it('should place tool_hook gusset entirely in front of the plug face (DEFECT-42-01)', () => {
+      const result = generateHswMesh({
+        ...DEFAULT_HSW_OPTIONS,
+        insertType: 'tool_hook',
+        plugDepthMm: 8.0,
+        flangeRim: true,
+      });
+
+      result.attachmentGeometry.computeBoundingBox();
+      const box = result.attachmentGeometry.boundingBox!;
+      const frontZ = 8.0 + 1.6; // depth + flange
+
+      expect(box.min.z).toBeGreaterThanOrEqual(frontZ - 0.01);
+
+      result.plugGeometry.dispose();
+      result.attachmentGeometry.dispose();
+    });
+
+    it('should match totalTriangles between metrics and binary STL for empty_plug (DEFECT-42-01)', () => {
+      const result = generateHswMesh({
+        ...DEFAULT_HSW_OPTIONS,
+        insertType: 'empty_plug',
+      });
+
+      const buffer = exportHswSTL(result.plugGeometry, result.attachmentGeometry);
+      const dv = new DataView(buffer);
+      const stlTriCount = dv.getUint32(80, true);
+
+      expect(result.metrics.totalTriangles).toBe(stlTriCount);
+
+      result.plugGeometry.dispose();
+      result.attachmentGeometry.dispose();
+    });
+
+    it('should reflect tightness tolerance in acrossFlatsMm metric (DEFECT-42-03)', () => {
+      const result = generateHswMesh({
+        ...DEFAULT_HSW_OPTIONS,
+        tightnessToleranceMm: 0.15,
+      });
+
+      expect(result.metrics.acrossFlatsMm).toBe(20.15);
+
+      result.plugGeometry.dispose();
+      result.attachmentGeometry.dispose();
+    });
+
+    it('should generate ganged multi-cell HSW plugs at canonical pitch for 2x1 and 2x2 grids (DEFECT-42-03)', () => {
+      const result2x1 = generateHswMesh({
+        ...DEFAULT_HSW_OPTIONS,
+        cellGrid: '2x1',
+      });
+
+      result2x1.plugGeometry.computeBoundingBox();
+      const box2x1 = result2x1.plugGeometry.boundingBox!;
+      const width2x1 = box2x1.max.x - box2x1.min.x;
+      // Canonical pitch 23.6mm + across flats ~20mm -> width >= 40mm
+      expect(width2x1).toBeGreaterThanOrEqual(40.0);
+
+      const result2x2 = generateHswMesh({
+        ...DEFAULT_HSW_OPTIONS,
+        cellGrid: '2x2',
+      });
+
+      result2x2.plugGeometry.computeBoundingBox();
+      const box2x2 = result2x2.plugGeometry.boundingBox!;
+      const width2x2 = box2x2.max.x - box2x2.min.x;
+      const height2x2 = box2x2.max.y - box2x2.min.y;
+      expect(width2x2).toBeGreaterThanOrEqual(40.0);
+      expect(height2x2).toBeGreaterThanOrEqual(38.0);
+
+      result2x1.plugGeometry.dispose();
+      result2x1.attachmentGeometry.dispose();
+      result2x2.plugGeometry.dispose();
+      result2x2.attachmentGeometry.dispose();
+    });
   });
 
   describe('File Serialization & Export (STL & 3MF)', () => {

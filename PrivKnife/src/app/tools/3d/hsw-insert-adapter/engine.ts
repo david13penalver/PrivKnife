@@ -85,7 +85,6 @@ export function validateHswOptions(options: HswInsertAdapterOptions): {
 // -------------------------------------------------------------
 function safeMergeGeometries(geometries: THREE.BufferGeometry[]): THREE.BufferGeometry {
   if (geometries.length === 0) return new THREE.BufferGeometry();
-  if (geometries.length === 1) return geometries[0].clone();
 
   const normalized = geometries.map((geom) => {
     let g = geom.index ? geom.toNonIndexed() : geom.clone();
@@ -139,58 +138,96 @@ export function generateHswMesh(options: HswInsertAdapterOptions): HswMeshResult
   const effAcrossFlats = standardAcrossFlats + options.tightnessToleranceMm;
   const depth = options.plugDepthMm;
 
-  // --- 1. Base Hexagonal Plug Body ---
+  // --- 1. Base Hexagonal Plug Body & Multi-Cell Ganging ---
   const plugGeometries: THREE.BufferGeometry[] = [];
-  const baseHexShape = createHexagonShape(effAcrossFlats);
+  const cellGrid = options.cellGrid || '1x1';
+  const horizontalPitch = 23.6;
+  const verticalPitch = 20.44;
 
-  // If hex_nut_pocket, subtract central screw hole from plug
-  if (options.insertType === 'hex_nut_pocket') {
-    const screwHoleR = options.nutSize === 'M3' ? 1.6 : options.nutSize === 'M4' ? 2.15 : 2.65;
-    const holePath = new THREE.Path();
-    holePath.absarc(0, 0, screwHoleR, 0, Math.PI * 2, true);
-    baseHexShape.holes.push(holePath);
-  } else if (options.insertType === 'empty_plug') {
-    // Center wiring / pry slot hole (Ø 5mm)
-    const centerHole = new THREE.Path();
-    centerHole.absarc(0, 0, 2.5, 0, Math.PI * 2, true);
-    baseHexShape.holes.push(centerHole);
+  let cellCenters: { x: number; y: number }[] = [{ x: 0, y: 0 }];
+  if (cellGrid === '2x1') {
+    cellCenters = [
+      { x: -horizontalPitch / 2, y: 0 },
+      { x: horizontalPitch / 2, y: 0 },
+    ];
+  } else if (cellGrid === '2x2') {
+    cellCenters = [
+      { x: -horizontalPitch / 2, y: -verticalPitch / 2 },
+      { x: horizontalPitch / 2, y: -verticalPitch / 2 },
+      { x: -horizontalPitch / 2, y: verticalPitch / 2 },
+      { x: horizontalPitch / 2, y: verticalPitch / 2 },
+    ];
   }
 
-  const hexBodyGeom = new THREE.ExtrudeGeometry(baseHexShape, {
-    depth,
-    bevelEnabled: false,
-  });
-  plugGeometries.push(hexBodyGeom);
+  for (const center of cellCenters) {
+    const baseHexShape = createHexagonShape(effAcrossFlats);
 
-  // Front Flange Stop Rim (resting flush on front surface of HSW panel)
-  if (options.flangeRim) {
-    const flangeShape = createHexagonShape(effAcrossFlats + 3.0);
-    if (baseHexShape.holes.length > 0) {
-      flangeShape.holes.push(...baseHexShape.holes);
+    // If hex_nut_pocket, subtract central screw hole from central plug
+    if (options.insertType === 'hex_nut_pocket' && (cellCenters.length === 1 || (Math.abs(center.x) < 0.01 && Math.abs(center.y) < 0.01))) {
+      const screwHoleR = options.nutSize === 'M3' ? 1.6 : options.nutSize === 'M4' ? 2.15 : 2.65;
+      const holePath = new THREE.Path();
+      holePath.absarc(0, 0, screwHoleR, 0, Math.PI * 2, true);
+      baseHexShape.holes.push(holePath);
     }
-    const flangeGeom = new THREE.ExtrudeGeometry(flangeShape, {
-      depth: 1.6,
+
+    const hexBodyGeom = new THREE.ExtrudeGeometry(baseHexShape, {
+      depth,
       bevelEnabled: false,
     });
-    flangeGeom.translate(0, 0, depth);
-    plugGeometries.push(flangeGeom);
+    hexBodyGeom.translate(center.x, center.y, 0);
+    plugGeometries.push(hexBodyGeom);
+
+    // Front Flange Stop Rim (resting flush on front surface of HSW panel)
+    if (options.flangeRim) {
+      const flangeShape = createHexagonShape(effAcrossFlats + 3.0);
+      if (baseHexShape.holes.length > 0) {
+        flangeShape.holes.push(...baseHexShape.holes);
+      }
+      const flangeGeom = new THREE.ExtrudeGeometry(flangeShape, {
+        depth: 1.6,
+        bevelEnabled: false,
+      });
+      flangeGeom.translate(center.x, center.y, depth);
+      plugGeometries.push(flangeGeom);
+    }
+
+    // Retention Snap Click-Tabs
+    if (options.retentionTabs) {
+      const tabWidth = 4.5;
+      const tabHeight = 0.45;
+      const tabLength = 1.6;
+      const tabDist = effAcrossFlats / 2;
+
+      const tabGeom1 = new THREE.BoxGeometry(tabWidth, tabHeight * 2, tabLength);
+      tabGeom1.translate(center.x, center.y + tabDist, depth * 0.5);
+
+      const tabGeom2 = new THREE.BoxGeometry(tabWidth, tabHeight * 2, tabLength);
+      tabGeom2.translate(center.x, center.y - tabDist, depth * 0.5);
+
+      plugGeometries.push(tabGeom1, tabGeom2);
+    }
   }
 
-  // Retention Snap Click-Tabs
-  if (options.retentionTabs) {
-    // Small locking ridge bumps on 2 opposing flats
-    const tabWidth = 4.5;
-    const tabHeight = 0.45;
-    const tabLength = 1.6;
-    const tabDist = effAcrossFlats / 2;
+  // Structural connecting bridge plate for multi-cell ganging (2x1 and 2x2)
+  let totalLengthMm = standardAcrossFlats;
+  let totalHeightMm = standardAcrossFlats;
 
-    const tabGeom1 = new THREE.BoxGeometry(tabWidth, tabHeight * 2, tabLength);
-    tabGeom1.translate(0, tabDist, depth * 0.5);
-
-    const tabGeom2 = new THREE.BoxGeometry(tabWidth, tabHeight * 2, tabLength);
-    tabGeom2.translate(0, -tabDist, depth * 0.5);
-
-    plugGeometries.push(tabGeom1, tabGeom2);
+  if (cellGrid === '2x1') {
+    const bridgeW = horizontalPitch + effAcrossFlats + 2.0;
+    const bridgeH = effAcrossFlats + 2.0;
+    const bridgeGeom = new THREE.BoxGeometry(bridgeW, bridgeH, 1.6);
+    bridgeGeom.translate(0, 0, depth + 0.8);
+    plugGeometries.push(bridgeGeom);
+    totalLengthMm = Math.max(totalLengthMm, bridgeW);
+    totalHeightMm = Math.max(totalHeightMm, bridgeH);
+  } else if (cellGrid === '2x2') {
+    const bridgeW = horizontalPitch + effAcrossFlats + 2.0;
+    const bridgeH = verticalPitch + effAcrossFlats + 2.0;
+    const bridgeGeom = new THREE.BoxGeometry(bridgeW, bridgeH, 1.6);
+    bridgeGeom.translate(0, 0, depth + 0.8);
+    plugGeometries.push(bridgeGeom);
+    totalLengthMm = Math.max(totalLengthMm, bridgeW);
+    totalHeightMm = Math.max(totalHeightMm, bridgeH);
   }
 
   const plugGeometry = safeMergeGeometries(plugGeometries);
@@ -198,16 +235,13 @@ export function generateHswMesh(options: HswInsertAdapterOptions): HswMeshResult
 
   // --- 2. Functional Attachment Geometry ---
   const attachGeometries: THREE.BufferGeometry[] = [];
-  const frontZ = depth + (options.flangeRim ? 1.6 : 0);
-
-  let totalLengthMm = standardAcrossFlats;
-  let totalHeightMm = standardAcrossFlats;
+  const frontZ = depth + (options.flangeRim || cellGrid !== '1x1' ? 1.6 : 0);
 
   switch (options.insertType) {
     case 'empty_plug': {
-      // Small decorative coin / pry groove on front
-      const slotGeom = new THREE.BoxGeometry(8.0, 1.8, 0.8);
-      slotGeom.translate(0, 0, frontZ - 0.4);
+      // Decorative flush coin / pry notch on front face
+      const slotGeom = new THREE.BoxGeometry(8.0, 1.8, 0.6);
+      slotGeom.translate(0, 0, frontZ + 0.3);
       attachGeometries.push(slotGeom);
       break;
     }
@@ -304,19 +338,21 @@ export function generateHswMesh(options: HswInsertAdapterOptions): HswMeshResult
         frontZ + hookLen + (tipLen / 2) * Math.cos(tipAngleRad)
       );
 
-      // Reinforced bottom gusset brace
+      // Reinforced bottom gusset brace: right triangle in Y-Z plane entirely at z >= frontZ
+      const gussetDrop = 10.0;
+      const gussetLen = Math.min(hookLen * 0.4, 15.0);
       const gussetShape = new THREE.Shape();
-      gussetShape.moveTo(-armWidth / 2, 0);
-      gussetShape.lineTo(armWidth / 2, 0);
-      gussetShape.lineTo(armWidth / 2, -10.0);
-      gussetShape.lineTo(-armWidth / 2, -10.0);
+      gussetShape.moveTo(0, 0);
+      gussetShape.lineTo(gussetLen, 0);
+      gussetShape.lineTo(0, -gussetDrop);
       gussetShape.closePath();
+
       const gussetGeom = new THREE.ExtrudeGeometry(gussetShape, {
-        depth: Math.min(hookLen * 0.4, 15.0),
+        depth: armWidth,
         bevelEnabled: false,
       });
-      gussetGeom.rotateX(Math.PI / 4);
-      gussetGeom.translate(0, -armThick, frontZ);
+      gussetGeom.rotateY(-Math.PI / 2);
+      gussetGeom.translate(armWidth / 2, -armThick, frontZ);
 
       attachGeometries.push(armGeom, tipGeom, gussetGeom);
 
@@ -345,9 +381,10 @@ export function generateHswMesh(options: HswInsertAdapterOptions): HswMeshResult
       });
       ringGeom.translate(0, 0, frontZ);
 
-      // Neck mounting bridge
-      const neckGeom = new THREE.BoxGeometry(8.0, standOff, ringHeight);
-      neckGeom.translate(0, standOff / 2, frontZ + ringHeight / 2);
+      // Neck mounting bridge: connects y=0 to outer/inner lower wall of ring without entering the ring hole
+      const neckHeight = standOff - ringInnerDia / 2;
+      const neckGeom = new THREE.BoxGeometry(8.0, neckHeight, ringHeight);
+      neckGeom.translate(0, neckHeight / 2, frontZ + ringHeight / 2);
 
       attachGeometries.push(ringGeom, neckGeom);
 
@@ -386,7 +423,7 @@ export function generateHswMesh(options: HswInsertAdapterOptions): HswMeshResult
     plugGeometry,
     attachmentGeometry,
     metrics: {
-      acrossFlatsMm: standardAcrossFlats,
+      acrossFlatsMm: Math.round(effAcrossFlats * 100) / 100,
       plugDepthMm: depth,
       totalLengthMm: Math.round(totalLengthMm * 10) / 10,
       totalHeightMm: Math.round(totalHeightMm * 10) / 10,

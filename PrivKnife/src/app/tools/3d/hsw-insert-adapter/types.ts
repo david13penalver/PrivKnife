@@ -8,6 +8,8 @@ export type HswInsertType =
 
 export type MetricNutSize = 'M3' | 'M4' | 'M5';
 
+export type HswCellGrid = '1x1' | '2x1' | '2x2';
+
 export type HswExportFormat = 'stl' | '3mf';
 
 export interface HswInsertAdapterOptions {
@@ -22,6 +24,7 @@ export interface HswInsertAdapterOptions {
   retentionTabs: boolean;
   plugDepthMm: number; // 6.0 - 12.0 mm
   flangeRim: boolean;
+  cellGrid?: HswCellGrid;
 }
 
 export interface HswMetrics {
@@ -52,4 +55,19 @@ export interface HswPreset {
   name: string;
   description: string;
   options: Partial<HswInsertAdapterOptions>;
+}
+
+export interface HswWorkerRequest {
+  options: HswInsertAdapterOptions;
+  format: HswExportFormat;
+}
+
+export interface HswWorkerResponse {
+  success: boolean;
+  blob?: Blob;
+  fileName?: string;
+  fileSize?: number;
+  mimeType?: string;
+  metrics?: HswMetrics;
+  error?: string;
 }
