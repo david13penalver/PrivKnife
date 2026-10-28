@@ -3,6 +3,7 @@ import {
   ElementRef,
   OnDestroy,
   OnInit,
+  AfterViewInit,
   ViewChild,
   signal,
 } from '@angular/core';
@@ -18,6 +19,8 @@ import {
   PresetHolder,
   SkadisPegboardMakerOptions,
   SkadisPegboardMetrics,
+  SkadisPegboardWorkerRequest,
+  SkadisPegboardWorkerResponse,
 } from './types';
 import {
   DEFAULT_SKADIS_OPTIONS,
@@ -82,7 +85,7 @@ import {
               <!-- System Selection -->
               <div class="control-group">
                 <label class="c-input__label">Target Board System</label>
-                <div class="btn-toggle-grid">
+                <div class="system-selector">
                   <button
                     type="button"
                     class="c-button c-button--small"
@@ -183,7 +186,7 @@ import {
                 </label>
                 <input
                   type="range"
-                  class="c-input c-input--slider"
+                  class="c-input c-input__slider"
                   min="20"
                   max="120"
                   step="5"
@@ -201,7 +204,7 @@ import {
                     </label>
                     <input
                       type="range"
-                      class="c-input c-input--slider"
+                      class="c-input c-input__slider"
                       min="0"
                       max="25"
                       step="1"
@@ -215,7 +218,7 @@ import {
                     </label>
                     <input
                       type="range"
-                      class="c-input c-input--slider"
+                      class="c-input c-input__slider"
                       min="4"
                       max="25"
                       step="1"
@@ -234,7 +237,7 @@ import {
                 </label>
                 <input
                   type="range"
-                  class="c-input c-input--slider"
+                  class="c-input c-input__slider"
                   min="20"
                   max="80"
                   step="4"
@@ -251,7 +254,7 @@ import {
                   </label>
                   <input
                     type="range"
-                    class="c-input c-input--slider"
+                    class="c-input c-input__slider"
                     min="14"
                     max="65"
                     step="2"
@@ -319,6 +322,10 @@ import {
                 (mouseup)="onMouseUp()"
                 (mouseleave)="onMouseUp()"
                 (wheel)="onWheel($event)"
+                (touchstart)="onTouchStart($event)"
+                (touchmove)="onTouchMove($event)"
+                (touchend)="onTouchEnd()"
+                (touchcancel)="onTouchEnd()"
               >
                 <div class="viewport-hints">
                   Left-drag to rotate • Scroll to zoom • Live pegboard fit preview
@@ -404,181 +411,13 @@ import {
       </div>
     </div>
   `,
-  styles: [
-    `
-      .preset-strip {
-        display: flex;
-        align-items: center;
-        gap: 12px;
-        flex-wrap: wrap;
-      }
-
-      .preset-label {
-        font-size: 0.85rem;
-        font-weight: 600;
-        color: #94a3b8;
-      }
-
-      .preset-buttons {
-        display: flex;
-        flex-wrap: wrap;
-        gap: 6px;
-      }
-
-      .btn-toggle-grid {
-        display: flex;
-        flex-direction: column;
-        gap: 6px;
-        margin-top: 6px;
-      }
-
-      .style-btn-grid {
-        display: grid;
-        grid-template-columns: repeat(2, 1fr);
-        gap: 6px;
-        margin-top: 6px;
-      }
-
-      .control-group {
-        display: flex;
-        flex-direction: column;
-      }
-
-      .control-row-2 {
-        display: grid;
-        grid-template-columns: 1fr 1fr;
-        gap: 16px;
-      }
-
-      .control-hint {
-        font-size: 0.75rem;
-        color: #64748b;
-        font-weight: 400;
-        margin-left: 4px;
-      }
-
-      .c-input--slider {
-        width: 100%;
-        margin-top: 4px;
-      }
-
-      .c-input__checkbox-label {
-        display: flex;
-        align-items: center;
-        gap: 8px;
-        cursor: pointer;
-        font-size: 0.9rem;
-      }
-
-      .toggles-column {
-        display: flex;
-        flex-direction: column;
-      }
-
-      .skadis-viewport {
-        position: relative;
-        width: 100%;
-        height: 380px;
-        background: #090d16;
-        border-radius: 8px;
-        overflow: hidden;
-        cursor: grab;
-      }
-
-      .skadis-viewport:active {
-        cursor: grabbing;
-      }
-
-      .viewport-hints {
-        position: absolute;
-        bottom: 8px;
-        left: 8px;
-        font-size: 0.75rem;
-        color: rgba(255, 255, 255, 0.5);
-        pointer-events: none;
-        user-select: none;
-      }
-
-      .metrics-grid {
-        display: grid;
-        grid-template-columns: repeat(2, 1fr);
-        gap: 10px;
-      }
-
-      .metric-card {
-        background: rgba(255, 255, 255, 0.04);
-        border: 1px solid rgba(255, 255, 255, 0.08);
-        border-radius: 6px;
-        padding: 8px 12px;
-        display: flex;
-        flex-direction: column;
-      }
-
-      .metric-label {
-        font-size: 0.75rem;
-        color: #9ca3af;
-      }
-
-      .metric-value {
-        font-size: 0.95rem;
-        font-weight: 600;
-        color: #f3f4f6;
-        margin-top: 2px;
-      }
-
-      .slicer-tips-card {
-        background: rgba(56, 189, 248, 0.05);
-        border: 1px solid rgba(56, 189, 248, 0.2);
-        border-radius: 6px;
-        padding: 10px 14px;
-      }
-
-      .tips-title {
-        font-size: 0.85rem;
-        font-weight: 600;
-        color: #38bdf8;
-        margin: 0 0 6px 0;
-      }
-
-      .tips-list {
-        margin: 0;
-        padding-left: 18px;
-        font-size: 0.8rem;
-        color: #cbd5e1;
-        line-height: 1.4;
-      }
-
-      .export-box {
-        background: rgba(255, 255, 255, 0.02);
-        border: 1px solid rgba(255, 255, 255, 0.06);
-        border-radius: 8px;
-        padding: 14px;
-      }
-
-      .export-format-selector {
-        display: flex;
-        flex-direction: column;
-        gap: 6px;
-      }
-
-      .format-radios {
-        display: flex;
-        flex-wrap: wrap;
-        gap: 8px;
-      }
-
-      .download-btn {
-        width: 100%;
-        justify-content: center;
-      }
-    `,
-  ],
+  styleUrl: './skadis-pegboard-maker.component.scss',
 })
-export class SkadisPegboardMakerComponent implements OnInit, OnDestroy {
+export class SkadisPegboardMakerComponent implements OnInit, AfterViewInit, OnDestroy {
   @ViewChild('viewportContainer', { static: false })
   viewportContainer!: ElementRef<HTMLDivElement>;
 
-  // --- SIGNALS FOR PARAMETRIC STATE ---
+  // --- PARAMETRIC STATE SIGNALS ---
   readonly pegboardSystem = signal<PegboardSystem>(DEFAULT_SKADIS_OPTIONS.pegboardSystem);
   readonly holderStyle = signal<HolderStyle>(DEFAULT_SKADIS_OPTIONS.holderStyle);
   readonly hookLengthMm = signal<number>(DEFAULT_SKADIS_OPTIONS.hookLengthMm);
@@ -594,24 +433,25 @@ export class SkadisPegboardMakerComponent implements OnInit, OnDestroy {
 
   readonly presets = SKADIS_PRESETS;
 
+  // Initial placeholder metrics
   readonly metrics = signal<SkadisPegboardMetrics>({
-    totalWidthMm: 24,
-    totalDepthMm: 55,
+    totalWidthMm: 28,
+    totalDepthMm: 62,
     totalHeightMm: 56,
     prongCount: 2,
-    triangleCount: 420,
-    estimatedGrams: 14.5,
-    estimatedPrintTimeHours: 0.8,
+    triangleCount: 380,
+    estimatedGrams: 14.2,
+    estimatedPrintTimeHours: 0.9,
     slicerTips: [
-      'Print Orientation: Print hook on its SIDE so layer lines run along the arm.',
-      'Perimeters: Use 4 to 5 wall perimeters for strong prongs and rigidity.',
+      'Print hook on its SIDE to keep layer lines parallel to the load stress.',
+      'Use 4 wall perimeters for maximum hook strength.',
     ],
   });
 
-  // Track created object URLs
   private activeDownloadUrls: string[] = [];
+  private worker?: Worker;
 
-  // Three.js Scene References
+  // Three.js References
   private scene: THREE.Scene | null = null;
   private camera: THREE.PerspectiveCamera | null = null;
   private renderer: THREE.WebGLRenderer | null = null;
@@ -619,16 +459,23 @@ export class SkadisPegboardMakerComponent implements OnInit, OnDestroy {
   private pegboardMesh: THREE.Mesh | null = null;
   private animationFrameId: number | null = null;
 
-  // Viewport navigation
+  // Interaction State
   private isDragging = false;
   private previousMouseX = 0;
   private previousMouseY = 0;
-  private meshRotationY = -0.7;
+  private meshRotationY = -0.65;
   private meshRotationX = 0.25;
   private cameraDistance = 140;
 
   ngOnInit(): void {
-    this.recalculateMetrics();
+    if (typeof Worker !== 'undefined') {
+      try {
+        this.worker = new Worker(new URL('./worker.ts', import.meta.url), { type: 'module' });
+      } catch {
+        // Fallback
+      }
+    }
+    this.rebuildMesh();
   }
 
   ngAfterViewInit(): void {
@@ -654,8 +501,22 @@ export class SkadisPegboardMakerComponent implements OnInit, OnDestroy {
       });
     }
 
+    if (this.pegboardMesh) {
+      this.pegboardMesh.geometry.dispose();
+      if (Array.isArray(this.pegboardMesh.material)) {
+        this.pegboardMesh.material.forEach((m) => m.dispose());
+      } else {
+        this.pegboardMesh.material.dispose();
+      }
+    }
+
     if (this.renderer) {
       this.renderer.dispose();
+    }
+
+    if (this.worker) {
+      this.worker.terminate();
+      this.worker = undefined;
     }
 
     for (const url of this.activeDownloadUrls) {
@@ -664,7 +525,7 @@ export class SkadisPegboardMakerComponent implements OnInit, OnDestroy {
     this.activeDownloadUrls = [];
   }
 
-  // --- ACTIONS & PRESETS ---
+  // --- ACTIONS & CONFIGURATION ---
 
   applyPreset(preset: PresetHolder): void {
     this.activePresetId.set(preset.id);
@@ -683,7 +544,6 @@ export class SkadisPegboardMakerComponent implements OnInit, OnDestroy {
   }
 
   resetToDefaults(): void {
-    this.activePresetId.set('skadis_single_hook');
     this.pegboardSystem.set(DEFAULT_SKADIS_OPTIONS.pegboardSystem);
     this.holderStyle.set(DEFAULT_SKADIS_OPTIONS.holderStyle);
     this.hookLengthMm.set(DEFAULT_SKADIS_OPTIONS.hookLengthMm);
@@ -693,6 +553,7 @@ export class SkadisPegboardMakerComponent implements OnInit, OnDestroy {
     this.toolDiameterMm.set(DEFAULT_SKADIS_OPTIONS.toolDiameterMm);
     this.reinforceRib.set(DEFAULT_SKADIS_OPTIONS.reinforceRib);
     this.lockingWedge.set(DEFAULT_SKADIS_OPTIONS.lockingWedge);
+    this.activePresetId.set('skadis_single_hook');
 
     this.rebuildMesh();
   }
@@ -711,13 +572,13 @@ export class SkadisPegboardMakerComponent implements OnInit, OnDestroy {
     this.exportFormat.set(fmt);
   }
 
-  toggleReinforceRib(): void {
-    this.reinforceRib.update((v) => !v);
+  toggleLockingWedge(): void {
+    this.lockingWedge.update((v) => !v);
     this.rebuildMesh();
   }
 
-  toggleLockingWedge(): void {
-    this.lockingWedge.update((v) => !v);
+  toggleReinforceRib(): void {
+    this.reinforceRib.update((v) => !v);
     this.rebuildMesh();
   }
 
@@ -769,24 +630,61 @@ export class SkadisPegboardMakerComponent implements OnInit, OnDestroy {
     };
 
     try {
+      if (this.worker) {
+        await new Promise<void>((resolve, reject) => {
+          const reqId = Date.now();
+          const handler = (event: MessageEvent<SkadisPegboardWorkerResponse>) => {
+            if (event.data.id !== reqId) return;
+            if (event.data.type === 'error') {
+              this.worker?.removeEventListener('message', handler);
+              reject(new Error(event.data.error || 'Export failed'));
+            } else if (event.data.type === 'result' && event.data.buffer) {
+              this.worker?.removeEventListener('message', handler);
+              const blob = new Blob([event.data.buffer], {
+                type: event.data.mimeType || 'application/octet-stream',
+              });
+              this.triggerFileDownload(blob, event.data.fileName || `skadis-holder.${format}`);
+              resolve();
+            }
+          };
+          this.worker!.addEventListener('message', handler);
+          this.worker!.postMessage({ id: reqId, options, format } as SkadisPegboardWorkerRequest);
+        });
+      } else {
+        const result = await processSkadisHolder(options, format);
+        if (result.success && result.blob) {
+          this.triggerFileDownload(result.blob, result.fileName);
+        }
+      }
+    } catch {
       const result = await processSkadisHolder(options, format);
-      if (!result.success || !result.blob) return;
-
-      const url = URL.createObjectURL(result.blob);
-      this.activeDownloadUrls.push(url);
-
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = result.fileName;
-      document.body.appendChild(a);
-      a.click();
-      document.body.removeChild(a);
+      if (result.success && result.blob) {
+        this.triggerFileDownload(result.blob, result.fileName);
+      }
     } finally {
       this.isGenerating.set(false);
     }
   }
 
-  // --- THREE.JS VIEWPORT & RENDERING ---
+  private triggerFileDownload(blob: Blob, fileName: string): void {
+    const url = URL.createObjectURL(blob);
+    this.activeDownloadUrls.push(url);
+
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = fileName;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+
+    setTimeout(() => {
+      URL.revokeObjectURL(url);
+      const idx = this.activeDownloadUrls.indexOf(url);
+      if (idx !== -1) this.activeDownloadUrls.splice(idx, 1);
+    }, 100);
+  }
+
+  // --- THREE.JS VIEWPORT & MESH REBUILD ---
 
   private initThree(): void {
     if (!this.viewportContainer) return;
@@ -807,30 +705,31 @@ export class SkadisPegboardMakerComponent implements OnInit, OnDestroy {
       this.renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
       container.appendChild(this.renderer.domElement);
 
-      const ambientLight = new THREE.AmbientLight(0xffffff, 0.55);
-      this.scene.add(ambientLight);
+      // Lighting
+      const amb = new THREE.AmbientLight(0xffffff, 0.7);
+      this.scene.add(amb);
 
-      const keyLight = new THREE.DirectionalLight(0xffffff, 0.85);
-      keyLight.position.set(120, 140, 120);
-      this.scene.add(keyLight);
+      const dir1 = new THREE.DirectionalLight(0xffffff, 0.85);
+      dir1.position.set(50, 80, 70);
+      this.scene.add(dir1);
 
-      const fillLight = new THREE.DirectionalLight(0x38bdf8, 0.4);
-      fillLight.position.set(-100, -80, -100);
-      this.scene.add(fillLight);
+      const dir2 = new THREE.DirectionalLight(0x38bdf8, 0.4);
+      dir2.position.set(-60, -30, -50);
+      this.scene.add(dir2);
 
-      // Translucent Pegboard simulation plane
-      const boardGeom = new THREE.BoxGeometry(5.0, 130, 130);
+      // Pegboard Simulation Section
+      const boardGeom = new THREE.BoxGeometry(5, 120, 120);
       const boardMat = new THREE.MeshStandardMaterial({
         color: 0x334155,
+        roughness: 0.85,
         transparent: true,
-        opacity: 0.35,
-        roughness: 0.8,
+        opacity: 0.4,
       });
       this.pegboardMesh = new THREE.Mesh(boardGeom, boardMat);
-      this.pegboardMesh.position.set(-2.5, 20, 0);
+      this.pegboardMesh.position.set(-2.5, 30, 0);
       this.scene.add(this.pegboardMesh);
 
-      // Group for holder & accessories
+      // Holder Mesh Group
       this.holderMeshGroup = new THREE.Group();
       this.scene.add(this.holderMeshGroup);
 
@@ -850,7 +749,7 @@ export class SkadisPegboardMakerComponent implements OnInit, OnDestroy {
       };
       animate();
     } catch {
-      // Guard against headless test environments
+      // Guard against non-WebGL headless tests
     }
   }
 
@@ -859,12 +758,12 @@ export class SkadisPegboardMakerComponent implements OnInit, OnDestroy {
     this.camera.position.set(
       this.cameraDistance * 0.75,
       this.cameraDistance * 0.4,
-      this.cameraDistance * 0.75
+      this.cameraDistance * 0.7
     );
-    this.camera.lookAt(15, 20, 0);
+    this.camera.lookAt(20, 20, 0);
   }
 
-  private recalculateMetrics(): void {
+  private rebuildMesh(): void {
     const options: SkadisPegboardMakerOptions = {
       pegboardSystem: this.pegboardSystem(),
       holderStyle: this.holderStyle(),
@@ -877,19 +776,21 @@ export class SkadisPegboardMakerComponent implements OnInit, OnDestroy {
       lockingWedge: this.lockingWedge(),
     };
 
-    const { holderGeometry, lockingWedgeGeometry, prongCount } = generateSkadisGeometries(options);
+    const { holderGeometry, lockingWedgeGeometry, combinedGeometry, prongCount } =
+      generateSkadisGeometries(options);
+
     const m = calculateSkadisMetrics(holderGeometry, lockingWedgeGeometry, options);
     m.prongCount = prongCount;
     this.metrics.set(m);
 
-    holderGeometry.dispose();
-    lockingWedgeGeometry.dispose();
-  }
+    // Dispose combinedGeometry as it is only used for monolithic exports
+    combinedGeometry.dispose();
 
-  private rebuildMesh(): void {
-    this.recalculateMetrics();
-
-    if (!this.scene || !this.holderMeshGroup) return;
+    if (!this.scene || !this.holderMeshGroup) {
+      holderGeometry.dispose();
+      lockingWedgeGeometry.dispose();
+      return;
+    }
 
     while (this.holderMeshGroup.children.length > 0) {
       const child = this.holderMeshGroup.children[0];
@@ -897,26 +798,12 @@ export class SkadisPegboardMakerComponent implements OnInit, OnDestroy {
       if (child instanceof THREE.Mesh) {
         child.geometry.dispose();
         if (Array.isArray(child.material)) {
-          child.material.forEach((m) => m.dispose());
+          child.material.forEach((mat) => mat.dispose());
         } else {
           child.material.dispose();
         }
       }
     }
-
-    const options: SkadisPegboardMakerOptions = {
-      pegboardSystem: this.pegboardSystem(),
-      holderStyle: this.holderStyle(),
-      hookLengthMm: this.hookLengthMm(),
-      hookAngleDeg: this.hookAngleDeg(),
-      lipHeightMm: this.lipHeightMm(),
-      bracketWidthMm: this.bracketWidthMm(),
-      toolDiameterMm: this.toolDiameterMm(),
-      reinforceRib: this.reinforceRib(),
-      lockingWedge: this.lockingWedge(),
-    };
-
-    const { holderGeometry, lockingWedgeGeometry } = generateSkadisGeometries(options);
 
     // Holder Material: Vibrant teal / cyan
     const holderMat = new THREE.MeshStandardMaterial({
@@ -928,20 +815,22 @@ export class SkadisPegboardMakerComponent implements OnInit, OnDestroy {
     this.holderMeshGroup.add(holderMesh);
 
     // Locking Wedge Material: Signal Amber/Orange
-    if (this.lockingWedge() && lockingWedgeGeometry.attributes['position']?.count > 0) {
+    const showWedge = this.lockingWedge() && options.pegboardSystem === 'ikea_skadis';
+    if (showWedge && lockingWedgeGeometry.attributes['position']?.count > 0) {
       const wedgeMat = new THREE.MeshStandardMaterial({
         color: 0xf59e0b,
         metalness: 0.1,
         roughness: 0.5,
       });
       const wedgeMesh = new THREE.Mesh(lockingWedgeGeometry, wedgeMat);
-      // Position wedge inserted above top prong
       wedgeMesh.position.set(-2, 42, 0);
       this.holderMeshGroup.add(wedgeMesh);
+    } else {
+      lockingWedgeGeometry.dispose();
     }
   }
 
-  // --- MOUSE & VIEWPORT NAVIGATION ---
+  // --- MOUSE & TOUCH NAVIGATION ---
 
   onMouseDown(event: MouseEvent): void {
     this.isDragging = true;
@@ -963,6 +852,33 @@ export class SkadisPegboardMakerComponent implements OnInit, OnDestroy {
   }
 
   onMouseUp(): void {
+    this.isDragging = false;
+  }
+
+  onTouchStart(event: TouchEvent): void {
+    if (event.touches.length === 1) {
+      this.isDragging = true;
+      this.previousMouseX = event.touches[0].clientX;
+      this.previousMouseY = event.touches[0].clientY;
+      event.preventDefault();
+    }
+  }
+
+  onTouchMove(event: TouchEvent): void {
+    if (!this.isDragging || event.touches.length !== 1) return;
+    const deltaX = event.touches[0].clientX - this.previousMouseX;
+    const deltaY = event.touches[0].clientY - this.previousMouseY;
+
+    this.meshRotationY += deltaX * 0.01;
+    this.meshRotationX += deltaY * 0.01;
+    this.meshRotationX = Math.max(-Math.PI / 2.2, Math.min(Math.PI / 2.2, this.meshRotationX));
+
+    this.previousMouseX = event.touches[0].clientX;
+    this.previousMouseY = event.touches[0].clientY;
+    event.preventDefault();
+  }
+
+  onTouchEnd(): void {
     this.isDragging = false;
   }
 

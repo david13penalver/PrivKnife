@@ -64,6 +64,51 @@ export function validateSkadisOptions(options: SkadisPegboardMakerOptions): {
 }
 
 /**
+ * Creates a hollow cylinder or cup geometry extruded along Y (centered at origin).
+ */
+export function createHollowCylinderGeometry(
+  outerR: number,
+  innerR: number,
+  height: number,
+  bottomThickness = 0,
+  segments = 32
+): THREE.BufferGeometry {
+  const parts: THREE.BufferGeometry[] = [];
+  const wallHeight = height - bottomThickness;
+
+  const shape = new THREE.Shape();
+  shape.absarc(0, 0, outerR, 0, Math.PI * 2, false);
+  const hole = new THREE.Path();
+  hole.absarc(0, 0, innerR, 0, Math.PI * 2, true);
+  shape.holes.push(hole);
+
+  const extrudeSettings: THREE.ExtrudeGeometryOptions = {
+    depth: wallHeight,
+    bevelEnabled: false,
+    curveSegments: segments,
+  };
+  const tube = new THREE.ExtrudeGeometry(shape, extrudeSettings);
+  tube.translate(0, 0, -wallHeight / 2);
+  tube.rotateX(Math.PI / 2);
+  tube.computeVertexNormals();
+
+  if (bottomThickness > 0) {
+    tube.translate(0, bottomThickness / 2, 0);
+    parts.push(tube);
+
+    const bottomDisc = new THREE.CylinderGeometry(outerR, outerR, bottomThickness, segments);
+    bottomDisc.translate(0, -height / 2 + bottomThickness / 2, 0);
+    parts.push(bottomDisc);
+
+    const merged = mergeBufferGeometries(parts);
+    for (const p of parts) p.dispose();
+    return merged;
+  }
+
+  return tube;
+}
+
+/**
  * Merges multiple BufferGeometries into a single BufferGeometry.
  */
 export function mergeBufferGeometries(
@@ -339,11 +384,13 @@ function createHolderFrontGeometry(options: SkadisPegboardMakerOptions): THREE.B
       parts.push(shelfLip);
 
       // Diagonal 45-degree truss support gusset
-      const braceLen = Math.min(shelfDepth * 0.9, 45);
-      const brace = new THREE.BoxGeometry(braceLen * 1.3, 4.5, bracketWidthMm * 0.6);
-      brace.rotateZ(-Math.PI / 4);
-      brace.translate(baseThick + braceLen * 0.45, 25 - braceLen * 0.45, 0);
-      parts.push(brace);
+      if (reinforceRib) {
+        const braceLen = Math.min(shelfDepth * 0.9, 45);
+        const brace = new THREE.BoxGeometry(braceLen * 1.3, 4.5, bracketWidthMm * 0.6);
+        brace.rotateZ(-Math.PI / 4);
+        brace.translate(baseThick + braceLen * 0.45, 25 - braceLen * 0.45, 0);
+        parts.push(brace);
+      }
       break;
     }
 
@@ -353,7 +400,7 @@ function createHolderFrontGeometry(options: SkadisPegboardMakerOptions): THREE.B
       const innerR = toolDiameterMm / 2;
       const holsterHeight = 18;
 
-      const ring = new THREE.CylinderGeometry(outerR, outerR, holsterHeight, 32);
+      const ring = createHollowCylinderGeometry(outerR, innerR, holsterHeight, 0, 32);
       const holsterCenterX = baseThick + outerR + 4;
       ring.translate(holsterCenterX, 20, 0);
       parts.push(ring);
@@ -362,6 +409,12 @@ function createHolderFrontGeometry(options: SkadisPegboardMakerOptions): THREE.B
       const neck = new THREE.BoxGeometry(outerR + 4, 8, bracketWidthMm * 0.6);
       neck.translate(baseThick + (outerR + 4) / 2, 20, 0);
       parts.push(neck);
+
+      if (reinforceRib) {
+        const rib = new THREE.BoxGeometry((outerR + 4) * 0.8, 12, 4);
+        rib.translate(baseThick + (outerR + 4) * 0.4, 20 - 6, 0);
+        parts.push(rib);
+      }
       break;
     }
 
@@ -371,8 +424,8 @@ function createHolderFrontGeometry(options: SkadisPegboardMakerOptions): THREE.B
       const cupOuterR = toolDiameterMm / 2 + 3;
       const cupInnerR = toolDiameterMm / 2;
 
-      // Outer cup cylinder
-      const cupGeom = new THREE.CylinderGeometry(cupOuterR, cupOuterR - 2, cupHeight, 32);
+      // Outer cup cylinder with 3.0mm closed bottom floor
+      const cupGeom = createHollowCylinderGeometry(cupOuterR, cupInnerR, cupHeight, 3.0, 32);
       const cupCenterX = baseThick + cupOuterR + 4;
       cupGeom.translate(cupCenterX, cupHeight / 2, 0);
       parts.push(cupGeom);
@@ -381,6 +434,12 @@ function createHolderFrontGeometry(options: SkadisPegboardMakerOptions): THREE.B
       const cupNeck = new THREE.BoxGeometry(cupOuterR + 4, cupHeight * 0.7, bracketWidthMm * 0.65);
       cupNeck.translate(baseThick + (cupOuterR + 4) / 2, cupHeight * 0.5, 0);
       parts.push(cupNeck);
+
+      if (reinforceRib) {
+        const rib = new THREE.BoxGeometry((cupOuterR + 4) * 0.8, 12, 4);
+        rib.translate(baseThick + (cupOuterR + 4) * 0.4, cupHeight * 0.15, 0);
+        parts.push(rib);
+      }
       break;
     }
   }

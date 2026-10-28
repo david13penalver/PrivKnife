@@ -50,3 +50,21 @@ export interface PresetHolder {
   description: string;
   options: Partial<SkadisPegboardMakerOptions>;
 }
+
+export interface SkadisPegboardWorkerRequest {
+  id: number;
+  options: SkadisPegboardMakerOptions;
+  format: 'stl' | '3mf';
+}
+
+export interface SkadisPegboardWorkerResponse {
+  id: number;
+  type: 'progress' | 'result' | 'error';
+  percent?: number;
+  buffer?: ArrayBuffer;
+  fileName?: string;
+  fileSize?: number;
+  mimeType?: string;
+  metrics?: SkadisPegboardMetrics;
+  error?: string;
+}

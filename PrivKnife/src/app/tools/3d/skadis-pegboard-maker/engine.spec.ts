@@ -1,4 +1,5 @@
 import { describe, it, expect } from 'vitest';
+import * as THREE from 'three';
 import {
   validateSkadisOptions,
   generateSkadisGeometries,
@@ -6,6 +7,7 @@ import {
   exportSkadisSTL,
   exportSkadis3MF,
   processSkadisHolder,
+  createHollowCylinderGeometry,
 } from './engine';
 import {
   DEFAULT_SKADIS_OPTIONS,
@@ -128,6 +130,119 @@ describe('SkadisPegboardEngine (Seam 1: Pure Processing Engine)', () => {
 
       lockingWedgeGeometry.dispose();
       combinedGeometry.dispose();
+    });
+
+    describe('Mechanical Correctness & Algorithmic Remediation (DEFECT-36-01)', () => {
+      it('should create hollow cylinder geometry with inner and outer radii vertices', () => {
+        const tube = createHollowCylinderGeometry(20, 15, 25, 0, 24);
+        expect(tube).toBeDefined();
+        const pos = tube.getAttribute('position');
+        expect(pos.count).toBeGreaterThan(0);
+
+        let hasOuterVertex = false;
+        let hasInnerVertex = false;
+        for (let i = 0; i < pos.count; i++) {
+          const x = pos.getX(i);
+          const z = pos.getZ(i);
+          const r = Math.sqrt(x * x + z * z);
+          if (Math.abs(r - 20) < 0.5) hasOuterVertex = true;
+          if (Math.abs(r - 15) < 0.5) hasInnerVertex = true;
+        }
+
+        expect(hasOuterVertex).toBe(true);
+        expect(hasInnerVertex).toBe(true);
+        tube.dispose();
+      });
+
+      it('should generate hollow tool_holster with inner bore vertices at toolDiameterMm / 2', () => {
+        const { holderGeometry } = generateSkadisGeometries({
+          ...DEFAULT_SKADIS_OPTIONS,
+          holderStyle: 'tool_holster',
+          toolDiameterMm: 28,
+        });
+
+        const pos = holderGeometry.getAttribute('position');
+        // holster center is baseThick (4) + outerR (14 + 4 = 18) + 4 = 26, Z = 0
+        const expectedCenterX = 26;
+        const expectedInnerR = 14;
+
+        let hasInnerBoreVertex = false;
+        for (let i = 0; i < pos.count; i++) {
+          const dx = pos.getX(i) - expectedCenterX;
+          const dz = pos.getZ(i);
+          const dist = Math.sqrt(dx * dx + dz * dz);
+          if (Math.abs(dist - expectedInnerR) < 0.6) {
+            hasInnerBoreVertex = true;
+            break;
+          }
+        }
+
+        expect(hasInnerBoreVertex).toBe(true);
+        holderGeometry.dispose();
+      });
+
+      it('should generate hollow cylinder_cup with inner cavity vertices at toolDiameterMm / 2', () => {
+        const { holderGeometry } = generateSkadisGeometries({
+          ...DEFAULT_SKADIS_OPTIONS,
+          holderStyle: 'cylinder_cup',
+          toolDiameterMm: 40,
+        });
+
+        const pos = holderGeometry.getAttribute('position');
+        // cup center is baseThick (4) + cupOuterR (20 + 3 = 23) + 4 = 31, Z = 0
+        const expectedCenterX = 31;
+        const expectedInnerR = 20;
+
+        let hasInnerCavityVertex = false;
+        for (let i = 0; i < pos.count; i++) {
+          const dx = pos.getX(i) - expectedCenterX;
+          const dz = pos.getZ(i);
+          const dist = Math.sqrt(dx * dx + dz * dz);
+          if (Math.abs(dist - expectedInnerR) < 0.6) {
+            hasInnerCavityVertex = true;
+            break;
+          }
+        }
+
+        expect(hasInnerCavityVertex).toBe(true);
+        holderGeometry.dispose();
+      });
+
+      it('should change triangle count when toggling reinforceRib across all 5 holder styles', () => {
+        const styles = [
+          'single_hook',
+          'dual_prong',
+          'shelf_bracket',
+          'tool_holster',
+          'cylinder_cup',
+        ] as const;
+
+        for (const style of styles) {
+          const withRib = generateSkadisGeometries({
+            ...DEFAULT_SKADIS_OPTIONS,
+            holderStyle: style,
+            reinforceRib: true,
+          }).holderGeometry;
+
+          const withoutRib = generateSkadisGeometries({
+            ...DEFAULT_SKADIS_OPTIONS,
+            holderStyle: style,
+            reinforceRib: false,
+          }).holderGeometry;
+
+          const countWithRib = withRib.index
+            ? withRib.index.count / 3
+            : withRib.getAttribute('position').count / 3;
+          const countWithoutRib = withoutRib.index
+            ? withoutRib.index.count / 3
+            : withoutRib.getAttribute('position').count / 3;
+
+          expect(countWithRib).toBeGreaterThan(countWithoutRib);
+
+          withRib.dispose();
+          withoutRib.dispose();
+        }
+      });
     });
   });
 
