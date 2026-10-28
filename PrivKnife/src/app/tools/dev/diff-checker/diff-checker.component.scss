@@ -1,0 +1,301 @@
+:host {
+  display: block;
+  max-width: 100%;
+  overflow-x: hidden;
+}
+
+.l-page {
+  max-width: 100%;
+  overflow-x: hidden;
+  box-sizing: border-box;
+}
+
+.c-header__title {
+  overflow-wrap: anywhere;
+  word-break: break-word;
+}
+
+.c-badge {
+  max-width: 100%;
+  overflow-wrap: anywhere;
+}
+
+.l-columns__area {
+  min-width: 0;
+  max-width: 100%;
+}
+
+.c-card {
+  max-width: 100%;
+  box-sizing: border-box;
+}
+
+.l-extremo {
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.c-button {
+  max-width: 100%;
+  white-space: normal;
+  text-align: center;
+}
+
+.c-diff-checker__toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 1rem;
+}
+
+.c-diff-checker__toolbar-group {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+
+  &--toggles {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+  }
+}
+
+.c-diff-checker__toolbar-label {
+  font-size: 0.8125rem;
+  font-weight: 600;
+  color: var(--color-text-muted, #64748b);
+}
+
+.c-diff-checker__button-group {
+  display: inline-flex;
+  flex-wrap: wrap;
+  gap: 0.25rem;
+}
+
+.c-diff-checker__select {
+  min-height: 38px;
+  font-size: 1rem;
+  padding: 0.375rem 0.625rem;
+  border-radius: 0.375rem;
+  border: 1px solid var(--color-border, #cbd5e1);
+  background: var(--color-surface, #ffffff);
+  color: var(--color-text, #0f172a);
+}
+
+.c-checkbox-label {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.875rem;
+  cursor: pointer;
+  min-height: 38px;
+  user-select: none;
+
+  input[type="checkbox"] {
+    width: 24px;
+    height: 24px;
+    min-width: 24px;
+    min-height: 24px;
+    cursor: pointer;
+  }
+}
+
+.c-diff-checker__textarea {
+  width: 100%;
+  font-family: 'Fira Code', Consolas, Monaco, monospace;
+  font-size: 1rem;
+  line-height: 1.4;
+  padding: 0.75rem;
+  border: 1px solid var(--color-border, #cbd5e1);
+  border-radius: 0.375rem;
+  background: var(--color-surface, #ffffff);
+  color: var(--color-text, #0f172a);
+  resize: vertical;
+  box-sizing: border-box;
+}
+
+.c-diff-checker__stats-bar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.c-diff-checker__stat-pill {
+  display: inline-flex;
+  flex-direction: column;
+  padding: 0.375rem 0.75rem;
+  border-radius: 0.375rem;
+  font-size: 0.75rem;
+  border: 1px solid var(--color-border, #cbd5e1);
+  background: var(--color-surface-variant, #f8fafc);
+
+  &--add {
+    background: color-mix(in srgb, #16a34a 12%, var(--color-surface, #ffffff));
+    border-color: color-mix(in srgb, #16a34a 30%, var(--color-border, #cbd5e1));
+    .c-diff-checker__stat-value { color: #16a34a; font-weight: 700; }
+  }
+
+  &--del {
+    background: color-mix(in srgb, #dc2626 12%, var(--color-surface, #ffffff));
+    border-color: color-mix(in srgb, #dc2626 30%, var(--color-border, #cbd5e1));
+    .c-diff-checker__stat-value { color: #dc2626; font-weight: 700; }
+  }
+
+  &--mod {
+    background: color-mix(in srgb, #d97706 12%, var(--color-surface, #ffffff));
+    border-color: color-mix(in srgb, #d97706 30%, var(--color-border, #cbd5e1));
+    .c-diff-checker__stat-value { color: #d97706; font-weight: 700; }
+  }
+
+  &--same {
+    background: var(--color-surface-variant, #f1f5f9);
+    .c-diff-checker__stat-value { color: var(--color-text-muted, #64748b); font-weight: 600; }
+  }
+}
+
+.c-diff-checker__stat-label {
+  font-size: 0.6875rem;
+  text-transform: uppercase;
+  color: var(--color-text-muted, #64748b);
+  letter-spacing: 0.025em;
+}
+
+.c-diff-checker__stat-value {
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--color-text, #0f172a);
+}
+
+.c-diff-checker__viewer-wrapper {
+  padding: 0;
+  overflow: hidden;
+  border-radius: 0 0 0.5rem 0.5rem;
+}
+
+.c-diff-checker__table-container {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  max-width: 100%;
+}
+
+.c-diff-checker__table {
+  width: 100%;
+  border-collapse: collapse;
+  font-family: 'Fira Code', Consolas, Monaco, monospace;
+  font-size: 0.75rem;
+  line-height: 1.5;
+
+  &--split {
+    min-width: 560px;
+  }
+
+  &--unified {
+    width: 100%;
+  }
+}
+
+.c-diff-checker__row {
+  border-bottom: 1px solid var(--color-border, #f1f5f9);
+
+  &--unchanged {
+    background: var(--color-surface, #ffffff);
+    color: var(--color-text, #0f172a);
+  }
+
+  &--added {
+    background: color-mix(in srgb, #16a34a 12%, var(--color-surface, #ffffff));
+    color: var(--color-text, #0f172a);
+  }
+
+  &--removed {
+    background: color-mix(in srgb, #dc2626 12%, var(--color-surface, #ffffff));
+    color: var(--color-text, #0f172a);
+  }
+
+  &--modified {
+    background: color-mix(in srgb, #d97706 12%, var(--color-surface, #ffffff));
+    color: var(--color-text, #0f172a);
+  }
+}
+
+.c-diff-checker__num {
+  width: 40px;
+  min-width: 40px;
+  max-width: 40px;
+  text-align: right;
+  padding: 2px 8px;
+  background: var(--color-surface-variant, #f8fafc);
+  color: var(--color-text-muted, #94a3b8);
+  border-right: 1px solid var(--color-border, #e2e8f0);
+  user-select: none;
+  font-size: 0.6875rem;
+}
+
+.c-diff-checker__prefix {
+  width: 20px;
+  text-align: center;
+  font-weight: 700;
+  user-select: none;
+  padding: 2px 4px;
+}
+
+.c-diff-checker__code {
+  padding: 2px 8px;
+  vertical-align: top;
+  white-space: pre-wrap;
+  word-break: break-word;
+
+  &--left {
+    width: calc(50% - 40px);
+    border-right: 1px solid var(--color-border, #cbd5e1);
+  }
+
+  &--right {
+    width: calc(50% - 40px);
+  }
+}
+
+.c-diff-checker__token {
+  border-radius: 2px;
+  padding: 1px 2px;
+
+  &--del {
+    background: #fca5a5;
+    color: #7f1d1d;
+  }
+
+  &--ins {
+    background: #86efac;
+    color: #14532d;
+  }
+}
+
+.c-diff-checker__line-del {
+  background: color-mix(in srgb, #dc2626 20%, transparent);
+  color: inherit;
+}
+
+.c-diff-checker__line-ins {
+  background: color-mix(in srgb, #16a34a 20%, transparent);
+  color: inherit;
+}
+
+.c-diff-checker__empty {
+  padding: 3rem 1rem;
+  text-align: center;
+  color: var(--color-text-muted, #64748b);
+}
+
+.c-diff-checker__empty-icon {
+  font-size: 2.5rem;
+  display: block;
+  margin-bottom: 0.5rem;
+}
+
+.c-diff-checker__export-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}

@@ -1,0 +1,430 @@
+<div class="l-page">
+  <!-- Header -->
+  <header class="l-page__header c-header">
+    <div class="c-header__title-group">
+      <h1 class="c-header__title">Side-by-Side Code & Contract Diff Checker</h1>
+      <p class="c-header__subtitle">
+        Private, high-speed text, code, and contract comparison with word-level character differences,
+        whitespace toggles, and unified patch export.
+      </p>
+    </div>
+    <div class="c-badge c-badge--privacy">
+      🛡️ 100% In-Browser • Never Leaves Your Device
+    </div>
+  </header>
+
+  <!-- Main Controls & Presets Bar -->
+  <section class="c-card g--margin-bottom-4">
+    <div class="c-card__body">
+      <div class="c-diff-checker__toolbar">
+        <!-- Sample Presets -->
+        <div class="c-diff-checker__toolbar-group">
+          <span class="c-diff-checker__toolbar-label">Sample Data:</span>
+          <div class="c-diff-checker__button-group">
+            <button
+              type="button"
+              class="c-button c-button--outline c-button--small"
+              (click)="loadSampleCode()"
+            >
+              Code Refactor
+            </button>
+            <button
+              type="button"
+              class="c-button c-button--outline c-button--small"
+              (click)="loadSampleContract()"
+            >
+              Legal Contract
+            </button>
+          </div>
+        </div>
+
+        <!-- View Mode -->
+        <div class="c-diff-checker__toolbar-group">
+          <span class="c-diff-checker__toolbar-label">View Layout:</span>
+          <div class="c-diff-checker__button-group">
+            <button
+              type="button"
+              class="c-button c-button--small"
+              [class.c-button--primary]="viewMode() === 'side_by_side'"
+              [class.c-button--outline]="viewMode() !== 'side_by_side'"
+              (click)="setViewMode('side_by_side')"
+            >
+              Side-by-Side
+            </button>
+            <button
+              type="button"
+              class="c-button c-button--small"
+              [class.c-button--primary]="viewMode() === 'unified_inline'"
+              [class.c-button--outline]="viewMode() !== 'unified_inline'"
+              (click)="setViewMode('unified_inline')"
+            >
+              Unified Inline
+            </button>
+          </div>
+        </div>
+
+        <!-- Granularity -->
+        <div class="c-diff-checker__toolbar-group">
+          <span class="c-diff-checker__toolbar-label">Granularity:</span>
+          <div class="c-diff-checker__button-group">
+            <button
+              type="button"
+              class="c-button c-button--small"
+              [class.c-button--primary]="diffGranularity() === 'word'"
+              [class.c-button--outline]="diffGranularity() !== 'word'"
+              (click)="setGranularity('word')"
+            >
+              Word
+            </button>
+            <button
+              type="button"
+              class="c-button c-button--small"
+              [class.c-button--primary]="diffGranularity() === 'character'"
+              [class.c-button--outline]="diffGranularity() !== 'character'"
+              (click)="setGranularity('character')"
+            >
+              Char
+            </button>
+            <button
+              type="button"
+              class="c-button c-button--small"
+              [class.c-button--primary]="diffGranularity() === 'line'"
+              [class.c-button--outline]="diffGranularity() !== 'line'"
+              (click)="setGranularity('line')"
+            >
+              Line
+            </button>
+          </div>
+        </div>
+
+        <!-- Language Selector -->
+        <div class="c-diff-checker__toolbar-group">
+          <label class="c-diff-checker__toolbar-label" for="syntaxLanguageSelect">Language:</label>
+          <select
+            id="syntaxLanguageSelect"
+            class="c-diff-checker__select"
+            [ngModel]="syntaxLanguage()"
+            (ngModelChange)="setSyntaxLanguage($event)"
+          >
+            <option value="plaintext">Plain Text</option>
+            <option value="javascript">JavaScript</option>
+            <option value="python">Python</option>
+            <option value="html">HTML</option>
+            <option value="css">CSS</option>
+            <option value="json">JSON</option>
+            <option value="markdown">Markdown</option>
+          </select>
+        </div>
+
+        <!-- Toggles -->
+        <div class="c-diff-checker__toolbar-group c-diff-checker__toolbar-group--toggles">
+          <label class="c-checkbox-label">
+            <input
+              type="checkbox"
+              [checked]="ignoreWhitespace()"
+              (change)="toggleIgnoreWhitespace()"
+            />
+            Ignore Whitespace
+          </label>
+          <label class="c-checkbox-label">
+            <input
+              type="checkbox"
+              [checked]="ignoreCase()"
+              (change)="toggleIgnoreCase()"
+            />
+            Ignore Case
+          </label>
+          <label class="c-checkbox-label">
+            <input
+              type="checkbox"
+              [checked]="syncScroll()"
+              (change)="toggleSyncScroll()"
+            />
+            Sync Scroll
+          </label>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Input Textareas Grid -->
+  <div class="l-columns l-columns--2 g--margin-bottom-4">
+    <!-- Original Input -->
+    <section class="l-columns__area c-card">
+      <div class="c-card__header l-extremo">
+        <h2 class="c-card__title l-extremo__area-izquierda">Original (Before)</h2>
+        <div class="l-extremo__area-derecha">
+          <input
+            #origFileInput
+            type="file"
+            style="display: none"
+            (change)="onOriginalFileInputChange($event)"
+          />
+          <button
+            type="button"
+            class="c-button c-button--outline c-button--small"
+            (click)="origFileInput.click()"
+          >
+            Upload File
+          </button>
+        </div>
+      </div>
+      <div class="c-card__body">
+        <textarea
+          #origTextarea
+          class="c-diff-checker__textarea"
+          rows="6"
+          placeholder="Paste original text or code here..."
+          [ngModel]="originalText()"
+          (ngModelChange)="setOriginalText($event)"
+          (scroll)="onScrollOriginal($event)"
+        ></textarea>
+      </div>
+    </section>
+
+    <!-- Modified Input -->
+    <section class="l-columns__area c-card">
+      <div class="c-card__header l-extremo">
+        <h2 class="c-card__title l-extremo__area-izquierda">Modified (After)</h2>
+        <div class="l-extremo__area-derecha">
+          <input
+            #modFileInput
+            type="file"
+            style="display: none"
+            (change)="onModifiedFileInputChange($event)"
+          />
+          <button
+            type="button"
+            class="c-button c-button--outline c-button--small"
+            (click)="modFileInput.click()"
+          >
+            Upload File
+          </button>
+        </div>
+      </div>
+      <div class="c-card__body">
+        <textarea
+          #modTextarea
+          class="c-diff-checker__textarea"
+          rows="6"
+          placeholder="Paste modified text or code here..."
+          [ngModel]="modifiedText()"
+          (ngModelChange)="setModifiedText($event)"
+          (scroll)="onScrollModified($event)"
+        ></textarea>
+      </div>
+    </section>
+  </div>
+
+  <!-- Stats Summary Banner -->
+  <section class="c-card g--margin-bottom-4">
+    <div class="c-card__body">
+      <div class="c-diff-checker__stats-bar">
+        <div class="c-diff-checker__stat-pill c-diff-checker__stat-pill--left">
+          <span class="c-diff-checker__stat-label">Original Lines</span>
+          <span class="c-diff-checker__stat-value">{{ result().stats.leftTotalLines }}</span>
+        </div>
+        <div class="c-diff-checker__stat-pill c-diff-checker__stat-pill--right">
+          <span class="c-diff-checker__stat-label">Modified Lines</span>
+          <span class="c-diff-checker__stat-value">{{ result().stats.rightTotalLines }}</span>
+        </div>
+        <div class="c-diff-checker__stat-pill c-diff-checker__stat-pill--add">
+          <span class="c-diff-checker__stat-label">Additions</span>
+          <span class="c-diff-checker__stat-value">+{{ result().stats.addedLines }}</span>
+        </div>
+        <div class="c-diff-checker__stat-pill c-diff-checker__stat-pill--del">
+          <span class="c-diff-checker__stat-label">Deletions</span>
+          <span class="c-diff-checker__stat-value">-{{ result().stats.removedLines }}</span>
+        </div>
+        <div class="c-diff-checker__stat-pill c-diff-checker__stat-pill--mod">
+          <span class="c-diff-checker__stat-label">Modifications</span>
+          <span class="c-diff-checker__stat-value">~{{ result().stats.modifiedLines }}</span>
+        </div>
+        <div class="c-diff-checker__stat-pill c-diff-checker__stat-pill--same">
+          <span class="c-diff-checker__stat-label">Unchanged</span>
+          <span class="c-diff-checker__stat-value">{{ result().stats.unchangedLines }}</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Diff Viewer Card -->
+  <section class="c-card g--margin-bottom-4">
+    <div class="c-card__header l-extremo">
+      <h2 class="c-card__title l-extremo__area-izquierda">Visual Comparison</h2>
+      <div class="l-extremo__area-derecha">
+        <button
+          type="button"
+          class="c-button c-button--outline c-button--small"
+          (click)="copyPatch()"
+        >
+          {{ copiedFeedback() ? '✓ Copied Patch!' : 'Copy .patch' }}
+        </button>
+      </div>
+    </div>
+
+    <div class="c-card__body c-diff-checker__viewer-wrapper">
+      @if (result().lines.length === 0) {
+        <div class="c-diff-checker__empty">
+          <span class="c-diff-checker__empty-icon">🔍</span>
+          <p>Enter text in both boxes above or click a sample to generate comparison.</p>
+        </div>
+      } @else if (viewMode() === 'side_by_side') {
+        <!-- Side by Side Viewer -->
+        <div class="c-diff-checker__table-container">
+          <table class="c-diff-checker__table c-diff-checker__table--split">
+            <tbody>
+              @for (line of result().lines; track $index) {
+                <tr class="c-diff-checker__row c-diff-checker__row--{{ line.type }}">
+                  <!-- Left Line -->
+                  <td class="c-diff-checker__num">{{ line.leftLineNumber || '' }}</td>
+                  <td class="c-diff-checker__code c-diff-checker__code--left">
+                    @if (line.type === 'modified' && line.leftTokens) {
+                      @for (t of line.leftTokens; track $index) {
+                        @if (t.type === 'removed') {
+                          <mark class="c-diff-checker__token c-diff-checker__token--del">{{ t.value }}</mark>
+                        } @else {
+                          <span>{{ t.value }}</span>
+                        }
+                      }
+                    } @else if (line.type === 'removed') {
+                      <span class="c-diff-checker__line-del">{{ line.leftText }}</span>
+                    } @else if (line.leftText !== undefined) {
+                      <span>{{ line.leftText }}</span>
+                    }
+                  </td>
+
+                  <!-- Right Line -->
+                  <td class="c-diff-checker__num">{{ line.rightLineNumber || '' }}</td>
+                  <td class="c-diff-checker__code c-diff-checker__code--right">
+                    @if (line.type === 'modified' && line.rightTokens) {
+                      @for (t of line.rightTokens; track $index) {
+                        @if (t.type === 'added') {
+                          <mark class="c-diff-checker__token c-diff-checker__token--ins">{{ t.value }}</mark>
+                        } @else {
+                          <span>{{ t.value }}</span>
+                        }
+                      }
+                    } @else if (line.type === 'added') {
+                      <span class="c-diff-checker__line-ins">{{ line.rightText }}</span>
+                    } @else if (line.rightText !== undefined) {
+                      <span>{{ line.rightText }}</span>
+                    }
+                  </td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+      } @else {
+        <!-- Unified Inline Viewer -->
+        <div class="c-diff-checker__table-container">
+          <table class="c-diff-checker__table c-diff-checker__table--unified">
+            <tbody>
+              @for (line of result().lines; track $index) {
+                @if (line.type === 'unchanged') {
+                  <tr class="c-diff-checker__row c-diff-checker__row--unchanged">
+                    <td class="c-diff-checker__num">{{ line.leftLineNumber }}</td>
+                    <td class="c-diff-checker__num">{{ line.rightLineNumber }}</td>
+                    <td class="c-diff-checker__prefix">&nbsp;</td>
+                    <td class="c-diff-checker__code">
+                      <span>{{ line.leftText }}</span>
+                    </td>
+                  </tr>
+                } @else if (line.type === 'modified') {
+                  <!-- Removed part -->
+                  <tr class="c-diff-checker__row c-diff-checker__row--removed">
+                    <td class="c-diff-checker__num">{{ line.leftLineNumber }}</td>
+                    <td class="c-diff-checker__num">&nbsp;</td>
+                    <td class="c-diff-checker__prefix">-</td>
+                    <td class="c-diff-checker__code">
+                      @if (line.leftTokens) {
+                        @for (t of line.leftTokens; track $index) {
+                          @if (t.type === 'removed') {
+                            <mark class="c-diff-checker__token c-diff-checker__token--del">{{ t.value }}</mark>
+                          } @else {
+                            <span>{{ t.value }}</span>
+                          }
+                        }
+                      } @else {
+                        <span>{{ line.leftText }}</span>
+                      }
+                    </td>
+                  </tr>
+                  <!-- Added part -->
+                  <tr class="c-diff-checker__row c-diff-checker__row--added">
+                    <td class="c-diff-checker__num">&nbsp;</td>
+                    <td class="c-diff-checker__num">{{ line.rightLineNumber }}</td>
+                    <td class="c-diff-checker__prefix">+</td>
+                    <td class="c-diff-checker__code">
+                      @if (line.rightTokens) {
+                        @for (t of line.rightTokens; track $index) {
+                          @if (t.type === 'added') {
+                            <mark class="c-diff-checker__token c-diff-checker__token--ins">{{ t.value }}</mark>
+                          } @else {
+                            <span>{{ t.value }}</span>
+                          }
+                        }
+                      } @else {
+                        <span>{{ line.rightText }}</span>
+                      }
+                    </td>
+                  </tr>
+                } @else if (line.type === 'removed') {
+                  <tr class="c-diff-checker__row c-diff-checker__row--removed">
+                    <td class="c-diff-checker__num">{{ line.leftLineNumber }}</td>
+                    <td class="c-diff-checker__num">&nbsp;</td>
+                    <td class="c-diff-checker__prefix">-</td>
+                    <td class="c-diff-checker__code">
+                      <span>{{ line.leftText }}</span>
+                    </td>
+                  </tr>
+                } @else if (line.type === 'added') {
+                  <tr class="c-diff-checker__row c-diff-checker__row--added">
+                    <td class="c-diff-checker__num">&nbsp;</td>
+                    <td class="c-diff-checker__num">{{ line.rightLineNumber }}</td>
+                    <td class="c-diff-checker__prefix">+</td>
+                    <td class="c-diff-checker__code">
+                      <span>{{ line.rightText }}</span>
+                    </td>
+                  </tr>
+                }
+              }
+            </tbody>
+          </table>
+        </div>
+      }
+    </div>
+
+    <!-- Footer Actions -->
+    <div class="c-card__footer l-extremo">
+      <div class="l-extremo__area-izquierda">
+        <button
+          type="button"
+          class="c-button c-button--outline"
+          (click)="reset()"
+        >
+          Reset / Clear
+        </button>
+      </div>
+      <div class="l-extremo__area-derecha c-diff-checker__export-actions">
+        <button
+          type="button"
+          class="c-button c-button--outline"
+          [disabled]="result().lines.length === 0"
+          (click)="downloadExport('patch')"
+        >
+          Download .patch
+        </button>
+        <button
+          type="button"
+          class="c-button c-button--primary"
+          [disabled]="result().lines.length === 0"
+          (click)="downloadExport('html')"
+        >
+          Export HTML Report
+        </button>
+      </div>
+    </div>
+  </section>
+</div>

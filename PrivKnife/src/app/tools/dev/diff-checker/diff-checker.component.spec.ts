@@ -150,6 +150,43 @@ describe('DiffCheckerComponent (Seam 2 & 4)', () => {
       fixture.destroy();
       expect(component).toBeTruthy();
     });
+
+    it('should terminate web worker on ngOnDestroy (DEFECT-55-02)', () => {
+      const mockWorker = {
+        postMessage: vi.fn(),
+        terminate: vi.fn(),
+        onmessage: null,
+      };
+      (component as any).worker = mockWorker;
+      component.ngOnDestroy();
+      expect(mockWorker.terminate).toHaveBeenCalled();
+    });
+
+    it('should support syntaxLanguage selection and syncScroll toggle (DEFECT-55-05)', () => {
+      expect(component.syntaxLanguage()).toBe('javascript');
+      expect(component.syncScroll()).toBe(true);
+
+      (component as any).setSyntaxLanguage?.('python');
+      expect(component.syntaxLanguage()).toBe('python');
+
+      (component as any).toggleSyncScroll?.();
+      expect(component.syncScroll()).toBe(false);
+    });
+
+    it('should synchronize textarea scroll when syncScroll is enabled (DEFECT-55-05)', () => {
+      component.syncScroll.set(true);
+      const fakeOrig = { scrollTop: 100, scrollHeight: 300, clientHeight: 100 };
+      const fakeMod = { scrollTop: 0, scrollHeight: 300, clientHeight: 100 };
+      (component as any).origTextareaRef = { nativeElement: fakeOrig };
+      (component as any).modTextareaRef = { nativeElement: fakeMod };
+
+      (component as any).onScrollOriginal?.({ target: fakeOrig } as any);
+      expect(fakeMod.scrollTop).toBe(100);
+
+      fakeMod.scrollTop = 50;
+      (component as any).onScrollModified?.({ target: fakeMod } as any);
+      expect(fakeOrig.scrollTop).toBe(50);
+    });
   });
 
   describe('Task 4.1: Privacy & Zero-Exfiltration Guard', () => {

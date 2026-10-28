@@ -127,6 +127,36 @@ describe('DiffEngine (engine.ts) - Seam 1', () => {
       expect(modifiedLine.leftTokens?.some((t) => t.type === 'removed' && t.value === 't')).toBe(true);
       expect(modifiedLine.rightTokens?.some((t) => t.type === 'added' && t.value === 'r')).toBe(true);
     });
+
+    it('should preserve strict monotonic line ordering of original and modified lines (DEFECT-55-01)', () => {
+      const result = computeDiff(SAMPLE_CODE_ORIGINAL, SAMPLE_CODE_MODIFIED, DEFAULT_DIFF_OPTIONS);
+      expect(result.success).toBe(true);
+
+      // Verify leftLineNumber is strictly increasing for all lines where it is present
+      const leftNums = result.lines.filter((l) => l.leftLineNumber !== undefined).map((l) => l.leftLineNumber!);
+      for (let i = 1; i < leftNums.length; i++) {
+        expect(leftNums[i]).toBeGreaterThan(leftNums[i - 1]);
+      }
+
+      // Verify rightLineNumber is strictly increasing for all lines where it is present
+      const rightNums = result.lines.filter((l) => l.rightLineNumber !== undefined).map((l) => l.rightLineNumber!);
+      for (let i = 1; i < rightNums.length; i++) {
+        expect(rightNums[i]).toBeGreaterThan(rightNums[i - 1]);
+      }
+
+      // Verify leftText lines follow the exact sequence of original lines
+      const leftTexts = result.lines.filter((l) => l.leftText !== undefined).map((l) => l.leftText!);
+      expect(leftTexts).toEqual(SAMPLE_CODE_ORIGINAL.split('\n'));
+
+      // Verify rightText lines follow the exact sequence of modified lines
+      const rightTexts = result.lines.filter((l) => l.rightText !== undefined).map((l) => l.rightText!);
+      expect(rightTexts).toEqual(SAMPLE_CODE_MODIFIED.split('\n'));
+
+      // Explicitly check that 'return total;' comes AFTER 'total = total + items[i].price;'
+      const returnTotalIdx = result.lines.findIndex((l) => l.leftText?.includes('return total;'));
+      const loopCalcIdx = result.lines.findIndex((l) => l.leftText?.includes('total = total + items[i].price;'));
+      expect(returnTotalIdx).toBeGreaterThan(loopCalcIdx);
+    });
   });
 
   describe('generateUnifiedPatch', () => {

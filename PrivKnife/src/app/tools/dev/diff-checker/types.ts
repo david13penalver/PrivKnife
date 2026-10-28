@@ -58,3 +58,15 @@ export interface DiffCheckerResult {
   metadata?: Record<string, unknown>;
   error?: string;
 }
+
+export interface DiffWorkerRequest {
+  requestId: number;
+  originalText: string;
+  modifiedText: string;
+  options: DiffCheckerOptions;
+}
+
+export interface DiffWorkerResponse {
+  requestId: number;
+  result: DiffCheckerResult;
+}

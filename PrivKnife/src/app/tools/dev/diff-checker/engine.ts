@@ -227,67 +227,120 @@ export function computeDiff(
         idx++;
       }
 
-      const usedRemoved = new Set<number>();
-      const usedAdded = new Set<number>();
+      // Pair lines that have reasonable similarity using monotonic DP alignment
+      const R = removedBlock.length;
+      const A = addedBlock.length;
 
-      // Pair lines that have reasonable similarity
-      for (let r = 0; r < removedBlock.length; r++) {
-        for (let a = 0; a < addedBlock.length; a++) {
-          if (!usedRemoved.has(r) && !usedAdded.has(a)) {
-            const sim = calculateSimilarity(
-              removedBlock[r],
-              addedBlock[a],
-              options.diffGranularity
-            );
-            if (sim >= 0.3) {
-              usedRemoved.add(r);
-              usedAdded.add(a);
-              const leftTxt = removedBlock[r];
-              const rightTxt = addedBlock[a];
-              const { leftTokens, rightTokens } = computeSubTokens(
-                leftTxt,
-                rightTxt,
-                options.diffGranularity,
-                options.ignoreCase
-              );
-
-              lines.push({
-                type: 'modified',
-                leftLineNumber: leftLineNum++,
-                rightLineNumber: rightLineNum++,
-                leftText: leftTxt,
-                rightText: rightTxt,
-                leftTokens,
-                rightTokens,
-              });
-              break;
-            }
+      // dp[r][a] represents max similarity alignment score
+      const dp: number[][] = Array.from({ length: R + 1 }, () => Array(A + 1).fill(0));
+      for (let r = 1; r <= R; r++) {
+        for (let a = 1; a <= A; a++) {
+          const sim = calculateSimilarity(
+            removedBlock[r - 1],
+            addedBlock[a - 1],
+            options.diffGranularity
+          );
+          let matchScore = 0;
+          if (sim >= 0.3) {
+            matchScore = dp[r - 1][a - 1] + sim;
           }
+          dp[r][a] = Math.max(dp[r - 1][a], dp[r][a - 1], matchScore);
         }
       }
 
-      // Remaining removed lines
-      for (let r = 0; r < removedBlock.length; r++) {
-        if (!usedRemoved.has(r)) {
+      // Backtrack to find aligned pairs (r, a)
+      const matchedPairs: Array<{ r: number; a: number }> = [];
+      let currR = R;
+      let currA = A;
+      while (currR > 0 && currA > 0) {
+        const sim = calculateSimilarity(
+          removedBlock[currR - 1],
+          addedBlock[currA - 1],
+          options.diffGranularity
+        );
+        if (
+          sim >= 0.3 &&
+          Math.abs(dp[currR][currA] - (dp[currR - 1][currA - 1] + sim)) < 1e-9
+        ) {
+          matchedPairs.push({ r: currR - 1, a: currA - 1 });
+          currR--;
+          currA--;
+        } else if (dp[currR - 1][currA] >= dp[currR][currA - 1]) {
+          currR--;
+        } else {
+          currA--;
+        }
+      }
+      matchedPairs.reverse(); // Now in strictly ascending order of r and a
+
+      // Monotonically flush preceding removals, additions, then paired modified line
+      let rCursor = 0;
+      let aCursor = 0;
+
+      for (const pair of matchedPairs) {
+        while (rCursor < pair.r) {
           lines.push({
             type: 'removed',
             leftLineNumber: leftLineNum++,
-            leftText: removedBlock[r],
-            unifiedText: removedBlock[r],
+            leftText: removedBlock[rCursor],
+            unifiedText: removedBlock[rCursor],
           });
+          rCursor++;
         }
-      }
 
-      // Remaining added lines
-      for (let a = 0; a < addedBlock.length; a++) {
-        if (!usedAdded.has(a)) {
+        while (aCursor < pair.a) {
           lines.push({
             type: 'added',
             rightLineNumber: rightLineNum++,
-            rightText: addedBlock[a],
-            unifiedText: addedBlock[a],
+            rightText: addedBlock[aCursor],
+            unifiedText: addedBlock[aCursor],
           });
+          aCursor++;
         }
+
+        const leftTxt = removedBlock[pair.r];
+        const rightTxt = addedBlock[pair.a];
+        const { leftTokens, rightTokens } = computeSubTokens(
+          leftTxt,
+          rightTxt,
+          options.diffGranularity,
+          options.ignoreCase
+        );
+
+        lines.push({
+          type: 'modified',
+          leftLineNumber: leftLineNum++,
+          rightLineNumber: rightLineNum++,
+          leftText: leftTxt,
+          rightText: rightTxt,
+          leftTokens,
+          rightTokens,
+        });
+
+        rCursor = pair.r + 1;
+        aCursor = pair.a + 1;
+      }
+
+      // Trailing unmatched removed lines
+      while (rCursor < R) {
+        lines.push({
+          type: 'removed',
+          leftLineNumber: leftLineNum++,
+          leftText: removedBlock[rCursor],
+          unifiedText: removedBlock[rCursor],
+        });
+        rCursor++;
+      }
+
+      // Trailing unmatched added lines
+      while (aCursor < A) {
+        lines.push({
+          type: 'added',
+          rightLineNumber: rightLineNum++,
+          rightText: addedBlock[aCursor],
+          unifiedText: addedBlock[aCursor],
+        });
+        aCursor++;
       }
     }
   }
@@ -457,9 +510,9 @@ export function generateHtmlDiffReport(
 
       return `<tr class="row row--${l.type}">
         <td class="lineno">${leftNum}</td>
-        <td class="code left-pane">${leftContent}</td>
+        <td class="code left-pane"><code class="language-${options.syntaxLanguage}">${leftContent}</code></td>
         <td class="lineno">${rightNum}</td>
-        <td class="code right-pane">${rightContent}</td>
+        <td class="code right-pane"><code class="language-${options.syntaxLanguage}">${rightContent}</code></td>
       </tr>`;
     })
     .join('\n');
