@@ -13,9 +13,15 @@ import {
   ConvertedImageItem,
   HeicAvifBatchStats,
   HeicAvifConverterOptions,
+  HeicAvifConverterResult,
+  HeicAvifWorkerRequest,
+  HeicAvifWorkerResponse,
   OutputFormat,
 } from './types';
-import { DEFAULT_CONVERTER_OPTIONS } from './test-fixtures';
+import {
+  DEFAULT_CONVERTER_OPTIONS,
+  SAMPLE_BATCH_FILES,
+} from './test-fixtures';
 import {
   calculateBatchStats,
   convertSingleImage,
@@ -27,411 +33,8 @@ import {
   selector: 'app-heic-avif-converter',
   standalone: true,
   imports: [CommonModule, FormsModule, Card, Dropzone, ProgressBar],
-  template: `
-    <div class="l-page">
-      <!-- Header -->
-      <div class="l-page__header c-header">
-        <div class="c-header__title-group">
-          <h1 class="c-header__title">HEIC & AVIF to JPG/PNG Batch Converter</h1>
-          <p class="c-header__subtitle">
-            Convert Apple HEIC/HEIF photos and modern AVIF files into universal JPEG, PNG, or WebP formats locally in browser memory. Up to 100 images in parallel with zero server uploads.
-          </p>
-        </div>
-        <div class="c-badge c-badge--privacy">
-          🛡️ 100% In-Browser • Never Leaves Your Device
-        </div>
-      </div>
-
-      <!-- Main Layout Columns -->
-      <div class="l-columns l-columns--2">
-        <!-- Controls Column -->
-        <div class="l-columns__column">
-          <!-- File Dropzone Card -->
-          <app-card title="1. Select or Drop Images" class="g--margin-bottom-4">
-            <app-dropzone
-              title="Drop HEIC, HEIF, or AVIF files here"
-              subtitle="or click to browse from iPhone, camera roll, or device (up to 100 files)"
-              accept=".heic,.heif,.avif,.webp,.png,.jpg,.jpeg,image/*"
-              [multiple]="true"
-              [maxSizeMb]="100"
-              (filesSelected)="handleFilesSelected($event)"
-            />
-
-            <div class="quick-hints g--margin-top-3">
-              <span class="g--text-muted text-xs">
-                💡 <em>Supports Apple Live Photos, burst shots, high-efficiency iPhone HEIC, and web-standard AVIF.</em>
-              </span>
-            </div>
-          </app-card>
-
-          <!-- Conversion Parameters Card -->
-          <app-card title="2. Output Settings" class="g--margin-bottom-4">
-            <!-- Format Selector -->
-            <div class="c-form-group g--margin-bottom-3">
-              <label class="c-form-label">Target Format</label>
-              <div class="format-pills">
-                <button
-                  type="button"
-                  class="c-button c-button--small"
-                  [class.c-button--primary]="outputFormat() === 'jpeg'"
-                  [class.c-button--outline]="outputFormat() !== 'jpeg'"
-                  (click)="setOutputFormat('jpeg')"
-                >
-                  JPG (Universal)
-                </button>
-                <button
-                  type="button"
-                  class="c-button c-button--small"
-                  [class.c-button--primary]="outputFormat() === 'png'"
-                  [class.c-button--outline]="outputFormat() !== 'png'"
-                  (click)="setOutputFormat('png')"
-                >
-                  PNG (Lossless)
-                </button>
-                <button
-                  type="button"
-                  class="c-button c-button--small"
-                  [class.c-button--primary]="outputFormat() === 'webp'"
-                  [class.c-button--outline]="outputFormat() !== 'webp'"
-                  (click)="setOutputFormat('webp')"
-                >
-                  WebP (Ultra Compact)
-                </button>
-              </div>
-            </div>
-
-            <!-- Quality Slider (JPEG / WebP) -->
-            @if (outputFormat() !== 'png') {
-              <div class="c-form-group g--margin-bottom-3">
-                <div class="l-extremo">
-                  <label class="c-form-label">Compression Quality</label>
-                  <span class="c-form-value">{{ Math.round(jpegQuality() * 100) }}%</span>
-                </div>
-                <input
-                  type="range"
-                  class="c-range"
-                  [min]="0.2"
-                  [max]="1.0"
-                  [step]="0.02"
-                  [ngModel]="jpegQuality()"
-                  (ngModelChange)="setJpegQuality($event)"
-                />
-              </div>
-            }
-
-            <!-- Max Dimension Downscaling -->
-            <div class="c-form-group g--margin-bottom-3">
-              <label class="c-form-label">Resolution / Downscale Limit</label>
-              <div class="dim-pills">
-                <button
-                  type="button"
-                  class="c-button c-button--small"
-                  [class.c-button--primary]="maxDimensionPx() === 0"
-                  [class.c-button--outline]="maxDimensionPx() !== 0"
-                  (click)="setMaxDimensionPx(0)"
-                >
-                  Original Size
-                </button>
-                <button
-                  type="button"
-                  class="c-button c-button--small"
-                  [class.c-button--primary]="maxDimensionPx() === 3840"
-                  [class.c-button--outline]="maxDimensionPx() !== 3840"
-                  (click)="setMaxDimensionPx(3840)"
-                >
-                  4K (3840px)
-                </button>
-                <button
-                  type="button"
-                  class="c-button c-button--small"
-                  [class.c-button--primary]="maxDimensionPx() === 1920"
-                  [class.c-button--outline]="maxDimensionPx() !== 1920"
-                  (click)="setMaxDimensionPx(1920)"
-                >
-                  1080p (1920px)
-                </button>
-                <button
-                  type="button"
-                  class="c-button c-button--small"
-                  [class.c-button--primary]="maxDimensionPx() === 1280"
-                  [class.c-button--outline]="maxDimensionPx() !== 1280"
-                  (click)="setMaxDimensionPx(1280)"
-                >
-                  720p (1280px)
-                </button>
-                <button
-                  type="button"
-                  class="c-button c-button--small"
-                  [class.c-button--primary]="maxDimensionPx() === 800"
-                  [class.c-button--outline]="maxDimensionPx() !== 800"
-                  (click)="setMaxDimensionPx(800)"
-                >
-                  Web (800px)
-                </button>
-              </div>
-            </div>
-
-            <!-- Filename Suffix -->
-            <div class="c-form-group g--margin-bottom-3">
-              <label class="c-form-label">Filename Suffix (Optional)</label>
-              <input
-                type="text"
-                class="c-input"
-                placeholder="e.g. -converted or _web"
-                [ngModel]="filenameSuffix()"
-                (ngModelChange)="setFilenameSuffix($event)"
-              />
-            </div>
-
-            <!-- Options & Reset -->
-            <div class="l-extremo g--align-center">
-              <label class="c-checkbox-label">
-                <input
-                  type="checkbox"
-                  [checked]="packageAsZip()"
-                  (change)="setPackageAsZip(!packageAsZip())"
-                />
-                Always package download as single .ZIP
-              </label>
-
-              <button
-                type="button"
-                class="c-button c-button--small c-button--outline"
-                (click)="resetToDefaults()"
-              >
-                Reset Defaults
-              </button>
-            </div>
-          </app-card>
-        </div>
-
-        <!-- Queue & Deliverables Column -->
-        <div class="l-columns__column">
-          <!-- Queue Summary Card -->
-          <app-card title="Batch Queue & Statistics" class="g--margin-bottom-4">
-            <div class="stats-grid g--margin-bottom-3">
-              <div class="stat-card">
-                <span class="stat-label">Files Queued</span>
-                <span class="stat-value">{{ batchStats().totalFiles }}</span>
-              </div>
-              <div class="stat-card">
-                <span class="stat-label">Completed</span>
-                <span class="stat-value text-success">{{ batchStats().completedFiles }} / {{ batchStats().totalFiles }}</span>
-              </div>
-              <div class="stat-card">
-                <span class="stat-label">Original Total</span>
-                <span class="stat-value">{{ formatFileSize(batchStats().totalOriginalSize) }}</span>
-              </div>
-              <div class="stat-card">
-                <span class="stat-label">Converted Total</span>
-                <span class="stat-value">{{ formatFileSize(batchStats().totalConvertedSize) }}</span>
-              </div>
-            </div>
-
-            @if (isConverting()) {
-              <div class="progress-wrap g--margin-bottom-3">
-                <app-progress-bar [value]="conversionProgress()" label="Converting batch..." />
-              </div>
-            }
-
-            @if (conversionError()) {
-              <div class="c-alert c-alert--danger g--margin-bottom-3">
-                {{ conversionError() }}
-              </div>
-            }
-
-            <!-- Action buttons -->
-            <div class="queue-actions l-extremo g--margin-bottom-3">
-              <div class="l-extremo__left">
-                <button
-                  type="button"
-                  class="c-button c-button--primary"
-                  [disabled]="imageQueue().length === 0 || isConverting()"
-                  (click)="startBatchConversion()"
-                >
-                  Convert All ({{ imageQueue().length }})
-                </button>
-              </div>
-
-              <div class="l-extremo__right action-button-group">
-                @if (hasConvertedFiles()) {
-                  <button
-                    type="button"
-                    class="c-button c-button--secondary"
-                    [disabled]="isConverting()"
-                    (click)="downloadAll()"
-                  >
-                    Download All ({{ batchStats().completedFiles }})
-                  </button>
-                }
-
-                <button
-                  type="button"
-                  class="c-button c-button--outline"
-                  [disabled]="imageQueue().length === 0 || isConverting()"
-                  (click)="clearQueue()"
-                >
-                  Clear Queue
-                </button>
-              </div>
-            </div>
-
-            <!-- Image Queue Table/List -->
-            @if (imageQueue().length > 0) {
-              <div class="queue-list-container">
-                <div class="queue-list">
-                  @for (item of imageQueue(); track item.id) {
-                    <div class="queue-item">
-                      <div class="item-info">
-                        <span class="item-name" [title]="item.originalName">{{ item.originalName }}</span>
-                        <span class="item-meta">
-                          {{ formatFileSize(item.originalSize) }}
-                          @if (item.convertedSize) {
-                            &rarr; <strong>{{ formatFileSize(item.convertedSize) }}</strong>
-                          }
-                        </span>
-                      </div>
-
-                      <div class="item-status">
-                        @if (item.status === 'pending') {
-                          <span class="c-badge c-badge--neutral">Ready</span>
-                        } @else if (item.status === 'processing') {
-                          <span class="c-badge c-badge--info">Converting...</span>
-                        } @else if (item.status === 'done') {
-                          <span class="c-badge c-badge--success">Done</span>
-                        } @else {
-                          <span class="c-badge c-badge--danger" [title]="item.errorMessage || 'Failed'">Error</span>
-                        }
-                      </div>
-
-                      <div class="item-actions">
-                        @if (item.status === 'done' && item.convertedBlob) {
-                          <button
-                            type="button"
-                            class="c-button c-button--small c-button--primary"
-                            (click)="downloadSingleItem(item)"
-                            title="Download this file"
-                          >
-                            ⬇️
-                          </button>
-                        }
-                        <button
-                          type="button"
-                          class="c-button c-button--small c-button--outline"
-                          (click)="removeQueueItem(item.id)"
-                          title="Remove from queue"
-                        >
-                          ✕
-                        </button>
-                      </div>
-                    </div>
-                  }
-                </div>
-              </div>
-            } @else {
-              <div class="empty-state g--text-center g--margin-top-4 g--margin-bottom-4">
-                <span class="empty-icon">🖼️</span>
-                <p class="g--text-muted">No images queued. Drop HEIC or AVIF photos on the left to begin.</p>
-              </div>
-            }
-          </app-card>
-        </div>
-      </div>
-    </div>
-  `,
-  styles: [
-    `
-      .format-pills,
-      .dim-pills,
-      .action-button-group {
-        display: flex;
-        gap: 0.5rem;
-        flex-wrap: wrap;
-      }
-      .stats-grid {
-        display: grid;
-        grid-template-columns: repeat(2, 1fr);
-        gap: 0.75rem;
-      }
-      .stat-card {
-        background: #f8fafc;
-        border: 1px solid #e2e8f0;
-        border-radius: 6px;
-        padding: 0.75rem;
-      }
-      .stat-label {
-        display: block;
-        font-size: 0.75rem;
-        color: #64748b;
-        margin-bottom: 0.25rem;
-      }
-      .stat-value {
-        font-size: 1.125rem;
-        font-weight: 700;
-        color: #1e293b;
-      }
-      .text-success {
-        color: #16a34a;
-      }
-      .text-xs {
-        font-size: 0.75rem;
-      }
-      .queue-list-container {
-        max-height: 400px;
-        overflow-y: auto;
-        border: 1px solid #e2e8f0;
-        border-radius: 6px;
-      }
-      .queue-item {
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        padding: 0.6rem 0.75rem;
-        border-bottom: 1px solid #f1f5f9;
-        font-size: 0.85rem;
-      }
-      .queue-item:last-child {
-        border-bottom: none;
-      }
-      .item-info {
-        flex: 1;
-        min-width: 0;
-        margin-right: 0.75rem;
-      }
-      .item-name {
-        display: block;
-        font-weight: 500;
-        color: #1e293b;
-        white-space: nowrap;
-        overflow: hidden;
-        text-overflow: ellipsis;
-      }
-      .item-meta {
-        font-size: 0.75rem;
-        color: #64748b;
-      }
-      .item-status {
-        margin-right: 0.75rem;
-      }
-      .item-actions {
-        display: flex;
-        gap: 0.35rem;
-      }
-      .empty-icon {
-        font-size: 2.5rem;
-        display: block;
-        margin-bottom: 0.5rem;
-      }
-      .c-alert--danger {
-        padding: 0.75rem;
-        background: #fef2f2;
-        color: #b91c1c;
-        border: 1px solid #fecaca;
-        border-radius: 6px;
-        font-size: 0.875rem;
-      }
-    `,
-  ],
+  templateUrl: './heic-avif-converter.component.html',
+  styleUrl: './heic-avif-converter.component.scss',
 })
 export class HeicAvifConverterComponent implements OnDestroy {
   readonly Math = Math;
@@ -451,6 +54,7 @@ export class HeicAvifConverterComponent implements OnDestroy {
   readonly conversionError = signal<string | null>(null);
 
   private createdObjectUrls: string[] = [];
+  private worker: Worker | null = null;
 
   readonly currentOptions = computed<HeicAvifConverterOptions>(() => ({
     outputFormat: this.outputFormat(),
@@ -470,6 +74,10 @@ export class HeicAvifConverterComponent implements OnDestroy {
   );
 
   ngOnDestroy(): void {
+    if (this.worker) {
+      this.worker.terminate();
+      this.worker = null;
+    }
     for (const url of this.createdObjectUrls) {
       URL.revokeObjectURL(url);
     }
@@ -520,11 +128,19 @@ export class HeicAvifConverterComponent implements OnDestroy {
     this.imageQueue.update((q) => [...q, ...newItems]);
   }
 
+  loadSampleBatch(): void {
+    this.handleFilesSelected(SAMPLE_BATCH_FILES);
+  }
+
   removeQueueItem(id: string): void {
     this.imageQueue.update((q) => q.filter((i) => i.id !== id));
   }
 
   clearQueue(): void {
+    if (this.worker) {
+      this.worker.terminate();
+      this.worker = null;
+    }
     for (const url of this.createdObjectUrls) {
       URL.revokeObjectURL(url);
     }
@@ -544,11 +160,21 @@ export class HeicAvifConverterComponent implements OnDestroy {
 
     const options = this.currentOptions();
 
+    // If web worker available, offload batch processing
+    if (typeof Worker !== 'undefined') {
+      try {
+        await this.runWorkerBatch(queue, options);
+        this.isConverting.set(false);
+        return;
+      } catch {
+        // Fallback to main thread
+      }
+    }
+
     for (let i = 0; i < queue.length; i++) {
       const item = queue[i];
       if (item.status === 'done') continue;
 
-      // Update status to processing
       this.updateItemInQueue(item.id, { status: 'processing' });
 
       try {
@@ -565,6 +191,57 @@ export class HeicAvifConverterComponent implements OnDestroy {
     }
 
     this.isConverting.set(false);
+  }
+
+  private runWorkerBatch(
+    queue: ConvertedImageItem[],
+    options: HeicAvifConverterOptions
+  ): Promise<void> {
+    return new Promise((resolve, reject) => {
+      try {
+        const worker = new Worker(new URL('./worker', import.meta.url), {
+          type: 'module',
+        });
+        this.worker = worker;
+
+        worker.onmessage = (event: MessageEvent<HeicAvifWorkerResponse>) => {
+          const msg = event.data;
+          if (msg.type === 'progress') {
+            this.conversionProgress.set(msg.progressPercent);
+            this.updateItemInQueue(msg.item.id, msg.item);
+          } else if (msg.type === 'done') {
+            worker.terminate();
+            if (this.worker === worker) {
+              this.worker = null;
+            }
+            if (msg.success) {
+              resolve();
+            } else {
+              reject(new Error(msg.error || 'Worker batch conversion failed'));
+            }
+          }
+        };
+
+        worker.onerror = (err) => {
+          worker.terminate();
+          if (this.worker === worker) {
+            this.worker = null;
+          }
+          reject(err);
+        };
+
+        const files = queue.map((item) => item.originalFile);
+        const itemIds = queue.map((item) => item.id);
+        worker.postMessage({
+          type: 'convert',
+          files,
+          itemIds,
+          options,
+        } as HeicAvifWorkerRequest);
+      } catch (err) {
+        reject(err);
+      }
+    });
   }
 
   private updateItemInQueue(id: string, partial: Partial<ConvertedImageItem>): void {
@@ -612,6 +289,14 @@ export class HeicAvifConverterComponent implements OnDestroy {
     document.body.appendChild(a);
     a.click();
     document.body.removeChild(a);
+
+    setTimeout(() => {
+      URL.revokeObjectURL(url);
+      const idx = this.createdObjectUrls.indexOf(url);
+      if (idx !== -1) {
+        this.createdObjectUrls.splice(idx, 1);
+      }
+    }, 100);
   }
 
   formatFileSize(bytes: number): string {

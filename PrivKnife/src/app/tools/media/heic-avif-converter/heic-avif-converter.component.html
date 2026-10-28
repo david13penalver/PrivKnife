@@ -1,0 +1,331 @@
+<div class="l-page">
+  <!-- Header -->
+  <div class="l-page__header c-header">
+    <div class="c-header__title-group">
+      <h1 class="c-header__title">HEIC & AVIF to JPG/PNG Batch Converter</h1>
+      <p class="c-header__subtitle">
+        Convert Apple HEIC/HEIF photos and modern AVIF files into universal JPEG, PNG, or WebP formats locally in browser memory. Up to 100 images in parallel with zero server uploads.
+      </p>
+    </div>
+    <div class="c-badge c-badge--privacy">
+      🛡️ 100% In-Browser • Never Leaves Your Device
+    </div>
+  </div>
+
+  <!-- Main Layout Columns -->
+  <div class="l-columns l-columns--2">
+    <!-- Controls Column -->
+    <div class="l-columns__area">
+      <!-- File Dropzone Card -->
+      <app-card title="1. Select or Drop Images" class="g--margin-bottom-4">
+        <!-- Sample Batch Loader Button -->
+        <div class="c-heic-converter__sample-action g--margin-bottom-3">
+          <button
+            type="button"
+            class="c-button c-button--small c-button--outline"
+            (click)="loadSampleBatch()"
+          >
+            Load Sample Batch (AVIF + HEIC)
+          </button>
+        </div>
+
+        <app-dropzone
+          title="Drop HEIC, HEIF, or AVIF files here"
+          subtitle="or click to browse from iPhone, camera roll, or device (up to 100 files)"
+          accept=".heic,.heif,.avif,.webp,.png,.jpg,.jpeg,image/*"
+          [multiple]="true"
+          [maxSizeMb]="100"
+          (filesSelected)="handleFilesSelected($event)"
+        />
+
+        <div class="quick-hints g--margin-top-3">
+          <span class="g--text-muted text-xs">
+            💡 <em>Supports Apple Live Photos, burst shots, high-efficiency iPhone HEIC, and web-standard AVIF.</em>
+          </span>
+        </div>
+      </app-card>
+
+      <!-- Conversion Parameters Card -->
+      <app-card title="2. Output Settings" class="g--margin-bottom-4">
+        <!-- Format Selector -->
+        <div class="c-input g--margin-bottom-3">
+          <label class="c-input__label g--margin-bottom-1">Target Format</label>
+          <div class="c-heic-converter__format-pills">
+            <button
+              type="button"
+              class="c-button c-button--small"
+              [class.c-button--primary]="outputFormat() === 'jpeg'"
+              [class.c-button--outline]="outputFormat() !== 'jpeg'"
+              (click)="setOutputFormat('jpeg')"
+            >
+              JPG (Universal)
+            </button>
+            <button
+              type="button"
+              class="c-button c-button--small"
+              [class.c-button--primary]="outputFormat() === 'png'"
+              [class.c-button--outline]="outputFormat() !== 'png'"
+              (click)="setOutputFormat('png')"
+            >
+              PNG (Lossless)
+            </button>
+            <button
+              type="button"
+              class="c-button c-button--small"
+              [class.c-button--primary]="outputFormat() === 'webp'"
+              [class.c-button--outline]="outputFormat() !== 'webp'"
+              (click)="setOutputFormat('webp')"
+            >
+              WebP (Ultra Compact)
+            </button>
+          </div>
+        </div>
+
+        <!-- Quality Slider (JPEG / WebP) -->
+        @if (outputFormat() !== 'png') {
+          <div class="c-input g--margin-bottom-3">
+            <div class="l-extremo">
+              <div class="l-extremo__area-izquierda">
+                <label class="c-input__label" for="qualityRange">Compression Quality</label>
+              </div>
+              <div class="l-extremo__area-derecha">
+                <span class="c-input__value">{{ Math.round(jpegQuality() * 100) }}%</span>
+              </div>
+            </div>
+            <input
+              id="qualityRange"
+              type="range"
+              class="c-input__slider"
+              [min]="0.2"
+              [max]="1.0"
+              [step]="0.02"
+              [ngModel]="jpegQuality()"
+              (ngModelChange)="setJpegQuality($event)"
+            />
+          </div>
+        }
+
+        <!-- Max Dimension Downscaling -->
+        <div class="c-input g--margin-bottom-3">
+          <label class="c-input__label g--margin-bottom-1">Resolution / Downscale Limit</label>
+          <div class="c-heic-converter__dim-pills">
+            <button
+              type="button"
+              class="c-button c-button--small"
+              [class.c-button--primary]="maxDimensionPx() === 0"
+              [class.c-button--outline]="maxDimensionPx() !== 0"
+              (click)="setMaxDimensionPx(0)"
+            >
+              Original Size
+            </button>
+            <button
+              type="button"
+              class="c-button c-button--small"
+              [class.c-button--primary]="maxDimensionPx() === 3840"
+              [class.c-button--outline]="maxDimensionPx() !== 3840"
+              (click)="setMaxDimensionPx(3840)"
+            >
+              4K (3840px)
+            </button>
+            <button
+              type="button"
+              class="c-button c-button--small"
+              [class.c-button--primary]="maxDimensionPx() === 1920"
+              [class.c-button--outline]="maxDimensionPx() !== 1920"
+              (click)="setMaxDimensionPx(1920)"
+            >
+              1080p (1920px)
+            </button>
+            <button
+              type="button"
+              class="c-button c-button--small"
+              [class.c-button--primary]="maxDimensionPx() === 1280"
+              [class.c-button--outline]="maxDimensionPx() !== 1280"
+              (click)="setMaxDimensionPx(1280)"
+            >
+              720p (1280px)
+            </button>
+            <button
+              type="button"
+              class="c-button c-button--small"
+              [class.c-button--primary]="maxDimensionPx() === 800"
+              [class.c-button--outline]="maxDimensionPx() !== 800"
+              (click)="setMaxDimensionPx(800)"
+            >
+              Web (800px)
+            </button>
+          </div>
+        </div>
+
+        <!-- Filename Suffix -->
+        <div class="c-input g--margin-bottom-3">
+          <label class="c-input__label g--margin-bottom-1" for="suffixInput">Filename Suffix (Optional)</label>
+          <input
+            id="suffixInput"
+            type="text"
+            class="c-input__control"
+            placeholder="e.g. -converted or _web"
+            [ngModel]="filenameSuffix()"
+            (ngModelChange)="setFilenameSuffix($event)"
+          />
+        </div>
+
+        <!-- Options & Reset -->
+        <div class="l-extremo g--align-center">
+          <div class="l-extremo__area-izquierda">
+            <label class="c-input__switch">
+              <input
+                type="checkbox"
+                [checked]="packageAsZip()"
+                (change)="setPackageAsZip(!packageAsZip())"
+              />
+              <span>Always package download as single .ZIP</span>
+            </label>
+          </div>
+
+          <div class="l-extremo__area-derecha">
+            <button
+              type="button"
+              class="c-button c-button--small c-button--outline"
+              (click)="resetToDefaults()"
+            >
+              Reset Defaults
+            </button>
+          </div>
+        </div>
+      </app-card>
+    </div>
+
+    <!-- Queue & Deliverables Column -->
+    <div class="l-columns__area">
+      <!-- Queue Summary Card -->
+      <app-card title="Batch Queue & Statistics" class="g--margin-bottom-4">
+        <div class="c-heic-converter__stats-grid g--margin-bottom-3">
+          <div class="c-heic-converter__stat-card">
+            <span class="c-heic-converter__stat-label">Files Queued</span>
+            <span class="c-heic-converter__stat-value">{{ batchStats().totalFiles }}</span>
+          </div>
+          <div class="c-heic-converter__stat-card">
+            <span class="c-heic-converter__stat-label">Completed</span>
+            <span class="c-heic-converter__stat-value c-heic-converter__stat-value--success">{{ batchStats().completedFiles }} / {{ batchStats().totalFiles }}</span>
+          </div>
+          <div class="c-heic-converter__stat-card">
+            <span class="c-heic-converter__stat-label">Original Total</span>
+            <span class="c-heic-converter__stat-value">{{ formatFileSize(batchStats().totalOriginalSize) }}</span>
+          </div>
+          <div class="c-heic-converter__stat-card">
+            <span class="c-heic-converter__stat-label">Converted Total</span>
+            <span class="c-heic-converter__stat-value">{{ formatFileSize(batchStats().totalConvertedSize) }}</span>
+          </div>
+        </div>
+
+        @if (isConverting()) {
+          <div class="progress-wrap g--margin-bottom-3">
+            <app-progress-bar [value]="conversionProgress()" label="Converting batch..." />
+          </div>
+        }
+
+        @if (conversionError()) {
+          <div class="c-heic-converter__alert c-heic-converter__alert--danger g--margin-bottom-3">
+            {{ conversionError() }}
+          </div>
+        }
+
+        <!-- Action buttons -->
+        <div class="queue-actions l-extremo g--margin-bottom-3">
+          <div class="l-extremo__area-izquierda">
+            <button
+              type="button"
+              class="c-button c-button--primary"
+              [disabled]="imageQueue().length === 0 || isConverting()"
+              (click)="startBatchConversion()"
+            >
+              Convert All ({{ imageQueue().length }})
+            </button>
+          </div>
+
+          <div class="l-extremo__area-derecha c-heic-converter__action-button-group">
+            @if (hasConvertedFiles()) {
+              <button
+                type="button"
+                class="c-button c-button--secondary"
+                [disabled]="isConverting()"
+                (click)="downloadAll()"
+              >
+                Download All ({{ batchStats().completedFiles }})
+              </button>
+            }
+
+            <button
+              type="button"
+              class="c-button c-button--outline"
+              [disabled]="imageQueue().length === 0 || isConverting()"
+              (click)="clearQueue()"
+            >
+              Clear Queue
+            </button>
+          </div>
+        </div>
+
+        <!-- Image Queue Table/List -->
+        @if (imageQueue().length > 0) {
+          <div class="c-heic-converter__queue-list-container">
+            <div class="c-heic-converter__queue-list">
+              @for (item of imageQueue(); track item.id) {
+                <div class="c-heic-converter__queue-item">
+                  <div class="c-heic-converter__item-info">
+                    <span class="c-heic-converter__item-name" [title]="item.originalName">{{ item.originalName }}</span>
+                    <span class="c-heic-converter__item-meta">
+                      {{ formatFileSize(item.originalSize) }}
+                      @if (item.convertedSize) {
+                        &rarr; <strong>{{ formatFileSize(item.convertedSize) }}</strong>
+                      }
+                    </span>
+                  </div>
+
+                  <div class="c-heic-converter__item-status">
+                    @if (item.status === 'pending') {
+                      <span class="c-badge c-badge--neutral">Ready</span>
+                    } @else if (item.status === 'processing') {
+                      <span class="c-badge c-badge--info">Converting...</span>
+                    } @else if (item.status === 'done') {
+                      <span class="c-badge c-badge--success">Done</span>
+                    } @else {
+                      <span class="c-badge c-badge--danger" [title]="item.errorMessage || 'Failed'">Error</span>
+                    }
+                  </div>
+
+                  <div class="c-heic-converter__item-actions">
+                    @if (item.status === 'done' && item.convertedBlob) {
+                      <button
+                        type="button"
+                        class="c-button c-button--small c-button--primary"
+                        (click)="downloadSingleItem(item)"
+                        title="Download this file"
+                      >
+                        ⬇️
+                      </button>
+                    }
+                    <button
+                      type="button"
+                      class="c-button c-button--small c-button--outline"
+                      (click)="removeQueueItem(item.id)"
+                      title="Remove from queue"
+                    >
+                      ✕
+                    </button>
+                  </div>
+                </div>
+              }
+            </div>
+          </div>
+        } @else {
+          <div class="empty-state g--text-center g--margin-top-4 g--margin-bottom-4">
+            <span class="c-heic-converter__empty-icon">🖼️</span>
+            <p class="g--text-muted">No images queued. Drop HEIC or AVIF photos on the left to begin.</p>
+          </div>
+        }
+      </app-card>
+    </div>
+  </div>
+</div>

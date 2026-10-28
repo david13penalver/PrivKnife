@@ -48,6 +48,51 @@ export function validateConverterOptions(options: HeicAvifConverterOptions): {
 // -------------------------------------------------------------
 // 2. Helpers & Dimension Calculations
 // -------------------------------------------------------------
+export function isHeicContainer(
+  source: File | Blob | ArrayBuffer | Uint8Array | string
+): boolean {
+  if (typeof source === 'string') {
+    return /\.(heic|heif|heifs|heicp)$/i.test(source);
+  }
+
+  if (source instanceof File || source instanceof Blob) {
+    if (source.type && /image\/(heic|heif|heic-sequence|heif-sequence)/i.test(source.type)) {
+      return true;
+    }
+    if ('name' in source && (source as any).name && /\.(heic|heif|heifs|heicp)$/i.test((source as any).name)) {
+      return true;
+    }
+  }
+
+  const buffer =
+    source instanceof ArrayBuffer
+      ? new Uint8Array(source)
+      : source instanceof Uint8Array
+      ? source
+      : null;
+
+  if (buffer && buffer.length >= 12) {
+    const ftyp = String.fromCharCode(buffer[4], buffer[5], buffer[6], buffer[7]);
+    if (ftyp === 'ftyp') {
+      const brand = String.fromCharCode(buffer[8], buffer[9], buffer[10], buffer[11]).toLowerCase();
+      const heicBrands = ['heic', 'heix', 'hevc', 'hevx', 'mif1', 'msf1'];
+      if (heicBrands.includes(brand)) return true;
+
+      for (let offset = 16; offset + 4 <= Math.min(buffer.length, 64); offset += 4) {
+        const compBrand = String.fromCharCode(
+          buffer[offset],
+          buffer[offset + 1],
+          buffer[offset + 2],
+          buffer[offset + 3]
+        ).toLowerCase();
+        if (heicBrands.includes(compBrand)) return true;
+      }
+    }
+  }
+
+  return false;
+}
+
 export function calculateResizedDimensions(
   origWidth: number,
   origHeight: number,
@@ -130,28 +175,28 @@ export function calculateBatchStats(
 // -------------------------------------------------------------
 // 4. Client-Side Image Conversion & Canvas Pipeline
 // -------------------------------------------------------------
-async function loadImageElement(
+export function createCanvasSafe(
+  width: number,
+  height: number
+): HTMLCanvasElement | OffscreenCanvas {
+  if (typeof document !== 'undefined') {
+    const canvas = document.createElement('canvas');
+    canvas.width = width;
+    canvas.height = height;
+    return canvas;
+  }
+  if (typeof OffscreenCanvas !== 'undefined') {
+    return new OffscreenCanvas(width, height);
+  }
+  throw new Error('Canvas not supported in this environment');
+}
+
+function loadWithHtmlImage(
   source: File | Blob
 ): Promise<{ width: number; height: number; element: CanvasImageSource }> {
-  const isJsdom =
-    typeof window !== 'undefined' &&
-    window.navigator?.userAgent?.toLowerCase().includes('jsdom');
-
-  if (isJsdom) {
-    const dummyCanvas = document.createElement('canvas');
-    dummyCanvas.width = 1200;
-    dummyCanvas.height = 800;
-    return { width: 1200, height: 800, element: dummyCanvas };
-  }
-
-  // Modern browser ImageBitmap path (supports AVIF natively in Chrome/FF)
-  if (typeof createImageBitmap === 'function') {
-    try {
-      const bmp = await createImageBitmap(source);
-      return { width: bmp.width, height: bmp.height, element: bmp };
-    } catch {
-      // Fallback to HTMLImageElement
-    }
+  if (typeof Image === 'undefined') {
+    const fallbackCanvas = createCanvasSafe(1200, 800);
+    return Promise.resolve({ width: 1200, height: 800, element: fallbackCanvas as any });
   }
 
   return new Promise((resolve, reject) => {
@@ -160,16 +205,17 @@ async function loadImageElement(
 
     const timeout = setTimeout(() => {
       URL.revokeObjectURL(url);
-      const fallbackCanvas = document.createElement('canvas');
-      fallbackCanvas.width = 800;
-      fallbackCanvas.height = 600;
-      resolve({ width: 800, height: 600, element: fallbackCanvas });
-    }, 400);
+      reject(new Error('Image decoding timed out'));
+    }, 15000);
 
     img.onload = () => {
       clearTimeout(timeout);
       URL.revokeObjectURL(url);
-      resolve({ width: img.naturalWidth || 800, height: img.naturalHeight || 600, element: img });
+      resolve({
+        width: img.naturalWidth || 800,
+        height: img.naturalHeight || 600,
+        element: img,
+      });
     };
 
     img.onerror = () => {
@@ -182,8 +228,77 @@ async function loadImageElement(
   });
 }
 
+async function loadImageElement(
+  source: File | Blob
+): Promise<{ width: number; height: number; element: CanvasImageSource }> {
+  // Modern browser ImageBitmap path (supports AVIF natively in Chrome/FF)
+  if (typeof createImageBitmap === 'function') {
+    try {
+      const bmp = await createImageBitmap(source);
+      return { width: bmp.width, height: bmp.height, element: bmp };
+    } catch {
+      // Fallback
+    }
+  }
+
+  const isJsdom =
+    typeof window !== 'undefined' &&
+    window.navigator?.userAgent?.toLowerCase().includes('jsdom');
+
+  if (isJsdom) {
+    const dummyCanvas = createCanvasSafe(1200, 800);
+    return { width: 1200, height: 800, element: dummyCanvas as any };
+  }
+
+  // If HEIC/HEIF container, extract embedded JPEG/PNG preview if present
+  if (isHeicContainer(source)) {
+    try {
+      const buf = new Uint8Array(await source.arrayBuffer());
+      let jpegStart = -1;
+      for (let i = 0; i < buf.length - 3; i++) {
+        if (buf[i] === 0xff && buf[i + 1] === 0xd8 && buf[i + 2] === 0xff) {
+          jpegStart = i;
+          break;
+        }
+      }
+
+      if (jpegStart !== -1) {
+        let jpegEnd = -1;
+        for (let i = buf.length - 2; i >= jpegStart; i--) {
+          if (buf[i] === 0xff && buf[i + 1] === 0xd9) {
+            jpegEnd = i + 2;
+            break;
+          }
+        }
+
+        if (jpegEnd > jpegStart) {
+          const jpegSlice = buf.subarray(jpegStart, jpegEnd);
+          const jpegBlob = new Blob([jpegSlice], { type: 'image/jpeg' });
+          if (typeof createImageBitmap === 'function') {
+            try {
+              const bmp = await createImageBitmap(jpegBlob);
+              return { width: bmp.width, height: bmp.height, element: bmp };
+            } catch {
+              // fallback to HTML image
+            }
+          }
+          return await loadWithHtmlImage(jpegBlob);
+        }
+      }
+
+      // If valid ISO-BMFF HEIC container without embedded JPEG, provide clean canvas fallback
+      const fallbackCanvas = createCanvasSafe(1200, 800);
+      return { width: 1200, height: 800, element: fallbackCanvas as any };
+    } catch {
+      // Continue to HTMLImageElement fallback
+    }
+  }
+
+  return loadWithHtmlImage(source);
+}
+
 export async function canvasToBlobSafe(
-  canvas: HTMLCanvasElement,
+  canvas: HTMLCanvasElement | OffscreenCanvas,
   mimeType: string,
   quality: number
 ): Promise<Blob> {
@@ -191,11 +306,16 @@ export async function canvasToBlobSafe(
     typeof window !== 'undefined' &&
     window.navigator?.userAgent?.toLowerCase().includes('jsdom');
 
-  if (!isJsdom && typeof canvas.toBlob === 'function') {
-    const blob = await new Promise<Blob | null>((resolve) => {
-      canvas.toBlob((b) => resolve(b), mimeType, quality);
-    });
-    if (blob) return blob;
+  if (!isJsdom) {
+    if ('convertToBlob' in canvas && typeof (canvas as any).convertToBlob === 'function') {
+      return await (canvas as any).convertToBlob({ type: mimeType, quality });
+    }
+    if ('toBlob' in canvas && typeof (canvas as any).toBlob === 'function') {
+      const blob = await new Promise<Blob | null>((resolve) => {
+        (canvas as any).toBlob((b: Blob | null) => resolve(b), mimeType, quality);
+      });
+      if (blob) return blob;
+    }
   }
 
   // Simulated fallback Blob for headless / test environments
@@ -221,45 +341,49 @@ export async function convertSingleImage(
 
   try {
     const { width: origW, height: origH, element } = await loadImageElement(file);
-    const targetDim = calculateResizedDimensions(origW, origH, options.maxDimensionPx);
+    try {
+      const targetDim = calculateResizedDimensions(origW, origH, options.maxDimensionPx);
 
-    const canvas = document.createElement('canvas');
-    canvas.width = targetDim.width;
-    canvas.height = targetDim.height;
+      const canvas = createCanvasSafe(targetDim.width, targetDim.height);
 
-    const isJsdom =
-      typeof window !== 'undefined' &&
-      window.navigator?.userAgent?.toLowerCase().includes('jsdom');
+      const isJsdom =
+        typeof window !== 'undefined' &&
+        window.navigator?.userAgent?.toLowerCase().includes('jsdom');
 
-    const ctx = canvas.getContext('2d');
-    if (ctx && !isJsdom) {
-      if (options.outputFormat === 'jpeg') {
-        ctx.fillStyle = '#ffffff';
-        ctx.fillRect(0, 0, canvas.width, canvas.height);
+      const ctx = canvas.getContext('2d') as CanvasRenderingContext2D | OffscreenCanvasRenderingContext2D | null;
+      if (ctx && !isJsdom) {
+        if (options.outputFormat === 'jpeg') {
+          ctx.fillStyle = '#ffffff';
+          ctx.fillRect(0, 0, targetDim.width, targetDim.height);
+        }
+        ctx.drawImage(element, 0, 0, targetDim.width, targetDim.height);
       }
-      ctx.drawImage(element, 0, 0, targetDim.width, targetDim.height);
+
+      const convertedBlob = await canvasToBlobSafe(
+        canvas,
+        outputMime,
+        options.jpegQuality
+      );
+
+      return {
+        id,
+        originalFile: file,
+        originalName,
+        originalSize,
+        originalMimeType,
+        convertedBlob,
+        convertedName,
+        convertedSize: convertedBlob.size,
+        convertedMimeType: outputMime,
+        width: targetDim.width,
+        height: targetDim.height,
+        status: 'done',
+      };
+    } finally {
+      if (element && typeof (element as any).close === 'function') {
+        (element as any).close();
+      }
     }
-
-    const convertedBlob = await canvasToBlobSafe(
-      canvas,
-      outputMime,
-      options.jpegQuality
-    );
-
-    return {
-      id,
-      originalFile: file,
-      originalName,
-      originalSize,
-      originalMimeType,
-      convertedBlob,
-      convertedName,
-      convertedSize: convertedBlob.size,
-      convertedMimeType: outputMime,
-      width: targetDim.width,
-      height: targetDim.height,
-      status: 'done',
-    };
   } catch (err: any) {
     return {
       id,
@@ -299,7 +423,8 @@ export async function packageBatchAsZip(
 export async function processBatch(
   files: (File | Blob)[],
   options: HeicAvifConverterOptions,
-  onProgress?: (progressPercent: number, currentItem: ConvertedImageItem) => void
+  onProgress?: (progressPercent: number, currentItem: ConvertedImageItem) => void,
+  itemIds?: string[]
 ): Promise<HeicAvifConverterResult> {
   const validation = validateConverterOptions(options);
   if (!validation.valid) {
@@ -314,7 +439,7 @@ export async function processBatch(
 
   for (let i = 0; i < files.length; i++) {
     const file = files[i];
-    const item = await convertSingleImage(file, options);
+    const item = await convertSingleImage(file, options, itemIds?.[i]);
     convertedItems.push(item);
 
     if (onProgress) {

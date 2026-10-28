@@ -1,9 +1,10 @@
-import { describe, it, expect } from 'vitest';
+import { describe, it, expect, vi } from 'vitest';
 import {
   calculateBatchStats,
   calculateResizedDimensions,
   convertSingleImage,
   generateOutputFilename,
+  isHeicContainer,
   packageBatchAsZip,
   processBatch,
   resolveMimeType,
@@ -105,6 +106,65 @@ describe('HEIC & AVIF to JPG_PNG Batch Converter Engine (Seam 1)', () => {
       expect(resolveMimeType('jpeg')).toBe('image/jpeg');
       expect(resolveMimeType('png')).toBe('image/png');
       expect(resolveMimeType('webp')).toBe('image/webp');
+    });
+  });
+
+  describe('HEIC & HEIF Container Detection (DEFECT-44-01)', () => {
+    it('should detect HEIC and HEIF files by filename extension', () => {
+      expect(isHeicContainer('photo.heic')).toBe(true);
+      expect(isHeicContainer('photo.HEIC')).toBe(true);
+      expect(isHeicContainer('photo.heif')).toBe(true);
+      expect(isHeicContainer('photo.HEIF')).toBe(true);
+      expect(isHeicContainer('photo.heifs')).toBe(true);
+      expect(isHeicContainer('photo.heicp')).toBe(true);
+      expect(isHeicContainer('photo.jpg')).toBe(false);
+      expect(isHeicContainer('photo.png')).toBe(false);
+      expect(isHeicContainer('photo.avif')).toBe(false);
+    });
+
+    it('should detect HEIC and HEIF files by MIME type', () => {
+      const fileHeic = new File([], 'image.bin', { type: 'image/heic' });
+      const fileHeif = new File([], 'image.bin', { type: 'image/heif' });
+      const fileJpg = new File([], 'image.bin', { type: 'image/jpeg' });
+
+      expect(isHeicContainer(fileHeic)).toBe(true);
+      expect(isHeicContainer(fileHeif)).toBe(true);
+      expect(isHeicContainer(fileJpg)).toBe(false);
+    });
+
+    it('should detect HEIC by ISO-BMFF ftyp header bytes', () => {
+      const ftypHeicBytes = new Uint8Array([
+        0x00, 0x00, 0x00, 0x18, 0x66, 0x74, 0x79, 0x70, // size 24, 'ftyp'
+        0x68, 0x65, 0x69, 0x63, 0x00, 0x00, 0x00, 0x00, // 'heic', 0
+        0x6d, 0x69, 0x66, 0x31, 0x68, 0x65, 0x69, 0x63, // 'mif1', 'heic'
+      ]);
+      expect(isHeicContainer(ftypHeicBytes)).toBe(true);
+      expect(isHeicContainer(ftypHeicBytes.buffer)).toBe(true);
+
+      const randomBytes = new Uint8Array([1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]);
+      expect(isHeicContainer(randomBytes)).toBe(false);
+    });
+  });
+
+  describe('ImageBitmap Resource Hygiene (DEFECT-44-03)', () => {
+    it('should call close() on ImageBitmap after rendering to prevent GPU leaks', async () => {
+      const closeSpy = vi.fn();
+      const mockBitmap = {
+        width: 100,
+        height: 100,
+        close: closeSpy,
+      };
+
+      const originalCreateBitmap = (globalThis as any).createImageBitmap;
+      (globalThis as any).createImageBitmap = vi.fn().mockResolvedValue(mockBitmap);
+
+      try {
+        const item = await convertSingleImage(SAMPLE_PNG_FILE, DEFAULT_CONVERTER_OPTIONS);
+        expect(item.status).toBe('done');
+        expect(closeSpy).toHaveBeenCalledOnce();
+      } finally {
+        (globalThis as any).createImageBitmap = originalCreateBitmap;
+      }
     });
   });
 

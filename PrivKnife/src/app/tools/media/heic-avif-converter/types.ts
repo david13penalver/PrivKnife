@@ -48,3 +48,27 @@ export interface HeicAvifBatchStats {
   savedBytes: number;
   savingsPercentage: number;
 }
+
+export interface HeicAvifWorkerRequest {
+  type: 'convert';
+  files: (File | Blob)[];
+  itemIds?: string[];
+  options: HeicAvifConverterOptions;
+}
+
+export interface HeicAvifWorkerProgressResponse {
+  type: 'progress';
+  progressPercent: number;
+  item: ConvertedImageItem;
+}
+
+export interface HeicAvifWorkerDoneResponse {
+  type: 'done';
+  success: boolean;
+  result?: HeicAvifConverterResult;
+  error?: string;
+}
+
+export type HeicAvifWorkerResponse =
+  | HeicAvifWorkerProgressResponse
+  | HeicAvifWorkerDoneResponse;

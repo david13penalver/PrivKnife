@@ -118,6 +118,54 @@ describe('HeicAvifConverterComponent (Seam 2 & 4)', () => {
       component.clearQueue();
       expect(component.imageQueue().length).toBe(0);
     });
+
+    it('should load sample batch of AVIF and HEIC files via loadSampleBatch()', () => {
+      expect(component.imageQueue().length).toBe(0);
+      component.loadSampleBatch();
+      expect(component.imageQueue().length).toBe(SAMPLE_BATCH_FILES.length);
+      expect(component.imageQueue()[0].originalName).toBe(SAMPLE_HEIC_FILE.name);
+    });
+  });
+
+  describe('BEM Architecture & Form Layout (DEFECT-44-04)', () => {
+    it('should use .l-columns__area instead of .l-columns__column', () => {
+      const columns = fixture.nativeElement.querySelectorAll('.l-columns__column');
+      expect(columns.length).toBe(0);
+
+      const areas = fixture.nativeElement.querySelectorAll('.l-columns__area');
+      expect(areas.length).toBeGreaterThanOrEqual(2);
+    });
+
+    it('should wrap .l-extremo children with .l-extremo__area-izquierda and __area-derecha', () => {
+      const extremos = fixture.nativeElement.querySelectorAll('.l-extremo');
+      expect(extremos.length).toBeGreaterThan(0);
+
+      const izq = fixture.nativeElement.querySelectorAll('.l-extremo__area-izquierda');
+      const der = fixture.nativeElement.querySelectorAll('.l-extremo__area-derecha');
+      expect(izq.length).toBeGreaterThanOrEqual(extremos.length);
+      expect(der.length).toBeGreaterThanOrEqual(extremos.length);
+
+      // Verify obsolete non-BEM classes are absent
+      const leftOld = fixture.nativeElement.querySelectorAll('.l-extremo__left');
+      const rightOld = fixture.nativeElement.querySelectorAll('.l-extremo__right');
+      expect(leftOld.length).toBe(0);
+      expect(rightOld.length).toBe(0);
+    });
+
+    it('should use .c-input__slider, .c-input__control, and .c-input__switch', () => {
+      const slider = fixture.nativeElement.querySelector('.c-input__slider');
+      expect(slider).not.toBeNull();
+
+      const control = fixture.nativeElement.querySelector('.c-input__control');
+      expect(control).not.toBeNull();
+
+      const switchEl = fixture.nativeElement.querySelector('.c-input__switch');
+      expect(switchEl).not.toBeNull();
+
+      // Verify obsolete non-BEM classes are absent
+      expect(fixture.nativeElement.querySelector('.c-range')).toBeNull();
+      expect(fixture.nativeElement.querySelector('.c-checkbox-label')).toBeNull();
+    });
   });
 
   describe('Batch Conversion & Deliverable Export', () => {
