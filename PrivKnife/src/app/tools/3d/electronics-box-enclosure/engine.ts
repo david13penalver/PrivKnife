@@ -59,6 +59,7 @@ export function generateEnclosureGeometries(
     innerWidthMm,
     innerHeightMm,
     wallThicknessMm,
+    cornerRadiusMm = 0,
     closureType,
     pcbPreset,
     standoffHeightMm = 5.0,
@@ -216,6 +217,15 @@ export function generateEnclosureGeometries(
     }
   }
 
+  // Corner radius / bevel reinforcements on base
+  const cr = Math.min(6, Math.min(halfInnerL, halfInnerW), Math.max(0, cornerRadiusMm || 0));
+  if (cr > 0) {
+    pushBox(basePos, baseNorm, baseIdx, -halfL, -halfL + cr, -halfW, -halfW + cr, 0, baseH);
+    pushBox(basePos, baseNorm, baseIdx, halfL - cr, halfL, -halfW, -halfW + cr, 0, baseH);
+    pushBox(basePos, baseNorm, baseIdx, halfL - cr, halfL, halfW - cr, halfW, 0, baseH);
+    pushBox(basePos, baseNorm, baseIdx, -halfL, -halfL + cr, halfW - cr, halfW, 0, baseH);
+  }
+
   const baseGeometry = new THREE.BufferGeometry();
   baseGeometry.setAttribute('position', new THREE.Float32BufferAttribute(basePos, 3));
   baseGeometry.setAttribute('normal', new THREE.Float32BufferAttribute(baseNorm, 3));
@@ -227,8 +237,53 @@ export function generateEnclosureGeometries(
   const lidNorm: number[] = [];
   const lidIdx: number[] = [];
 
-  // Main lid top cover plate
-  pushBox(lidPos, lidNorm, lidIdx, -halfL, halfL, -halfW, halfW, 0, lidH);
+  // When print-bed mode (exploded === false), lid outer top face sits at z = 0 with lip pointing +Z.
+  // When exploded === true, lid hovers above base at z = baseH + 20 with lip pointing -Z into tub.
+  const plateZ0 = exploded ? baseH + 20 : 0;
+  const plateZ1 = plateZ0 + lidH;
+
+  // Main lid top cover plate (solid or through-slotted)
+  if (!ventilationGrille) {
+    pushBox(lidPos, lidNorm, lidIdx, -halfL, halfL, -halfW, halfW, plateZ0, plateZ1);
+  } else {
+    // True through-slots across lid thickness
+    const slotCount = Math.min(8, Math.max(3, Math.floor(innerLengthMm / 12)));
+    const slotW = 2.4;
+    const slotL = Math.min(innerWidthMm * 0.6, 30);
+    const spacing = innerLengthMm / (slotCount + 1);
+
+    // Front solid frame border
+    pushBox(lidPos, lidNorm, lidIdx, -halfL, halfL, -halfW, -slotL / 2, plateZ0, plateZ1);
+    // Rear solid frame border
+    pushBox(lidPos, lidNorm, lidIdx, -halfL, halfL, slotL / 2, halfW, plateZ0, plateZ1);
+
+    const firstSlotX = -halfInnerL + 1 * spacing;
+    const lastSlotX = -halfInnerL + slotCount * spacing;
+
+    // Left end solid frame
+    pushBox(lidPos, lidNorm, lidIdx, -halfL, firstSlotX - slotW / 2, -slotL / 2, slotL / 2, plateZ0, plateZ1);
+    // Right end solid frame
+    pushBox(lidPos, lidNorm, lidIdx, lastSlotX + slotW / 2, halfL, -slotL / 2, slotL / 2, plateZ0, plateZ1);
+
+    // Solid slats between slots
+    for (let i = 1; i < slotCount; i++) {
+      const gxCurr = -halfInnerL + i * spacing;
+      const gxNext = -halfInnerL + (i + 1) * spacing;
+      const slatMinX = gxCurr + slotW / 2;
+      const slatMaxX = gxNext - slotW / 2;
+      if (slatMaxX > slatMinX) {
+        pushBox(lidPos, lidNorm, lidIdx, slatMinX, slatMaxX, -slotL / 2, slotL / 2, plateZ0, plateZ1);
+      }
+    }
+  }
+
+  // Corner radius / bevel reinforcements on lid
+  if (cr > 0) {
+    pushBox(lidPos, lidNorm, lidIdx, -halfL, -halfL + cr, -halfW, -halfW + cr, plateZ0, plateZ1);
+    pushBox(lidPos, lidNorm, lidIdx, halfL - cr, halfL, -halfW, -halfW + cr, plateZ0, plateZ1);
+    pushBox(lidPos, lidNorm, lidIdx, halfL - cr, halfL, halfW - cr, halfW, plateZ0, plateZ1);
+    pushBox(lidPos, lidNorm, lidIdx, -halfL, -halfL + cr, halfW - cr, halfW, plateZ0, plateZ1);
+  }
 
   // Inner interlocking lip (with 0.2mm 3D print clearance)
   const clear = 0.2;
@@ -237,33 +292,24 @@ export function generateEnclosureGeometries(
   const lipL = halfInnerL - clear;
   const lipW = halfInnerW - clear;
 
-  // Interlocking rim pointing down (-Z relative to lid plate)
-  pushBox(lidPos, lidNorm, lidIdx, -lipL, -lipL + lipT, -lipW, lipW, -lipProtrusion, 0);
-  pushBox(lidPos, lidNorm, lidIdx, lipL - lipT, lipL, -lipW, lipW, -lipProtrusion, 0);
-  pushBox(lidPos, lidNorm, lidIdx, -lipL + lipT, lipL - lipT, -lipW, -lipW + lipT, -lipProtrusion, 0);
-  pushBox(lidPos, lidNorm, lidIdx, -lipL + lipT, lipL - lipT, lipW - lipT, lipW, -lipProtrusion, 0);
+  const lipZ0 = exploded ? baseH + 20 - lipProtrusion : plateZ1;
+  const lipZ1 = exploded ? baseH + 20 : plateZ1 + lipProtrusion;
+
+  // Interlocking rim
+  pushBox(lidPos, lidNorm, lidIdx, -lipL, -lipL + lipT, -lipW, lipW, lipZ0, lipZ1);
+  pushBox(lidPos, lidNorm, lidIdx, lipL - lipT, lipL, -lipW, lipW, lipZ0, lipZ1);
+  pushBox(lidPos, lidNorm, lidIdx, -lipL + lipT, lipL - lipT, -lipW, -lipW + lipT, lipZ0, lipZ1);
+  pushBox(lidPos, lidNorm, lidIdx, -lipL + lipT, lipL - lipT, lipW - lipT, lipW, lipZ0, lipZ1);
 
   // Snap-fit tabs
   if (closureType === 'snap_fit') {
     const tabW = Math.min(20, innerLengthMm * 0.3);
     const tabH = 1.2;
+    const snapZ0 = exploded ? lipZ0 : lipZ1 - 1.5;
+    const snapZ1 = exploded ? lipZ0 + 1.5 : lipZ1;
     // Left & Right snap overhangs
-    pushBox(lidPos, lidNorm, lidIdx, -lipL - tabH, -lipL, -tabW / 2, tabW / 2, -lipProtrusion, -lipProtrusion + 1.5);
-    pushBox(lidPos, lidNorm, lidIdx, lipL, lipL + tabH, -tabW / 2, tabW / 2, -lipProtrusion, -lipProtrusion + 1.5);
-  }
-
-  // Ventilation cooling grilles
-  if (ventilationGrille) {
-    const slotCount = Math.min(8, Math.max(3, Math.floor(innerLengthMm / 12)));
-    const slotW = 2.0;
-    const slotL = Math.min(innerWidthMm * 0.6, 30);
-    const spacing = innerLengthMm / (slotCount + 1);
-
-    for (let i = 1; i <= slotCount; i++) {
-      const gx = -halfInnerL + i * spacing;
-      // Add subtle raised decorative grille fins
-      pushBox(lidPos, lidNorm, lidIdx, gx - slotW / 2, gx + slotW / 2, -slotL / 2, slotL / 2, lidH, lidH + 0.8);
-    }
+    pushBox(lidPos, lidNorm, lidIdx, -lipL - tabH, -lipL, -tabW / 2, tabW / 2, snapZ0, snapZ1);
+    pushBox(lidPos, lidNorm, lidIdx, lipL, lipL + tabH, -tabW / 2, tabW / 2, snapZ0, snapZ1);
   }
 
   const lidGeometry = new THREE.BufferGeometry();
@@ -299,12 +345,14 @@ export function generateEnclosureGeometries(
   const lidNormAttr = lidGeometry.getAttribute('normal');
   const lidIdxAttr = lidGeometry.getIndex()!;
 
-  const lidZ = exploded ? baseH + 20 : 0;
   const lidX = exploded ? 0 : bedOffset;
 
   for (let i = 0; i < lidPosAttr.count; i++) {
-    combPos.push(lidPosAttr.getX(i) + lidX, lidPosAttr.getY(i), lidPosAttr.getZ(i) + lidZ);
+    combPos.push(lidPosAttr.getX(i) + lidX, lidPosAttr.getY(i), lidPosAttr.getZ(i));
     combNorm.push(lidNormAttr.getX(i), lidNormAttr.getY(i), lidNormAttr.getZ(i));
+  }
+  for (let i = 0; i < lidIdxAttr.count; i++) {
+    combIdx.push(lidOffsetStart + lidIdxAttr.getX(i));
   }
   for (let i = 0; i < lidIdxAttr.count; i++) {
     combIdx.push(lidOffsetStart + lidIdxAttr.getX(i));

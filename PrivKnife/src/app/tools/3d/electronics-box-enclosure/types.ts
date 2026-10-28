@@ -44,3 +44,21 @@ export interface PresetEnclosure {
   description: string;
   options: Partial<ElectronicsBoxEnclosureOptions>;
 }
+
+export interface ElectronicsBoxWorkerRequest {
+  id: number;
+  options: ElectronicsBoxEnclosureOptions;
+  format: 'stl' | '3mf';
+}
+
+export interface ElectronicsBoxWorkerResponse {
+  id: number;
+  type: 'progress' | 'result' | 'error';
+  percent?: number;
+  buffer?: ArrayBuffer;
+  fileName?: string;
+  fileSize?: number;
+  mimeType?: string;
+  metrics?: ElectronicsBoxMetrics;
+  error?: string;
+}

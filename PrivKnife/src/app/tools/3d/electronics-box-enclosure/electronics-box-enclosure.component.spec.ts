@@ -96,6 +96,79 @@ describe('ElectronicsBoxEnclosureComponent (Seam 2 & 4)', () => {
       createObjectURLSpy.mockRestore();
       revokeObjectURLSpy.mockRestore();
     });
+
+    it('should revoke object URL immediately after download trigger (Directive 4 & DEFECT-34-05)', async () => {
+      const createObjectURLSpy = vi
+        .spyOn(URL, 'createObjectURL')
+        .mockReturnValue('blob:test-immediate-revoke-url');
+      const revokeObjectURLSpy = vi.spyOn(URL, 'revokeObjectURL').mockImplementation(() => {});
+
+      await component.downloadFormat('stl');
+
+      expect(createObjectURLSpy).toHaveBeenCalled();
+      expect(revokeObjectURLSpy).toHaveBeenCalledWith('blob:test-immediate-revoke-url');
+
+      createObjectURLSpy.mockRestore();
+      revokeObjectURLSpy.mockRestore();
+    });
+  });
+
+  describe('Secondary Controls & Configuration (DEFECT-34-01 & DEFECT-34-05)', () => {
+    it('should render cornerRadiusMm slider and update signal on input', () => {
+      fixture.detectChanges();
+      const compiled = fixture.nativeElement as HTMLElement;
+      const cornerSlider = compiled.querySelector<HTMLInputElement>(
+        'input[data-testid="corner-radius-slider"]'
+      );
+      expect(cornerSlider).toBeTruthy();
+
+      component.onCornerRadiusChange({ target: { value: '5' } } as unknown as Event);
+      expect(component.cornerRadiusMm()).toBe(5);
+    });
+  });
+
+  describe('3D Viewport Interaction: Touch Orbit & Wheel Zoom (DEFECT-34-04)', () => {
+    it('should handle wheel zoom on viewport', () => {
+      const initialZ = (component as any).camera?.position.z || 120;
+      const wheelEvent = new WheelEvent('wheel', { deltaY: 100, bubbles: true });
+      component.onWheel(wheelEvent);
+      if ((component as any).camera) {
+        expect((component as any).camera.position.z).toBeGreaterThan(initialZ);
+      }
+    });
+
+    it('should handle touch drag rotation on viewport', () => {
+      const initialRotX = (component as any).meshRotationX;
+      const initialRotY = (component as any).meshRotationY;
+
+      component.onTouchStart({
+        touches: [{ clientX: 100, clientY: 100 }],
+        preventDefault: () => {},
+      } as unknown as TouchEvent);
+
+      component.onTouchMove({
+        touches: [{ clientX: 120, clientY: 130 }],
+        preventDefault: () => {},
+      } as unknown as TouchEvent);
+
+      expect((component as any).meshRotationX).not.toBe(initialRotX);
+      expect((component as any).meshRotationY).not.toBe(initialRotY);
+
+      component.onTouchEnd();
+      expect((component as any).isDragging).toBe(false);
+    });
+  });
+
+  describe('Responsive Layout & Touch Target BEM Classes (DEFECT-34-02, DEFECT-34-03, DEFECT-34-05)', () => {
+    it('should use .c-input__slider on all range inputs for touch target compliance', () => {
+      fixture.detectChanges();
+      const compiled = fixture.nativeElement as HTMLElement;
+      const sliders = compiled.querySelectorAll<HTMLInputElement>('input[type="range"]');
+      expect(sliders.length).toBeGreaterThan(0);
+      sliders.forEach((slider) => {
+        expect(slider.classList.contains('c-input__slider')).toBe(true);
+      });
+    });
   });
 
   describe('Reset & Memory Hygiene', () => {

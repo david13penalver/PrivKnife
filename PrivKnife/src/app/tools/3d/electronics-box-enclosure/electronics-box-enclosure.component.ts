@@ -19,6 +19,8 @@ import {
   ElectronicsBoxMetrics,
   PcbPresetType,
   PresetEnclosure,
+  ElectronicsBoxWorkerRequest,
+  ElectronicsBoxWorkerResponse,
 } from './types';
 import {
   calculateEnclosureMetrics,
@@ -93,7 +95,7 @@ import {
                   <label class="c-input__label">Inner Length: <strong>{{ innerLengthMm() }} mm</strong></label>
                   <input
                     type="range"
-                    class="c-input c-input--slider"
+                    class="c-input c-input__slider"
                     min="30"
                     max="180"
                     step="1"
@@ -106,7 +108,7 @@ import {
                   <label class="c-input__label">Inner Width: <strong>{{ innerWidthMm() }} mm</strong></label>
                   <input
                     type="range"
-                    class="c-input c-input--slider"
+                    class="c-input c-input__slider"
                     min="20"
                     max="120"
                     step="1"
@@ -121,7 +123,7 @@ import {
                   <label class="c-input__label">Inner Height: <strong>{{ innerHeightMm() }} mm</strong></label>
                   <input
                     type="range"
-                    class="c-input c-input--slider"
+                    class="c-input c-input__slider"
                     min="12"
                     max="80"
                     step="1"
@@ -134,7 +136,7 @@ import {
                   <label class="c-input__label">Wall Thickness: <strong>{{ wallThicknessMm() | number:'1.1-1' }} mm</strong></label>
                   <input
                     type="range"
-                    class="c-input c-input--slider"
+                    class="c-input c-input__slider"
                     min="1.2"
                     max="3.6"
                     step="0.2"
@@ -142,6 +144,20 @@ import {
                     (input)="onWallChange($event)"
                   />
                 </div>
+              </div>
+
+              <div class="control-group g--margin-top-3">
+                <label class="c-input__label">Corner Radius / Bevel: <strong>{{ cornerRadiusMm() | number:'1.1-1' }} mm</strong></label>
+                <input
+                  type="range"
+                  class="c-input c-input__slider"
+                  data-testid="corner-radius-slider"
+                  min="0"
+                  max="8"
+                  step="0.5"
+                  [value]="cornerRadiusMm()"
+                  (input)="onCornerRadiusChange($event)"
+                />
               </div>
 
               <!-- Closure Mechanism -->
@@ -193,7 +209,7 @@ import {
                 </label>
                 <input
                   type="range"
-                  class="c-input c-input--slider"
+                  class="c-input c-input__slider"
                   min="2"
                   max="14"
                   step="0.5"
@@ -219,7 +235,7 @@ import {
                   <label class="c-input__label">Port Cutout Width: <strong>{{ cableSlotDiameterMm() }} mm</strong></label>
                   <input
                     type="range"
-                    class="c-input c-input--slider"
+                    class="c-input c-input__slider"
                     min="5"
                     max="18"
                     step="1"
@@ -238,6 +254,18 @@ import {
                     (change)="toggleVentilation()"
                   />
                   <span>Heat Dissipation Cooling Grille Slots</span>
+                </label>
+              </div>
+
+              <!-- Exploded View Toggle -->
+              <div class="control-row g--margin-top-3">
+                <label class="c-input__checkbox-label">
+                  <input
+                    type="checkbox"
+                    [checked]="explodedView()"
+                    (change)="toggleExplodedView()"
+                  />
+                  <span>Exploded View (Lift lid to inspect internals)</span>
                 </label>
               </div>
             </div>
@@ -261,34 +289,32 @@ import {
           <app-card>
             <div class="c-card__header l-extremo">
               <div class="l-extremo__area-izquierda">
-                <h2 class="c-card__title">Interactive 3D Viewport</h2>
+                <h2 class="c-card__title">Interactive 3D Assembly Preview</h2>
               </div>
-              <!-- Exploded View Toggle -->
               <div class="l-extremo__area-derecha">
-                <button
-                  type="button"
-                  class="c-button c-button--small"
-                  [class.c-button--primary]="explodedView()"
-                  [class.c-button--outline]="!explodedView()"
-                  (click)="toggleExplodedView()"
-                  title="Hover lid above base to inspect internal layout"
-                >
-                  🔍 Exploded View: {{ explodedView() ? 'ON' : 'OFF' }}
-                </button>
+                <span class="badge-dim">{{ explodedView() ? 'Exploded View' : 'Print Bed Layout' }}</span>
               </div>
             </div>
 
             <div class="c-card__body">
+              <!-- 3D Canvas Viewport -->
               <div
                 #viewportContainer
                 class="c-preview enclosure-viewport"
+                tabindex="0"
+                role="region"
+                aria-label="Interactive 3D model viewport"
                 (mousedown)="onMouseDown($event)"
                 (mousemove)="onMouseMove($event)"
                 (mouseup)="onMouseUp()"
                 (mouseleave)="onMouseUp()"
+                (wheel)="onWheel($event)"
+                (touchstart)="onTouchStart($event)"
+                (touchmove)="onTouchMove($event)"
+                (touchend)="onTouchEnd()"
               >
                 <div class="viewport-hints">
-                  <span>🖱️ Click & Drag to Orbit • Scroll to Zoom</span>
+                  <span>🖱️ Click & Drag to Rotate • Scroll to Zoom</span>
                 </div>
               </div>
 
@@ -296,26 +322,26 @@ import {
               @if (currentMetrics(); as metrics) {
                 <div class="metrics-grid g--margin-top-4">
                   <div class="metric-card">
-                    <span class="metric-label">Outer Footprint</span>
+                    <span class="metric-label">Outer Dimensions</span>
                     <strong class="metric-value">{{ metrics.outerLengthMm }} × {{ metrics.outerWidthMm }} × {{ metrics.outerHeightMm }} mm</strong>
                   </div>
                   <div class="metric-card">
-                    <span class="metric-label">Polygons</span>
-                    <strong class="metric-value">{{ metrics.totalTriangles | number }} tris</strong>
+                    <span class="metric-label">Mesh Detail</span>
+                    <strong class="metric-value">{{ metrics.totalTriangles }} tris ({{ metrics.baseTriangleCount }} base + {{ metrics.lidTriangleCount }} lid)</strong>
                   </div>
                   <div class="metric-card">
-                    <span class="metric-label">Est. Weight</span>
+                    <span class="metric-label">Estimated Mass</span>
                     <strong class="metric-value">{{ metrics.estimatedGrams }} g (PLA)</strong>
                   </div>
                   <div class="metric-card">
-                    <span class="metric-label">Est. Print Time</span>
+                    <span class="metric-label">Estimated Print Time</span>
                     <strong class="metric-value">~{{ metrics.estimatedPrintTimeHours }} hrs</strong>
                   </div>
                 </div>
 
                 <!-- Slicer Tips -->
                 <div class="slicer-box g--margin-top-3">
-                  <h4 class="slicer-title">🛠️ Optimal 3D Printing Recommendations</h4>
+                  <h4 class="slicer-title">🛠️ Slicer Configuration Guidelines</h4>
                   <ul class="slicer-list">
                     @for (tip of metrics.slicerTips; track tip) {
                       <li>{{ tip }}</li>
@@ -328,7 +354,7 @@ import {
             <!-- Export Buttons -->
             <div class="c-card__footer l-extremo">
               <div class="l-extremo__area-izquierda">
-                <span class="g--text-muted">Export deliverables:</span>
+                <span class="g--text-muted">Export formats:</span>
               </div>
               <div class="l-extremo__area-derecha export-actions">
                 <button
@@ -343,7 +369,7 @@ import {
                   class="c-button c-button--primary"
                   (click)="downloadFormat('stl')"
                 >
-                  Download .STL (Bed Layout)
+                  Download .STL (Combined Mesh)
                 </button>
               </div>
             </div>
@@ -352,148 +378,7 @@ import {
       </div>
     </div>
   `,
-  styles: [
-    `
-      .enclosure-presets {
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-        gap: 12px;
-      }
-
-      .enclosure-preset-btn {
-        display: flex;
-        flex-direction: column;
-        align-items: flex-start;
-        text-align: left;
-        padding: 12px;
-        height: auto;
-      }
-
-      .enclosure-preset-desc {
-        font-size: 0.8rem;
-        opacity: 0.8;
-        margin-top: 4px;
-        font-weight: normal;
-      }
-
-      .param-grid {
-        display: grid;
-        grid-template-columns: 1fr 1fr;
-        gap: 16px;
-      }
-
-      .closure-btn-row {
-        display: flex;
-        flex-wrap: wrap;
-        gap: 6px;
-        margin-top: 6px;
-      }
-
-      .c-input--slider {
-        width: 100%;
-        margin-top: 4px;
-      }
-
-      .c-input__checkbox-label {
-        display: flex;
-        align-items: center;
-        gap: 8px;
-        cursor: pointer;
-        font-size: 0.9rem;
-      }
-
-      .enclosure-viewport {
-        position: relative;
-        width: 100%;
-        height: 380px;
-        background: #090d16;
-        border-radius: 8px;
-        overflow: hidden;
-        cursor: grab;
-      }
-
-      .enclosure-viewport:active {
-        cursor: grabbing;
-      }
-
-      .viewport-hints {
-        position: absolute;
-        bottom: 8px;
-        left: 8px;
-        font-size: 0.75rem;
-        color: rgba(255, 255, 255, 0.5);
-        pointer-events: none;
-        user-select: none;
-      }
-
-      .metrics-grid {
-        display: grid;
-        grid-template-columns: repeat(2, 1fr);
-        gap: 10px;
-      }
-
-      .metric-card {
-        background: rgba(255, 255, 255, 0.04);
-        border: 1px solid rgba(255, 255, 255, 0.08);
-        border-radius: 6px;
-        padding: 8px 12px;
-        display: flex;
-        flex-direction: column;
-      }
-
-      .metric-label {
-        font-size: 0.75rem;
-        color: #9ca3af;
-      }
-
-      .metric-value {
-        font-size: 0.95rem;
-        color: #f3f4f6;
-        margin-top: 2px;
-      }
-
-      .slicer-box {
-        background: rgba(59, 130, 246, 0.08);
-        border: 1px solid rgba(59, 130, 246, 0.2);
-        border-radius: 6px;
-        padding: 10px 14px;
-      }
-
-      .slicer-title {
-        font-size: 0.85rem;
-        margin: 0 0 6px 0;
-        color: #93c5fd;
-      }
-
-      .slicer-list {
-        margin: 0;
-        padding-left: 18px;
-        font-size: 0.8rem;
-        color: #cbd5e1;
-        line-height: 1.4;
-      }
-
-      .export-actions {
-        display: flex;
-        gap: 8px;
-      }
-
-      @media (max-width: 768px) {
-        .param-grid {
-          grid-template-columns: 1fr;
-        }
-
-        .metrics-grid {
-          grid-template-columns: 1fr;
-        }
-
-        .export-actions {
-          flex-direction: column;
-          width: 100%;
-        }
-      }
-    `,
-  ],
+  styleUrls: ['./electronics-box-enclosure.component.scss'],
 })
 export class ElectronicsBoxEnclosureComponent implements OnInit, OnDestroy {
   @ViewChild('viewportContainer') viewportContainer!: ElementRef<HTMLDivElement>;
@@ -521,6 +406,9 @@ export class ElectronicsBoxEnclosureComponent implements OnInit, OnDestroy {
   // Tracked object URLs
   private activeDownloadUrls: string[] = [];
 
+  // Dedicated Web Worker ref
+  private worker: Worker | null = null;
+
   // Three.js internal refs
   private scene: THREE.Scene | null = null;
   private camera: THREE.PerspectiveCamera | null = null;
@@ -528,7 +416,7 @@ export class ElectronicsBoxEnclosureComponent implements OnInit, OnDestroy {
   private currentMesh: THREE.Mesh | null = null;
   private animationFrameId: number | null = null;
 
-  // Mouse rotation orbit state
+  // Mouse & Touch rotation orbit state
   private isDragging = false;
   private prevMouseX = 0;
   private prevMouseY = 0;
@@ -543,6 +431,11 @@ export class ElectronicsBoxEnclosureComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy(): void {
+    if (this.worker) {
+      this.worker.terminate();
+      this.worker = null;
+    }
+
     if (this.animationFrameId !== null) {
       cancelAnimationFrame(this.animationFrameId);
     }
@@ -556,7 +449,7 @@ export class ElectronicsBoxEnclosureComponent implements OnInit, OnDestroy {
       }
     }
 
-    if (this.renderer) {
+    if (this.renderer && typeof this.renderer.dispose === 'function') {
       this.renderer.dispose();
     }
 
@@ -573,39 +466,19 @@ export class ElectronicsBoxEnclosureComponent implements OnInit, OnDestroy {
     if (preset.options.innerWidthMm !== undefined) this.innerWidthMm.set(preset.options.innerWidthMm);
     if (preset.options.innerHeightMm !== undefined) this.innerHeightMm.set(preset.options.innerHeightMm);
     if (preset.options.wallThicknessMm !== undefined) this.wallThicknessMm.set(preset.options.wallThicknessMm);
+    if (preset.options.cornerRadiusMm !== undefined) this.cornerRadiusMm.set(preset.options.cornerRadiusMm);
     if (preset.options.closureType) this.closureType.set(preset.options.closureType);
     if (preset.options.pcbPreset) this.pcbPreset.set(preset.options.pcbPreset);
     if (preset.options.standoffHeightMm !== undefined) this.standoffHeightMm.set(preset.options.standoffHeightMm);
     if (preset.options.cableSlot !== undefined) this.cableSlot.set(preset.options.cableSlot);
+    if (preset.options.cableSlotDiameterMm !== undefined) this.cableSlotDiameterMm.set(preset.options.cableSlotDiameterMm);
     if (preset.options.ventilationGrille !== undefined) this.ventilationGrille.set(preset.options.ventilationGrille);
-
-    this.rebuildMesh();
-  }
-
-  resetToDefaults(): void {
-    this.innerLengthMm.set(DEFAULT_ENCLOSURE_OPTIONS.innerLengthMm);
-    this.innerWidthMm.set(DEFAULT_ENCLOSURE_OPTIONS.innerWidthMm);
-    this.innerHeightMm.set(DEFAULT_ENCLOSURE_OPTIONS.innerHeightMm);
-    this.wallThicknessMm.set(DEFAULT_ENCLOSURE_OPTIONS.wallThicknessMm);
-    this.cornerRadiusMm.set(DEFAULT_ENCLOSURE_OPTIONS.cornerRadiusMm);
-    this.closureType.set(DEFAULT_ENCLOSURE_OPTIONS.closureType);
-    this.pcbPreset.set(DEFAULT_ENCLOSURE_OPTIONS.pcbPreset);
-    this.standoffHeightMm.set(DEFAULT_ENCLOSURE_OPTIONS.standoffHeightMm);
-    this.cableSlot.set(DEFAULT_ENCLOSURE_OPTIONS.cableSlot);
-    this.cableSlotDiameterMm.set(DEFAULT_ENCLOSURE_OPTIONS.cableSlotDiameterMm);
-    this.ventilationGrille.set(DEFAULT_ENCLOSURE_OPTIONS.ventilationGrille);
-    this.explodedView.set(false);
 
     this.rebuildMesh();
   }
 
   setClosureType(type: ClosureType): void {
     this.closureType.set(type);
-    this.rebuildMesh();
-  }
-
-  toggleExplodedView(): void {
-    this.explodedView.update((v) => !v);
     this.rebuildMesh();
   }
 
@@ -616,6 +489,11 @@ export class ElectronicsBoxEnclosureComponent implements OnInit, OnDestroy {
 
   toggleVentilation(): void {
     this.ventilationGrille.update((v) => !v);
+    this.rebuildMesh();
+  }
+
+  toggleExplodedView(): void {
+    this.explodedView.update((v) => !v);
     this.rebuildMesh();
   }
 
@@ -643,6 +521,12 @@ export class ElectronicsBoxEnclosureComponent implements OnInit, OnDestroy {
     this.rebuildMesh();
   }
 
+  onCornerRadiusChange(event: Event): void {
+    const val = parseFloat((event.target as HTMLInputElement).value);
+    this.cornerRadiusMm.set(val);
+    this.rebuildMesh();
+  }
+
   onStandoffChange(event: Event): void {
     const val = parseFloat((event.target as HTMLInputElement).value);
     this.standoffHeightMm.set(val);
@@ -652,6 +536,22 @@ export class ElectronicsBoxEnclosureComponent implements OnInit, OnDestroy {
   onSlotDiameterChange(event: Event): void {
     const val = parseInt((event.target as HTMLInputElement).value, 10);
     this.cableSlotDiameterMm.set(val);
+    this.rebuildMesh();
+  }
+
+  resetToDefaults(): void {
+    this.innerLengthMm.set(DEFAULT_ENCLOSURE_OPTIONS.innerLengthMm);
+    this.innerWidthMm.set(DEFAULT_ENCLOSURE_OPTIONS.innerWidthMm);
+    this.innerHeightMm.set(DEFAULT_ENCLOSURE_OPTIONS.innerHeightMm);
+    this.wallThicknessMm.set(DEFAULT_ENCLOSURE_OPTIONS.wallThicknessMm);
+    this.cornerRadiusMm.set(DEFAULT_ENCLOSURE_OPTIONS.cornerRadiusMm ?? 3.0);
+    this.closureType.set(DEFAULT_ENCLOSURE_OPTIONS.closureType);
+    this.pcbPreset.set(DEFAULT_ENCLOSURE_OPTIONS.pcbPreset);
+    this.standoffHeightMm.set(DEFAULT_ENCLOSURE_OPTIONS.standoffHeightMm);
+    this.cableSlot.set(DEFAULT_ENCLOSURE_OPTIONS.cableSlot);
+    this.cableSlotDiameterMm.set(DEFAULT_ENCLOSURE_OPTIONS.cableSlotDiameterMm);
+    this.ventilationGrille.set(DEFAULT_ENCLOSURE_OPTIONS.ventilationGrille);
+    this.explodedView.set(false);
     this.rebuildMesh();
   }
 
@@ -670,20 +570,65 @@ export class ElectronicsBoxEnclosureComponent implements OnInit, OnDestroy {
       cableSlot: this.cableSlot(),
       cableSlotDiameterMm: this.cableSlotDiameterMm(),
       ventilationGrille: this.ventilationGrille(),
+      explodedView: false, // Always export unexploded flat print bed arrangement
     };
+
+    if (typeof Worker !== 'undefined') {
+      try {
+        await new Promise<void>((resolve, reject) => {
+          const worker = new Worker(new URL('./worker.ts', import.meta.url), { type: 'module' });
+          this.worker = worker;
+
+          worker.onmessage = (e: MessageEvent<ElectronicsBoxWorkerResponse>) => {
+            if (e.data.type === 'result' && e.data.buffer) {
+              const blob = new Blob([e.data.buffer], {
+                type: e.data.mimeType || 'application/octet-stream',
+              });
+              this.triggerDownload(blob, e.data.fileName || `electronics-box.${format}`);
+              worker.terminate();
+              this.worker = null;
+              resolve();
+            } else if (e.data.type === 'error') {
+              worker.terminate();
+              this.worker = null;
+              reject(new Error(e.data.error || 'Worker export failed'));
+            }
+          };
+
+          worker.onerror = (err) => {
+            worker.terminate();
+            this.worker = null;
+            reject(err);
+          };
+
+          worker.postMessage({ id: Date.now(), options, format } as ElectronicsBoxWorkerRequest);
+        });
+        return;
+      } catch {
+        // Fallback to synchronous execution
+      }
+    }
 
     const result = await processEnclosure(options, format);
     if (!result.success || !result.blob) return;
 
-    const url = URL.createObjectURL(result.blob);
+    this.triggerDownload(result.blob, result.fileName);
+  }
+
+  private triggerDownload(blob: Blob, fileName: string): void {
+    const url = URL.createObjectURL(blob);
     this.activeDownloadUrls.push(url);
 
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = result.fileName;
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
+    try {
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = fileName;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+    } finally {
+      URL.revokeObjectURL(url);
+    }
   }
 
   // --- THREE.JS VIEWPORT & RENDERING ---
@@ -795,7 +740,7 @@ export class ElectronicsBoxEnclosureComponent implements OnInit, OnDestroy {
     }
   }
 
-  // --- MOUSE ORBIT CONTROLS ---
+  // --- MOUSE & TOUCH ORBIT CONTROLS & WHEEL ZOOM ---
 
   onMouseDown(event: MouseEvent): void {
     this.isDragging = true;
@@ -818,6 +763,42 @@ export class ElectronicsBoxEnclosureComponent implements OnInit, OnDestroy {
   }
 
   onMouseUp(): void {
+    this.isDragging = false;
+  }
+
+  onWheel(event: WheelEvent): void {
+    event.preventDefault();
+    if (!this.camera) return;
+    const zoomFactor = event.deltaY > 0 ? 1.08 : 0.92;
+    this.camera.position.x *= zoomFactor;
+    this.camera.position.y *= zoomFactor;
+    this.camera.position.z *= zoomFactor;
+  }
+
+  onTouchStart(event: TouchEvent): void {
+    if (event.touches.length === 1) {
+      this.isDragging = true;
+      this.prevMouseX = event.touches[0].clientX;
+      this.prevMouseY = event.touches[0].clientY;
+    }
+  }
+
+  onTouchMove(event: TouchEvent): void {
+    if (!this.isDragging || event.touches.length !== 1) return;
+    event.preventDefault();
+    const touch = event.touches[0];
+    const deltaX = touch.clientX - this.prevMouseX;
+    const deltaY = touch.clientY - this.prevMouseY;
+
+    this.meshRotationY += deltaX * 0.01;
+    this.meshRotationX += deltaY * 0.01;
+    this.meshRotationX = Math.max(0.1, Math.min(Math.PI / 2.2, this.meshRotationX));
+
+    this.prevMouseX = touch.clientX;
+    this.prevMouseY = touch.clientY;
+  }
+
+  onTouchEnd(): void {
     this.isDragging = false;
   }
 }

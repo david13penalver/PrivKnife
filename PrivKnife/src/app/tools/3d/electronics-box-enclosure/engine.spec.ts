@@ -89,6 +89,67 @@ describe('ElectronicsBoxEnclosure Engine (Seam 1)', () => {
       baseGeometry.dispose();
       lidGeometry.dispose();
     });
+
+    it('should orient lid flat on print bed with min.z >= 0 when exploded is false (DEFECT-34-01)', () => {
+      const { baseGeometry, lidGeometry } =
+        generateEnclosureGeometries(DEFAULT_ENCLOSURE_OPTIONS, false);
+
+      baseGeometry.computeBoundingBox();
+      lidGeometry.computeBoundingBox();
+
+      expect(baseGeometry.boundingBox!.min.z).toBeGreaterThanOrEqual(-1e-4);
+      expect(lidGeometry.boundingBox!.min.z).toBeGreaterThanOrEqual(-1e-4);
+
+      baseGeometry.dispose();
+      lidGeometry.dispose();
+    });
+
+    it('should cut through-slots across lid thickness without raised overflow when ventilationGrille is true (DEFECT-34-01)', () => {
+      const withGrille = generateEnclosureGeometries(
+        { ...DEFAULT_ENCLOSURE_OPTIONS, ventilationGrille: true },
+        false
+      );
+      const withoutGrille = generateEnclosureGeometries(
+        { ...DEFAULT_ENCLOSURE_OPTIONS, ventilationGrille: false },
+        false
+      );
+
+      withGrille.lidGeometry.computeBoundingBox();
+      withoutGrille.lidGeometry.computeBoundingBox();
+
+      expect(withGrille.lidGeometry.boundingBox!.max.z).toBeCloseTo(
+        withoutGrille.lidGeometry.boundingBox!.max.z,
+        1
+      );
+      expect(withGrille.lidGeometry.getIndex()!.count).toBeGreaterThan(
+        withoutGrille.lidGeometry.getIndex()!.count
+      );
+
+      withGrille.baseGeometry.dispose();
+      withGrille.lidGeometry.dispose();
+      withoutGrille.baseGeometry.dispose();
+      withoutGrille.lidGeometry.dispose();
+    });
+
+    it('should alter corner geometry when cornerRadiusMm is adjusted (DEFECT-34-01)', () => {
+      const sharp = generateEnclosureGeometries(
+        { ...DEFAULT_ENCLOSURE_OPTIONS, cornerRadiusMm: 0 },
+        false
+      );
+      const rounded = generateEnclosureGeometries(
+        { ...DEFAULT_ENCLOSURE_OPTIONS, cornerRadiusMm: 4 },
+        false
+      );
+
+      expect(rounded.baseGeometry.getIndex()!.count).toBeGreaterThan(
+        sharp.baseGeometry.getIndex()!.count
+      );
+
+      sharp.baseGeometry.dispose();
+      sharp.lidGeometry.dispose();
+      rounded.baseGeometry.dispose();
+      rounded.lidGeometry.dispose();
+    });
   });
 
   describe('calculateEnclosureMetrics', () => {
