@@ -13,6 +13,19 @@ import {
 import { DEFAULT_FLOOR_PLAN_OPTIONS, SAMPLE_STUDIO_PLAN } from './test-fixtures';
 
 /**
+ * Escapes XML/SVG special characters to prevent XSS / markup injection.
+ */
+export function escapeXml(str: string): string {
+  if (!str) return '';
+  return String(str)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&apos;');
+}
+
+/**
  * Snaps a coordinate value to the nearest grid step.
  */
 export function snapToGrid(val: number, step: number): number {
@@ -82,13 +95,12 @@ export function formatDimension(cm: number, unit: MeasurementUnit): string {
 /**
  * Calculates oriented or axis-aligned bounding box for furniture item.
  */
-function getItemBoundingBox(item: FurnitureItem): {
+export function getItemBoundingBox(item: FurnitureItem): {
   minX: number;
   minY: number;
   maxX: number;
   maxY: number;
 } {
-  // If rotation is 0 or 180
   const rad = ((item.rotationDeg || 0) * Math.PI) / 180;
   const cos = Math.abs(Math.cos(rad));
   const sin = Math.abs(Math.sin(rad));
@@ -109,10 +121,11 @@ function getItemBoundingBox(item: FurnitureItem): {
  */
 export function checkFurnitureClearances(
   furniture: FurnitureItem[],
-  _walls: Wall[] = []
+  walls: Wall[] = []
 ): ClearanceWarning[] {
   const warnings: ClearanceWarning[] = [];
 
+  // Pairwise furniture overlap check
   for (let i = 0; i < furniture.length; i++) {
     const a = furniture[i];
     const boxA = getItemBoundingBox(a);
@@ -137,7 +150,91 @@ export function checkFurnitureClearances(
     }
   }
 
+  // Wall boundary containment check
+  if (walls && walls.length > 0) {
+    const wallMinX = Math.min(...walls.flatMap((w) => [w.start.x, w.end.x]));
+    const wallMaxX = Math.max(...walls.flatMap((w) => [w.start.x, w.end.x]));
+    const wallMinY = Math.min(...walls.flatMap((w) => [w.start.y, w.end.y]));
+    const wallMaxY = Math.max(...walls.flatMap((w) => [w.start.y, w.end.y]));
+
+    for (const item of furniture) {
+      const box = getItemBoundingBox(item);
+      if (box.minX < wallMinX || box.maxX > wallMaxX || box.minY < wallMinY || box.maxY > wallMaxY) {
+        warnings.push({
+          itemId1: item.id,
+          itemId2: 'wall-boundary',
+          item1Name: item.name,
+          item2Name: 'Room Wall Boundary',
+          type: 'overlap',
+          distanceCm: 0,
+        });
+      }
+    }
+  }
+
   return warnings;
+}
+
+/**
+ * Dynamically resizes the primary rectangular room boundary and walls.
+ */
+export function resizeRoomDimensions(
+  project: FloorPlanProject,
+  newWidthCm: number,
+  newDepthCm: number
+): FloorPlanProject {
+  const width = Math.max(100, Math.round(newWidthCm));
+  const depth = Math.max(100, Math.round(newDepthCm));
+
+  const updatedWalls = project.walls.map((w) => {
+    // Only adjust perimeter walls that started from 0,0 rectangle
+    const newStart = { ...w.start };
+    const newEnd = { ...w.end };
+
+    if (w.id === 'w1') {
+      newStart.x = 0;
+      newStart.y = 0;
+      newEnd.x = width;
+      newEnd.y = 0;
+    } else if (w.id === 'w2') {
+      newStart.x = width;
+      newStart.y = 0;
+      newEnd.x = width;
+      newEnd.y = depth;
+    } else if (w.id === 'w3') {
+      newStart.x = width;
+      newStart.y = depth;
+      newEnd.x = 0;
+      newEnd.y = depth;
+    } else if (w.id === 'w4') {
+      newStart.x = 0;
+      newStart.y = depth;
+      newEnd.x = 0;
+      newEnd.y = 0;
+    }
+    return { ...w, start: newStart, end: newEnd };
+  });
+
+  const updatedRooms = project.rooms.map((r, idx) => {
+    if (idx === 0) {
+      return {
+        ...r,
+        points: [
+          { x: 0, y: 0 },
+          { x: width, y: 0 },
+          { x: width, y: depth },
+          { x: 0, y: depth },
+        ],
+      };
+    }
+    return r;
+  });
+
+  return {
+    ...project,
+    walls: updatedWalls,
+    rooms: updatedRooms,
+  };
 }
 
 /**
@@ -148,54 +245,48 @@ export function generateFloorPlanSvg(project: FloorPlanProject): string {
 
   // Determine drawing bounding box
   let minX = 0;
+  let maxX = 600;
   let minY = 0;
-  let maxX = 800;
-  let maxY = 600;
+  let maxY = 500;
 
   for (const w of walls) {
     minX = Math.min(minX, w.start.x, w.end.x);
-    minY = Math.min(minY, w.start.y, w.end.y);
     maxX = Math.max(maxX, w.start.x, w.end.x);
+    minY = Math.min(minY, w.start.y, w.end.y);
     maxY = Math.max(maxY, w.start.y, w.end.y);
   }
 
-  for (const f of furniture) {
-    minX = Math.min(minX, f.x - f.widthCm / 2);
-    minY = Math.min(minY, f.y - f.depthCm / 2);
-    maxX = Math.max(maxX, f.x + f.widthCm / 2);
-    maxY = Math.max(maxY, f.y + f.depthCm / 2);
-  }
+  // Padding
+  const pad = 80;
+  minX -= pad;
+  minY -= pad;
+  maxX += pad;
+  maxY += pad + 60; // Extra room for title block
 
-  const margin = 100;
-  minX -= margin;
-  minY -= margin;
-  maxX += margin;
-  maxY += margin;
+  const width = Math.max(800, maxX - minX);
+  const height = Math.max(600, maxY - minY);
 
-  const width = Math.max(maxX - minX, 600);
-  const height = Math.max(maxY - minY, 500);
-
-  // Theme palettes
-  let bgColor = '#0f2338'; // blueprint blue
-  let gridColor = '#1c3d5e';
-  let wallFill = '#225588';
-  let wallStroke = '#93c5fd';
-  let furnitureFill = '#1e3a5f';
-  let furnitureStroke = '#60a5fa';
-  let textColor = '#e2e8f0';
+  // Theme colors
+  let bgColor = '#0f2338';
+  let gridColor = 'rgba(255, 255, 255, 0.08)';
+  let wallFill = '#93c5fd';
+  let wallStroke = '#bfdbfe';
+  let furnitureFill = 'rgba(56, 189, 248, 0.15)';
+  let furnitureStroke = '#38bdf8';
+  let textColor = '#f0f6ff';
   let dimensionColor = '#38bdf8';
   let doorStroke = '#f59e0b';
 
   if (options.themeColor === 'classic_cad_dark') {
     bgColor = '#111827';
-    gridColor = '#1f2937';
-    wallFill = '#374151';
-    wallStroke = '#10b981';
-    furnitureFill = '#1f2937';
-    furnitureStroke = '#34d399';
+    gridColor = 'rgba(255, 255, 255, 0.06)';
+    wallFill = '#22c55e';
+    wallStroke = '#4ade80';
+    furnitureFill = 'rgba(34, 197, 94, 0.12)';
+    furnitureStroke = '#22c55e';
     textColor = '#f9fafb';
-    dimensionColor = '#fbbf24';
-    doorStroke = '#f87171';
+    dimensionColor = '#eab308';
+    doorStroke = '#ef4444';
   } else if (options.themeColor === 'clean_white') {
     bgColor = '#ffffff';
     gridColor = '#e2e8f0';
@@ -209,7 +300,7 @@ export function generateFloorPlanSvg(project: FloorPlanProject): string {
   }
 
   let svg = `<?xml version="1.0" encoding="UTF-8"?>
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="${minX} ${minY} ${width} ${height}" width="${width}" height="${height}">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="${minX} ${minY} ${width} ${height}" width="100%" height="100%" style="max-height: 520px; display: block;">
   <defs>
     <pattern id="cadGrid" width="${options.gridSnapStepCm || 50}" height="${options.gridSnapStepCm || 50}" patternUnits="userSpaceOnUse">
       <path d="M ${options.gridSnapStepCm || 50} 0 L 0 0 0 ${options.gridSnapStepCm || 50}" fill="none" stroke="${gridColor}" stroke-width="1" />
@@ -243,8 +334,8 @@ export function generateFloorPlanSvg(project: FloorPlanProject): string {
           options.measurementUnit === 'imperial_feet'
             ? `${areaSqFt.toFixed(1)} sq ft`
             : `${areaSqM.toFixed(1)} m²`;
-        svg += `    <text x="${centerPt.x}" y="${centerPt.y}" fill="${textColor}" font-family="sans-serif" font-size="16" font-weight="bold" text-anchor="middle">${r.name}</text>\n`;
-        svg += `    <text x="${centerPt.x}" y="${centerPt.y + 20}" fill="${dimensionColor}" font-family="sans-serif" font-size="12" text-anchor="middle">${areaStr}</text>\n`;
+        svg += `    <text x="${centerPt.x}" y="${centerPt.y}" fill="${textColor}" font-family="sans-serif" font-size="16" font-weight="bold" text-anchor="middle">${escapeXml(r.name)}</text>\n`;
+        svg += `    <text x="${centerPt.x}" y="${centerPt.y + 20}" fill="${dimensionColor}" font-family="sans-serif" font-size="12" text-anchor="middle">${escapeXml(areaStr)}</text>\n`;
       }
     }
   }
@@ -264,7 +355,7 @@ export function generateFloorPlanSvg(project: FloorPlanProject): string {
       const angle = calculateWallAngle(w);
       const dimLabel = formatDimension(len, options.measurementUnit);
 
-      svg += `    <text x="${midX}" y="${midY - 10}" fill="${dimensionColor}" font-family="sans-serif" font-size="12" text-anchor="middle" transform="rotate(${angle > 90 && angle < 270 ? angle + 180 : angle}, ${midX}, ${midY})">${dimLabel}</text>\n`;
+      svg += `    <text x="${midX}" y="${midY - 10}" fill="${dimensionColor}" font-family="sans-serif" font-size="12" text-anchor="middle" transform="rotate(${angle > 90 && angle < 270 ? angle + 180 : angle}, ${midX}, ${midY})">${escapeXml(dimLabel)}</text>\n`;
     }
   }
   svg += `  </g>\n`;
@@ -303,18 +394,22 @@ export function generateFloorPlanSvg(project: FloorPlanProject): string {
       const halfD = f.depthCm / 2;
       svg += `    <g transform="translate(${f.x}, ${f.y}) rotate(${f.rotationDeg || 0})">\n`;
       svg += `      <rect x="${-halfW}" y="${-halfD}" width="${f.widthCm}" height="${f.depthCm}" rx="4" fill="${furnitureFill}" stroke="${furnitureStroke}" stroke-width="2" />\n`;
-      svg += `      <text x="0" y="4" fill="${textColor}" font-family="sans-serif" font-size="11" text-anchor="middle">${f.name}</text>\n`;
+      svg += `      <text x="0" y="4" fill="${textColor}" font-family="sans-serif" font-size="11" text-anchor="middle">${escapeXml(f.name)}</text>\n`;
       svg += `    </g>\n`;
     }
     svg += `  </g>\n`;
   }
 
   // Title Block & Legend
+  const escapedProjectName = escapeXml(project.name || options.projectName);
+  const escapedDesignerName = escapeXml(options.designerName);
+  const unitLabel = options.measurementUnit === 'metric_meters' ? 'Metric (m)' : 'Imperial (ft)';
+
   svg += `  <!-- Title Block & Legend -->
   <g id="title-block" transform="translate(${minX + 20}, ${maxY - 70})">
     <rect x="0" y="0" width="340" height="50" fill="${bgColor}" stroke="${wallStroke}" stroke-width="1" rx="4" />
-    <text x="12" y="20" fill="${textColor}" font-family="sans-serif" font-size="14" font-weight="bold">${project.name || options.projectName}</text>
-    <text x="12" y="38" fill="${textColor}" font-family="sans-serif" font-size="10">Scale: ${options.blueprintScale} • Unit: ${options.measurementUnit === 'metric_meters' ? 'Metric (m)' : 'Imperial (ft)'} • ${options.designerName}</text>
+    <text x="12" y="20" fill="${textColor}" font-family="sans-serif" font-size="14" font-weight="bold">${escapedProjectName}</text>
+    <text x="12" y="38" fill="${textColor}" font-family="sans-serif" font-size="10">Scale: ${options.blueprintScale} • Unit: ${unitLabel} • ${escapedDesignerName}</text>
   </g>
 </svg>`;
 
@@ -348,34 +443,33 @@ export async function generateBlueprintPdf(project: FloorPlanProject): Promise<B
   // Blueprint Border
   doc.setDrawColor(strokeColor[0], strokeColor[1], strokeColor[2]);
   doc.setLineWidth(0.8);
-  doc.rect(margin, margin, pageWidth - margin * 2, pageHeight - margin * 2);
+  doc.rect(margin, margin, pageWidth - 2 * margin, pageHeight - 2 * margin);
 
-  // Inner margin border
-  doc.setLineWidth(0.3);
-  doc.rect(margin + 2, margin + 2, pageWidth - (margin + 2) * 2, pageHeight - (margin + 2) * 2);
+  // Inner margin line
+  doc.setLineWidth(0.2);
+  doc.rect(margin + 2, margin + 2, pageWidth - 2 * (margin + 2), pageHeight - 2 * (margin + 2));
 
-  // Compute bounding box of floor plan
+  // Determine drawing bounding box in cm
   let minX = 0;
-  let minY = 0;
   let maxX = 600;
+  let minY = 0;
   let maxY = 500;
 
   for (const w of project.walls) {
     minX = Math.min(minX, w.start.x, w.end.x);
-    minY = Math.min(minY, w.start.y, w.end.y);
     maxX = Math.max(maxX, w.start.x, w.end.x);
+    minY = Math.min(minY, w.start.y, w.end.y);
     maxY = Math.max(maxY, w.start.y, w.end.y);
   }
 
-  const planWidthCm = Math.max(maxX - minX, 100);
-  const planHeightCm = Math.max(maxY - minY, 100);
+  const planWidthCm = Math.max(100, maxX - minX);
+  const planHeightCm = Math.max(100, maxY - minY);
 
-  // Scale to fit available drawing region (pageWidth - 60mm, pageHeight - 70mm)
-  const drawWidthMm = pageWidth - 60;
-  const drawHeightMm = pageHeight - 70;
-  const scaleX = drawWidthMm / planWidthCm;
-  const scaleY = drawHeightMm / planHeightCm;
-  const scaleFactor = Math.min(scaleX, scaleY);
+  // Printable area inside border
+  const drawWidthMm = pageWidth - 2 * margin - 30;
+  const drawHeightMm = pageHeight - 2 * margin - 40;
+
+  const scaleFactor = Math.min(drawWidthMm / planWidthCm, drawHeightMm / planHeightCm);
 
   const originX = margin + 15 + (drawWidthMm - planWidthCm * scaleFactor) / 2;
   const originY = margin + 15 + (drawHeightMm - planHeightCm * scaleFactor) / 2;
@@ -405,6 +499,16 @@ export async function generateBlueprintPdf(project: FloorPlanProject): Promise<B
     }
   }
 
+  // Draw Windows
+  doc.setDrawColor(56, 189, 248);
+  doc.setLineWidth(0.8);
+  for (const win of project.windows) {
+    const wx = toPdfX(win.x);
+    const wy = toPdfY(win.y);
+    const ww = (win.widthCm / 2) * scaleFactor;
+    doc.line(wx - ww, wy, wx + ww, wy);
+  }
+
   // Draw Doors
   doc.setDrawColor(245, 158, 11);
   doc.setLineWidth(0.6);
@@ -415,17 +519,21 @@ export async function generateBlueprintPdf(project: FloorPlanProject): Promise<B
     doc.line(dx, dy, dx + dw, dy);
   }
 
-  // Draw Furniture
+  // Draw Furniture with effective dimensions for rotation
   if (project.options.showFurniture) {
     doc.setDrawColor(strokeColor[0], strokeColor[1], strokeColor[2]);
     doc.setFillColor(isDark ? 28 : 240, isDark ? 55 : 243, isDark ? 85 : 246);
     doc.setLineWidth(0.4);
 
     for (const f of project.furniture) {
-      const fx = toPdfX(f.x - f.widthCm / 2);
-      const fy = toPdfY(f.y - f.depthCm / 2);
-      const fw = f.widthCm * scaleFactor;
-      const fh = f.depthCm * scaleFactor;
+      const isRotated = f.rotationDeg === 90 || f.rotationDeg === 270;
+      const effWidth = isRotated ? f.depthCm : f.widthCm;
+      const effDepth = isRotated ? f.widthCm : f.depthCm;
+
+      const fx = toPdfX(f.x - effWidth / 2);
+      const fy = toPdfY(f.y - effDepth / 2);
+      const fw = effWidth * scaleFactor;
+      const fh = effDepth * scaleFactor;
 
       doc.rect(fx, fy, fw, fh, 'FD');
       doc.setFontSize(7);
@@ -495,9 +603,21 @@ export async function generateBlueprintPdf(project: FloorPlanProject): Promise<B
   doc.line(scaleBarX + 40, scaleBarY - 2, scaleBarX + 40, scaleBarY + 2);
   doc.setFontSize(6);
   doc.text('0', scaleBarX, scaleBarY - 3, { align: 'center' });
-  doc.text('1m', scaleBarX + 20, scaleBarY - 3, { align: 'center' });
-  doc.text('2m', scaleBarX + 40, scaleBarY - 3, { align: 'center' });
-  doc.text('GRAPHICAL SCALE', scaleBarX + 20, scaleBarY + 6, { align: 'center' });
+  doc.text(
+    project.options.measurementUnit === 'imperial_feet' ? '5 ft' : '1m',
+    scaleBarX + 20,
+    scaleBarY - 3,
+    { align: 'center' }
+  );
+  doc.text(
+    project.options.measurementUnit === 'imperial_feet' ? '10 ft' : '2m',
+    scaleBarX + 40,
+    scaleBarY - 3,
+    { align: 'center' }
+  );
+  doc.text(`GRAPHICAL SCALE (${project.options.blueprintScale})`, scaleBarX + 20, scaleBarY + 6, {
+    align: 'center',
+  });
 
   return doc.output('blob');
 }

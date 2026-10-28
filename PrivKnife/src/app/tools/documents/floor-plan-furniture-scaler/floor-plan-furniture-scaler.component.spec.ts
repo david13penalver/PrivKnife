@@ -5,8 +5,13 @@ import { FloorPlanFurnitureScalerComponent } from './floor-plan-furniture-scaler
 describe('FloorPlanFurnitureScalerComponent', () => {
   let component: FloorPlanFurnitureScalerComponent;
   let fixture: ComponentFixture<FloorPlanFurnitureScalerComponent>;
+  let fetchSpy: ReturnType<typeof vi.spyOn>;
+  let xhrSpy: ReturnType<typeof vi.spyOn>;
 
   beforeEach(async () => {
+    fetchSpy = vi.spyOn(window, 'fetch');
+    xhrSpy = vi.spyOn(XMLHttpRequest.prototype, 'open');
+
     await TestBed.configureTestingModule({
       imports: [FloorPlanFurnitureScalerComponent],
     }).compileComponents();
@@ -17,6 +22,8 @@ describe('FloorPlanFurnitureScalerComponent', () => {
   });
 
   afterEach(() => {
+    fetchSpy.mockRestore();
+    xhrSpy.mockRestore();
     vi.restoreAllMocks();
   });
 
@@ -42,13 +49,26 @@ describe('FloorPlanFurnitureScalerComponent', () => {
     expect(component.project().name).toContain('Office');
   });
 
-  it('should allow adding furniture from template library', () => {
+  it('should allow adding furniture from template library with grid snap (DEFECT-58-03)', () => {
     const initialCount = component.project().furniture.length;
+    component.updateSnap(50);
     component.addFurniture('armchair');
     fixture.detectChanges();
 
     expect(component.project().furniture.length).toBe(initialCount + 1);
-    expect(component.project().furniture.some((f) => f.name.includes('Armchair'))).toBe(true);
+    const added = component.project().furniture[component.project().furniture.length - 1];
+    expect(added.name).toContain('Armchair');
+    expect(added.x % 50).toBe(0);
+    expect(added.y % 50).toBe(0);
+  });
+
+  it('should resize room dimensions via controls (DEFECT-58-03)', () => {
+    component.onRoomWidthChange(750);
+    component.onRoomDepthChange(550);
+    fixture.detectChanges();
+
+    expect(component.currentRoomWidth()).toBe(750);
+    expect(component.currentRoomDepth()).toBe(550);
   });
 
   it('should update scale and measurement units reactively', () => {
@@ -66,7 +86,6 @@ describe('FloorPlanFurnitureScalerComponent', () => {
   });
 
   it('should detect and display clearance overlap warnings', () => {
-    // Add two items at the exact same location
     component.project.update((p) => ({
       ...p,
       furniture: [
@@ -96,6 +115,53 @@ describe('FloorPlanFurnitureScalerComponent', () => {
 
     expect(component.clearanceWarnings().length).toBeGreaterThan(0);
     expect(component.clearanceWarnings()[0].type).toBe('overlap');
+  });
+
+  it('should display error alert when invalid JSON is imported (DEFECT-58-01)', async () => {
+    const invalidFile = new File(['NOT_JSON'], 'invalid.json', { type: 'application/json' });
+    const event = {
+      target: {
+        files: [invalidFile],
+        value: '',
+      },
+    } as unknown as Event;
+
+    await component.onJsonFileSelected(event);
+    fixture.detectChanges();
+
+    expect(component.importError()).toContain('Failed to import JSON floor plan');
+    const compiled = fixture.nativeElement as HTMLElement;
+    expect(compiled.querySelector('.c-alert--danger')).toBeTruthy();
+  });
+
+  it('should sanitize malicious SVG input preventing XSS injection (DEFECT-58-01)', async () => {
+    const maliciousJson = JSON.stringify({
+      version: '1.0',
+      name: '</text><img src=x onerror="window.__xss=true"><text>',
+      options: {
+        ...component.project().options,
+        designerName: '<script>window.__xss=true</script>',
+      },
+      walls: component.project().walls,
+      furniture: component.project().furniture,
+    });
+
+    const file = new File([maliciousJson], 'evil.json', { type: 'application/json' });
+    const event = {
+      target: {
+        files: [file],
+        value: '',
+      },
+    } as unknown as Event;
+
+    await component.onJsonFileSelected(event);
+    fixture.detectChanges();
+
+    const compiled = fixture.nativeElement as HTMLElement;
+    const previewEl = compiled.querySelector('.c-floor-plan__svg-wrap');
+    expect(previewEl?.querySelector('img')).toBeNull();
+    expect(previewEl?.querySelector('script')).toBeNull();
+    expect((window as unknown as { __xss?: boolean }).__xss).toBeUndefined();
   });
 
   it('should trigger SVG export and revoke Object URL', () => {
@@ -136,5 +202,25 @@ describe('FloorPlanFurnitureScalerComponent', () => {
     component.ngOnDestroy();
 
     expect(revokeSpy).toHaveBeenCalled();
+  });
+
+  it('should render BEM compliant elements and areas (DEFECT-58-04)', () => {
+    fixture.detectChanges();
+    const compiled = fixture.nativeElement as HTMLElement;
+
+    expect(compiled.querySelector('.c-floor-plan')).toBeTruthy();
+    expect(compiled.querySelector('.c-floor-plan__preset-group')).toBeTruthy();
+    expect(compiled.querySelector('.c-floor-plan__svg-wrap')).toBeTruthy();
+    expect(compiled.querySelector('.l-extremo__area-izquierda')).toBeTruthy();
+    expect(compiled.querySelector('.l-extremo__area-derecha')).toBeTruthy();
+  });
+
+  it('should execute floor plan operations with zero network calls', async () => {
+    component.downloadSvg();
+    component.downloadJson();
+    await component.downloadPdf();
+
+    expect(fetchSpy).not.toHaveBeenCalled();
+    expect(xhrSpy).not.toHaveBeenCalled();
   });
 });

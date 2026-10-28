@@ -1,0 +1,400 @@
+<div class="l-page c-floor-plan">
+  <!-- Header -->
+  <header class="l-page__header c-header">
+    <div class="c-header__title-group">
+      <h1 class="c-header__title">Interactive 2D Floor Plan &amp; Room Furniture Scaler</h1>
+      <p class="c-header__subtitle">
+        Draft scaled architectural walls, position real-dimension furniture items, verify clearance zones,
+        and export print-ready dimensioned blueprints or vector SVGs directly in your browser.
+      </p>
+    </div>
+    <div class="c-badge c-badge--privacy">
+      🛡️ 100% In-Browser • Never Leaves Your Device
+    </div>
+  </header>
+
+  <!-- Main Layout -->
+  <div class="l-columns l-columns--2">
+    <!-- Controls Column -->
+    <section class="l-columns__area c-card">
+      <div class="c-card__header c-floor-plan__card-header">
+        <h2 class="c-card__title">Layout &amp; Architectural Configuration</h2>
+      </div>
+
+      <div class="c-card__body">
+        <!-- Error Alert -->
+        @if (importError()) {
+          <div class="c-alert c-alert--danger g--margin-bottom-4" role="alert">
+            <strong>Error:</strong> {{ importError() }}
+          </div>
+        }
+
+        <!-- Preset Selector -->
+        <div class="g--margin-bottom-4">
+          <label class="c-input__label">Architectural Presets</label>
+          <div class="c-floor-plan__preset-group g--margin-top-1">
+            <button
+              type="button"
+              class="c-button c-button--small c-floor-plan__action-btn"
+              [class.c-button--primary]="activePreset() === 'studio_30m'"
+              [class.c-button--outline]="activePreset() !== 'studio_30m'"
+              (click)="loadPreset('studio_30m')"
+            >
+              Studio (30m²)
+            </button>
+            <button
+              type="button"
+              class="c-button c-button--small c-floor-plan__action-btn"
+              [class.c-button--primary]="activePreset() === 'one_bedroom_50m'"
+              [class.c-button--outline]="activePreset() !== 'one_bedroom_50m'"
+              (click)="loadPreset('one_bedroom_50m')"
+            >
+              1-Bedroom (50m²)
+            </button>
+            <button
+              type="button"
+              class="c-button c-button--small c-floor-plan__action-btn"
+              [class.c-button--primary]="activePreset() === 'office_60m'"
+              [class.c-button--outline]="activePreset() !== 'office_60m'"
+              (click)="loadPreset('office_60m')"
+            >
+              Studio Office (60m²)
+            </button>
+          </div>
+        </div>
+
+        <!-- Room Dimensions (DEFECT-58-03) -->
+        <div class="l-columns l-columns--2 g--margin-bottom-4 c-floor-plan__gap-3">
+          <div class="l-columns__area">
+            <label class="c-input__label" for="roomWidthInput">Room Width (cm)</label>
+            <input
+              id="roomWidthInput"
+              type="number"
+              min="100"
+              max="3000"
+              step="10"
+              class="c-input c-floor-plan__input"
+              [ngModel]="currentRoomWidth()"
+              (ngModelChange)="onRoomWidthChange(+$event)"
+            />
+          </div>
+
+          <div class="l-columns__area">
+            <label class="c-input__label" for="roomDepthInput">Room Depth (cm)</label>
+            <input
+              id="roomDepthInput"
+              type="number"
+              min="100"
+              max="3000"
+              step="10"
+              class="c-input c-floor-plan__input"
+              [ngModel]="currentRoomDepth()"
+              (ngModelChange)="onRoomDepthChange(+$event)"
+            />
+          </div>
+        </div>
+
+        <!-- Units & Scale -->
+        <div class="l-columns l-columns--2 g--margin-bottom-4 c-floor-plan__gap-3">
+          <div class="l-columns__area">
+            <label class="c-input__label" for="measurementUnitSelect">Measurement Unit</label>
+            <select
+              id="measurementUnitSelect"
+              class="c-input c-input--select c-floor-plan__select"
+              [ngModel]="project().options.measurementUnit"
+              (ngModelChange)="updateUnit($event)"
+            >
+              <option value="metric_meters">Metric (Meters / cm)</option>
+              <option value="imperial_feet">Imperial (Feet / Inches)</option>
+            </select>
+          </div>
+
+          <div class="l-columns__area">
+            <label class="c-input__label" for="blueprintScaleSelect">Blueprint Scale</label>
+            <select
+              id="blueprintScaleSelect"
+              class="c-input c-input--select c-floor-plan__select"
+              [ngModel]="project().options.blueprintScale"
+              (ngModelChange)="updateScale($event)"
+            >
+              <option value="1:20">1:20 (Detail View)</option>
+              <option value="1:50">1:50 (Standard Architectural)</option>
+              <option value="1:100">1:100 (Site / Overall)</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Visual Theme & Snap -->
+        <div class="l-columns l-columns--2 g--margin-bottom-4 c-floor-plan__gap-3">
+          <div class="l-columns__area">
+            <label class="c-input__label" for="visualThemeSelect">Visual Theme</label>
+            <select
+              id="visualThemeSelect"
+              class="c-input c-input--select c-floor-plan__select"
+              [ngModel]="project().options.themeColor"
+              (ngModelChange)="updateTheme($event)"
+            >
+              <option value="blueprint_blue">Classic Cyan Blueprint</option>
+              <option value="classic_cad_dark">Dark CAD Workstation</option>
+              <option value="clean_white">Clean Paper White</option>
+            </select>
+          </div>
+
+          <div class="l-columns__area">
+            <label class="c-input__label" for="gridSnapStepSelect">Grid Snap Step</label>
+            <select
+              id="gridSnapStepSelect"
+              class="c-input c-input--select c-floor-plan__select"
+              [ngModel]="project().options.gridSnapStepCm"
+              (ngModelChange)="updateSnap($event)"
+            >
+              <option [ngValue]="10">10 cm</option>
+              <option [ngValue]="25">25 cm (Quarter Meter)</option>
+              <option [ngValue]="50">50 cm (Half Meter)</option>
+              <option [ngValue]="100">100 cm (Full Meter)</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Display Toggles -->
+        <div class="g--margin-bottom-4">
+          <label class="c-input__label">Layer Visibility</label>
+          <div class="c-floor-plan__checkbox-group g--margin-top-1">
+            <label class="c-floor-plan__checkbox-label">
+              <input
+                type="checkbox"
+                class="c-floor-plan__checkbox-input"
+                [checked]="project().options.showGrid"
+                (change)="toggleOption('showGrid')"
+              />
+              <span>Grid</span>
+            </label>
+            <label class="c-floor-plan__checkbox-label">
+              <input
+                type="checkbox"
+                class="c-floor-plan__checkbox-input"
+                [checked]="project().options.showDimensions"
+                (change)="toggleOption('showDimensions')"
+              />
+              <span>Dimensions</span>
+            </label>
+            <label class="c-floor-plan__checkbox-label">
+              <input
+                type="checkbox"
+                class="c-floor-plan__checkbox-input"
+                [checked]="project().options.showAreaReadouts"
+                (change)="toggleOption('showAreaReadouts')"
+              />
+              <span>Area Readouts</span>
+            </label>
+            <label class="c-floor-plan__checkbox-label">
+              <input
+                type="checkbox"
+                class="c-floor-plan__checkbox-input"
+                [checked]="project().options.showFurniture"
+                (change)="toggleOption('showFurniture')"
+              />
+              <span>Furniture</span>
+            </label>
+          </div>
+        </div>
+
+        <!-- Add Furniture Section -->
+        <div class="g--margin-bottom-4">
+          <label class="c-input__label">Add Scaled Furniture</label>
+          <div class="c-floor-plan__catalog-grid g--margin-top-1">
+            @for (tpl of furnitureTemplates; track tpl.type) {
+              <button
+                type="button"
+                class="c-button c-button--outline c-button--small c-floor-plan__catalog-btn"
+                (click)="addFurniture(tpl.type)"
+              >
+                + {{ tpl.name }}
+              </button>
+            }
+          </div>
+        </div>
+
+        <!-- Selected Furniture Item Inspector -->
+        @if (selectedFurnitureItem(); as selected) {
+          <div class="c-card c-floor-plan__inspector g--margin-bottom-4">
+            <div class="l-extremo c-floor-plan__inspector-header">
+              <span class="l-extremo__area-izquierda c-floor-plan__inspector-title">Selected: {{ selected.name }}</span>
+              <button
+                type="button"
+                class="c-button c-button--danger c-button--small l-extremo__area-derecha c-floor-plan__action-btn"
+                (click)="deleteFurniture(selected.id)"
+              >
+                Delete
+              </button>
+            </div>
+
+            <div class="l-columns l-columns--3 c-floor-plan__gap-2">
+              <div class="l-columns__area">
+                <label class="c-input__label" for="selectedX">X (cm)</label>
+                <input
+                  id="selectedX"
+                  type="number"
+                  class="c-input c-input--small c-floor-plan__input"
+                  [ngModel]="selected.x"
+                  (ngModelChange)="updateSelectedItem({ x: $event })"
+                />
+              </div>
+              <div class="l-columns__area">
+                <label class="c-input__label" for="selectedY">Y (cm)</label>
+                <input
+                  id="selectedY"
+                  type="number"
+                  class="c-input c-input--small c-floor-plan__input"
+                  [ngModel]="selected.y"
+                  (ngModelChange)="updateSelectedItem({ y: $event })"
+                />
+              </div>
+              <div class="l-columns__area">
+                <label class="c-input__label" for="selectedRotation">Rotation (°)</label>
+                <input
+                  id="selectedRotation"
+                  type="number"
+                  class="c-input c-input--small c-floor-plan__input"
+                  [ngModel]="selected.rotationDeg"
+                  (ngModelChange)="updateSelectedItem({ rotationDeg: $event })"
+                  step="15"
+                />
+              </div>
+            </div>
+
+            <div class="l-columns l-columns--2 g--margin-top-2 c-floor-plan__gap-2">
+              <div class="l-columns__area">
+                <label class="c-input__label" for="selectedWidth">Width (cm)</label>
+                <input
+                  id="selectedWidth"
+                  type="number"
+                  class="c-input c-input--small c-floor-plan__input"
+                  [ngModel]="selected.widthCm"
+                  (ngModelChange)="updateSelectedItem({ widthCm: $event })"
+                />
+              </div>
+              <div class="l-columns__area">
+                <label class="c-input__label" for="selectedDepth">Depth (cm)</label>
+                <input
+                  id="selectedDepth"
+                  type="number"
+                  class="c-input c-input--small c-floor-plan__input"
+                  [ngModel]="selected.depthCm"
+                  (ngModelChange)="updateSelectedItem({ depthCm: $event })"
+                />
+              </div>
+            </div>
+          </div>
+        }
+
+        <!-- Warnings / Clearance Notice -->
+        @if (clearanceWarnings().length > 0) {
+          <div class="c-alert c-alert--warning c-floor-plan__warning-card g--margin-bottom-4">
+            <div class="c-floor-plan__warning-title">
+              ⚠️ Clearance &amp; Boundary Warning:
+            </div>
+            @for (w of clearanceWarnings(); track w.itemId1 + w.itemId2) {
+              <div class="c-floor-plan__warning-item">
+                • <strong>{{ w.item1Name }}</strong> {{ w.itemId2 === 'wall-boundary' ? 'extends beyond' : 'overlaps with' }} <strong>{{ w.item2Name }}</strong>
+              </div>
+            }
+          </div>
+        }
+      </div>
+
+      <div class="c-card__footer l-extremo c-floor-plan__card-footer">
+        <div class="l-extremo__area-izquierda">
+          <button
+            type="button"
+            class="c-button c-button--outline c-floor-plan__action-btn"
+            (click)="resetToDefaults()"
+          >
+            Reset to Defaults
+          </button>
+        </div>
+        <div class="l-extremo__area-derecha c-floor-plan__btn-group">
+          <label class="c-button c-button--outline c-floor-plan__action-btn c-floor-plan__file-label">
+            Import JSON
+            <input
+              type="file"
+              accept=".json,application/json"
+              style="display: none;"
+              (change)="onJsonFileSelected($event)"
+            />
+          </label>
+          <button
+            type="button"
+            class="c-button c-button--secondary c-floor-plan__action-btn"
+            (click)="downloadJson()"
+          >
+            Export JSON
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <!-- Preview Column -->
+    <section class="l-columns__area c-card">
+      <div class="c-card__header l-extremo c-floor-plan__card-header">
+        <h2 class="c-card__title l-extremo__area-izquierda">Real-Time Scaled Blueprint</h2>
+        <div class="l-extremo__area-derecha c-floor-plan__stats">
+          Walls: {{ project().walls.length }} • Furniture: {{ project().furniture.length }}
+        </div>
+      </div>
+
+      <div class="c-card__body">
+        <!-- Scaled Interactive SVG Viewport (DEFECT-58-02) -->
+        <div
+          class="c-preview c-floor-plan__preview"
+          [style.background]="viewportBackground()"
+        >
+          <div
+            [innerHTML]="sanitizedSvg()"
+            class="c-floor-plan__svg-wrap"
+          ></div>
+        </div>
+
+        <!-- List of Furniture Items in Scene -->
+        <div class="g--margin-top-3">
+          <label class="c-input__label">Furniture in Plan (Click to Select)</label>
+          <div class="c-floor-plan__scene-furniture g--margin-top-1">
+            @for (item of project().furniture; track item.id) {
+              <button
+                type="button"
+                class="c-button c-button--small c-floor-plan__action-btn"
+                [class.c-button--primary]="selectedFurnitureId() === item.id"
+                [class.c-button--outline]="selectedFurnitureId() !== item.id"
+                (click)="selectFurniture(item.id)"
+              >
+                {{ item.name }}
+              </button>
+            }
+          </div>
+        </div>
+      </div>
+
+      <!-- Export Action Bar -->
+      <div class="c-card__footer l-extremo c-floor-plan__card-footer">
+        <div class="l-extremo__area-izquierda">
+          <button
+            type="button"
+            class="c-button c-button--secondary c-floor-plan__action-btn"
+            (click)="downloadSvg()"
+          >
+            Download Vector SVG
+          </button>
+        </div>
+        <div class="l-extremo__area-derecha">
+          <button
+            type="button"
+            class="c-button c-button--primary c-floor-plan__action-btn"
+            (click)="downloadPdf()"
+          >
+            Download Blueprint PDF (A4)
+          </button>
+        </div>
+      </div>
+    </section>
+  </div>
+</div>
