@@ -138,14 +138,73 @@ describe('PiiScrubberAnonymizerComponent (Seam 2 & 4)', () => {
   });
 
   describe('Memory Hygiene & Disposal', () => {
+    it('should not call URL.createObjectURL during handleFileSelected (DEFECT-49-07)', async () => {
+      const createSpy = vi.spyOn(URL, 'createObjectURL');
+      const file = createSyntheticLogFile('clean.log');
+      await component.handleFileSelected(file);
+
+      expect(createSpy).not.toHaveBeenCalled();
+      createSpy.mockRestore();
+    });
+
     it('should revoke created object URLs upon reset and destroy', async () => {
       const revokeSpy = vi.spyOn(URL, 'revokeObjectURL');
       const file = createSyntheticLogFile();
       await component.handleFileSelected(file);
       await component.scrubData();
 
+      component.downloadDeliverable();
       component.resetToDefaults();
       expect(revokeSpy).toHaveBeenCalled();
+    });
+  });
+
+  describe('Custom Regex Input & Error Feedback (DEFECT-49-02, DEFECT-49-05)', () => {
+    it('should bind customRegexPatterns to #customRegexInput and display customMatchesRedacted in audit grid', async () => {
+      const inputEl = fixture.nativeElement.querySelector('#customRegexInput') as HTMLInputElement;
+      expect(inputEl).toBeTruthy();
+
+      inputEl.value = 'EMP-\\d{4}';
+      inputEl.dispatchEvent(new Event('input'));
+      fixture.detectChanges();
+
+      expect(component.customRegexPatterns()).toBe('EMP-\\d{4}');
+
+      component.inputText.set('User EMP-9821 logged in');
+      await component.scrubData();
+      fixture.detectChanges();
+
+      expect(component.lastResult()?.auditStats.customMatchesRedacted).toBe(1);
+      const auditGrid = fixture.nativeElement.querySelector('.c-audit-grid');
+      expect(auditGrid?.textContent).toContain('Custom');
+    });
+
+    it('should catch validation error and display alert banner when salt is empty in pseudonym mode', async () => {
+      component.inputText.set('Some user alice@acme.corp');
+      component.setRedactionMode('salted_hash_pseudonym');
+      component.customSalt.set('');
+      fixture.detectChanges();
+
+      await component.scrubData();
+      fixture.detectChanges();
+
+      expect(component.errorMessage()).toContain('salt');
+      const alertEl = fixture.nativeElement.querySelector('.c-alert--danger');
+      expect(alertEl).toBeTruthy();
+      expect(alertEl.textContent).toContain('salt');
+    });
+
+    it('should catch invalid custom regex syntax and display alert banner', async () => {
+      component.inputText.set('Some log line');
+      component.customRegexPatterns.set('[unclosed');
+      fixture.detectChanges();
+
+      await component.scrubData();
+      fixture.detectChanges();
+
+      expect(component.errorMessage()).toMatch(/invalid.*regex/i);
+      const alertEl = fixture.nativeElement.querySelector('.c-alert--danger');
+      expect(alertEl).toBeTruthy();
     });
   });
 

@@ -45,3 +45,15 @@ export interface PiiScrubberAnonymizerResult {
     timestamp: number;
   };
 }
+
+export interface PiiScrubberWorkerRequest {
+  id: number;
+  text: string;
+  options: PiiScrubberAnonymizerOptions;
+  originalFileName: string;
+}
+
+export type PiiScrubberWorkerResponse =
+  | { id: number; type: 'progress'; percent: number }
+  | { id: number; type: 'result'; result: PiiScrubberAnonymizerResult }
+  | { id: number; type: 'error'; error: string };

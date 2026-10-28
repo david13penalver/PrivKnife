@@ -49,6 +49,16 @@ describe('PII Log & CSV Scrubber Engine (Seam 1)', () => {
       expect(res.valid).toBe(false);
       expect(res.error).toContain('salt');
     });
+
+    it('should reject invalid custom regex pattern syntax', () => {
+      const invalid = {
+        ...DEFAULT_SCRUBBER_OPTIONS,
+        customRegexPatterns: '[unclosed-bracket',
+      };
+      const res = validateScrubberOptions(invalid);
+      expect(res.valid).toBe(false);
+      expect(res.error).toMatch(/invalid.*regex/i);
+    });
   });
 
   describe('Luhn Credit Card Verification Checksum', () => {
@@ -106,8 +116,45 @@ describe('PII Log & CSV Scrubber Engine (Seam 1)', () => {
 
       expect(sanitized).not.toContain('alice@acme.corp');
       expect(sanitized).not.toContain('192.168.1.45');
-      expect(sanitized).toMatch(/USER_[0-9a-f]{8}/);
-      expect(sanitized).toMatch(/IP_[0-9a-f]{8}/);
+      expect(sanitized).toMatch(/USER_[0-9a-f]{12}/);
+      expect(sanitized).toMatch(/IP_[0-9a-f]{12}/);
+    });
+
+    it('should scrub both standard and compressed IPv6 addresses (DEFECT-49-01)', async () => {
+      const ipv6Log = 'Connections from 2001:0db8:85a3:0000:0000:8a2e:0370:7334 and fe80::1ff:fe23:4567:890a reported.';
+
+      // Tag mode
+      const tagResult = await scrubPiiText(ipv6Log, DEFAULT_SCRUBBER_OPTIONS);
+      expect(tagResult.sanitized).not.toContain('2001:0db8:85a3:0000:0000:8a2e:0370:7334');
+      expect(tagResult.sanitized).not.toContain('fe80::1ff:fe23:4567:890a');
+      expect(tagResult.stats.ipsRedacted).toBe(2);
+      expect(tagResult.sanitized).toBe('Connections from [IP_REDACTED] and [IP_REDACTED] reported.');
+
+      // Mask mode
+      const maskResult = await scrubPiiText(ipv6Log, MASK_SCRUBBER_OPTIONS);
+      expect(maskResult.sanitized).not.toContain('2001:0db8:85a3:0000:0000:8a2e:0370:7334');
+      expect(maskResult.sanitized).not.toContain('fe80::1ff:fe23:4567:890a');
+      expect(maskResult.stats.ipsRedacted).toBe(2);
+
+      // Pseudonym mode
+      const pseudoResult = await scrubPiiText(ipv6Log, PSEUDONYM_SCRUBBER_OPTIONS);
+      expect(pseudoResult.sanitized).not.toContain('2001:0db8:85a3:0000:0000:8a2e:0370:7334');
+      expect(pseudoResult.sanitized).not.toContain('fe80::1ff:fe23:4567:890a');
+      expect(pseudoResult.stats.ipsRedacted).toBe(2);
+      expect(pseudoResult.sanitized).toMatch(/IP_[0-9a-f]{12}/);
+    });
+
+    it('should redact custom regex matches and record customMatchesRedacted stat', async () => {
+      const customLog = 'Employee EMP-1024 accessed file DOC-9871.';
+      const options: PiiScrubberAnonymizerOptions = {
+        ...DEFAULT_SCRUBBER_OPTIONS,
+        customRegexPatterns: 'EMP-\\d{4}|DOC-\\d{4}',
+      };
+
+      const result = await scrubPiiText(customLog, options);
+      expect(result.sanitized).toBe('Employee [CUSTOM_REDACTED] accessed file [CUSTOM_REDACTED].');
+      expect(result.stats.customMatchesRedacted).toBe(2);
+      expect(result.stats.totalRedactions).toBe(2);
     });
   });
 

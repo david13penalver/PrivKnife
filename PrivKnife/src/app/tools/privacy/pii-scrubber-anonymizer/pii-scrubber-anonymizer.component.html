@@ -1,0 +1,341 @@
+<div class="l-page">
+  <!-- Header -->
+  <header class="l-page__header c-header">
+    <div class="c-header__title-group">
+      <h1 class="c-header__title">PII Log &amp; CSV Scrubber &amp; Data Anonymizer</h1>
+      <p class="c-header__subtitle">
+        Sanitize Personally Identifiable Information (emails, IPv4/IPv6, phones, SSNs, credit cards, API keys)
+        from raw server logs and CSV files before feeding data to LLMs or third parties. 100% in-browser privacy.
+      </p>
+    </div>
+    <div class="c-badge c-badge--privacy">
+      🛡️ 100% In-Browser • Never Leaves Your Device
+    </div>
+  </header>
+
+  <!-- Error Alert Banner -->
+  @if (errorMessage()) {
+    <div class="c-alert c-alert--danger g--margin-bottom-4" role="alert">
+      ⚠️ {{ errorMessage() }}
+    </div>
+  }
+
+  <!-- Main Columns -->
+  <div class="l-columns l-columns--2">
+    <!-- Configuration & Input Controls -->
+    <section class="l-columns__area c-card">
+      <div class="c-card__header l-extremo">
+        <div class="l-extremo__area-izquierda">
+          <h2 class="c-card__title">Scrubber Configuration &amp; Input</h2>
+        </div>
+        <div class="l-extremo__area-derecha">
+          <button
+            type="button"
+            class="c-button c-button--outline c-button--small"
+            (click)="loadSampleData()"
+          >
+            Load Sample Log
+          </button>
+        </div>
+      </div>
+
+      <div class="c-card__body">
+        <!-- Dropzone -->
+        <div
+          class="c-dropzone g--margin-bottom-4"
+          (dragover)="$event.preventDefault()"
+          (drop)="onFileDrop($event)"
+          (click)="fileInput.click()"
+        >
+          <input
+            #fileInput
+            type="file"
+            class="c-dropzone__input"
+            accept=".txt,.log,.csv,.json"
+            (change)="onFileInputChange($event)"
+          />
+          <div class="c-dropzone__content">
+            <span class="c-dropzone__icon">📋</span>
+            <p class="c-dropzone__text">
+              @if (selectedFile()) {
+                Selected: <strong>{{ selectedFile()?.name }}</strong> ({{ formatBytes(selectedFile()?.size || 0) }})
+              } @else {
+                Drop log or CSV file here, or <strong>paste text below</strong>
+              }
+            </p>
+            <span class="c-dropzone__hint">Supports .log, .txt, .csv, .json</span>
+          </div>
+        </div>
+
+        <!-- Text Area Input -->
+        <div class="c-input g--margin-bottom-4">
+          <label class="c-input__label">Raw Content to Anonymize</label>
+          <textarea
+            class="c-scrubber-textarea"
+            placeholder="Paste server logs, error dumps, or CSV lines here..."
+            [ngModel]="inputText()"
+            (ngModelChange)="inputText.set($event)"
+          ></textarea>
+        </div>
+
+        <!-- Redaction Mode Selector -->
+        <div class="c-input g--margin-bottom-4">
+          <label class="c-input__label">Redaction Technique</label>
+          <div class="c-button-group">
+            <button
+              type="button"
+              class="c-button c-button--small"
+              [class.c-button--primary]="redactionMode() === 'replacement_tag'"
+              [class.c-button--outline]="redactionMode() !== 'replacement_tag'"
+              (click)="setRedactionMode('replacement_tag')"
+            >
+              [TAG_REDACTED]
+            </button>
+            <button
+              type="button"
+              class="c-button c-button--small"
+              [class.c-button--primary]="redactionMode() === 'mask_characters'"
+              [class.c-button--outline]="redactionMode() !== 'mask_characters'"
+              (click)="setRedactionMode('mask_characters')"
+            >
+              Mask (a***&#64;acme.corp)
+            </button>
+            <button
+              type="button"
+              class="c-button c-button--small"
+              [class.c-button--primary]="redactionMode() === 'salted_hash_pseudonym'"
+              [class.c-button--outline]="redactionMode() !== 'salted_hash_pseudonym'"
+              (click)="setRedactionMode('salted_hash_pseudonym')"
+            >
+              Salted Pseudonym
+            </button>
+          </div>
+        </div>
+
+        <!-- Salt Field (conditional) -->
+        @if (redactionMode() === 'salted_hash_pseudonym') {
+          <div class="c-input g--margin-bottom-4">
+            <label class="c-input__label" for="customSaltInput">Consistent Pseudonym Salt</label>
+            <input
+              id="customSaltInput"
+              type="text"
+              class="c-input__control"
+              placeholder="Enter salt to deterministically pseudonymize values"
+              [ngModel]="customSalt()"
+              (ngModelChange)="customSalt.set($event)"
+            />
+          </div>
+        }
+
+        <!-- Entity Toggles -->
+        <div class="c-input g--margin-bottom-4">
+          <label class="c-input__label">PII Entities to Redact</label>
+          <div class="c-entity-grid">
+            <label class="c-checkbox-label">
+              <input
+                type="checkbox"
+                class="c-checkbox-input"
+                [checked]="scrubEmails()"
+                (change)="toggleEntity('scrubEmails')"
+              />
+              <span>Emails (RFC 5322)</span>
+            </label>
+            <label class="c-checkbox-label">
+              <input
+                type="checkbox"
+                class="c-checkbox-input"
+                [checked]="scrubIpAddresses()"
+                (change)="toggleEntity('scrubIpAddresses')"
+              />
+              <span>IP Addresses (IPv4 / IPv6)</span>
+            </label>
+            <label class="c-checkbox-label">
+              <input
+                type="checkbox"
+                class="c-checkbox-input"
+                [checked]="scrubPhoneNumbers()"
+                (change)="toggleEntity('scrubPhoneNumbers')"
+              />
+              <span>Phone Numbers</span>
+            </label>
+            <label class="c-checkbox-label">
+              <input
+                type="checkbox"
+                class="c-checkbox-input"
+                [checked]="scrubCreditCards()"
+                (change)="toggleEntity('scrubCreditCards')"
+              />
+              <span>Credit Cards (Luhn Checked)</span>
+            </label>
+            <label class="c-checkbox-label">
+              <input
+                type="checkbox"
+                class="c-checkbox-input"
+                [checked]="scrubSsnNationalIds()"
+                (change)="toggleEntity('scrubSsnNationalIds')"
+              />
+              <span>SSN / National IDs</span>
+            </label>
+            <label class="c-checkbox-label">
+              <input
+                type="checkbox"
+                class="c-checkbox-input"
+                [checked]="scrubApiTokens()"
+                (change)="toggleEntity('scrubApiTokens')"
+              />
+              <span>API Tokens &amp; Bearer Keys</span>
+            </label>
+          </div>
+        </div>
+
+        <!-- Custom Regex Pattern (DEFECT-49-02) -->
+        <div class="c-input g--margin-bottom-4">
+          <label class="c-input__label" for="customRegexInput">Custom Regex Pattern (Optional)</label>
+          <input
+            id="customRegexInput"
+            type="text"
+            class="c-input__control"
+            placeholder="e.g. EMP-\\d{6}|ACC_[A-Z0-9]{8}"
+            [ngModel]="customRegexPatterns()"
+            (ngModelChange)="customRegexPatterns.set($event)"
+          />
+          <small class="g--text-small">Optional regular expression for organization-specific identifiers</small>
+        </div>
+
+        <!-- Output Format -->
+        <div class="c-input g--margin-bottom-4">
+          <label class="c-input__label">Output Export Format</label>
+          <div class="c-button-group">
+            <button
+              type="button"
+              class="c-button c-button--small"
+              [class.c-button--primary]="outputFormat() === 'txt'"
+              [class.c-button--outline]="outputFormat() !== 'txt'"
+              (click)="setOutputFormat('txt')"
+            >
+              Plain Text (.txt)
+            </button>
+            <button
+              type="button"
+              class="c-button c-button--small"
+              [class.c-button--primary]="outputFormat() === 'csv'"
+              [class.c-button--outline]="outputFormat() !== 'csv'"
+              (click)="setOutputFormat('csv')"
+            >
+              CSV (.csv)
+            </button>
+            <button
+              type="button"
+              class="c-button c-button--small"
+              [class.c-button--primary]="outputFormat() === 'json'"
+              [class.c-button--outline]="outputFormat() !== 'json'"
+              (click)="setOutputFormat('json')"
+            >
+              JSON + Audit (.json)
+            </button>
+          </div>
+        </div>
+
+        <!-- Privacy Guarantee Badge -->
+        <div class="c-privacy-notice g--margin-bottom-4">
+          <span>🔒 <strong>Zero Server Ingestion:</strong> All regex matching and cryptographic pseudonymization run exclusively in your browser memory. Zero external calls.</span>
+        </div>
+      </div>
+
+      <div class="c-card__footer l-extremo">
+        <div class="l-extremo__area-izquierda">
+          <button
+            type="button"
+            class="c-button c-button--outline"
+            (click)="resetToDefaults()"
+          >
+            Reset
+          </button>
+        </div>
+        <div class="l-extremo__area-derecha">
+          <button
+            type="button"
+            class="c-button c-button--primary"
+            [disabled]="isProcessing() || !inputText().trim()"
+            (click)="scrubData()"
+          >
+            {{ isProcessing() ? 'Scrubbing...' : 'Sanitize & Anonymize' }}
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <!-- Preview & Output Area -->
+    <section class="l-columns__area c-card">
+      <div class="c-card__header l-extremo">
+        <div class="l-extremo__area-izquierda">
+          <h2 class="c-card__title">Anonymized Output &amp; Audit</h2>
+        </div>
+        <div class="l-extremo__area-derecha">
+          @if (lastResult()) {
+            <button
+              type="button"
+              class="c-button c-button--outline c-button--small"
+              (click)="copyToClipboard()"
+            >
+              {{ copySuccess() ? '✓ Copied!' : 'Copy Sanitized' }}
+            </button>
+          }
+        </div>
+      </div>
+
+      <div class="c-card__body">
+        @if (isProcessing()) {
+          <div class="c-progress g--margin-bottom-4">
+            <div class="c-progress__bar" style="width: 100%"></div>
+            <small class="g--text-small g--margin-top-2">Scrubbing PII entities and sanitizing text...</small>
+          </div>
+        }
+
+        @if (lastResult()) {
+          <div class="c-preview">
+            <textarea
+              readonly
+              class="c-scrubber-textarea c-scrubber-textarea--output"
+              [value]="lastResult()?.sanitizedText"
+            ></textarea>
+          </div>
+
+          <!-- Audit Stats Grid -->
+          <div class="c-audit-panel g--margin-top-4">
+            <div class="c-badge c-badge--success">
+              ✓ {{ lastResult()?.auditStats?.totalRedactions }} Total Entities Redacted
+            </div>
+            <div class="c-audit-grid g--margin-top-2">
+              <div class="c-audit-chip">📧 Emails: <strong>{{ lastResult()?.auditStats?.emailsRedacted }}</strong></div>
+              <div class="c-audit-chip">🌐 IPs: <strong>{{ lastResult()?.auditStats?.ipsRedacted }}</strong></div>
+              <div class="c-audit-chip">📱 Phones: <strong>{{ lastResult()?.auditStats?.phonesRedacted }}</strong></div>
+              <div class="c-audit-chip">💳 Cards: <strong>{{ lastResult()?.auditStats?.creditCardsRedacted }}</strong></div>
+              <div class="c-audit-chip">🆔 SSNs: <strong>{{ lastResult()?.auditStats?.ssnsRedacted }}</strong></div>
+              <div class="c-audit-chip">🔑 Tokens: <strong>{{ lastResult()?.auditStats?.apiTokensRedacted }}</strong></div>
+              <div class="c-audit-chip">🧩 Custom: <strong>{{ lastResult()?.auditStats?.customMatchesRedacted }}</strong></div>
+            </div>
+          </div>
+        } @else {
+          <div class="c-preview__empty">
+            <span>No text sanitized yet</span>
+            <small>Enter logs or drop a file to inspect anonymized output</small>
+          </div>
+        }
+      </div>
+
+      <div class="c-card__footer l-extremo">
+        <div class="l-extremo__area-derecha">
+          <button
+            type="button"
+            class="c-button c-button--primary"
+            [disabled]="!lastResult()"
+            (click)="downloadDeliverable()"
+          >
+            Download {{ outputFormat().toUpperCase() }} Deliverable
+          </button>
+        </div>
+      </div>
+    </section>
+  </div>
+</div>

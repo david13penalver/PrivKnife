@@ -37,6 +37,17 @@ export function validateScrubberOptions(
     };
   }
 
+  if (options.customRegexPatterns && options.customRegexPatterns.trim().length > 0) {
+    try {
+      new RegExp(options.customRegexPatterns);
+    } catch (err) {
+      return {
+        valid: false,
+        error: `Invalid custom regex pattern: ${err instanceof Error ? err.message : String(err)}`,
+      };
+    }
+  }
+
   return { valid: true };
 }
 
@@ -64,11 +75,25 @@ export function luhnCheck(digits: string): boolean {
 }
 
 // -------------------------------------------------------------
-// 3. Fast Pseudo-Hash for Pseudonymization
+// 3. Web Crypto Salted Pseudonymization (SHA-256)
 // -------------------------------------------------------------
-function computePseudonym(prefix: string, value: string, salt: string): string {
+export async function computePseudonym(
+  prefix: string,
+  value: string,
+  salt: string
+): Promise<string> {
+  const combined = `${salt}:${value}`;
+  if (typeof globalThis.crypto !== 'undefined' && globalThis.crypto.subtle) {
+    const encoder = new TextEncoder();
+    const data = encoder.encode(combined);
+    const hashBuffer = await globalThis.crypto.subtle.digest('SHA-256', data);
+    const hashArray = Array.from(new Uint8Array(hashBuffer));
+    const hex = hashArray.map((b) => b.toString(16).padStart(2, '0')).join('').slice(0, 12);
+    return `${prefix}_${hex}`;
+  }
+
+  // Deterministic FNV-1a fallback if Web Crypto is unavailable
   let hash = 0x811c9dc5;
-  const combined = salt + ':' + value;
   for (let i = 0; i < combined.length; i++) {
     hash ^= combined.charCodeAt(i);
     hash +=
@@ -76,6 +101,42 @@ function computePseudonym(prefix: string, value: string, salt: string): string {
   }
   const hex = (hash >>> 0).toString(16).padStart(8, '0');
   return `${prefix}_${hex}`;
+}
+
+async function replaceMatches(
+  text: string,
+  regex: RegExp,
+  replacer: (match: string) => Promise<string | null> | (string | null)
+): Promise<{ text: string; count: number }> {
+  const re = new RegExp(regex.source, regex.flags.includes('g') ? regex.flags : regex.flags + 'g');
+  const matches: { match: string; index: number; length: number }[] = [];
+  let m: RegExpExecArray | null;
+  while ((m = re.exec(text)) !== null) {
+    matches.push({ match: m[0], index: m.index, length: m[0].length });
+  }
+  if (matches.length === 0) {
+    return { text, count: 0 };
+  }
+  const unique = Array.from(new Set(matches.map((x) => x.match)));
+  const replacementMap = new Map<string, string | null>();
+  for (const item of unique) {
+    replacementMap.set(item, await replacer(item));
+  }
+  let result = '';
+  let lastIndex = 0;
+  let count = 0;
+  for (const item of matches) {
+    const rep = replacementMap.get(item.match);
+    if (rep !== null && rep !== undefined) {
+      result += text.slice(lastIndex, item.index) + rep;
+      count++;
+    } else {
+      result += text.slice(lastIndex, item.index) + item.match;
+    }
+    lastIndex = item.index + item.length;
+  }
+  result += text.slice(lastIndex);
+  return { text: result, count };
 }
 
 // -------------------------------------------------------------
@@ -105,52 +166,53 @@ export async function scrubPiiText(
   if (options.scrubApiTokens) {
     const tokenRegex =
       /\b(?:sk_live_|ghp_|eyJhbGciOi|AIzaSy|Bearer\s+)[A-Za-z0-9_.-]{16,}\b/g;
-    sanitized = sanitized.replace(tokenRegex, (match) => {
-      stats.apiTokensRedacted++;
-      stats.totalRedactions++;
+    const { text: resText, count } = await replaceMatches(sanitized, tokenRegex, async (match) => {
       if (mode === 'replacement_tag') return '[API_KEY_REDACTED]';
       if (mode === 'mask_characters')
         return match.slice(0, 8) + '***' + match.slice(-4);
-      return computePseudonym('TOKEN', match, salt);
+      return await computePseudonym('TOKEN', match, salt);
     });
+    sanitized = resText;
+    stats.apiTokensRedacted += count;
+    stats.totalRedactions += count;
   }
 
   // 2. Credit Cards (with Luhn verification)
   if (options.scrubCreditCards) {
     const cardRegex = /\b(?:\d[ -]*?){13,19}\b/g;
-    sanitized = sanitized.replace(cardRegex, (match) => {
+    const { text: resText, count } = await replaceMatches(sanitized, cardRegex, async (match) => {
       const cleanDigits = match.replace(/\D/g, '');
       if (cleanDigits.length >= 13 && cleanDigits.length <= 19 && luhnCheck(cleanDigits)) {
-        stats.creditCardsRedacted++;
-        stats.totalRedactions++;
         if (mode === 'replacement_tag') return '[CARD_REDACTED]';
         if (mode === 'mask_characters') {
           return '************' + cleanDigits.slice(-4);
         }
-        return computePseudonym('CARD', cleanDigits, salt);
+        return await computePseudonym('CARD', cleanDigits, salt);
       }
-      return match;
+      return null;
     });
+    sanitized = resText;
+    stats.creditCardsRedacted += count;
+    stats.totalRedactions += count;
   }
 
   // 3. Social Security Numbers (US SSN: 000-00-0000)
   if (options.scrubSsnNationalIds) {
     const ssnRegex = /\b\d{3}-\d{2}-\d{4}\b/g;
-    sanitized = sanitized.replace(ssnRegex, (match) => {
-      stats.ssnsRedacted++;
-      stats.totalRedactions++;
+    const { text: resText, count } = await replaceMatches(sanitized, ssnRegex, async (match) => {
       if (mode === 'replacement_tag') return '[SSN_REDACTED]';
       if (mode === 'mask_characters') return '***-**-' + match.slice(-4);
-      return computePseudonym('SSN', match, salt);
+      return await computePseudonym('SSN', match, salt);
     });
+    sanitized = resText;
+    stats.ssnsRedacted += count;
+    stats.totalRedactions += count;
   }
 
   // 4. Emails
   if (options.scrubEmails) {
     const emailRegex = /\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}\b/g;
-    sanitized = sanitized.replace(emailRegex, (match) => {
-      stats.emailsRedacted++;
-      stats.totalRedactions++;
+    const { text: resText, count } = await replaceMatches(sanitized, emailRegex, async (match) => {
       if (mode === 'replacement_tag') return '[EMAIL_REDACTED]';
       if (mode === 'mask_characters') {
         const [user, domain] = match.split('@');
@@ -160,52 +222,75 @@ export async function scrubPiiText(
             : '***';
         return `${maskedUser}@${domain}`;
       }
-      return computePseudonym('USER', match, salt);
+      return await computePseudonym('USER', match, salt);
     });
+    sanitized = resText;
+    stats.emailsRedacted += count;
+    stats.totalRedactions += count;
   }
 
   // 5. Phone Numbers
   if (options.scrubPhoneNumbers) {
     const phoneRegex =
       /(?:\+?\d{1,3}[-.\s]?)?\(?\d{3}\)?[-.\s]?\d{3}[-.\s]?\d{4}\b/g;
-    sanitized = sanitized.replace(phoneRegex, (match) => {
-      stats.phonesRedacted++;
-      stats.totalRedactions++;
+    const { text: resText, count } = await replaceMatches(sanitized, phoneRegex, async (match) => {
       if (mode === 'replacement_tag') return '[PHONE_REDACTED]';
       if (mode === 'mask_characters') {
         return match.replace(/\d(?=.*\d{4})/g, '*');
       }
-      return computePseudonym('PHONE', match, salt);
+      return await computePseudonym('PHONE', match, salt);
     });
+    sanitized = resText;
+    stats.phonesRedacted += count;
+    stats.totalRedactions += count;
   }
 
   // 6. IP Addresses (IPv4 and IPv6)
   if (options.scrubIpAddresses) {
+    // 6a. IPv6 Addresses (RFC 4291 compliant full and compressed)
+    const ipv6Regex =
+      /\b(?:[0-9a-fA-F]{1,4}:){7}[0-9a-fA-F]{1,4}\b|\b(?:[0-9a-fA-F]{1,4}:)+:(?:[0-9a-fA-F]{1,4}:)*[0-9a-fA-F]{1,4}\b|\b(?:[0-9a-fA-F]{1,4}:){1,7}:\b|\b::(?:[0-9a-fA-F]{1,4}:)*[0-9a-fA-F]{1,4}\b/gi;
+    const { text: textAfterIpv6, count: ipv6Count } = await replaceMatches(sanitized, ipv6Regex, async (match) => {
+      if (mode === 'replacement_tag') return '[IP_REDACTED]';
+      if (mode === 'mask_characters') {
+        const parts = match.split(':');
+        const visible = parts.slice(0, 2).filter((p) => p.length > 0).join(':');
+        return `${visible || '****'}:****:****`;
+      }
+      return await computePseudonym('IP', match, salt);
+    });
+    sanitized = textAfterIpv6;
+    stats.ipsRedacted += ipv6Count;
+    stats.totalRedactions += ipv6Count;
+
+    // 6b. IPv4 Addresses
     const ipv4Regex =
       /\b(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\b/g;
-    sanitized = sanitized.replace(ipv4Regex, (match) => {
-      stats.ipsRedacted++;
-      stats.totalRedactions++;
+    const { text: textAfterIpv4, count: ipv4Count } = await replaceMatches(sanitized, ipv4Regex, async (match) => {
       if (mode === 'replacement_tag') return '[IP_REDACTED]';
       if (mode === 'mask_characters') {
         const parts = match.split('.');
         return `${parts[0]}.${parts[1]}.*.*`;
       }
-      return computePseudonym('IP', match, salt);
+      return await computePseudonym('IP', match, salt);
     });
+    sanitized = textAfterIpv4;
+    stats.ipsRedacted += ipv4Count;
+    stats.totalRedactions += ipv4Count;
   }
 
   // 7. Custom Regex Patterns
   if (options.customRegexPatterns && options.customRegexPatterns.trim().length > 0) {
     try {
       const customRegex = new RegExp(options.customRegexPatterns, 'g');
-      sanitized = sanitized.replace(customRegex, (match) => {
-        stats.customMatchesRedacted++;
-        stats.totalRedactions++;
+      const { text: resText, count } = await replaceMatches(sanitized, customRegex, async (match) => {
         if (mode === 'replacement_tag') return '[CUSTOM_REDACTED]';
         if (mode === 'mask_characters') return '*'.repeat(match.length);
-        return computePseudonym('CUSTOM', match, salt);
+        return await computePseudonym('CUSTOM', match, salt);
       });
+      sanitized = resText;
+      stats.customMatchesRedacted += count;
+      stats.totalRedactions += count;
     } catch {
       // Ignore invalid regex
     }

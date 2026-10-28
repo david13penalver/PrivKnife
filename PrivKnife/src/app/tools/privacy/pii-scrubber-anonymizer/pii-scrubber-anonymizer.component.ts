@@ -5,6 +5,8 @@ import {
   OutputFormat,
   PiiScrubberAnonymizerOptions,
   PiiScrubberAnonymizerResult,
+  PiiScrubberWorkerRequest,
+  PiiScrubberWorkerResponse,
   RedactionMode,
 } from './types';
 import { processPiiScrub } from './engine';
@@ -14,405 +16,8 @@ import { SAMPLE_SERVER_LOG } from './test-fixtures';
   selector: 'app-pii-scrubber-anonymizer',
   standalone: true,
   imports: [CommonModule, FormsModule],
-  template: `
-    <div class="l-page">
-      <!-- Header -->
-      <header class="l-page__header c-header">
-        <div class="c-header__title-group">
-          <h1 class="c-header__title">PII Log & CSV Scrubber & Data Anonymizer</h1>
-          <p class="c-header__subtitle">
-            Sanitize Personally Identifiable Information (emails, IPs, phones, SSNs, credit cards, API keys)
-            from raw server logs and CSV files before feeding data to LLMs or third parties. 100% in-browser privacy.
-          </p>
-        </div>
-        <div class="c-badge c-badge--privacy">
-          🛡️ 100% In-Browser • Never Leaves Your Device
-        </div>
-      </header>
-
-      <!-- Main Columns -->
-      <div class="l-columns l-columns--2">
-        <!-- Configuration & Input Controls -->
-        <section class="l-columns__area c-card">
-          <div class="c-card__header l-extremo">
-            <div class="l-extremo__area-izquierda">
-              <h2 class="c-card__title">Scrubber Configuration & Input</h2>
-            </div>
-            <div class="l-extremo__area-derecha">
-              <button
-                type="button"
-                class="c-button c-button--outline c-button--small"
-                (click)="loadSampleData()"
-              >
-                Load Sample Log
-              </button>
-            </div>
-          </div>
-
-          <div class="c-card__body">
-            <!-- Dropzone -->
-            <div
-              class="c-dropzone g--margin-bottom-4"
-              (dragover)="$event.preventDefault()"
-              (drop)="onFileDrop($event)"
-              (click)="fileInput.click()"
-            >
-              <input
-                #fileInput
-                type="file"
-                class="c-dropzone__input"
-                accept=".txt,.log,.csv,.json"
-                (change)="onFileInputChange($event)"
-              />
-              <div class="c-dropzone__content">
-                <span class="c-dropzone__icon">📋</span>
-                <p class="c-dropzone__text">
-                  @if (selectedFile()) {
-                    Selected: <strong>{{ selectedFile()?.name }}</strong> ({{ formatBytes(selectedFile()?.size || 0) }})
-                  } @else {
-                    Drop log or CSV file here, or <strong>paste text below</strong>
-                  }
-                </p>
-                <span class="c-dropzone__hint">Supports .log, .txt, .csv, .json</span>
-              </div>
-            </div>
-
-            <!-- Text Area Input -->
-            <div class="c-input g--margin-bottom-4">
-              <label class="c-input__label">Raw Content to Anonymize</label>
-              <textarea
-                class="c-scrubber-textarea"
-                placeholder="Paste server logs, error dumps, or CSV lines here..."
-                [ngModel]="inputText()"
-                (ngModelChange)="inputText.set($event)"
-              ></textarea>
-            </div>
-
-            <!-- Redaction Mode Selector -->
-            <div class="c-input g--margin-bottom-4">
-              <label class="c-input__label">Redaction Technique</label>
-              <div class="c-button-group">
-                <button
-                  type="button"
-                  class="c-button c-button--small"
-                  [class.c-button--primary]="redactionMode() === 'replacement_tag'"
-                  [class.c-button--outline]="redactionMode() !== 'replacement_tag'"
-                  (click)="setRedactionMode('replacement_tag')"
-                >
-                  [TAG_REDACTED]
-                </button>
-                <button
-                  type="button"
-                  class="c-button c-button--small"
-                  [class.c-button--primary]="redactionMode() === 'mask_characters'"
-                  [class.c-button--outline]="redactionMode() !== 'mask_characters'"
-                  (click)="setRedactionMode('mask_characters')"
-                >
-                  Mask (a***&#64;acme.corp)
-                </button>
-                <button
-                  type="button"
-                  class="c-button c-button--small"
-                  [class.c-button--primary]="redactionMode() === 'salted_hash_pseudonym'"
-                  [class.c-button--outline]="redactionMode() !== 'salted_hash_pseudonym'"
-                  (click)="setRedactionMode('salted_hash_pseudonym')"
-                >
-                  Salted Pseudonym
-                </button>
-              </div>
-            </div>
-
-            <!-- Salt Field (conditional) -->
-            @if (redactionMode() === 'salted_hash_pseudonym') {
-              <div class="c-input g--margin-bottom-4">
-                <label class="c-input__label">Consistent Pseudonym Salt</label>
-                <input
-                  type="text"
-                  class="c-input__text"
-                  placeholder="Enter salt to deterministically pseudonymize values"
-                  [ngModel]="customSalt()"
-                  (ngModelChange)="customSalt.set($event)"
-                />
-              </div>
-            }
-
-            <!-- Entity Toggles -->
-            <div class="c-input g--margin-bottom-4">
-              <label class="c-input__label">PII Entities to Redact</label>
-              <div class="c-entity-grid">
-                <label class="c-checkbox-label">
-                  <input
-                    type="checkbox"
-                    [checked]="scrubEmails()"
-                    (change)="toggleEntity('scrubEmails')"
-                  />
-                  <span>Emails (RFC 5322)</span>
-                </label>
-                <label class="c-checkbox-label">
-                  <input
-                    type="checkbox"
-                    [checked]="scrubIpAddresses()"
-                    (change)="toggleEntity('scrubIpAddresses')"
-                  />
-                  <span>IP Addresses (IPv4 / IPv6)</span>
-                </label>
-                <label class="c-checkbox-label">
-                  <input
-                    type="checkbox"
-                    [checked]="scrubPhoneNumbers()"
-                    (change)="toggleEntity('scrubPhoneNumbers')"
-                  />
-                  <span>Phone Numbers</span>
-                </label>
-                <label class="c-checkbox-label">
-                  <input
-                    type="checkbox"
-                    [checked]="scrubCreditCards()"
-                    (change)="toggleEntity('scrubCreditCards')"
-                  />
-                  <span>Credit Cards (Luhn Checked)</span>
-                </label>
-                <label class="c-checkbox-label">
-                  <input
-                    type="checkbox"
-                    [checked]="scrubSsnNationalIds()"
-                    (change)="toggleEntity('scrubSsnNationalIds')"
-                  />
-                  <span>SSN / National IDs</span>
-                </label>
-                <label class="c-checkbox-label">
-                  <input
-                    type="checkbox"
-                    [checked]="scrubApiTokens()"
-                    (change)="toggleEntity('scrubApiTokens')"
-                  />
-                  <span>API Tokens & Bearer Keys</span>
-                </label>
-              </div>
-            </div>
-
-            <!-- Output Format -->
-            <div class="c-input g--margin-bottom-4">
-              <label class="c-input__label">Output Export Format</label>
-              <div class="c-button-group">
-                <button
-                  type="button"
-                  class="c-button c-button--small"
-                  [class.c-button--primary]="outputFormat() === 'txt'"
-                  [class.c-button--outline]="outputFormat() !== 'txt'"
-                  (click)="setOutputFormat('txt')"
-                >
-                  Plain Text (.txt)
-                </button>
-                <button
-                  type="button"
-                  class="c-button c-button--small"
-                  [class.c-button--primary]="outputFormat() === 'csv'"
-                  [class.c-button--outline]="outputFormat() !== 'csv'"
-                  (click)="setOutputFormat('csv')"
-                >
-                  CSV (.csv)
-                </button>
-                <button
-                  type="button"
-                  class="c-button c-button--small"
-                  [class.c-button--primary]="outputFormat() === 'json'"
-                  [class.c-button--outline]="outputFormat() !== 'json'"
-                  (click)="setOutputFormat('json')"
-                >
-                  JSON + Audit (.json)
-                </button>
-              </div>
-            </div>
-
-            <!-- Privacy Guarantee Badge -->
-            <div class="c-privacy-notice g--margin-bottom-4">
-              <span>🔒 <strong>Zero Server Ingestion:</strong> All regex matching and cryptographic pseudonymization run exclusively in your browser memory. Zero external calls.</span>
-            </div>
-          </div>
-
-          <div class="c-card__footer l-extremo">
-            <div class="l-extremo__area-izquierda">
-              <button
-                type="button"
-                class="c-button c-button--outline"
-                (click)="resetToDefaults()"
-              >
-                Reset
-              </button>
-            </div>
-            <div class="l-extremo__area-derecha">
-              <button
-                type="button"
-                class="c-button c-button--primary"
-                [disabled]="isProcessing() || !inputText().trim()"
-                (click)="scrubData()"
-              >
-                {{ isProcessing() ? 'Scrubbing...' : 'Sanitize & Anonymize' }}
-              </button>
-            </div>
-          </div>
-        </section>
-
-        <!-- Preview & Output Area -->
-        <section class="l-columns__area c-card">
-          <div class="c-card__header l-extremo">
-            <div class="l-extremo__area-izquierda">
-              <h2 class="c-card__title">Anonymized Output & Audit</h2>
-            </div>
-            <div class="l-extremo__area-derecha">
-              @if (lastResult()) {
-                <button
-                  type="button"
-                  class="c-button c-button--outline c-button--small"
-                  (click)="copyToClipboard()"
-                >
-                  {{ copySuccess() ? '✓ Copied!' : 'Copy Sanitized' }}
-                </button>
-              }
-            </div>
-          </div>
-
-          <div class="c-card__body">
-            @if (isProcessing()) {
-              <div class="c-progress g--margin-bottom-4">
-                <div class="c-progress__bar" style="width: 100%"></div>
-                <small class="g--text-small g--margin-top-2">Scrubbing PII entities and sanitizing text...</small>
-              </div>
-            }
-
-            @if (lastResult()) {
-              <div class="c-preview">
-                <textarea
-                  readonly
-                  class="c-scrubber-textarea c-scrubber-textarea--output"
-                  [value]="lastResult()?.sanitizedText"
-                ></textarea>
-              </div>
-
-              <!-- Audit Stats Grid -->
-              <div class="c-audit-panel g--margin-top-4">
-                <div class="c-badge c-badge--success">
-                  ✓ {{ lastResult()?.auditStats?.totalRedactions }} Total Entities Redacted
-                </div>
-                <div class="c-audit-grid g--margin-top-2">
-                  <div class="c-audit-chip">📧 Emails: <strong>{{ lastResult()?.auditStats?.emailsRedacted }}</strong></div>
-                  <div class="c-audit-chip">🌐 IPs: <strong>{{ lastResult()?.auditStats?.ipsRedacted }}</strong></div>
-                  <div class="c-audit-chip">📱 Phones: <strong>{{ lastResult()?.auditStats?.phonesRedacted }}</strong></div>
-                  <div class="c-audit-chip">💳 Cards: <strong>{{ lastResult()?.auditStats?.creditCardsRedacted }}</strong></div>
-                  <div class="c-audit-chip">🆔 SSNs: <strong>{{ lastResult()?.auditStats?.ssnsRedacted }}</strong></div>
-                  <div class="c-audit-chip">🔑 Tokens: <strong>{{ lastResult()?.auditStats?.apiTokensRedacted }}</strong></div>
-                </div>
-              </div>
-            } @else {
-              <div class="c-preview__empty">
-                <span>No text sanitized yet</span>
-                <small>Enter logs or drop a file to inspect anonymized output</small>
-              </div>
-            }
-          </div>
-
-          <div class="c-card__footer l-extremo">
-            <div class="l-extremo__area-derecha">
-              <button
-                type="button"
-                class="c-button c-button--primary"
-                [disabled]="!lastResult()"
-                (click)="downloadDeliverable()"
-              >
-                Download {{ outputFormat().toUpperCase() }} Deliverable
-              </button>
-            </div>
-          </div>
-        </section>
-      </div>
-    </div>
-  `,
-  styles: [`
-    .c-button-group {
-      display: flex;
-      gap: 0.5rem;
-      flex-wrap: wrap;
-    }
-    .c-scrubber-textarea {
-      width: 100%;
-      min-height: 180px;
-      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
-      font-size: 0.85rem;
-      line-height: 1.5;
-      padding: 0.75rem;
-      border: 1px solid #cbd5e1;
-      border-radius: 6px;
-      background: #f8fafc;
-      color: #0f172a;
-      resize: vertical;
-    }
-    .c-scrubber-textarea--output {
-      min-height: 280px;
-    }
-    .c-input__text {
-      width: 100%;
-      padding: 0.5rem 0.75rem;
-      border: 1px solid #cbd5e1;
-      border-radius: 4px;
-      font-size: 0.875rem;
-    }
-    .c-entity-grid {
-      display: grid;
-      grid-template-columns: repeat(2, 1fr);
-      gap: 0.5rem;
-    }
-    .c-checkbox-label {
-      display: flex;
-      align-items: center;
-      gap: 0.5rem;
-      font-size: 0.85rem;
-      color: #334155;
-      cursor: pointer;
-    }
-    .c-privacy-notice {
-      padding: 0.75rem;
-      background: rgba(16, 185, 129, 0.08);
-      border: 1px solid rgba(16, 185, 129, 0.3);
-      border-radius: 4px;
-      font-size: 0.85rem;
-      color: #065f46;
-    }
-    .c-audit-panel {
-      padding: 0.75rem;
-      background: #f8fafc;
-      border: 1px solid #e2e8f0;
-      border-radius: 6px;
-    }
-    .c-audit-grid {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 0.5rem;
-    }
-    .c-audit-chip {
-      padding: 0.25rem 0.5rem;
-      background: #fff;
-      border: 1px solid #cbd5e1;
-      border-radius: 4px;
-      font-size: 0.75rem;
-      color: #475569;
-    }
-    .c-preview__empty {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      min-height: 280px;
-      background: #f8fafc;
-      border: 2px dashed #cbd5e1;
-      border-radius: 8px;
-      color: #94a3b8;
-    }
-    .g--text-small {
-      font-size: 0.85rem;
-      color: #64748b;
-    }
-  `],
+  templateUrl: './pii-scrubber-anonymizer.component.html',
+  styleUrl: './pii-scrubber-anonymizer.component.scss',
 })
 export class PiiScrubberAnonymizerComponent implements OnDestroy {
   // Signals
@@ -432,11 +37,15 @@ export class PiiScrubberAnonymizerComponent implements OnDestroy {
   readonly selectedFile = signal<{ name: string; size: number } | null>(null);
   readonly lastResult = signal<PiiScrubberAnonymizerResult | null>(null);
   readonly copySuccess = signal<boolean>(false);
+  readonly errorMessage = signal<string | null>(null);
 
   private createdBlobUrls: string[] = [];
+  private activeWorker: Worker | null = null;
+  private workerRequestId = 0;
 
   ngOnDestroy(): void {
     this.cleanUpUrls();
+    this.terminateWorker();
   }
 
   setRedactionMode(mode: RedactionMode): void {
@@ -484,8 +93,6 @@ export class PiiScrubberAnonymizerComponent implements OnDestroy {
 
   async handleFileSelected(file: File): Promise<void> {
     const text = await file.text();
-    const previewUrl = URL.createObjectURL(file);
-    this.createdBlobUrls.push(previewUrl);
 
     this.selectedFile.set({
       name: file.name,
@@ -521,26 +128,89 @@ export class PiiScrubberAnonymizerComponent implements OnDestroy {
     if (!text.trim()) return;
 
     this.isProcessing.set(true);
+    this.errorMessage.set(null);
+
+    const options: PiiScrubberAnonymizerOptions = {
+      scrubEmails: this.scrubEmails(),
+      scrubPhoneNumbers: this.scrubPhoneNumbers(),
+      scrubIpAddresses: this.scrubIpAddresses(),
+      scrubCreditCards: this.scrubCreditCards(),
+      scrubSsnNationalIds: this.scrubSsnNationalIds(),
+      scrubApiTokens: this.scrubApiTokens(),
+      redactionMode: this.redactionMode(),
+      customSalt: this.customSalt(),
+      customRegexPatterns: this.customRegexPatterns(),
+      outputFormat: this.outputFormat(),
+    };
+
+    const originalName = this.selectedFile()?.name || 'sanitized-log.txt';
 
     try {
-      const options: PiiScrubberAnonymizerOptions = {
-        scrubEmails: this.scrubEmails(),
-        scrubPhoneNumbers: this.scrubPhoneNumbers(),
-        scrubIpAddresses: this.scrubIpAddresses(),
-        scrubCreditCards: this.scrubCreditCards(),
-        scrubSsnNationalIds: this.scrubSsnNationalIds(),
-        scrubApiTokens: this.scrubApiTokens(),
-        redactionMode: this.redactionMode(),
-        customSalt: this.customSalt(),
-        customRegexPatterns: this.customRegexPatterns(),
-        outputFormat: this.outputFormat(),
-      };
-
-      const originalName = this.selectedFile()?.name || 'sanitized-log.txt';
-      const result = await processPiiScrub(text, options, originalName);
-      this.lastResult.set(result);
+      if (typeof Worker !== 'undefined') {
+        const result = await this.scrubWithWorker(text, options, originalName);
+        this.lastResult.set(result);
+      } else {
+        const result = await processPiiScrub(text, options, originalName);
+        this.lastResult.set(result);
+      }
+    } catch (err) {
+      this.errorMessage.set(err instanceof Error ? err.message : String(err));
     } finally {
       this.isProcessing.set(false);
+    }
+  }
+
+  private scrubWithWorker(
+    text: string,
+    options: PiiScrubberAnonymizerOptions,
+    originalFileName: string
+  ): Promise<PiiScrubberAnonymizerResult> {
+    return new Promise((resolve, reject) => {
+      try {
+        this.terminateWorker();
+        this.activeWorker = new Worker(new URL('./worker.ts', import.meta.url), {
+          type: 'module',
+        });
+
+        const id = ++this.workerRequestId;
+
+        this.activeWorker.onmessage = (event: MessageEvent<PiiScrubberWorkerResponse>) => {
+          const data = event.data;
+          if (data.id !== id) return;
+
+          if (data.type === 'result') {
+            resolve(data.result);
+            this.terminateWorker();
+          } else if (data.type === 'error') {
+            reject(new Error(data.error));
+            this.terminateWorker();
+          }
+        };
+
+        this.activeWorker.onerror = (err) => {
+          reject(new Error(err.message || 'Worker processing error'));
+          this.terminateWorker();
+        };
+
+        const request: PiiScrubberWorkerRequest = {
+          id,
+          text,
+          options,
+          originalFileName,
+        };
+
+        this.activeWorker.postMessage(request);
+      } catch (err) {
+        // Fallback to direct synchronous execution if worker instantiation fails (e.g., test environment)
+        processPiiScrub(text, options, originalFileName).then(resolve, reject);
+      }
+    });
+  }
+
+  private terminateWorker(): void {
+    if (this.activeWorker) {
+      this.activeWorker.terminate();
+      this.activeWorker = null;
     }
   }
 
@@ -580,6 +250,7 @@ export class PiiScrubberAnonymizerComponent implements OnDestroy {
 
   resetToDefaults(): void {
     this.cleanUpUrls();
+    this.terminateWorker();
     this.inputText.set('');
     this.scrubEmails.set(true);
     this.scrubPhoneNumbers.set(true);
@@ -594,6 +265,7 @@ export class PiiScrubberAnonymizerComponent implements OnDestroy {
     this.selectedFile.set(null);
     this.lastResult.set(null);
     this.copySuccess.set(false);
+    this.errorMessage.set(null);
   }
 
   formatBytes(bytes: number): string {
