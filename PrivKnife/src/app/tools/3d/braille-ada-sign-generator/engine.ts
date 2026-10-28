@@ -352,8 +352,8 @@ function createTextGeometry(
 
         const dx = x2 - x1;
         const dy = y2 - y1;
-        const len = Math.sqrt(dx * dy + dx * dx);
-        if (len < 0.001) continue;
+        const len = Math.hypot(dx, dy);
+        if (!Number.isFinite(len) || len < 0.001) continue;
 
         const angle = Math.atan2(dy, dx);
         const halfThick = strokeWidthMm / 2;

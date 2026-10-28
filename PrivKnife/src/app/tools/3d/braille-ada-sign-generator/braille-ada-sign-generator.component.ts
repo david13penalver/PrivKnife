@@ -15,6 +15,8 @@ import { Card } from '../../../components';
 
 import {
   BrailleAdaSignGeneratorOptions,
+  BrailleAdaSignWorkerRequest,
+  BrailleAdaSignWorkerResponse,
   BrailleStandard,
   SignExportFormat,
   SignMetrics,
@@ -106,7 +108,7 @@ import {
                   type="text"
                   class="c-input"
                   [ngModel]="subText()"
-                  (ngModelChange)="subText.set($event)"
+                  (ngModelChange)="onSubTextChange($event)"
                   placeholder="e.g. ALL GENDER, PRIVATE, ROOM 102"
                   maxlength="40"
                 />
@@ -217,29 +219,29 @@ import {
             <div class="c-card__body">
               <div class="grid-2-col">
                 <div class="control-group">
-                  <label class="c-input__label" for="plaqueWidth">Width (mm): {{ plaqueWidthMm() }} mm</label>
+                  <label class="c-input__label" for="plaqueWidth">Width: {{ plaqueWidthMm() }} mm</label>
                   <input
                     id="plaqueWidth"
                     type="range"
-                    class="c-input c-input--range"
+                    class="c-input c-input__slider"
                     min="100"
                     max="300"
                     step="2"
                     [ngModel]="plaqueWidthMm()"
-                    (ngModelChange)="plaqueWidthMm.set($event)"
+                    (ngModelChange)="onPlaqueWidthChange($event)"
                   />
                 </div>
                 <div class="control-group">
-                  <label class="c-input__label" for="plaqueHeight">Height (mm): {{ plaqueHeightMm() }} mm</label>
+                  <label class="c-input__label" for="plaqueHeight">Height: {{ plaqueHeightMm() }} mm</label>
                   <input
                     id="plaqueHeight"
                     type="range"
-                    class="c-input c-input--range"
+                    class="c-input c-input__slider"
                     min="100"
                     max="300"
                     step="2"
                     [ngModel]="plaqueHeightMm()"
-                    (ngModelChange)="plaqueHeightMm.set($event)"
+                    (ngModelChange)="onPlaqueHeightChange($event)"
                   />
                 </div>
               </div>
@@ -250,12 +252,12 @@ import {
                   <input
                     id="plaqueThickness"
                     type="range"
-                    class="c-input c-input--range"
+                    class="c-input c-input__slider"
                     min="2"
                     max="8"
                     step="0.5"
                     [ngModel]="plaqueThicknessMm()"
-                    (ngModelChange)="plaqueThicknessMm.set($event)"
+                    (ngModelChange)="onPlaqueThicknessChange($event)"
                   />
                 </div>
                 <div class="control-group">
@@ -263,12 +265,12 @@ import {
                   <input
                     id="tactileRaise"
                     type="range"
-                    class="c-input c-input--range"
+                    class="c-input c-input__slider"
                     min="0.6"
                     max="2.0"
                     step="0.1"
                     [ngModel]="tactileRaiseMm()"
-                    (ngModelChange)="tactileRaiseMm.set($event)"
+                    (ngModelChange)="onTactileRaiseChange($event)"
                   />
                   <span class="input-hint">ADA standard: 0.8mm (1/32").</span>
                 </div>
@@ -280,22 +282,23 @@ import {
                   <input
                     id="cornerRadius"
                     type="range"
-                    class="c-input c-input--range"
+                    class="c-input c-input__slider"
                     min="0"
                     max="20"
                     step="1"
                     [ngModel]="cornerRadiusMm()"
-                    (ngModelChange)="cornerRadiusMm.set($event)"
+                    (ngModelChange)="onCornerRadiusChange($event)"
                   />
                 </div>
                 <div class="control-group">
                   <label class="c-input__label">Frame Border Ring</label>
-                  <div class="toggle-row">
+                  <div class="toggle-row" (click)="onToggleFrameBorder()">
                     <input
                       type="checkbox"
                       id="includeFrameBorder"
                       [checked]="includeFrameBorder()"
-                      (change)="includeFrameBorder.set(!includeFrameBorder())"
+                      (click)="$event.stopPropagation()"
+                      (change)="onToggleFrameBorder()"
                     />
                     <label for="includeFrameBorder">Raised border frame (3mm)</label>
                   </div>
@@ -304,12 +307,13 @@ import {
 
               <!-- Mounting Holes -->
               <div class="control-group">
-                <div class="toggle-row">
+                <div class="toggle-row" (click)="onToggleMountHoles()">
                   <input
                     type="checkbox"
                     id="mountHoles"
                     [checked]="mountHoles()"
-                    (change)="mountHoles.set(!mountHoles())"
+                    (click)="$event.stopPropagation()"
+                    (change)="onToggleMountHoles()"
                   />
                   <label for="mountHoles">4 Corner Screw Mounting Holes (Ø {{ mountHoleDiameterMm() }} mm)</label>
                 </div>
@@ -355,7 +359,7 @@ import {
                 >
                   🎯 Reset Camera
                 </button>
-                <span class="drag-hint">🖱️ Left-drag to rotate • Scroll to zoom</span>
+                <span class="drag-hint">🖱️ Left-drag or touch to rotate • Scroll to zoom</span>
               </div>
 
               <!-- Production & Regulatory Metrics -->
@@ -392,25 +396,25 @@ import {
 
               <!-- Export Buttons -->
               <div class="export-actions g--margin-top-4">
-                <div class="export-buttons-grid">
+                <div class="export-btn-group">
                   <button
                     type="button"
-                    class="c-button c-button--primary c-button--block"
+                    class="c-button c-button--primary download-btn-3mf"
                     [disabled]="isGenerating()"
                     (click)="downloadFormat('3mf_multicolor')"
                   >
-                    📥 Download Multi-Color 3MF (Recommended)
+                    📥 Download Multi-Color 3MF
                   </button>
                   <button
                     type="button"
-                    class="c-button c-button--outline c-button--block"
+                    class="c-button c-button--outline download-btn-stl"
                     [disabled]="isGenerating()"
                     (click)="downloadFormat('stl_unified')"
                   >
-                    📦 Download Unified STL (Single Extruder)
+                    📦 Download Unified STL
                   </button>
                 </div>
-                <p class="export-hint">
+                <p class="export-hint input-hint">
                   Multi-color .3mf is split into Base Plate, Tactile Elements, and Braille Domes for instant AMS / MMU slicing.
                 </p>
               </div>
@@ -420,204 +424,18 @@ import {
       </div>
     </div>
   `,
-  styles: [
-    `
-      .preset-strip {
-        display: flex;
-        align-items: center;
-        flex-wrap: wrap;
-        gap: 0.5rem;
-      }
-      .preset-label {
-        font-weight: 600;
-        font-size: 0.85rem;
-        color: var(--color-text-muted, #94a3b8);
-      }
-      .preset-buttons {
-        display: flex;
-        flex-wrap: wrap;
-        gap: 0.35rem;
-      }
-      .btn-grid-2 {
-        display: grid;
-        grid-template-columns: 1fr 1fr;
-        gap: 0.4rem;
-        margin-top: 0.25rem;
-      }
-      .btn-grid-3 {
-        display: grid;
-        grid-template-columns: repeat(3, 1fr);
-        gap: 0.4rem;
-        margin-top: 0.25rem;
-      }
-      .grid-2-col {
-        display: grid;
-        grid-template-columns: 1fr 1fr;
-        gap: 0.75rem;
-        margin-bottom: 0.5rem;
-      }
-      .control-group {
-        display: flex;
-        flex-direction: column;
-        margin-bottom: 0.85rem;
-      }
-      .c-input__label {
-        font-size: 0.85rem;
-        font-weight: 500;
-        margin-bottom: 0.25rem;
-        color: var(--color-text-main, #e2e8f0);
-      }
-      .input-hint {
-        font-size: 0.75rem;
-        color: var(--color-text-muted, #94a3b8);
-        margin-top: 0.2rem;
-      }
-      .toggle-row {
-        display: flex;
-        align-items: center;
-        gap: 0.5rem;
-        font-size: 0.85rem;
-        color: var(--color-text-main, #e2e8f0);
-      }
-      .braille-callout {
-        background: rgba(30, 41, 59, 0.7);
-        border: 1px solid rgba(148, 163, 184, 0.2);
-        border-radius: 6px;
-        padding: 0.75rem;
-        margin-top: 0.5rem;
-        text-align: center;
-      }
-      .braille-callout__label {
-        font-size: 0.75rem;
-        text-transform: uppercase;
-        letter-spacing: 0.05em;
-        color: #94a3b8;
-      }
-      .braille-callout__symbol {
-        font-size: 2.2rem;
-        letter-spacing: 0.25rem;
-        line-height: 1.2;
-        color: #38bdf8;
-        font-family: monospace;
-      }
-      .braille-callout__sub {
-        font-size: 0.75rem;
-        color: #cbd5e1;
-      }
-      .preview-container {
-        display: flex;
-        flex-direction: column;
-      }
-      .canvas-wrapper {
-        width: 100%;
-        height: 380px;
-        background: #0f172a;
-        border-radius: 6px;
-        position: relative;
-        overflow: hidden;
-      }
-      .three-canvas {
-        width: 100%;
-        height: 100%;
-        display: block;
-      }
-      .preview-controls-row {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        margin-top: 0.5rem;
-      }
-      .drag-hint {
-        font-size: 0.75rem;
-        color: var(--color-text-muted, #94a3b8);
-      }
-      .badge-dim {
-        font-size: 0.8rem;
-        padding: 0.2rem 0.5rem;
-        border-radius: 4px;
-        background: rgba(148, 163, 184, 0.15);
-        color: #cbd5e1;
-      }
-      .metrics-panel {
-        display: grid;
-        grid-template-columns: 1fr 1fr;
-        gap: 0.4rem;
-        background: rgba(30, 41, 59, 0.5);
-        border: 1px solid rgba(148, 163, 184, 0.15);
-        border-radius: 6px;
-        padding: 0.65rem;
-      }
-      .metric-row {
-        display: flex;
-        justify-content: space-between;
-        font-size: 0.8rem;
-      }
-      .metric-key {
-        color: var(--color-text-muted, #94a3b8);
-      }
-      .metric-val {
-        font-weight: 600;
-        color: var(--color-text-main, #f8fafc);
-      }
-      .ada-notes-card {
-        background: rgba(15, 23, 42, 0.6);
-        border: 1px solid rgba(56, 189, 248, 0.2);
-        border-radius: 6px;
-        padding: 0.65rem;
-      }
-      .ada-notes-title {
-        font-size: 0.8rem;
-        font-weight: 600;
-        color: #38bdf8;
-        margin-bottom: 0.25rem;
-      }
-      .ada-notes-list {
-        margin: 0;
-        padding-left: 1.1rem;
-        font-size: 0.75rem;
-        color: #94a3b8;
-        line-height: 1.35;
-      }
-      .export-actions {
-        display: flex;
-        flex-direction: column;
-      }
-      .export-buttons-grid {
-        display: grid;
-        grid-template-columns: 1.2fr 1fr;
-        gap: 0.5rem;
-      }
-      .export-hint {
-        font-size: 0.72rem;
-        color: var(--color-text-muted, #94a3b8);
-        text-align: center;
-        margin-top: 0.35rem;
-      }
-      @media (max-width: 768px) {
-        .btn-grid-3 {
-          grid-template-columns: 1fr 1fr;
-        }
-        .grid-2-col {
-          grid-template-columns: 1fr;
-        }
-        .export-buttons-grid {
-          grid-template-columns: 1fr;
-        }
-      }
-    `,
-  ],
+  styleUrl: './braille-ada-sign-generator.component.scss',
 })
 export class BrailleAdaSignGeneratorComponent implements OnInit, OnDestroy {
-  @ViewChild('previewCanvas', { static: true })
-  canvasRef!: ElementRef<HTMLCanvasElement>;
+  @ViewChild('previewCanvas', { static: false })
+  previewCanvas!: ElementRef<HTMLCanvasElement>;
 
-  @ViewChild('canvasWrapper', { static: true })
-  wrapperRef!: ElementRef<HTMLDivElement>;
+  @ViewChild('canvasWrapper', { static: false })
+  canvasWrapper!: ElementRef<HTMLDivElement>;
 
-  readonly presets = SIGN_PRESETS;
-  readonly activePresetId = signal<string>('restroom_all_gender');
+  readonly presets: SignPreset[] = SIGN_PRESETS;
 
-  // Reactive state signals
+  // Sign Configuration Signals
   readonly roomTitle = signal<string>(DEFAULT_BRAILLE_SIGN_OPTIONS.roomTitle);
   readonly subText = signal<string>(DEFAULT_BRAILLE_SIGN_OPTIONS.subText);
   readonly pictogram = signal<SignPictogram>(DEFAULT_BRAILLE_SIGN_OPTIONS.pictogram);
@@ -629,13 +447,12 @@ export class BrailleAdaSignGeneratorComponent implements OnInit, OnDestroy {
   readonly cornerRadiusMm = signal<number>(DEFAULT_BRAILLE_SIGN_OPTIONS.cornerRadiusMm);
   readonly mountHoles = signal<boolean>(DEFAULT_BRAILLE_SIGN_OPTIONS.mountHoles);
   readonly mountHoleDiameterMm = signal<number>(DEFAULT_BRAILLE_SIGN_OPTIONS.mountHoleDiameterMm);
-  readonly includeFrameBorder = signal<boolean>(
-    DEFAULT_BRAILLE_SIGN_OPTIONS.includeFrameBorder ?? true
-  );
-  readonly isGenerating = signal<boolean>(false);
+  readonly includeFrameBorder = signal<boolean>(DEFAULT_BRAILLE_SIGN_OPTIONS.includeFrameBorder ?? true);
+  readonly frameBorderWidthMm = signal<number>(DEFAULT_BRAILLE_SIGN_OPTIONS.frameBorderWidthMm ?? 3.0);
 
-  // Active metrics
+  readonly activePresetId = signal<string>('restroom_all_gender');
   readonly currentMetrics = signal<SignMetrics | null>(null);
+  readonly isGenerating = signal<boolean>(false);
 
   // Computed Braille representation
   readonly brailleCells = computed(() => transliterateToBraille(this.roomTitle()));
@@ -646,6 +463,10 @@ export class BrailleAdaSignGeneratorComponent implements OnInit, OnDestroy {
   );
 
   private readonly activeDownloadUrls: string[] = [];
+
+  // Web Worker offloading
+  private worker: Worker | null = null;
+  private workerRequestId = 0;
 
   // Three.js scene instances
   private scene?: THREE.Scene;
@@ -658,13 +479,30 @@ export class BrailleAdaSignGeneratorComponent implements OnInit, OnDestroy {
   // Interaction controls
   private isDragging = false;
   private previousMousePosition = { x: 0, y: 0 };
+  private readonly onWindowMouseUp = () => {
+    this.isDragging = false;
+  };
 
   ngOnInit(): void {
+    if (typeof Worker !== 'undefined') {
+      try {
+        this.worker = new Worker(new URL('./worker.ts', import.meta.url), { type: 'module' });
+      } catch {
+        // Fallback to inline processing
+      }
+    }
     this.initThree();
     this.updatePreviewMesh();
   }
 
   ngOnDestroy(): void {
+    window.removeEventListener('mouseup', this.onWindowMouseUp);
+
+    if (this.worker) {
+      this.worker.terminate();
+      this.worker = null;
+    }
+
     if (this.animationFrameId) {
       cancelAnimationFrame(this.animationFrameId);
     }
@@ -689,6 +527,46 @@ export class BrailleAdaSignGeneratorComponent implements OnInit, OnDestroy {
     this.updatePreviewMesh();
   }
 
+  onSubTextChange(newVal: string): void {
+    this.subText.set(newVal);
+    this.updatePreviewMesh();
+  }
+
+  onPlaqueWidthChange(val: number): void {
+    this.plaqueWidthMm.set(Number(val));
+    this.updatePreviewMesh();
+  }
+
+  onPlaqueHeightChange(val: number): void {
+    this.plaqueHeightMm.set(Number(val));
+    this.updatePreviewMesh();
+  }
+
+  onPlaqueThicknessChange(val: number): void {
+    this.plaqueThicknessMm.set(Number(val));
+    this.updatePreviewMesh();
+  }
+
+  onTactileRaiseChange(val: number): void {
+    this.tactileRaiseMm.set(Number(val));
+    this.updatePreviewMesh();
+  }
+
+  onCornerRadiusChange(val: number): void {
+    this.cornerRadiusMm.set(Number(val));
+    this.updatePreviewMesh();
+  }
+
+  onToggleFrameBorder(): void {
+    this.includeFrameBorder.update((v) => !v);
+    this.updatePreviewMesh();
+  }
+
+  onToggleMountHoles(): void {
+    this.mountHoles.update((v) => !v);
+    this.updatePreviewMesh();
+  }
+
   setPictogram(p: SignPictogram): void {
     this.pictogram.set(p);
     this.updatePreviewMesh();
@@ -701,21 +579,37 @@ export class BrailleAdaSignGeneratorComponent implements OnInit, OnDestroy {
 
   applyPreset(preset: SignPreset): void {
     this.activePresetId.set(preset.id);
-    const opt = preset.options;
-    if (opt.roomTitle !== undefined) this.roomTitle.set(opt.roomTitle);
-    if (opt.subText !== undefined) this.subText.set(opt.subText);
-    if (opt.pictogram !== undefined) this.pictogram.set(opt.pictogram);
-    if (opt.plaqueWidthMm !== undefined) this.plaqueWidthMm.set(opt.plaqueWidthMm);
-    if (opt.plaqueHeightMm !== undefined) this.plaqueHeightMm.set(opt.plaqueHeightMm);
-    if (opt.brailleStandard !== undefined) this.brailleStandard.set(opt.brailleStandard);
+    const opts = preset.options;
+    if (opts.roomTitle !== undefined) this.roomTitle.set(opts.roomTitle);
+    if (opts.subText !== undefined) this.subText.set(opts.subText);
+    if (opts.pictogram !== undefined) this.pictogram.set(opts.pictogram);
+    if (opts.plaqueWidthMm !== undefined) this.plaqueWidthMm.set(opts.plaqueWidthMm);
+    if (opts.plaqueHeightMm !== undefined) this.plaqueHeightMm.set(opts.plaqueHeightMm);
+    if (opts.plaqueThicknessMm !== undefined) this.plaqueThicknessMm.set(opts.plaqueThicknessMm);
+    if (opts.tactileRaiseMm !== undefined) this.tactileRaiseMm.set(opts.tactileRaiseMm);
+    if (opts.brailleStandard !== undefined) this.brailleStandard.set(opts.brailleStandard);
+    if (opts.cornerRadiusMm !== undefined) this.cornerRadiusMm.set(opts.cornerRadiusMm);
+    if (opts.mountHoles !== undefined) this.mountHoles.set(opts.mountHoles);
+    if (opts.mountHoleDiameterMm !== undefined)
+      this.mountHoleDiameterMm.set(opts.mountHoleDiameterMm);
+    if (opts.includeFrameBorder !== undefined)
+      this.includeFrameBorder.set(opts.includeFrameBorder);
+    if (opts.frameBorderWidthMm !== undefined)
+      this.frameBorderWidthMm.set(opts.frameBorderWidthMm);
 
     this.updatePreviewMesh();
   }
 
   resetToDefaults(): void {
-    this.applyPreset(this.presets[0]);
+    this.activePresetId.set('restroom_all_gender');
+    this.roomTitle.set(DEFAULT_BRAILLE_SIGN_OPTIONS.roomTitle);
+    this.subText.set(DEFAULT_BRAILLE_SIGN_OPTIONS.subText);
+    this.pictogram.set(DEFAULT_BRAILLE_SIGN_OPTIONS.pictogram);
+    this.plaqueWidthMm.set(DEFAULT_BRAILLE_SIGN_OPTIONS.plaqueWidthMm);
+    this.plaqueHeightMm.set(DEFAULT_BRAILLE_SIGN_OPTIONS.plaqueHeightMm);
     this.plaqueThicknessMm.set(DEFAULT_BRAILLE_SIGN_OPTIONS.plaqueThicknessMm);
     this.tactileRaiseMm.set(DEFAULT_BRAILLE_SIGN_OPTIONS.tactileRaiseMm);
+    this.brailleStandard.set(DEFAULT_BRAILLE_SIGN_OPTIONS.brailleStandard);
     this.cornerRadiusMm.set(DEFAULT_BRAILLE_SIGN_OPTIONS.cornerRadiusMm);
     this.mountHoles.set(DEFAULT_BRAILLE_SIGN_OPTIONS.mountHoles);
     this.mountHoleDiameterMm.set(DEFAULT_BRAILLE_SIGN_OPTIONS.mountHoleDiameterMm);
@@ -731,22 +625,62 @@ export class BrailleAdaSignGeneratorComponent implements OnInit, OnDestroy {
 
   async downloadFormat(format: SignExportFormat): Promise<void> {
     this.isGenerating.set(true);
+    const options = this.getCurrentOptions();
+
     try {
-      const options = this.getCurrentOptions();
+      if (this.worker) {
+        const reqId = ++this.workerRequestId;
+        await new Promise<void>((resolve, reject) => {
+          const handler = (event: MessageEvent<BrailleAdaSignWorkerResponse>) => {
+            if (event.data.id !== reqId) return;
+
+            if (event.data.type === 'error') {
+              this.worker?.removeEventListener('message', handler);
+              reject(new Error(event.data.error || 'Export failed'));
+            } else if (event.data.type === 'result' && event.data.buffer) {
+              this.worker?.removeEventListener('message', handler);
+              const blob = new Blob([event.data.buffer], {
+                type: event.data.mimeType || 'application/octet-stream',
+              });
+              this.triggerFileDownload(blob, event.data.fileName || `ada-sign.${format.startsWith('3mf') ? '3mf' : 'stl'}`);
+              resolve();
+            }
+          };
+          this.worker!.addEventListener('message', handler);
+          this.worker!.postMessage({ id: reqId, options, format } as BrailleAdaSignWorkerRequest);
+        });
+      } else {
+        const result = await processSign(options, format);
+        if (result.success && result.blob) {
+          this.triggerFileDownload(result.blob, result.fileName);
+        }
+      }
+    } catch {
       const result = await processSign(options, format);
-
-      const url = URL.createObjectURL(result.blob);
-      this.activeDownloadUrls.push(url);
-
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = result.fileName;
-      document.body.appendChild(a);
-      a.click();
-      document.body.removeChild(a);
+      if (result.success && result.blob) {
+        this.triggerFileDownload(result.blob, result.fileName);
+      }
     } finally {
       this.isGenerating.set(false);
     }
+  }
+
+  private triggerFileDownload(blob: Blob, fileName: string): void {
+    const url = URL.createObjectURL(blob);
+    this.activeDownloadUrls.push(url);
+
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = fileName;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+
+    setTimeout(() => {
+      URL.revokeObjectURL(url);
+      const idx = this.activeDownloadUrls.indexOf(url);
+      if (idx !== -1) this.activeDownloadUrls.splice(idx, 1);
+    }, 100);
   }
 
   private getCurrentOptions(): BrailleAdaSignGeneratorOptions {
@@ -763,23 +697,27 @@ export class BrailleAdaSignGeneratorComponent implements OnInit, OnDestroy {
       mountHoles: this.mountHoles(),
       mountHoleDiameterMm: this.mountHoleDiameterMm(),
       includeFrameBorder: this.includeFrameBorder(),
-      frameBorderWidthMm: 3.0,
+      frameBorderWidthMm: this.frameBorderWidthMm(),
     };
   }
 
+  // --- THREE.JS VIEWPORT & RENDERING ---
+
   private initThree(): void {
-    const canvas = this.canvasRef.nativeElement;
-    const wrapper = this.wrapperRef.nativeElement;
+    if (!this.previewCanvas || !this.canvasWrapper) return;
 
     try {
-      this.scene = new THREE.Scene();
-      this.scene.background = new THREE.Color(0x0f172a);
-
+      const canvas = this.previewCanvas.nativeElement;
+      const wrapper = this.canvasWrapper.nativeElement;
       const width = wrapper.clientWidth || 400;
       const height = wrapper.clientHeight || 380;
 
+      this.scene = new THREE.Scene();
+      this.scene.background = new THREE.Color(0x0f172a);
+
       this.camera = new THREE.PerspectiveCamera(40, width / height, 1, 2000);
-      this.camera.position.set(0, -60, 260);
+      this.camera.position.set(0, -50, 420);
+      this.camera.lookAt(0, 0, 0);
 
       this.renderer = new THREE.WebGLRenderer({
         canvas,
@@ -789,13 +727,13 @@ export class BrailleAdaSignGeneratorComponent implements OnInit, OnDestroy {
       this.renderer.setSize(width, height);
       this.renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
 
-      // Lights
-      const ambientLight = new THREE.AmbientLight(0xffffff, 0.85);
+      // Lighting
+      const ambientLight = new THREE.AmbientLight(0xffffff, 0.7);
       this.scene.add(ambientLight);
 
-      const keyLight = new THREE.DirectionalLight(0xffffff, 1.2);
-      keyLight.position.set(150, 200, 250);
-      this.scene.add(keyLight);
+      const mainLight = new THREE.DirectionalLight(0xffffff, 0.9);
+      mainLight.position.set(120, 180, 200);
+      this.scene.add(mainLight);
 
       const fillLight = new THREE.DirectionalLight(0x93c5fd, 0.6);
       fillLight.position.set(-150, -100, 150);
@@ -839,9 +777,7 @@ export class BrailleAdaSignGeneratorComponent implements OnInit, OnDestroy {
       this.previousMousePosition = { x: e.clientX, y: e.clientY };
     });
 
-    window.addEventListener('mouseup', () => {
-      this.isDragging = false;
-    });
+    window.addEventListener('mouseup', this.onWindowMouseUp);
 
     canvas.addEventListener('mousemove', (e) => {
       if (!this.isDragging || !this.signGroup) return;
@@ -865,6 +801,42 @@ export class BrailleAdaSignGeneratorComponent implements OnInit, OnDestroy {
       },
       { passive: false }
     );
+
+    canvas.addEventListener('touchstart', (e) => this.onTouchStart(e), { passive: false });
+    canvas.addEventListener('touchmove', (e) => this.onTouchMove(e), { passive: false });
+    canvas.addEventListener('touchend', () => this.onTouchEnd());
+    canvas.addEventListener('touchcancel', () => this.onTouchEnd());
+  }
+
+  onTouchStart(event: TouchEvent): void {
+    if (event.touches.length === 1) {
+      this.isDragging = true;
+      this.previousMousePosition = {
+        x: event.touches[0].clientX,
+        y: event.touches[0].clientY,
+      };
+      event.preventDefault();
+    }
+  }
+
+  onTouchMove(event: TouchEvent): void {
+    if (!this.isDragging || !this.signGroup || event.touches.length !== 1) return;
+
+    const deltaX = event.touches[0].clientX - this.previousMousePosition.x;
+    const deltaY = event.touches[0].clientY - this.previousMousePosition.y;
+
+    this.signGroup.rotation.z += deltaX * 0.01;
+    this.signGroup.rotation.x += deltaY * 0.01;
+
+    this.previousMousePosition = {
+      x: event.touches[0].clientX,
+      y: event.touches[0].clientY,
+    };
+    event.preventDefault();
+  }
+
+  onTouchEnd(): void {
+    this.isDragging = false;
   }
 
   private updatePreviewMesh(): void {
@@ -877,7 +849,12 @@ export class BrailleAdaSignGeneratorComponent implements OnInit, OnDestroy {
 
     this.currentMetrics.set(metrics);
 
-    if (!this.signGroup) return;
+    if (!this.signGroup) {
+      baseGeometry.dispose();
+      tactileGeometry.dispose();
+      brailleGeometry.dispose();
+      return;
+    }
 
     this.disposeThreeObjects();
 
@@ -891,7 +868,7 @@ export class BrailleAdaSignGeneratorComponent implements OnInit, OnDestroy {
     this.signGroup.add(baseMesh);
 
     // Tactile Elements Mesh (High-contrast bright white)
-    if (tactileGeometry.getAttribute('position')) {
+    if (tactileGeometry.getAttribute('position')?.count > 0) {
       const tactileMaterial = new THREE.MeshStandardMaterial({
         color: 0xf8fafc,
         roughness: 0.3,
@@ -899,10 +876,12 @@ export class BrailleAdaSignGeneratorComponent implements OnInit, OnDestroy {
       });
       const tactileMesh = new THREE.Mesh(tactileGeometry, tactileMaterial);
       this.signGroup.add(tactileMesh);
+    } else {
+      tactileGeometry.dispose();
     }
 
     // Braille Domes Mesh (Crisp dome highlight)
-    if (brailleGeometry.getAttribute('position')) {
+    if (brailleGeometry.getAttribute('position')?.count > 0) {
       const brailleMaterial = new THREE.MeshStandardMaterial({
         color: 0x38bdf8,
         roughness: 0.2,
@@ -910,6 +889,8 @@ export class BrailleAdaSignGeneratorComponent implements OnInit, OnDestroy {
       });
       const brailleMesh = new THREE.Mesh(brailleGeometry, brailleMaterial);
       this.signGroup.add(brailleMesh);
+    } else {
+      brailleGeometry.dispose();
     }
 
     this.fitCameraToSign();
@@ -921,6 +902,7 @@ export class BrailleAdaSignGeneratorComponent implements OnInit, OnDestroy {
     const size = new THREE.Vector3();
     box.getSize(size);
     const maxDim = Math.max(size.x, size.y, size.z);
+    if (!Number.isFinite(maxDim) || maxDim <= 0) return;
     this.camera.position.set(0, -maxDim * 0.2, maxDim * 1.8);
     this.camera.lookAt(0, 0, 0);
   }

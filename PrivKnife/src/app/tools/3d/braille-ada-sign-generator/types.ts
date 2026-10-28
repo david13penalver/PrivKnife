@@ -60,3 +60,23 @@ export interface SignPreset {
   description: string;
   options: Partial<BrailleAdaSignGeneratorOptions>;
 }
+
+export interface BrailleAdaSignWorkerRequest {
+  id: number;
+  options: BrailleAdaSignGeneratorOptions;
+  format: SignExportFormat;
+}
+
+export interface BrailleAdaSignWorkerResponse {
+  id: number;
+  type: 'progress' | 'result' | 'error';
+  percent?: number;
+  buffer?: ArrayBuffer;
+  fileName?: string;
+  fileSize?: number;
+  mimeType?: string;
+  metrics?: SignMetrics;
+  brailleTransliteration?: string;
+  unicodeBraille?: string;
+  error?: string;
+}

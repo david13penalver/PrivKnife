@@ -112,6 +112,98 @@ describe('BrailleAdaSignGeneratorComponent (Seam 2 & 4)', () => {
       expect(revokeSpy).toHaveBeenCalledWith('blob:dummy-sign-url');
       revokeSpy.mockRestore();
     });
+
+    it('should remove window mouseup listener on ngOnDestroy (DEFECT-38-05)', () => {
+      const removeSpy = vi.spyOn(window, 'removeEventListener');
+      fixture.destroy();
+      expect(removeSpy).toHaveBeenCalledWith('mouseup', expect.any(Function));
+      removeSpy.mockRestore();
+    });
+  });
+
+  describe('Reactive Secondary Form Controls (DEFECT-38-02)', () => {
+    it('should update currentMetrics when plaqueWidthMm changes', () => {
+      const initialGrams = component.currentMetrics()?.estimatedGrams;
+      component.onPlaqueWidthChange(250);
+      expect(component.plaqueWidthMm()).toBe(250);
+      expect(component.currentMetrics()?.estimatedGrams).not.toBe(initialGrams);
+    });
+
+    it('should update currentMetrics when plaqueHeightMm changes', () => {
+      const initialGrams = component.currentMetrics()?.estimatedGrams;
+      component.onPlaqueHeightChange(250);
+      expect(component.plaqueHeightMm()).toBe(250);
+      expect(component.currentMetrics()?.estimatedGrams).not.toBe(initialGrams);
+    });
+
+    it('should update currentMetrics when subText changes', () => {
+      component.onSubTextChange('TEST SUBTEXT');
+      expect(component.subText()).toBe('TEST SUBTEXT');
+    });
+
+    it('should update currentMetrics when plaqueThicknessMm changes', () => {
+      const initialGrams = component.currentMetrics()?.estimatedGrams;
+      component.onPlaqueThicknessChange(6.0);
+      expect(component.plaqueThicknessMm()).toBe(6.0);
+      expect(component.currentMetrics()?.estimatedGrams).not.toBe(initialGrams);
+    });
+
+    it('should update currentMetrics when cornerRadiusMm changes', () => {
+      component.onCornerRadiusChange(15);
+      expect(component.cornerRadiusMm()).toBe(15);
+    });
+
+    it('should update currentMetrics when includeFrameBorder toggles', () => {
+      const initialTriangles = component.currentMetrics()?.totalTriangles;
+      component.onToggleFrameBorder();
+      expect(component.includeFrameBorder()).toBe(false);
+      expect(component.currentMetrics()?.totalTriangles).not.toBe(initialTriangles);
+    });
+
+    it('should update currentMetrics when mountHoles toggles', () => {
+      component.onToggleMountHoles();
+      expect(component.mountHoles()).toBe(false);
+    });
+  });
+
+  describe('Touch Viewport Navigation (DEFECT-38-05)', () => {
+    it('should orbit camera on touchstart and touchmove events', () => {
+      const touchStartEvent = {
+        touches: [{ clientX: 100, clientY: 100 }],
+        preventDefault: vi.fn(),
+      } as unknown as TouchEvent;
+
+      (component as any).onTouchStart(touchStartEvent);
+      expect(component['isDragging']).toBe(true);
+
+      const touchMoveEvent = {
+        touches: [{ clientX: 120, clientY: 110 }],
+        preventDefault: vi.fn(),
+      } as unknown as TouchEvent;
+
+      (component as any).onTouchMove(touchMoveEvent);
+      (component as any).onTouchEnd();
+      expect(component['isDragging']).toBe(false);
+    });
+  });
+
+  describe('Mobile Responsive & BEM Styling (DEFECT-38-03, DEFECT-38-04)', () => {
+    it('should use .c-input__slider on all range slider inputs', () => {
+      const compiled = fixture.nativeElement as HTMLElement;
+      const rangeInputs = compiled.querySelectorAll('input[type="range"]');
+      expect(rangeInputs.length).toBeGreaterThan(0);
+
+      rangeInputs.forEach((input) => {
+        expect(input.classList.contains('c-input__slider')).toBe(true);
+      });
+    });
+
+    it('should not contain hardcoded #e2e8f0 or #cbd5e1 in styles', () => {
+      const compiled = fixture.nativeElement as HTMLElement;
+      const html = compiled.innerHTML;
+      expect(html).not.toContain('#e2e8f0');
+      expect(html).not.toContain('#cbd5e1');
+    });
   });
 
   describe('Privacy & Zero Exfiltration (Directive 1 & 2)', () => {

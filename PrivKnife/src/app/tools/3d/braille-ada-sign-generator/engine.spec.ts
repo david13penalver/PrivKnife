@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'vitest';
+import JSZip from 'jszip';
 import {
   validateSignOptions,
   transliterateToBraille,
@@ -12,6 +13,7 @@ import {
   DEFAULT_BRAILLE_SIGN_OPTIONS,
   MINIMAL_BRAILLE_SIGN_OPTIONS,
   MAXIMUM_BRAILLE_SIGN_OPTIONS,
+  SIGN_PRESETS,
 } from './test-fixtures';
 import { BrailleAdaSignGeneratorOptions } from './types';
 
@@ -150,6 +152,53 @@ describe('Braille & ADA Tactile Door Sign Generator Engine (Seam 1)', () => {
       for (const p of pictos) {
         const res = generateSignMesh({ ...DEFAULT_BRAILLE_SIGN_OPTIONS, pictogram: p });
         expect(res.metrics.totalTriangles).toBeGreaterThan(0);
+      }
+    });
+
+    it('should produce zero NaN vertices across all characters and presets (DEFECT-38-01 Red test)', async () => {
+      for (const preset of SIGN_PRESETS) {
+        const options: BrailleAdaSignGeneratorOptions = {
+          ...DEFAULT_BRAILLE_SIGN_OPTIONS,
+          ...preset.options,
+        };
+        const res = generateSignMesh(options);
+        const posArray = res.tactileGeometry.getAttribute('position').array as Float32Array;
+        for (let i = 0; i < posArray.length; i++) {
+          expect(Number.isFinite(posArray[i])).toBe(true);
+        }
+
+        const blob = await exportSign3MF(
+          res.baseGeometry,
+          res.tactileGeometry,
+          res.brailleGeometry,
+          options
+        );
+        const zip = await JSZip.loadAsync(blob);
+        const modelXml = await zip.file('3D/3dmodel.model')?.async('text');
+        expect(modelXml).toBeDefined();
+        expect(modelXml).not.toContain('"NaN"');
+        expect(modelXml).not.toContain('>NaN<');
+      }
+
+      const allCharsOptions: BrailleAdaSignGeneratorOptions = {
+        ...DEFAULT_BRAILLE_SIGN_OPTIONS,
+        roomTitle: 'RESTROOM 204',
+        subText: 'ABCDEFGHIJKLM NOPQRSTUVWXYZ 0123456789-&/',
+      };
+      const allRes = generateSignMesh(allCharsOptions);
+      const allPos = allRes.tactileGeometry.getAttribute('position').array as Float32Array;
+      for (let i = 0; i < allPos.length; i++) {
+        expect(Number.isFinite(allPos[i])).toBe(true);
+      }
+
+      const stl = exportSignSTL(allRes.tactileGeometry);
+      const view = new DataView(stl);
+      const triCount = view.getUint32(80, true);
+      for (let i = 0; i < triCount; i++) {
+        for (let j = 0; j < 12; j++) {
+          const val = view.getFloat32(84 + i * 50 + j * 4, true);
+          expect(Number.isFinite(val)).toBe(true);
+        }
       }
     });
   });
