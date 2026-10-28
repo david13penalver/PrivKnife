@@ -14,6 +14,7 @@ describe('CsvVectorChartBuilderComponent', () => {
     fixture = TestBed.createComponent(CsvVectorChartBuilderComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
+    await fixture.whenStable();
   });
 
   afterEach(() => {
@@ -108,5 +109,56 @@ describe('CsvVectorChartBuilderComponent', () => {
     component.ngOnDestroy();
 
     expect(revokeSpy).toHaveBeenCalled();
+  });
+
+  // DEFECT-60-01: DOM Security & Sanitization
+  it('should sanitize SVG to prevent DOM XSS injection via malicious CSV', () => {
+    const maliciousCsv = `Category,Val\nTest</text><img src=x onerror="window.__xss60=true"><text>,100`;
+    component.onCsvTextChange(maliciousCsv);
+    fixture.detectChanges();
+
+    const hostEl: HTMLElement = fixture.nativeElement;
+    const previewEl = hostEl.querySelector('.c-chart-builder__preview-stage');
+    expect(previewEl).toBeTruthy();
+
+    const injectedImg = previewEl?.querySelector('img');
+    expect(injectedImg).toBeNull();
+    expect(previewEl?.querySelectorAll('img').length).toBe(0);
+
+    const rawHtml = previewEl?.innerHTML || '';
+    expect(rawHtml).toContain('&lt;img');
+    expect((window as unknown as { __xss60?: boolean }).__xss60).toBeUndefined();
+  });
+
+  // DEFECT-60-04: BEM layout, area separation & controls
+  it('should adhere to BEM structure with l-extremo area separation in headers', () => {
+    const hostEl: HTMLElement = fixture.nativeElement;
+    const previewHeader = hostEl.querySelector('.c-chart-builder__preview-card .c-card__header');
+    expect(previewHeader).toBeTruthy();
+
+    const leftArea = previewHeader?.querySelector('.l-extremo__area-izquierda');
+    const rightArea = previewHeader?.querySelector('.l-extremo__area-derecha');
+    expect(leftArea).toBeTruthy();
+    expect(rightArea).toBeTruthy();
+
+    const previewStage = hostEl.querySelector('.c-chart-builder__preview-stage');
+    expect(previewStage).toBeTruthy();
+  });
+
+  // Prime Directive: Zero Network Exfiltration
+  it('should never make any network calls during CSV parsing, SVG rendering, and downloads', async () => {
+    const fetchSpy = vi.spyOn(window, 'fetch');
+    const xhrSpy = vi.spyOn(window, 'XMLHttpRequest');
+
+    component.onCsvTextChange('Region,Units\nWest,300\nEast,450');
+    fixture.detectChanges();
+    await fixture.whenStable();
+
+    component.downloadSvg();
+    await component.downloadPng();
+    await component.downloadPdf();
+
+    expect(fetchSpy).not.toHaveBeenCalled();
+    expect(xhrSpy).not.toHaveBeenCalled();
   });
 });

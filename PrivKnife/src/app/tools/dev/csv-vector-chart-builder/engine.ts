@@ -10,6 +10,30 @@ import {
 } from './types';
 
 /**
+ * Escapes XML/SVG special characters to prevent XSS / markup injection.
+ */
+export function escapeXml(str: string): string {
+  if (!str) return '';
+  return String(str)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&apos;');
+}
+
+/**
+ * Helper to convert hex color string to RGB tuple.
+ */
+export function hexToRgb(hex: string): [number, number, number] {
+  const clean = hex.replace('#', '');
+  const r = parseInt(clean.substring(0, 2), 16) || 0;
+  const g = parseInt(clean.substring(2, 4), 16) || 0;
+  const b = parseInt(clean.substring(4, 6), 16) || 0;
+  return [r, g, b];
+}
+
+/**
  * Returns color palette hex values.
  */
 export function getColorPaletteValues(palette: ColorPalette): string[] {
@@ -133,25 +157,47 @@ export function generateChartSvg(
   const axisColor = '#94a3b8';
   const gridColor = '#e2e8f0';
 
-  // Compute scale ceiling
-  const rawMax = data.maxValue > 0 ? data.maxValue : 100;
-  const rawMin = Math.min(0, data.minValue);
-  const range = rawMax - rawMin;
-  const niceMax = rawMax + range * 0.1;
-  const niceMin = rawMin < 0 ? rawMin : 0;
-  const valRange = niceMax - niceMin || 1;
+  const numCats = data.categories.length || 1;
+  const numSeries = data.series.length || 1;
 
+  // Compute scale ceiling
+  const isStackedArea = options.chartType === 'stacked_area';
+  let niceMax = 100;
+  let niceMin = 0;
+
+  if (isStackedArea) {
+    const catSums: number[] = new Array(numCats).fill(0);
+    for (let c = 0; c < numCats; c++) {
+      for (let s = 0; s < numSeries; s++) {
+        catSums[c] += Math.max(0, data.series[s]?.values[c] || 0);
+      }
+    }
+    const maxStacked = Math.max(...catSums, 10);
+    niceMax = maxStacked + maxStacked * 0.1;
+    niceMin = 0;
+  } else {
+    const rawMax = data.maxValue > 0 ? data.maxValue : 100;
+    const rawMin = Math.min(0, data.minValue);
+    const range = rawMax - rawMin;
+    niceMax = rawMax + range * 0.1;
+    niceMin = rawMin < 0 ? rawMin : 0;
+  }
+
+  const valRange = niceMax - niceMin || 1;
   const getY = (val: number) => marginTop + plotH - ((val - niceMin) / valRange) * plotH;
 
+  const escapedTitle = escapeXml(options.chartTitle);
+  const escapedSubtitle = escapeXml(options.chartSubtitle);
+
   let svg = `<?xml version="1.0" encoding="UTF-8"?>
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${width} ${height}" width="${width}" height="${height}">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${width} ${height}" width="100%" height="100%">
   <!-- Background -->
   <rect x="0" y="0" width="${width}" height="${height}" fill="#ffffff" />
 
   <!-- Title & Subtitle -->
   <g id="header">
-    <text x="${marginLeft}" y="36" fill="${titleColor}" font-family="sans-serif" font-size="20" font-weight="bold">${options.chartTitle}</text>
-    <text x="${marginLeft}" y="54" fill="${subtitleColor}" font-family="sans-serif" font-size="12">${options.chartSubtitle}</text>
+    <text x="${marginLeft}" y="36" fill="${titleColor}" font-family="sans-serif" font-size="20" font-weight="bold">${escapedTitle}</text>
+    <text x="${marginLeft}" y="54" fill="${subtitleColor}" font-family="sans-serif" font-size="12">${escapedSubtitle}</text>
   </g>
 `;
 
@@ -170,7 +216,9 @@ export function generateChartSvg(
 
     for (let i = 0; i < values.length; i++) {
       const v = Math.max(0, values[i]);
-      const sliceAngle = (v / total) * (Math.PI * 2);
+      // Clamp slice angle to avoid degenerate 0-length arc when a single slice is 100%
+      const rawSliceAngle = (v / total) * (Math.PI * 2);
+      const sliceAngle = Math.min(rawSliceAngle, Math.PI * 2 - 0.0001);
       const endAngle = currentAngle + sliceAngle;
       const color = colors[i % colors.length];
 
@@ -190,14 +238,19 @@ export function generateChartSvg(
 
       svg += `    <path d="${pathData}" fill="${color}" stroke="#ffffff" stroke-width="2" />\n`;
 
-      // Slice label
+      // Slice label with valueFormat support (DEFECT-60-03)
       if (options.showDataLabels && sliceAngle > 0.25) {
         const midAngle = currentAngle + sliceAngle / 2;
         const labelR = (outerR + innerR) / 2;
         const lx = cx + labelR * Math.cos(midAngle);
         const ly = cy + labelR * Math.sin(midAngle);
         const pct = ((v / total) * 100).toFixed(1) + '%';
-        svg += `    <text x="${lx}" y="${ly + 4}" fill="#ffffff" font-family="sans-serif" font-size="11" font-weight="bold" text-anchor="middle">${pct}</text>\n`;
+        const formattedVal = formatChartValue(v, options.valueFormat);
+        const labelText =
+          options.valueFormat === 'percentage'
+            ? pct
+            : `${formattedVal} (${pct})`;
+        svg += `    <text x="${lx}" y="${ly + 4}" fill="#ffffff" font-family="sans-serif" font-size="10" font-weight="bold" text-anchor="middle">${escapeXml(labelText)}</text>\n`;
       }
 
       currentAngle = endAngle;
@@ -210,10 +263,10 @@ export function generateChartSvg(
       let legX = 0;
       for (let i = 0; i < data.categories.length; i++) {
         const color = colors[i % colors.length];
-        const name = data.categories[i];
+        const name = escapeXml(data.categories[i]);
         svg += `    <rect x="${legX}" y="-10" width="12" height="12" rx="2" fill="${color}" />\n`;
         svg += `    <text x="${legX + 16}" y="0" fill="${subtitleColor}" font-family="sans-serif" font-size="11">${name}</text>\n`;
-        legX += name.length * 8 + 40;
+        legX += data.categories[i].length * 8 + 40;
       }
       svg += `  </g>\n`;
     }
@@ -224,15 +277,13 @@ export function generateChartSvg(
 
   // Horizontal Bar Chart Renderer
   if (options.chartType === 'horizontal_bar') {
-    const numCats = data.categories.length || 1;
     const catH = plotH / numCats;
-    const numSeries = data.series.length || 1;
     const barH = (catH * 0.7) / numSeries;
 
     svg += `  <g id="horizontal-bars">\n`;
     for (let c = 0; c < numCats; c++) {
       const catY = marginTop + c * catH;
-      const catName = data.categories[c];
+      const catName = escapeXml(data.categories[c]);
 
       // Y-axis category label
       svg += `    <text x="${marginLeft - 10}" y="${catY + catH / 2 + 4}" fill="${subtitleColor}" font-family="sans-serif" font-size="11" text-anchor="end">${catName}</text>\n`;
@@ -246,7 +297,7 @@ export function generateChartSvg(
         svg += `    <rect x="${marginLeft}" y="${by}" width="${barW}" height="${barH - 2}" rx="3" fill="${color}" />\n`;
 
         if (options.showDataLabels && barW > 30) {
-          const formatted = formatChartValue(val, options.valueFormat);
+          const formatted = escapeXml(formatChartValue(val, options.valueFormat));
           svg += `    <text x="${marginLeft + barW + 6}" y="${by + barH / 2 + 2}" fill="${subtitleColor}" font-family="sans-serif" font-size="10">${formatted}</text>\n`;
         }
       }
@@ -260,7 +311,7 @@ export function generateChartSvg(
       for (let i = 0; i <= steps; i++) {
         const tickVal = niceMin + (valRange / steps) * i;
         const y = getY(tickVal);
-        const formatted = formatChartValue(tickVal, options.valueFormat);
+        const formatted = escapeXml(formatChartValue(tickVal, options.valueFormat));
 
         svg += `    <line x1="${marginLeft}" y1="${y}" x2="${marginLeft + plotW}" y2="${y}" stroke="${gridColor}" stroke-width="1" stroke-dasharray="3 3" />\n`;
         svg += `    <text x="${marginLeft - 8}" y="${y + 4}" fill="${axisColor}" font-family="sans-serif" font-size="10" text-anchor="end">${formatted}</text>\n`;
@@ -268,9 +319,7 @@ export function generateChartSvg(
       svg += `  </g>\n`;
     }
 
-    const numCats = data.categories.length || 1;
     const catW = plotW / numCats;
-    const numSeries = data.series.length || 1;
 
     // Vertical Bar Chart
     if (options.chartType === 'vertical_bar') {
@@ -291,13 +340,13 @@ export function generateChartSvg(
           svg += `    <rect x="${bx}" y="${y}" width="${barW - 3}" height="${barH}" rx="3" fill="${color}" />\n`;
 
           if (options.showDataLabels) {
-            const formatted = formatChartValue(val, options.valueFormat);
+            const formatted = escapeXml(formatChartValue(val, options.valueFormat));
             svg += `    <text x="${bx + (barW - 3) / 2}" y="${y - 6}" fill="${subtitleColor}" font-family="sans-serif" font-size="10" text-anchor="middle">${formatted}</text>\n`;
           }
         }
 
         // X-Axis Category Label
-        svg += `    <text x="${catX + catW / 2}" y="${marginTop + plotH + 20}" fill="${subtitleColor}" font-family="sans-serif" font-size="11" text-anchor="middle">${data.categories[c]}</text>\n`;
+        svg += `    <text x="${catX + catW / 2}" y="${marginTop + plotH + 20}" fill="${subtitleColor}" font-family="sans-serif" font-size="11" text-anchor="middle">${escapeXml(data.categories[c])}</text>\n`;
       }
       svg += `  </g>\n`;
     }
@@ -309,13 +358,13 @@ export function generateChartSvg(
       for (let s = 0; s < numSeries; s++) {
         const seriesData = data.series[s];
         const color = colors[s % colors.length];
-        const points: { x: number; y: number }[] = [];
+        const points: { x: number; y: number; val: number }[] = [];
 
         for (let c = 0; c < numCats; c++) {
           const val = seriesData.values[c] || 0;
           const x = marginLeft + c * catW + catW / 2;
           const y = getY(val);
-          points.push({ x, y });
+          points.push({ x, y, val });
         }
 
         if (points.length > 0) {
@@ -330,9 +379,13 @@ export function generateChartSvg(
 
           svg += `    <path d="${pathD}" fill="none" stroke="${color}" stroke-width="3" stroke-linecap="round" />\n`;
 
-          // Point Dots
+          // Point Dots & Optional Labels
           for (const pt of points) {
             svg += `    <circle cx="${pt.x}" cy="${pt.y}" r="4" fill="#ffffff" stroke="${color}" stroke-width="2.5" />\n`;
+            if (options.showDataLabels) {
+              const formatted = escapeXml(formatChartValue(pt.val, options.valueFormat));
+              svg += `    <text x="${pt.x}" y="${pt.y - 8}" fill="${subtitleColor}" font-family="sans-serif" font-size="10" text-anchor="middle">${formatted}</text>\n`;
+            }
           }
         }
       }
@@ -340,51 +393,76 @@ export function generateChartSvg(
       // X-Axis Labels
       for (let c = 0; c < numCats; c++) {
         const x = marginLeft + c * catW + catW / 2;
-        svg += `    <text x="${x}" y="${marginTop + plotH + 20}" fill="${subtitleColor}" font-family="sans-serif" font-size="11" text-anchor="middle">${data.categories[c]}</text>\n`;
+        svg += `    <text x="${x}" y="${marginTop + plotH + 20}" fill="${subtitleColor}" font-family="sans-serif" font-size="11" text-anchor="middle">${escapeXml(data.categories[c])}</text>\n`;
       }
 
       svg += `  </g>\n`;
     }
 
-    // Stacked Area Chart
+    // Stacked Area Chart (DEFECT-60-03: True cumulative series stacking)
     if (options.chartType === 'stacked_area') {
       svg += `  <g id="areas">\n`;
       const zeroY = getY(0);
 
+      // Cumulative baseline trackers across series
+      const prevCumY: number[] = new Array(numCats).fill(zeroY);
+      const prevCumVal: number[] = new Array(numCats).fill(0);
+
       for (let s = 0; s < numSeries; s++) {
         const seriesData = data.series[s];
         const color = colors[s % colors.length];
-        const points: { x: number; y: number }[] = [];
+        const currTopPoints: { x: number; y: number }[] = [];
 
         for (let c = 0; c < numCats; c++) {
-          const val = seriesData.values[c] || 0;
+          const val = Math.max(0, seriesData.values[c] || 0);
+          const topVal = prevCumVal[c] + val;
           const x = marginLeft + c * catW + catW / 2;
-          const y = getY(val);
-          points.push({ x, y });
+          const y = getY(topVal);
+          currTopPoints.push({ x, y });
         }
 
-        if (points.length > 0) {
-          let pathD = `M ${points[0].x} ${points[0].y}`;
-          for (let p = 1; p < points.length; p++) {
-            const prev = points[p - 1];
-            const curr = points[p];
+        if (currTopPoints.length > 0) {
+          // Top line path forward
+          let pathD = `M ${currTopPoints[0].x} ${currTopPoints[0].y}`;
+          for (let p = 1; p < currTopPoints.length; p++) {
+            const prev = currTopPoints[p - 1];
+            const curr = currTopPoints[p];
             const cp1x = prev.x + (curr.x - prev.x) / 2;
             const cp2x = prev.x + (curr.x - prev.x) / 2;
             pathD += ` C ${cp1x} ${prev.y}, ${cp2x} ${curr.y}, ${curr.x} ${curr.y}`;
           }
 
-          const lastX = points[points.length - 1].x;
-          const firstX = points[0].x;
-          pathD += ` L ${lastX} ${zeroY} L ${firstX} ${zeroY} Z`;
+          // Bottom baseline backward
+          for (let p = currTopPoints.length - 1; p >= 0; p--) {
+            const bx = currTopPoints[p].x;
+            const by = prevCumY[p];
+            pathD += ` L ${bx} ${by}`;
+          }
+          pathD += ' Z';
 
-          svg += `    <path d="${pathD}" fill="${color}" fill-opacity="0.35" stroke="${color}" stroke-width="2" />\n`;
+          svg += `    <path d="${pathD}" fill="${color}" fill-opacity="0.38" stroke="${color}" stroke-width="2" />\n`;
+
+          // Data labels on top point if requested
+          if (options.showDataLabels) {
+            for (let c = 0; c < numCats; c++) {
+              const val = seriesData.values[c] || 0;
+              const formatted = escapeXml(formatChartValue(val, options.valueFormat));
+              svg += `    <text x="${currTopPoints[c].x}" y="${currTopPoints[c].y - 6}" fill="${subtitleColor}" font-family="sans-serif" font-size="9" text-anchor="middle">${formatted}</text>\n`;
+            }
+          }
+        }
+
+        // Update cumulative trackers
+        for (let c = 0; c < numCats; c++) {
+          prevCumY[c] = currTopPoints[c].y;
+          prevCumVal[c] += Math.max(0, seriesData.values[c] || 0);
         }
       }
 
       // X-Axis Labels
       for (let c = 0; c < numCats; c++) {
         const x = marginLeft + c * catW + catW / 2;
-        svg += `    <text x="${x}" y="${marginTop + plotH + 20}" fill="${subtitleColor}" font-family="sans-serif" font-size="11" text-anchor="middle">${data.categories[c]}</text>\n`;
+        svg += `    <text x="${x}" y="${marginTop + plotH + 20}" fill="${subtitleColor}" font-family="sans-serif" font-size="11" text-anchor="middle">${escapeXml(data.categories[c])}</text>\n`;
       }
 
       svg += `  </g>\n`;
@@ -397,11 +475,11 @@ export function generateChartSvg(
     let legX = 0;
     for (let s = 0; s < data.series.length; s++) {
       const color = colors[s % colors.length];
-      const name = data.series[s].name;
+      const name = escapeXml(data.series[s].name);
 
       svg += `    <rect x="${legX}" y="-10" width="12" height="12" rx="2" fill="${color}" />\n`;
       svg += `    <text x="${legX + 16}" y="0" fill="${subtitleColor}" font-family="sans-serif" font-size="11">${name}</text>\n`;
-      legX += name.length * 8 + 40;
+      legX += data.series[s].name.length * 8 + 40;
     }
     svg += `  </g>\n`;
   }
@@ -412,6 +490,7 @@ export function generateChartSvg(
 
 /**
  * Generates an executive presentation PDF containing the chart using jsPDF.
+ * DEFECT-60-02: Supports vertical_bar, horizontal_bar, smooth_line, stacked_area, and donut_pie.
  */
 export async function generateChartPdf(
   data: ParsedChartData,
@@ -439,11 +518,11 @@ export async function generateChartPdf(
   // Title
   doc.setFontSize(18);
   doc.setTextColor(15, 23, 42);
-  doc.text(options.chartTitle, margin + 8, margin + 14);
+  doc.text(options.chartTitle || 'Vector Chart Report', margin + 8, margin + 14);
 
   doc.setFontSize(10);
   doc.setTextColor(100, 116, 139);
-  doc.text(options.chartSubtitle, margin + 8, margin + 21);
+  doc.text(options.chartSubtitle || '', margin + 8, margin + 21);
 
   // Chart area
   const chartW = pageWidth - margin * 2 - 20;
@@ -453,32 +532,267 @@ export async function generateChartPdf(
 
   const colors = getColorPaletteValues(options.colorPalette);
   const numCats = data.categories.length || 1;
-  const catW = chartW / numCats;
   const numSeries = data.series.length || 1;
-  const barW = (catW * 0.7) / numSeries;
 
-  // Draw simple vector representation in PDF
-  for (let c = 0; c < numCats; c++) {
-    for (let s = 0; s < numSeries; s++) {
-      const val = data.series[s]?.values[c] || 0;
-      const pct = Math.min(1, Math.max(0, val / (data.maxValue || 100)));
-      const bH = pct * (chartH - 20);
-      const bx = chartX + c * catW + s * barW + 5;
-      const by = chartY + chartH - 10 - bH;
+  // Render chart type specific vector graphics
+  if (options.chartType === 'donut_pie') {
+    const cx = chartX + chartW / 2;
+    const cy = chartY + chartH / 2;
+    const outerR = Math.min(chartW, chartH) / 2.3;
+    const innerR = outerR * 0.52;
 
-      // Hex to RGB
-      const hex = colors[s % colors.length];
-      const r = parseInt(hex.slice(1, 3), 16);
-      const g = parseInt(hex.slice(3, 5), 16);
-      const b = parseInt(hex.slice(5, 7), 16);
+    const values = data.series[0]?.values || [];
+    const total = values.reduce((sum, v) => sum + Math.max(0, v), 0) || 1;
 
-      doc.setFillColor(r, g, b);
-      doc.rect(bx, by, barW - 2, bH, 'F');
+    let currentAngle = -Math.PI / 2;
+    for (let i = 0; i < values.length; i++) {
+      const v = Math.max(0, values[i]);
+      const rawSlice = (v / total) * (Math.PI * 2);
+      const sliceAngle = Math.min(rawSlice, Math.PI * 2 - 0.0001);
+      const endAngle = currentAngle + sliceAngle;
+
+      const rgb = hexToRgb(colors[i % colors.length]);
+      doc.setFillColor(rgb[0], rgb[1], rgb[2]);
+
+      // Approximate sector with triangle fan
+      const steps = Math.max(6, Math.ceil(sliceAngle / 0.1));
+      for (let k = 0; k < steps; k++) {
+        const a1 = currentAngle + (k / steps) * sliceAngle;
+        const a2 = currentAngle + ((k + 1) / steps) * sliceAngle;
+        const p1x = cx + outerR * Math.cos(a1);
+        const p1y = cy + outerR * Math.sin(a1);
+        const p2x = cx + outerR * Math.cos(a2);
+        const p2y = cy + outerR * Math.sin(a2);
+        doc.triangle(cx, cy, p1x, p1y, p2x, p2y, 'F');
+      }
+
+      // Draw slice label if room
+      if (options.showDataLabels && sliceAngle > 0.3) {
+        const midA = currentAngle + sliceAngle / 2;
+        const labelR = (outerR + innerR) / 2;
+        const lx = cx + labelR * Math.cos(midA);
+        const ly = cy + labelR * Math.sin(midA);
+        const pct = ((v / total) * 100).toFixed(0) + '%';
+        doc.setFontSize(8);
+        doc.setTextColor(255, 255, 255);
+        doc.text(pct, lx, ly, { align: 'center', baseline: 'middle' });
+      }
+
+      currentAngle = endAngle;
     }
 
-    doc.setFontSize(8);
-    doc.setTextColor(100, 116, 139);
-    doc.text(data.categories[c], chartX + c * catW + catW / 2, chartY + chartH, { align: 'center' });
+    // Inner donut hole
+    doc.setFillColor(255, 255, 255);
+    doc.circle(cx, cy, innerR, 'F');
+
+    // Donut Legend
+    if (options.showLegend) {
+      let legX = chartX;
+      const legY = chartY + chartH + 5;
+      for (let i = 0; i < data.categories.length; i++) {
+        const rgb = hexToRgb(colors[i % colors.length]);
+        doc.setFillColor(rgb[0], rgb[1], rgb[2]);
+        doc.rect(legX, legY - 3, 4, 4, 'F');
+
+        doc.setFontSize(8);
+        doc.setTextColor(100, 116, 139);
+        const catName = data.categories[i] || `Item ${i + 1}`;
+        doc.text(catName, legX + 6, legY);
+        legX += catName.length * 2.2 + 16;
+      }
+    }
+  } else if (options.chartType === 'horizontal_bar') {
+    const catH = chartH / numCats;
+    const barH = (catH * 0.65) / numSeries;
+    const maxVal = data.maxValue > 0 ? data.maxValue : 100;
+
+    // Gridlines
+    if (options.showGridLines) {
+      doc.setDrawColor(241, 245, 249);
+      doc.setLineWidth(0.3);
+      for (let i = 0; i <= 4; i++) {
+        const gx = chartX + 35 + (chartW - 45) * (i / 4);
+        doc.line(gx, chartY, gx, chartY + chartH);
+      }
+    }
+
+    for (let c = 0; c < numCats; c++) {
+      const catY = chartY + c * catH;
+      // Y-axis label
+      doc.setFontSize(8);
+      doc.setTextColor(100, 116, 139);
+      doc.text(data.categories[c] || '', chartX + 30, catY + catH / 2, { align: 'right' });
+
+      for (let s = 0; s < numSeries; s++) {
+        const val = data.series[s]?.values[c] || 0;
+        const bW = Math.max(1, (val / maxVal) * (chartW - 55));
+        const by = catY + (catH * 0.15) + s * barH;
+
+        const rgb = hexToRgb(colors[s % colors.length]);
+        doc.setFillColor(rgb[0], rgb[1], rgb[2]);
+        doc.rect(chartX + 35, by, bW, Math.max(1, barH - 1), 'F');
+
+        if (options.showDataLabels && bW > 8) {
+          doc.setFontSize(7);
+          doc.setTextColor(100, 116, 139);
+          doc.text(formatChartValue(val, options.valueFormat), chartX + 38 + bW, by + barH / 2 + 1);
+        }
+      }
+    }
+  } else if (options.chartType === 'smooth_line') {
+    const catW = chartW / numCats;
+    const maxVal = data.maxValue > 0 ? data.maxValue : 100;
+
+    // Gridlines
+    if (options.showGridLines) {
+      doc.setDrawColor(241, 245, 249);
+      doc.setLineWidth(0.3);
+      for (let i = 0; i <= 4; i++) {
+        const gy = chartY + chartH - 10 - (chartH - 25) * (i / 4);
+        doc.line(chartX, gy, chartX + chartW, gy);
+      }
+    }
+
+    for (let s = 0; s < numSeries; s++) {
+      const seriesData = data.series[s];
+      const rgb = hexToRgb(colors[s % colors.length]);
+      doc.setDrawColor(rgb[0], rgb[1], rgb[2]);
+      doc.setLineWidth(0.8);
+
+      let prevX = 0;
+      let prevY = 0;
+
+      for (let c = 0; c < numCats; c++) {
+        const val = seriesData?.values[c] || 0;
+        const x = chartX + c * catW + catW / 2;
+        const pct = Math.min(1, Math.max(0, val / maxVal));
+        const y = chartY + chartH - 10 - pct * (chartH - 25);
+
+        if (c > 0) {
+          doc.line(prevX, prevY, x, y);
+        }
+
+        // Draw dot
+        doc.setFillColor(rgb[0], rgb[1], rgb[2]);
+        doc.circle(x, y, 1.2, 'F');
+
+        if (options.showDataLabels) {
+          doc.setFontSize(7);
+          doc.setTextColor(100, 116, 139);
+          doc.text(formatChartValue(val, options.valueFormat), x, y - 2.5, { align: 'center' });
+        }
+
+        prevX = x;
+        prevY = y;
+      }
+    }
+
+    // Category labels
+    for (let c = 0; c < numCats; c++) {
+      doc.setFontSize(8);
+      doc.setTextColor(100, 116, 139);
+      doc.text(data.categories[c] || '', chartX + c * catW + catW / 2, chartY + chartH, { align: 'center' });
+    }
+  } else if (options.chartType === 'stacked_area') {
+    const catW = chartW / numCats;
+    const catSums: number[] = new Array(numCats).fill(0);
+    for (let c = 0; c < numCats; c++) {
+      for (let s = 0; s < numSeries; s++) {
+        catSums[c] += Math.max(0, data.series[s]?.values[c] || 0);
+      }
+    }
+    const maxStacked = Math.max(...catSums, 10);
+    const prevCumH: number[] = new Array(numCats).fill(0);
+
+    for (let s = 0; s < numSeries; s++) {
+      const seriesData = data.series[s];
+      const rgb = hexToRgb(colors[s % colors.length]);
+      doc.setFillColor(rgb[0], rgb[1], rgb[2]);
+
+      for (let c = 0; c < numCats; c++) {
+        const val = Math.max(0, seriesData?.values[c] || 0);
+        const segH = (val / maxStacked) * (chartH - 25);
+        const bx = chartX + c * catW + 4;
+        const by = chartY + chartH - 10 - prevCumH[c] - segH;
+
+        doc.rect(bx, by, catW - 8, segH, 'F');
+        prevCumH[c] += segH;
+
+        if (options.showDataLabels && segH > 5) {
+          doc.setFontSize(7);
+          doc.setTextColor(255, 255, 255);
+          doc.text(formatChartValue(val, options.valueFormat), bx + (catW - 8) / 2, by + segH / 2 + 1, {
+            align: 'center',
+          });
+        }
+      }
+    }
+
+    for (let c = 0; c < numCats; c++) {
+      doc.setFontSize(8);
+      doc.setTextColor(100, 116, 139);
+      doc.text(data.categories[c] || '', chartX + c * catW + catW / 2, chartY + chartH, { align: 'center' });
+    }
+  } else {
+    // Vertical Bar Chart (Default)
+    const catW = chartW / numCats;
+    const barW = (catW * 0.7) / numSeries;
+    const maxVal = data.maxValue > 0 ? data.maxValue : 100;
+
+    // Gridlines
+    if (options.showGridLines) {
+      doc.setDrawColor(241, 245, 249);
+      doc.setLineWidth(0.3);
+      for (let i = 0; i <= 4; i++) {
+        const gy = chartY + chartH - 10 - (chartH - 25) * (i / 4);
+        doc.line(chartX, gy, chartX + chartW, gy);
+      }
+    }
+
+    for (let c = 0; c < numCats; c++) {
+      for (let s = 0; s < numSeries; s++) {
+        const val = data.series[s]?.values[c] || 0;
+        const pct = Math.min(1, Math.max(0, val / maxVal));
+        const bH = pct * (chartH - 25);
+        const bx = chartX + c * catW + s * barW + 5;
+        const by = chartY + chartH - 10 - bH;
+
+        const rgb = hexToRgb(colors[s % colors.length]);
+        doc.setFillColor(rgb[0], rgb[1], rgb[2]);
+        doc.rect(bx, by, Math.max(1, barW - 2), bH, 'F');
+
+        if (options.showDataLabels && bH > 5) {
+          doc.setFontSize(7);
+          doc.setTextColor(100, 116, 139);
+          doc.text(formatChartValue(val, options.valueFormat), bx + (barW - 2) / 2, by - 2, {
+            align: 'center',
+          });
+        }
+      }
+
+      doc.setFontSize(8);
+      doc.setTextColor(100, 116, 139);
+      doc.text(data.categories[c] || '', chartX + c * catW + catW / 2, chartY + chartH, {
+        align: 'center',
+      });
+    }
+  }
+
+  // Legend Bar for Cartesian charts
+  if (options.showLegend && options.chartType !== 'donut_pie') {
+    let legX = chartX;
+    const legY = chartY + chartH + 7;
+    for (let s = 0; s < data.series.length; s++) {
+      const rgb = hexToRgb(colors[s % colors.length]);
+      doc.setFillColor(rgb[0], rgb[1], rgb[2]);
+      doc.rect(legX, legY - 3, 4, 4, 'F');
+
+      doc.setFontSize(8);
+      doc.setTextColor(100, 116, 139);
+      const sName = data.series[s]?.name || `Series ${s + 1}`;
+      doc.text(sName, legX + 6, legY);
+      legX += sName.length * 2.2 + 16;
+    }
   }
 
   // Footer
@@ -494,15 +808,39 @@ export async function generateChartPdf(
 }
 
 /**
- * Creates high-res PNG blob from SVG string.
+ * Creates high-res PNG blob from SVG string preserving exact aspect ratio.
+ * DEFECT-60-03: Parses viewBox dimensions and scales canvas by _dpi / 96.
  */
 export async function generateChartPngBlob(svgStr: string, _dpi = 300): Promise<Blob> {
+  // Parse viewBox or width/height dimensions
+  let svgW = 960;
+  let svgH = 540;
+
+  const vbMatch = svgStr.match(
+    /viewBox=["']\s*([0-9.]+)\s+([0-9.]+)\s+([0-9.]+)\s+([0-9.]+)\s*["']/
+  );
+  if (vbMatch) {
+    svgW = parseFloat(vbMatch[3]) || 960;
+    svgH = parseFloat(vbMatch[4]) || 540;
+  } else {
+    const wMatch = svgStr.match(/width=["']([0-9.]+)["']/);
+    const hMatch = svgStr.match(/height=["']([0-9.]+)["']/);
+    if (wMatch && hMatch) {
+      svgW = parseFloat(wMatch[1]) || 960;
+      svgH = parseFloat(hMatch[1]) || 540;
+    }
+  }
+
+  const scale = Math.max(1, (_dpi || 300) / 96);
+  const targetW = Math.min(3840, Math.round(svgW * scale));
+  const targetH = Math.min(3840, Math.round(svgH * scale));
+
   // If running in browser with Image & Canvas
   if (typeof document !== 'undefined' && typeof Image !== 'undefined') {
     try {
       const canvas = document.createElement('canvas');
-      canvas.width = 1920;
-      canvas.height = 1080;
+      canvas.width = targetW;
+      canvas.height = targetH;
       const ctx = canvas.getContext('2d');
       if (ctx) {
         const svgBlob = new Blob([svgStr], { type: 'image/svg+xml;charset=utf-8' });

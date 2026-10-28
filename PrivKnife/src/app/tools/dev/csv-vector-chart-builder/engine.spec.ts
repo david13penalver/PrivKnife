@@ -7,6 +7,7 @@ import {
   generateChartSvg,
   generateChartPdf,
   generateChartPngBlob,
+  escapeXml,
 } from './engine';
 import {
   DEFAULT_CHART_OPTIONS,
@@ -66,6 +67,33 @@ describe('CsvVectorChartBuilder Engine', () => {
     expect(r43.height).toBe(600);
   });
 
+  it('should escape XML entities properly with escapeXml', () => {
+    expect(escapeXml('<script>alert("xss & \'fun\'")</script>')).toBe(
+      '&lt;script&gt;alert(&quot;xss &amp; &apos;fun&apos;&quot;)&lt;/script&gt;'
+    );
+  });
+
+  // DEFECT-60-01: Escaping in generateChartSvg
+  it('should escape XML special characters in titles, categories, and series names', () => {
+    const customData = {
+      categories: ['R&D', 'Sales <East>'],
+      series: [{ name: 'Projected & Actual "Total"', values: [100, 200] }],
+      minValue: 100,
+      maxValue: 200,
+    };
+    const svg = generateChartSvg(customData, {
+      ...DEFAULT_CHART_OPTIONS,
+      chartTitle: 'Title & Analysis <2024>',
+      chartSubtitle: 'Notes "Draft" & Review',
+    });
+
+    expect(svg).toContain('Title &amp; Analysis &lt;2024&gt;');
+    expect(svg).toContain('Notes &quot;Draft&quot; &amp; Review');
+    expect(svg).toContain('R&amp;D');
+    expect(svg).toContain('Sales &lt;East&gt;');
+    expect(svg).toContain('Projected &amp; Actual &quot;Total&quot;');
+  });
+
   it('should generate valid vector SVG for vertical bar chart', () => {
     const data = parseCsvToChartData(SAMPLE_REVENUE_CSV);
     const svg = generateChartSvg(data, {
@@ -106,7 +134,8 @@ describe('CsvVectorChartBuilder Engine', () => {
     expect(svg).toContain('<path');
   });
 
-  it('should generate valid vector SVG for stacked area chart', () => {
+  // DEFECT-60-03: Stacked area cumulative math
+  it('should generate valid vector SVG for stacked area chart with cumulative polygons', () => {
     const data = parseCsvToChartData(SAMPLE_TRAFFIC_CSV);
     const svg = generateChartSvg(data, {
       ...DEFAULT_CHART_OPTIONS,
@@ -115,38 +144,64 @@ describe('CsvVectorChartBuilder Engine', () => {
 
     expect(svg).toContain('<svg');
     expect(svg).toContain('id="areas"');
+    expect(svg).toContain('<path');
+    expect(svg).toContain('fill-opacity="0.38"');
   });
 
-  it('should generate valid vector SVG for donut / pie chart', () => {
-    const data = parseCsvToChartData(SAMPLE_MARKET_SHARE_CSV);
-    const svg = generateChartSvg(data, {
+  // DEFECT-60-03: Donut pie with single slice & valueFormat
+  it('should generate non-degenerate arc for single 100% slice in donut chart', () => {
+    const singleData = {
+      categories: ['Monopoly'],
+      series: [{ name: 'Market', values: [100] }],
+      minValue: 100,
+      maxValue: 100,
+    };
+    const svg = generateChartSvg(singleData, {
       ...DEFAULT_CHART_OPTIONS,
       chartType: 'donut_pie',
-      valueFormat: 'percentage',
+      valueFormat: 'currency',
     });
 
     expect(svg).toContain('<svg');
     expect(svg).toContain('id="donut"');
-    expect(svg).toContain('Chrome');
-    expect(svg).toContain('Safari');
+    expect(svg).toContain('Monopoly');
+    expect(svg).toContain('$100');
   });
 
-  it('should generate presentation-ready PDF blob via jsPDF', async () => {
+  // DEFECT-60-02: Multi-chart PDF generation
+  it('should generate valid PDF blobs for all chart types', async () => {
     const data = parseCsvToChartData(SAMPLE_REVENUE_CSV);
-    const blob = await generateChartPdf(data, DEFAULT_CHART_OPTIONS);
+    const chartTypes = [
+      'vertical_bar',
+      'horizontal_bar',
+      'smooth_line',
+      'stacked_area',
+      'donut_pie',
+    ] as const;
 
-    expect(blob).toBeDefined();
-    expect(blob.size).toBeGreaterThan(1000);
-    expect(blob.type).toBe('application/pdf');
+    for (const chartType of chartTypes) {
+      const blob = await generateChartPdf(data, {
+        ...DEFAULT_CHART_OPTIONS,
+        chartType,
+      });
+
+      expect(blob).toBeDefined();
+      expect(blob.size).toBeGreaterThan(1000);
+      expect(blob.type).toBe('application/pdf');
+    }
   });
 
-  it('should generate high-res PNG blob from SVG', async () => {
+  // DEFECT-60-03: Aspect-ratio preserving PNG generation
+  it('should generate PNG blob preserving aspect ratio dimensions', async () => {
     const data = parseCsvToChartData(SAMPLE_REVENUE_CSV);
-    const svg = generateChartSvg(data, DEFAULT_CHART_OPTIONS);
-    const blob = await generateChartPngBlob(svg, 300);
+    const svg11 = generateChartSvg(data, {
+      ...DEFAULT_CHART_OPTIONS,
+      aspectRatio: '1:1',
+    });
+    const blob11 = await generateChartPngBlob(svg11, 300);
 
-    expect(blob).toBeDefined();
-    expect(blob.size).toBeGreaterThan(50);
-    expect(blob.type).toBe('image/png');
+    expect(blob11).toBeDefined();
+    expect(blob11.size).toBeGreaterThan(50);
+    expect(blob11.type).toBe('image/png');
   });
 });

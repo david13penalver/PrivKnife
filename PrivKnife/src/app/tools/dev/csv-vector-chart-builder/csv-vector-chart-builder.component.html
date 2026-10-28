@@ -1,0 +1,288 @@
+<div class="l-page c-chart-builder">
+  <!-- Header -->
+  <div class="l-page__header c-header">
+    <div class="c-header__title-group">
+      <h1 class="c-header__title">CSV / Paste to Vector Chart &amp; Infographic Builder</h1>
+      <p class="c-header__subtitle">
+        Convert copied spreadsheet tables or CSV files into publication-grade vector charts (bar, line, stacked area, donut)
+        with designer color palettes, custom labels, and instant SVG/PNG/PDF downloads.
+      </p>
+    </div>
+    <div class="c-badge c-badge--privacy">
+      🛡️ 100% In-Browser • Never Leaves Your Device
+    </div>
+  </div>
+
+  <!-- Main Layout -->
+  <div class="l-columns l-columns--2">
+    <!-- Controls Column -->
+    <div class="l-columns__area c-card c-chart-builder__controls-card">
+      <div class="c-card__header l-extremo">
+        <div class="l-extremo__area-izquierda">
+          <h2 class="c-card__title">Data Input &amp; Chart Configuration</h2>
+        </div>
+      </div>
+
+      <div class="c-card__body c-chart-builder__body">
+        <!-- Sample Data Presets -->
+        <div class="g--margin-bottom-4">
+          <label class="c-input__label" id="lbl-presets">Sample Datasets</label>
+          <div class="c-chart-builder__preset-group g--margin-top-1" role="group" aria-labelledby="lbl-presets">
+            <button
+              type="button"
+              class="c-button c-button--small c-chart-builder__preset-btn"
+              [class.c-button--primary]="activeSample() === 'revenue'"
+              [class.c-button--outline]="activeSample() !== 'revenue'"
+              (click)="loadSampleData('revenue')"
+            >
+              Quarterly Revenue
+            </button>
+            <button
+              type="button"
+              class="c-button c-button--small c-chart-builder__preset-btn"
+              [class.c-button--primary]="activeSample() === 'market_share'"
+              [class.c-button--outline]="activeSample() !== 'market_share'"
+              (click)="loadSampleData('market_share')"
+            >
+              Market Share (Donut)
+            </button>
+            <button
+              type="button"
+              class="c-button c-button--small c-chart-builder__preset-btn"
+              [class.c-button--primary]="activeSample() === 'traffic'"
+              [class.c-button--outline]="activeSample() !== 'traffic'"
+              (click)="loadSampleData('traffic')"
+            >
+              Website Traffic (Line)
+            </button>
+          </div>
+        </div>
+
+        <!-- CSV / Spreadsheet Paste Textarea -->
+        <div class="g--margin-bottom-4">
+          <div class="l-extremo c-chart-builder__csv-header">
+            <div class="l-extremo__area-izquierda">
+              <label class="c-input__label" for="csv-textarea">CSV Data / Paste Spreadsheet</label>
+            </div>
+            <div class="l-extremo__area-derecha">
+              <label class="c-button c-button--outline c-chart-builder__file-label">
+                Upload .csv
+                <input
+                  type="file"
+                  class="c-chart-builder__hidden-input"
+                  accept=".csv,text/csv,text/plain"
+                  (change)="onCsvFileSelected($event)"
+                />
+              </label>
+            </div>
+          </div>
+          <textarea
+            id="csv-textarea"
+            class="c-input c-chart-builder__csv-textarea"
+            rows="5"
+            [ngModel]="rawCsvText()"
+            (ngModelChange)="onCsvTextChange($event)"
+            placeholder="Paste CSV rows or tab-separated spreadsheet cells here..."
+          ></textarea>
+        </div>
+
+        <!-- Titles -->
+        <div class="g--margin-bottom-4">
+          <label class="c-input__label" for="chart-title-input">Chart Title</label>
+          <input
+            id="chart-title-input"
+            type="text"
+            class="c-input c-chart-builder__input"
+            [ngModel]="options().chartTitle"
+            (ngModelChange)="updateTitle($event)"
+          />
+        </div>
+
+        <div class="g--margin-bottom-4">
+          <label class="c-input__label" for="chart-subtitle-input">Chart Subtitle / Legend Note</label>
+          <input
+            id="chart-subtitle-input"
+            type="text"
+            class="c-input c-chart-builder__input"
+            [ngModel]="options().chartSubtitle"
+            (ngModelChange)="updateSubtitle($event)"
+          />
+        </div>
+
+        <!-- Chart Type & Palette -->
+        <div class="l-columns l-columns--2 g--margin-bottom-4 c-chart-builder__select-row">
+          <div class="l-columns__area">
+            <label class="c-input__label" for="chart-type-select">Chart Type</label>
+            <select
+              id="chart-type-select"
+              class="c-input c-input--select c-chart-builder__select"
+              [ngModel]="options().chartType"
+              (ngModelChange)="updateChartType($event)"
+            >
+              <option value="vertical_bar">Vertical Bar (Columns)</option>
+              <option value="horizontal_bar">Horizontal Bar</option>
+              <option value="smooth_line">Smooth Line Curve</option>
+              <option value="stacked_area">Stacked Area</option>
+              <option value="donut_pie">Donut / Pie Chart</option>
+            </select>
+          </div>
+
+          <div class="l-columns__area">
+            <label class="c-input__label" for="palette-select">Color Palette</label>
+            <select
+              id="palette-select"
+              class="c-input c-input--select c-chart-builder__select"
+              [ngModel]="options().colorPalette"
+              (ngModelChange)="updatePalette($event)"
+            >
+              <option value="electric_indigo">Electric Indigo &amp; Violet</option>
+              <option value="emerald_growth">Emerald Growth</option>
+              <option value="sunset_gradient">Sunset Gradient</option>
+              <option value="corporate_slate">Corporate Slate</option>
+              <option value="monochrome">Monochrome Minimal</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Aspect Ratio & Value Format -->
+        <div class="l-columns l-columns--2 g--margin-bottom-4 c-chart-builder__select-row">
+          <div class="l-columns__area">
+            <label class="c-input__label" for="aspect-ratio-select">Canvas Aspect Ratio</label>
+            <select
+              id="aspect-ratio-select"
+              class="c-input c-input--select c-chart-builder__select"
+              [ngModel]="options().aspectRatio"
+              (ngModelChange)="updateAspectRatio($event)"
+            >
+              <option value="16:9">16:9 Widescreen (960×540)</option>
+              <option value="4:3">4:3 Standard (800×600)</option>
+              <option value="1:1">1:1 Square (700×700)</option>
+            </select>
+          </div>
+
+          <div class="l-columns__area">
+            <label class="c-input__label" for="value-format-select">Value Formatting</label>
+            <select
+              id="value-format-select"
+              class="c-input c-input--select c-chart-builder__select"
+              [ngModel]="options().valueFormat"
+              (ngModelChange)="updateValueFormat($event)"
+            >
+              <option value="currency">Currency ($150,000)</option>
+              <option value="percentage">Percentage (65.2%)</option>
+              <option value="number">Standard Number (150,000)</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Toggles -->
+        <div class="g--margin-bottom-4">
+          <span class="c-input__label">Display Elements</span>
+          <div class="c-chart-builder__checkbox-grid g--margin-top-1">
+            <label class="c-chart-builder__checkbox-label">
+              <input
+                type="checkbox"
+                class="c-chart-builder__checkbox"
+                [checked]="options().showLegend"
+                (change)="toggleOption('showLegend')"
+              />
+              <span>Legend</span>
+            </label>
+            <label class="c-chart-builder__checkbox-label">
+              <input
+                type="checkbox"
+                class="c-chart-builder__checkbox"
+                [checked]="options().showDataLabels"
+                (change)="toggleOption('showDataLabels')"
+              />
+              <span>Data Labels</span>
+            </label>
+            <label class="c-chart-builder__checkbox-label">
+              <input
+                type="checkbox"
+                class="c-chart-builder__checkbox"
+                [checked]="options().showGridLines"
+                (change)="toggleOption('showGridLines')"
+              />
+              <span>Gridlines</span>
+            </label>
+          </div>
+        </div>
+      </div>
+
+      <div class="c-card__footer l-extremo">
+        <div class="l-extremo__area-izquierda">
+          <button
+            type="button"
+            class="c-button c-button--outline c-chart-builder__action-btn"
+            (click)="resetToDefaults()"
+          >
+            Reset to Defaults
+          </button>
+        </div>
+        <div class="l-extremo__area-derecha">
+          <button
+            type="button"
+            class="c-button c-button--outline c-chart-builder__action-btn"
+            (click)="copySvgCode()"
+          >
+            {{ copiedFeedback() ? '✓ SVG Copied!' : 'Copy SVG Code' }}
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Preview Column -->
+    <div class="l-columns__area c-card c-chart-builder__preview-card">
+      <div class="c-card__header l-extremo">
+        <div class="l-extremo__area-izquierda">
+          <h2 class="c-card__title">Real-Time Vector Preview</h2>
+        </div>
+        <div class="l-extremo__area-derecha">
+          <div class="c-chart-builder__meta">
+            {{ chartData().categories.length }} Categories • {{ chartData().series.length }} Series
+          </div>
+        </div>
+      </div>
+
+      <div class="c-card__body">
+        <!-- Scaled SVG Viewport -->
+        <div class="c-preview c-chart-builder__preview">
+          <div
+            class="c-chart-builder__preview-stage"
+            [innerHTML]="sanitizedSvg()"
+          ></div>
+        </div>
+      </div>
+
+      <!-- Download Action Bar -->
+      <div class="c-card__footer l-extremo c-chart-builder__download-bar">
+        <div class="l-extremo__area-izquierda c-chart-builder__export-group">
+          <button
+            type="button"
+            class="c-button c-button--secondary c-chart-builder__download-btn"
+            (click)="downloadSvg()"
+          >
+            Download Vector SVG
+          </button>
+          <button
+            type="button"
+            class="c-button c-button--outline c-chart-builder__download-btn"
+            (click)="downloadPng()"
+          >
+            Download 300 DPI PNG
+          </button>
+        </div>
+        <div class="l-extremo__area-derecha">
+          <button
+            type="button"
+            class="c-button c-button--primary c-chart-builder__download-btn"
+            (click)="downloadPdf()"
+          >
+            Download Executive PDF
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
