@@ -36,3 +36,30 @@ export interface LocalOcrTextExtractorResult {
     format: ExportOcrFormat;
   };
 }
+
+export interface LocalOcrWorkerRequest {
+  type: 'ocr' | 'preprocess';
+  id?: string;
+  fileBuffer?: ArrayBuffer;
+  imageData?: {
+    data: Uint8ClampedArray;
+    width: number;
+    height: number;
+  };
+  options: LocalOcrTextExtractorOptions;
+  originalFileName: string;
+}
+
+export interface LocalOcrWorkerResponse {
+  type: 'ocr' | 'preprocess' | 'progress';
+  id?: string;
+  progress?: number;
+  result?: LocalOcrTextExtractorResult;
+  imageData?: {
+    data: Uint8ClampedArray;
+    width: number;
+    height: number;
+  };
+  success?: boolean;
+  error?: string;
+}

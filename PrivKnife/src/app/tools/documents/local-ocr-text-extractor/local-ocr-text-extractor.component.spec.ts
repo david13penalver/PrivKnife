@@ -42,6 +42,8 @@ describe('LocalOcrTextExtractorComponent (Seam 2 & 4)', () => {
       expect(component.cleanIrregularLinebreaks()).toBe(true);
       expect(component.preserveTableSpacing()).toBe(true);
       expect(component.exportFormat()).toBe('txt');
+      expect(component.binarizeThreshold()).toBe(128);
+      expect(component.enhanceContrast()).toBe(true);
       expect(component.selectedFile()).toBeNull();
       expect(component.extractedResult()).toBeNull();
     });
@@ -69,6 +71,14 @@ describe('LocalOcrTextExtractorComponent (Seam 2 & 4)', () => {
       expect(component.exportFormat()).toBe('docx');
     });
 
+    it('should update preprocessing signals (enhanceContrast, binarizeThreshold)', () => {
+      component.setEnhanceContrast(false);
+      expect(component.enhanceContrast()).toBe(false);
+
+      component.setBinarizeThreshold(160);
+      expect(component.binarizeThreshold()).toBe(160);
+    });
+
     it('should toggle clean linebreaks and table preservation flags', () => {
       component.setCleanLinebreaks(false);
       expect(component.cleanIrregularLinebreaks()).toBe(false);
@@ -79,13 +89,40 @@ describe('LocalOcrTextExtractorComponent (Seam 2 & 4)', () => {
   });
 
   describe('File Handling & Text Extraction', () => {
-    it('should accept uploaded image and configure state', async () => {
+    it('should accept uploaded image without creating unused blob URLs', async () => {
+      const createObjectURLSpy = vi.spyOn(URL, 'createObjectURL');
       const file = createSyntheticImageFile('scanned-doc.png', 2048);
       await component.handleFileSelected(file);
 
       expect(component.selectedFile()).toBeTruthy();
       expect(component.selectedFile()?.name).toBe('scanned-doc.png');
       expect(component.selectedFile()?.isPdf).toBe(false);
+      // DEFECT-47-03: Must NOT call createObjectURL for unused preview URL
+      expect(createObjectURLSpy).not.toHaveBeenCalled();
+      createObjectURLSpy.mockRestore();
+    });
+
+    it('should reset stale extractedResult and previewText on new file selection', async () => {
+      const file1 = createSyntheticImageFile('first-doc.png', 2048);
+      await component.handleFileSelected(file1);
+      await component.extractText();
+
+      expect(component.extractedResult()).toBeTruthy();
+      expect(component.previewText().length).toBeGreaterThan(0);
+
+      const file2 = createSyntheticImageFile('second-doc.png', 2048);
+      await component.handleFileSelected(file2);
+
+      expect(component.selectedFile()?.name).toBe('second-doc.png');
+      expect(component.extractedResult()).toBeNull();
+      expect(component.previewText()).toBe('');
+    });
+
+    it('should load sample receipt when loadSampleReceipt is called', async () => {
+      await component.loadSampleReceipt();
+
+      expect(component.selectedFile()).toBeTruthy();
+      expect(component.selectedFile()?.name).toBe('sample-invoice.png');
     });
 
     it('should accept uploaded PDF and configure state', async () => {
@@ -152,6 +189,7 @@ describe('LocalOcrTextExtractorComponent (Seam 2 & 4)', () => {
       const file = createSyntheticImageFile('memo.png', 1024);
       await component.handleFileSelected(file);
       await component.extractText();
+      component.downloadDeliverable();
 
       component.resetToDefaults();
       expect(revokeSpy).toHaveBeenCalled();

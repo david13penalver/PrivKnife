@@ -5,334 +5,22 @@ import {
   ExportOcrFormat,
   LocalOcrTextExtractorOptions,
   LocalOcrTextExtractorResult,
+  LocalOcrWorkerRequest,
+  LocalOcrWorkerResponse,
   OcrLanguage,
   PageSegmentationMode,
 } from './types';
-import { processLocalOcr } from './engine';
+import { createSampleReceiptImageBlob, processLocalOcr } from './engine';
 
 @Component({
   selector: 'app-local-ocr-text-extractor',
   standalone: true,
   imports: [CommonModule, FormsModule],
-  template: `
-    <div class="l-page">
-      <!-- Header -->
-      <header class="l-page__header c-header">
-        <div class="c-header__title-group">
-          <h1 class="c-header__title">Local OCR Image & Scanned PDF to Text & Word</h1>
-          <p class="c-header__subtitle">
-            Extract editable text, tables, and paragraphs from photos, invoices, and scanned multi-page PDFs.
-            100% private in-browser recognition with zero server uploads and zero telemetry.
-          </p>
-        </div>
-        <div class="c-badge c-badge--privacy">
-          🛡️ 100% In-Browser • Never Leaves Your Device
-        </div>
-      </header>
-
-      <!-- Main Columns Layout -->
-      <div class="l-columns l-columns--2">
-        <!-- Configuration & Upload Area -->
-        <section class="l-columns__area c-card">
-          <div class="c-card__header">
-            <h2 class="c-card__title">OCR Configuration & Input</h2>
-          </div>
-
-          <div class="c-card__body">
-            <!-- Dropzone -->
-            <div
-              class="c-dropzone g--margin-bottom-4"
-              (dragover)="$event.preventDefault()"
-              (drop)="onFileDrop($event)"
-              (click)="fileInput.click()"
-            >
-              <input
-                #fileInput
-                type="file"
-                class="c-dropzone__input"
-                accept="image/png,image/jpeg,image/webp,application/pdf"
-                (change)="onFileInputChange($event)"
-              />
-              <div class="c-dropzone__content">
-                <span class="c-dropzone__icon">📄</span>
-                <p class="c-dropzone__text">
-                  @if (selectedFile()) {
-                    Selected: <strong>{{ selectedFile()?.name }}</strong> ({{ formatBytes(selectedFile()?.size || 0) }})
-                  } @else {
-                    Drop scanned document or image here, or <strong>browse</strong>
-                  }
-                </p>
-                <span class="c-dropzone__hint">Supports PDF, PNG, JPG, WebP</span>
-              </div>
-            </div>
-
-            <!-- Language Selector -->
-            <div class="c-input g--margin-bottom-4">
-              <label class="c-input__label">Document Language</label>
-              <select
-                class="c-input__select"
-                [ngModel]="ocrLanguage()"
-                (ngModelChange)="setLanguage($event)"
-              >
-                <option value="eng">English (eng)</option>
-                <option value="spa">Spanish / Español (spa)</option>
-                <option value="fra">French / Français (fra)</option>
-                <option value="deu">German / Deutsch (deu)</option>
-                <option value="ita">Italian / Italiano (ita)</option>
-                <option value="por">Portuguese / Português (por)</option>
-              </select>
-            </div>
-
-            <!-- Page Segmentation Mode -->
-            <div class="c-input g--margin-bottom-4">
-              <label class="c-input__label">Page Segmentation (Layout Analysis)</label>
-              <div class="c-button-group">
-                <button
-                  type="button"
-                  class="c-button c-button--small"
-                  [class.c-button--primary]="pageSegmentationMode() === 'auto'"
-                  [class.c-button--outline]="pageSegmentationMode() !== 'auto'"
-                  (click)="setSegmentation('auto')"
-                >
-                  Auto Detect
-                </button>
-                <button
-                  type="button"
-                  class="c-button c-button--small"
-                  [class.c-button--primary]="pageSegmentationMode() === 'single_block'"
-                  [class.c-button--outline]="pageSegmentationMode() !== 'single_block'"
-                  (click)="setSegmentation('single_block')"
-                >
-                  Single Block
-                </button>
-                <button
-                  type="button"
-                  class="c-button c-button--small"
-                  [class.c-button--primary]="pageSegmentationMode() === 'single_line'"
-                  [class.c-button--outline]="pageSegmentationMode() !== 'single_line'"
-                  (click)="setSegmentation('single_line')"
-                >
-                  Single Line
-                </button>
-              </div>
-            </div>
-
-            <!-- Text Formatting Toggles -->
-            <div class="c-input g--margin-bottom-4">
-              <label class="c-input__label">Post-Processing Optimizations</label>
-              <div class="c-checkbox-group">
-                <label class="c-checkbox-label">
-                  <input
-                    type="checkbox"
-                    [ngModel]="cleanIrregularLinebreaks()"
-                    (ngModelChange)="setCleanLinebreaks($event)"
-                  />
-                  <span>Unwrap hyphenated words & clean linebreaks</span>
-                </label>
-                <label class="c-checkbox-label g--margin-top-2">
-                  <input
-                    type="checkbox"
-                    [ngModel]="preserveTableSpacing()"
-                    (ngModelChange)="setPreserveTables($event)"
-                  />
-                  <span>Preserve tabular spacing (tab stops)</span>
-                </label>
-              </div>
-            </div>
-
-            <!-- Export Format Selector -->
-            <div class="c-input g--margin-bottom-4">
-              <label class="c-input__label">Export Format</label>
-              <div class="c-button-group">
-                <button
-                  type="button"
-                  class="c-button c-button--small"
-                  [class.c-button--primary]="exportFormat() === 'txt'"
-                  [class.c-button--outline]="exportFormat() !== 'txt'"
-                  (click)="setExportFormat('txt')"
-                >
-                  Plain Text (.txt)
-                </button>
-                <button
-                  type="button"
-                  class="c-button c-button--small"
-                  [class.c-button--primary]="exportFormat() === 'markdown'"
-                  [class.c-button--outline]="exportFormat() !== 'markdown'"
-                  (click)="setExportFormat('markdown')"
-                >
-                  Markdown (.md)
-                </button>
-                <button
-                  type="button"
-                  class="c-button c-button--small"
-                  [class.c-button--primary]="exportFormat() === 'docx'"
-                  [class.c-button--outline]="exportFormat() !== 'docx'"
-                  (click)="setExportFormat('docx')"
-                >
-                  Word Document (.docx)
-                </button>
-              </div>
-            </div>
-
-            <!-- Privacy Guarantee Notice -->
-            <div class="c-privacy-notice g--margin-bottom-4">
-              <span>🔒 <strong>Zero Network Ingestion:</strong> Optical character recognition executes 100% in your local browser sandbox. No file chunks or text strings ever leave your device.</span>
-            </div>
-          </div>
-
-          <div class="c-card__footer l-extremo">
-            <div class="l-extremo__area-izquierda">
-              <button
-                type="button"
-                class="c-button c-button--outline"
-                (click)="resetToDefaults()"
-              >
-                Reset
-              </button>
-            </div>
-            <div class="l-extremo__area-derecha">
-              <button
-                type="button"
-                class="c-button c-button--primary"
-                [disabled]="isProcessing() || !selectedFile()"
-                (click)="extractText()"
-              >
-                {{ isProcessing() ? 'Extracting Text...' : 'Start OCR Extraction' }}
-              </button>
-            </div>
-          </div>
-        </section>
-
-        <!-- Preview & Output Area -->
-        <section class="l-columns__area c-card">
-          <div class="c-card__header l-extremo">
-            <div class="l-extremo__area-izquierda">
-              <h2 class="c-card__title">Extracted Text & Output</h2>
-            </div>
-            <div class="l-extremo__area-derecha">
-              @if (previewText()) {
-                <button
-                  type="button"
-                  class="c-button c-button--outline c-button--small"
-                  (click)="copyToClipboard()"
-                >
-                  {{ copySuccess() ? '✓ Copied!' : 'Copy Text' }}
-                </button>
-              }
-            </div>
-          </div>
-
-          <div class="c-card__body">
-            @if (isProcessing()) {
-              <div class="c-progress g--margin-bottom-4">
-                <div class="c-progress__bar" style="width: 100%"></div>
-                <small class="g--text-small g--margin-top-2">Processing document with local client OCR engine...</small>
-              </div>
-            }
-
-            @if (previewText()) {
-              <div class="c-preview">
-                <textarea
-                  readonly
-                  class="c-ocr-textarea"
-                  [value]="previewText()"
-                ></textarea>
-              </div>
-
-              <!-- Metadata badge bar -->
-              <div class="c-result-meta g--margin-top-4">
-                <div class="c-badge c-badge--success">
-                  ✓ Recognition Completed ({{ formatBytes(extractedResult()?.fileSize || 0) }})
-                </div>
-                <p class="g--margin-top-2 g--text-small">
-                  Pages: <strong>{{ extractedResult()?.metadata?.pageCount || 1 }}</strong> |
-                  Words: <strong>{{ extractedResult()?.metadata?.wordCount || 0 }}</strong> |
-                  Characters: <strong>{{ extractedResult()?.metadata?.characterCount || 0 }}</strong> |
-                  Confidence: <strong>{{ extractedResult()?.metadata?.averageConfidence || 95 }}%</strong>
-                </p>
-              </div>
-            } @else {
-              <div class="c-preview__empty">
-                <span>No document processed</span>
-                <small>Upload an image or scanned PDF to extract text</small>
-              </div>
-            }
-          </div>
-
-          <div class="c-card__footer l-extremo">
-            <div class="l-extremo__area-derecha">
-              <button
-                type="button"
-                class="c-button c-button--primary"
-                [disabled]="!extractedResult()"
-                (click)="downloadDeliverable()"
-              >
-                Download {{ exportFormat().toUpperCase() }} Deliverable
-              </button>
-            </div>
-          </div>
-        </section>
-      </div>
-    </div>
-  `,
-  styles: [`
-    .c-button-group {
-      display: flex;
-      gap: 0.5rem;
-      flex-wrap: wrap;
-    }
-    .c-checkbox-group {
-      display: flex;
-      flex-direction: column;
-    }
-    .c-checkbox-label {
-      display: flex;
-      align-items: center;
-      gap: 0.5rem;
-      font-size: 0.875rem;
-      color: #334155;
-      cursor: pointer;
-    }
-    .c-privacy-notice {
-      padding: 0.75rem;
-      background: rgba(16, 185, 129, 0.08);
-      border: 1px solid rgba(16, 185, 129, 0.3);
-      border-radius: 4px;
-      font-size: 0.85rem;
-      color: #065f46;
-    }
-    .c-ocr-textarea {
-      width: 100%;
-      min-height: 380px;
-      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
-      font-size: 0.875rem;
-      line-height: 1.5;
-      padding: 0.75rem;
-      border: 1px solid #cbd5e1;
-      border-radius: 6px;
-      background: #f8fafc;
-      color: #0f172a;
-      resize: vertical;
-    }
-    .c-preview__empty {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      min-height: 380px;
-      background: #f8fafc;
-      border: 2px dashed #cbd5e1;
-      border-radius: 8px;
-      color: #94a3b8;
-    }
-    .g--text-small {
-      font-size: 0.85rem;
-      color: #64748b;
-    }
-  `],
+  templateUrl: './local-ocr-text-extractor.component.html',
+  styleUrls: ['./local-ocr-text-extractor.component.scss'],
 })
 export class LocalOcrTextExtractorComponent implements OnDestroy {
-  // Signals
+  // Reactive Signals
   readonly ocrLanguage = signal<OcrLanguage>('eng');
   readonly pageSegmentationMode = signal<PageSegmentationMode>('auto');
   readonly cleanIrregularLinebreaks = signal<boolean>(true);
@@ -344,7 +32,7 @@ export class LocalOcrTextExtractorComponent implements OnDestroy {
   readonly selectedFile = signal<{
     name: string;
     size: number;
-    file: File;
+    file: File | Blob;
     isPdf: boolean;
   } | null>(null);
 
@@ -354,8 +42,17 @@ export class LocalOcrTextExtractorComponent implements OnDestroy {
   readonly copySuccess = signal<boolean>(false);
 
   private createdBlobUrls: string[] = [];
+  private worker: Worker | null = null;
 
   ngOnDestroy(): void {
+    if (this.worker) {
+      try {
+        this.worker.terminate();
+      } catch {
+        // ignore
+      }
+      this.worker = null;
+    }
     this.cleanUpUrls();
   }
 
@@ -379,20 +76,37 @@ export class LocalOcrTextExtractorComponent implements OnDestroy {
     this.preserveTableSpacing.set(val);
   }
 
-  async handleFileSelected(file: File): Promise<void> {
-    const isPdf =
-      file.type === 'application/pdf' ||
-      file.name.toLowerCase().endsWith('.pdf');
+  setBinarizeThreshold(val: number | string): void {
+    const num = Math.max(0, Math.min(255, Number(val) || 128));
+    this.binarizeThreshold.set(num);
+  }
 
-    const previewUrl = URL.createObjectURL(file);
-    this.createdBlobUrls.push(previewUrl);
+  setEnhanceContrast(val: boolean): void {
+    this.enhanceContrast.set(val);
+  }
+
+  async handleFileSelected(file: File | Blob, name?: string): Promise<void> {
+    const fileName =
+      name || (file instanceof File ? file.name : 'document.png');
+    const isPdf =
+      fileName.toLowerCase().endsWith('.pdf') ||
+      ('type' in file && file.type === 'application/pdf');
+
+    // Reset stale extracted state on re-upload (DEFECT-47-03)
+    this.extractedResult.set(null);
+    this.previewText.set('');
 
     this.selectedFile.set({
-      name: file.name,
+      name: fileName,
       size: file.size,
       file,
       isPdf,
     });
+  }
+
+  async loadSampleReceipt(): Promise<void> {
+    const sampleBlob = await createSampleReceiptImageBlob();
+    await this.handleFileSelected(sampleBlob, 'sample-invoice.png');
   }
 
   onFileInputChange(event: Event): void {
@@ -426,12 +140,67 @@ export class LocalOcrTextExtractorComponent implements OnDestroy {
         enhanceContrast: this.enhanceContrast(),
       };
 
-      const result = await processLocalOcr(item.file, options, item.name);
+      let result: LocalOcrTextExtractorResult;
+
+      // Offload to web worker if available
+      if (typeof Worker !== 'undefined') {
+        try {
+          const buffer = await item.file.arrayBuffer();
+          result = await this.extractWithWorker(buffer, options, item.name);
+        } catch {
+          result = await processLocalOcr(item.file, options, item.name);
+        }
+      } else {
+        result = await processLocalOcr(item.file, options, item.name);
+      }
+
       this.extractedResult.set(result);
       this.previewText.set(result.extractedText);
     } finally {
       this.isProcessing.set(false);
     }
+  }
+
+  private extractWithWorker(
+    fileBuffer: ArrayBuffer,
+    options: LocalOcrTextExtractorOptions,
+    originalFileName: string
+  ): Promise<LocalOcrTextExtractorResult> {
+    return new Promise((resolve, reject) => {
+      try {
+        const worker = new Worker(new URL('./worker', import.meta.url), {
+          type: 'module',
+        });
+        this.worker = worker;
+
+        worker.onmessage = (event: MessageEvent<LocalOcrWorkerResponse>) => {
+          if (event.data.type === 'ocr') {
+            worker.terminate();
+            if (this.worker === worker) this.worker = null;
+            if (event.data.success && event.data.result) {
+              resolve(event.data.result);
+            } else {
+              reject(new Error(event.data.error || 'Worker OCR failed'));
+            }
+          }
+        };
+
+        worker.onerror = (err) => {
+          worker.terminate();
+          if (this.worker === worker) this.worker = null;
+          reject(err);
+        };
+
+        worker.postMessage({
+          type: 'ocr',
+          fileBuffer,
+          options,
+          originalFileName,
+        } as LocalOcrWorkerRequest);
+      } catch (err) {
+        reject(err);
+      }
+    });
   }
 
   async copyToClipboard(): Promise<void> {
@@ -475,6 +244,8 @@ export class LocalOcrTextExtractorComponent implements OnDestroy {
     this.cleanIrregularLinebreaks.set(true);
     this.preserveTableSpacing.set(true);
     this.exportFormat.set('txt');
+    this.binarizeThreshold.set(128);
+    this.enhanceContrast.set(true);
     this.selectedFile.set(null);
     this.extractedResult.set(null);
     this.previewText.set('');

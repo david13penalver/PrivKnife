@@ -1,0 +1,315 @@
+<div class="l-page">
+  <!-- Header -->
+  <header class="l-page__header c-header">
+    <div class="c-header__title-group">
+      <h1 class="c-header__title">Local OCR Image & Scanned PDF to Text & Word</h1>
+      <p class="c-header__subtitle">
+        Extract editable text, tables, and paragraphs from photos, invoices, and scanned multi-page PDFs.
+        100% private in-browser recognition with zero server uploads and zero telemetry.
+      </p>
+    </div>
+    <div class="c-badge c-badge--privacy">
+      🛡️ 100% In-Browser • Never Leaves Your Device
+    </div>
+  </header>
+
+  <!-- Main Columns Layout -->
+  <div class="l-columns l-columns--2">
+    <!-- Configuration & Upload Area -->
+    <section class="l-columns__area c-card">
+      <div class="c-card__header">
+        <h2 class="c-card__title">OCR Configuration & Input</h2>
+      </div>
+
+      <div class="c-card__body">
+        <!-- Dropzone -->
+        <div
+          class="c-dropzone g--margin-bottom-4"
+          (dragover)="$event.preventDefault()"
+          (drop)="onFileDrop($event)"
+          (click)="fileInput.click()"
+        >
+          <input
+            #fileInput
+            type="file"
+            class="c-dropzone__input"
+            accept="image/png,image/jpeg,image/webp,application/pdf"
+            (change)="onFileInputChange($event)"
+          />
+          <div class="c-dropzone__content">
+            <span class="c-dropzone__icon">📄</span>
+            <p class="c-dropzone__text">
+              @if (selectedFile()) {
+                Selected: <strong>{{ selectedFile()?.name }}</strong> ({{ formatBytes(selectedFile()?.size || 0) }})
+              } @else {
+                Drop scanned document or image here, or <strong>browse</strong>
+              }
+            </p>
+            <div class="c-ocr__sample-row" (click)="$event.stopPropagation()">
+              <button
+                type="button"
+                class="c-button c-button--outline c-button--small"
+                (click)="loadSampleReceipt()"
+              >
+                Load Sample Receipt
+              </button>
+            </div>
+            <span class="c-dropzone__hint">Supports PDF, PNG, JPG, WebP • 100% Local Sandbox</span>
+          </div>
+        </div>
+
+        <!-- Language Selector -->
+        <div class="c-input g--margin-bottom-4">
+          <label class="c-input__label" for="ocrLanguageSelect">Document Language</label>
+          <select
+            id="ocrLanguageSelect"
+            class="c-input__control"
+            [ngModel]="ocrLanguage()"
+            (ngModelChange)="setLanguage($event)"
+          >
+            <option value="eng">English (eng)</option>
+            <option value="spa">Spanish / Español (spa)</option>
+            <option value="fra">French / Français (fra)</option>
+            <option value="deu">German / Deutsch (deu)</option>
+            <option value="ita">Italian / Italiano (ita)</option>
+            <option value="por">Portuguese / Português (por)</option>
+          </select>
+        </div>
+
+        <!-- Page Segmentation Mode -->
+        <div class="c-input g--margin-bottom-4">
+          <label class="c-input__label">Page Segmentation (Layout Analysis)</label>
+          <div class="c-button-group">
+            <button
+              type="button"
+              class="c-button c-button--small"
+              [class.c-button--primary]="pageSegmentationMode() === 'auto'"
+              [class.c-button--outline]="pageSegmentationMode() !== 'auto'"
+              (click)="setSegmentation('auto')"
+            >
+              Auto Detect
+            </button>
+            <button
+              type="button"
+              class="c-button c-button--small"
+              [class.c-button--primary]="pageSegmentationMode() === 'single_block'"
+              [class.c-button--outline]="pageSegmentationMode() !== 'single_block'"
+              (click)="setSegmentation('single_block')"
+            >
+              Single Block
+            </button>
+            <button
+              type="button"
+              class="c-button c-button--small"
+              [class.c-button--primary]="pageSegmentationMode() === 'single_line'"
+              [class.c-button--outline]="pageSegmentationMode() !== 'single_line'"
+              (click)="setSegmentation('single_line')"
+            >
+              Single Line
+            </button>
+          </div>
+        </div>
+
+        <!-- Image Preprocessing & Contrast Controls -->
+        <div class="c-input g--margin-bottom-4">
+          <label class="c-input__label">Image Preprocessing Filters</label>
+          <div class="c-ocr__switches-group">
+            <label class="c-input__switch">
+              <input
+                type="checkbox"
+                class="c-input__switch-input"
+                [ngModel]="enhanceContrast()"
+                (ngModelChange)="setEnhanceContrast($event)"
+              />
+              <span class="c-input__switch-slider"></span>
+              <span class="c-input__switch-label">Enhance Dynamic Contrast (Histogram Stretching)</span>
+            </label>
+          </div>
+        </div>
+
+        <!-- Binarization Threshold Slider -->
+        <div class="c-input g--margin-bottom-4">
+          <label class="c-input__label">
+            Binarize Threshold: <strong>{{ binarizeThreshold() }}</strong>
+          </label>
+          <input
+            id="binarizeThresholdRange"
+            type="range"
+            class="c-input__slider"
+            min="0"
+            max="255"
+            step="1"
+            [ngModel]="binarizeThreshold()"
+            (ngModelChange)="setBinarizeThreshold($event)"
+          />
+        </div>
+
+        <!-- Text Formatting Toggles -->
+        <div class="c-input g--margin-bottom-4">
+          <label class="c-input__label">Post-Processing Optimizations</label>
+          <div class="c-ocr__switches-group">
+            <label class="c-input__switch">
+              <input
+                type="checkbox"
+                class="c-input__switch-input"
+                [ngModel]="cleanIrregularLinebreaks()"
+                (ngModelChange)="setCleanLinebreaks($event)"
+              />
+              <span class="c-input__switch-slider"></span>
+              <span class="c-input__switch-label">Unwrap hyphenated words & clean linebreaks</span>
+            </label>
+            <label class="c-input__switch g--margin-top-2">
+              <input
+                type="checkbox"
+                class="c-input__switch-input"
+                [ngModel]="preserveTableSpacing()"
+                (ngModelChange)="setPreserveTables($event)"
+              />
+              <span class="c-input__switch-slider"></span>
+              <span class="c-input__switch-label">Preserve tabular spacing (tab stops)</span>
+            </label>
+          </div>
+        </div>
+
+        <!-- Export Format Selector -->
+        <div class="c-input g--margin-bottom-4">
+          <label class="c-input__label" for="exportFormatSelect">Export Format</label>
+          <div class="c-button-group">
+            <button
+              type="button"
+              class="c-button c-button--small"
+              [class.c-button--primary]="exportFormat() === 'txt'"
+              [class.c-button--outline]="exportFormat() !== 'txt'"
+              (click)="setExportFormat('txt')"
+            >
+              Plain Text (.txt)
+            </button>
+            <button
+              type="button"
+              class="c-button c-button--small"
+              [class.c-button--primary]="exportFormat() === 'markdown'"
+              [class.c-button--outline]="exportFormat() !== 'markdown'"
+              (click)="setExportFormat('markdown')"
+            >
+              Markdown (.md)
+            </button>
+            <button
+              type="button"
+              class="c-button c-button--small"
+              [class.c-button--primary]="exportFormat() === 'docx'"
+              [class.c-button--outline]="exportFormat() !== 'docx'"
+              (click)="setExportFormat('docx')"
+            >
+              Word Document (.docx)
+            </button>
+          </div>
+        </div>
+
+        <!-- Privacy Guarantee Notice -->
+        <div class="c-ocr__privacy-notice g--margin-bottom-4">
+          <span>🔒 <strong>Zero Network Ingestion:</strong> Optical character recognition executes 100% in your local browser sandbox. No file chunks or text strings ever leave your device.</span>
+        </div>
+      </div>
+
+      <div class="c-card__footer l-extremo">
+        <div class="l-extremo__area-izquierda">
+          <button
+            type="button"
+            class="c-button c-button--outline"
+            (click)="resetToDefaults()"
+          >
+            Reset
+          </button>
+        </div>
+        <div class="l-extremo__area-derecha">
+          <button
+            type="button"
+            class="c-button c-button--primary"
+            [disabled]="isProcessing() || !selectedFile()"
+            (click)="extractText()"
+          >
+            {{ isProcessing() ? 'Extracting Text...' : 'Start OCR Extraction' }}
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <!-- Preview & Output Area -->
+    <section class="l-columns__area c-card">
+      <div class="c-card__header l-extremo">
+        <div class="l-extremo__area-izquierda">
+          <h2 class="c-card__title">Extracted Text & Output</h2>
+        </div>
+        <div class="l-extremo__area-derecha">
+          @if (previewText()) {
+            <button
+              type="button"
+              class="c-button c-button--outline c-button--small"
+              (click)="copyToClipboard()"
+            >
+              {{ copySuccess() ? '✓ Copied!' : 'Copy Text' }}
+            </button>
+          }
+        </div>
+      </div>
+
+      <div class="c-card__body">
+        @if (isProcessing()) {
+          <div class="c-progress g--margin-bottom-4">
+            <div class="c-progress__bar" style="width: 100%"></div>
+            <small class="g--text-small g--margin-top-2">Processing document with local client OCR engine...</small>
+          </div>
+        }
+
+        @if (previewText()) {
+          <div class="c-ocr__preview">
+            <textarea
+              readonly
+              class="c-ocr__textarea"
+              [value]="previewText()"
+            ></textarea>
+          </div>
+
+          <!-- Metadata badge bar -->
+          <div class="c-ocr__result-meta g--margin-top-4">
+            <div class="c-badge c-badge--success">
+              ✓ Recognition Completed ({{ formatBytes(extractedResult()?.fileSize || 0) }})
+            </div>
+            <p class="g--margin-top-2 g--text-small">
+              Pages: <strong>{{ extractedResult()?.metadata?.pageCount || 1 }}</strong> |
+              Words: <strong>{{ extractedResult()?.metadata?.wordCount || 0 }}</strong> |
+              Characters: <strong>{{ extractedResult()?.metadata?.characterCount || 0 }}</strong> |
+              Confidence: <strong>{{ extractedResult()?.metadata?.averageConfidence || 95 }}%</strong>
+            </p>
+          </div>
+        } @else {
+          <div class="c-ocr__empty">
+            <span class="c-ocr__empty-icon">📄</span>
+            <strong>No document processed</strong>
+            <small>Upload an image or scanned PDF to extract text</small>
+            <button
+              type="button"
+              class="c-button c-button--primary c-button--small g--margin-top-4"
+              (click)="loadSampleReceipt()"
+            >
+              Load Sample Receipt
+            </button>
+          </div>
+        }
+      </div>
+
+      <div class="c-card__footer l-extremo">
+        <div class="l-extremo__area-derecha">
+          <button
+            type="button"
+            class="c-button c-button--primary"
+            [disabled]="!extractedResult()"
+            (click)="downloadDeliverable()"
+          >
+            Download {{ exportFormat().toUpperCase() }} Deliverable
+          </button>
+        </div>
+      </div>
+    </section>
+  </div>
+</div>
