@@ -200,6 +200,7 @@ gantt
 | **88** | [88 - Remediation - Interactive 2D Floor Plan & Room Furniture Scaler](88%20-%20Remediation%20-%20Interactive%202D%20Floor%20Plan%20%26%20Room%20Furniture%20Scaler/spec.md) | #58 (`floor-plan-furniture-scaler`) | Critical | ⚠️ (`⚠️ Partial` / `⚠️ Minor issues`) | [ ] |
 | **89** | [89 - Remediation - Printable Emergency Recovery & Password Kit Sheet](89%20-%20Remediation%20-%20Printable%20Emergency%20Recovery%20%26%20Password%20Kit%20Sheet/spec.md) | #59 (`emergency-recovery-kit`) | Critical | ⚠️ (`✅ Works` / `⚠️ Minor issues`) | [ ] |
 | **90** | [90 - Remediation - CSV_Paste to Vector Chart & Infographic Builder](90%20-%20CSV_Paste%20to%20Vector%20Chart%20%26%20Infographic%20Builder/spec.md) | #60 (`csv-vector-chart-builder`) | Critical | ⚠️ (`⚠️ Partial` / `⚠️ Minor issues`) | [ ] |
+| **91** | [91 - Multi-Language Internationalization (i18n) for Tools 31-60](91%20-%20Multi-Language%20Internationalization%20(i18n)%20for%20Tools%2031-60/spec.md) | Platform / i18n | Multi-language dictionaries for Tools 31–60 across 8 locales (`en`, `es`, `fr`, `it`, `de`, `zh`, `ja`, `ar`) + 59+ tools catalog sync | Angular Signals, Dynamic ES Imports, LocalStorage | [ ] |
 
 ---
 
