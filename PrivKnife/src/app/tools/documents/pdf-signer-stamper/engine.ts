@@ -8,8 +8,23 @@ import {
 } from './types';
 
 // -------------------------------------------------------------
-// 1. Validation Guardrails
+// 1. Validation Guardrails & Coordinate Clamping
 // -------------------------------------------------------------
+export function clampStampCoordinates(
+  x: number,
+  y: number,
+  w: number,
+  h: number,
+  pageW: number,
+  pageH: number
+): { x: number; y: number } {
+  const maxX = Math.max(0, pageW - w);
+  const maxY = Math.max(0, pageH - h);
+  const clampedX = Math.max(0, Math.min(x, maxX));
+  const clampedY = Math.max(0, Math.min(y, maxY));
+  return { x: clampedX, y: clampedY };
+}
+
 export function validateSignerOptions(options: PdfSignerStamperOptions): {
   valid: boolean;
   error?: string;
@@ -129,7 +144,7 @@ export async function applyStampsToPdf(
   pdfBuffer: ArrayBuffer,
   stamps: PlacedStamp[],
   options: PdfSignerStamperOptions
-): Promise<Uint8Array> {
+): Promise<{ signedBytes: Uint8Array; pageCount: number }> {
   const pdfDoc = await PDFDocument.load(pdfBuffer, { ignoreEncryption: true });
   const pageCount = pdfDoc.getPageCount();
 
@@ -148,6 +163,16 @@ export async function applyStampsToPdf(
     }
 
     const page = pdfDoc.getPage(stamp.pageIndex);
+    const pageWidth = page.getWidth();
+    const pageHeight = page.getHeight();
+    const { x, y } = clampStampCoordinates(
+      stamp.x,
+      stamp.y,
+      stamp.width || 100,
+      stamp.height || 40,
+      pageWidth,
+      pageHeight
+    );
 
     if (stamp.type === 'signature' && stamp.imageDataUrl) {
       try {
@@ -155,16 +180,16 @@ export async function applyStampsToPdf(
         const embeddedImage = await pdfDoc.embedPng(imageBytes);
 
         page.drawImage(embeddedImage, {
-          x: stamp.x,
-          y: stamp.y,
+          x,
+          y,
           width: stamp.width,
           height: stamp.height,
         });
       } catch {
         // Fallback text if image embedding fails
         page.drawText(stamp.text || '[Digitally Signed]', {
-          x: stamp.x,
-          y: stamp.y,
+          x,
+          y,
           size: 14,
           font: timesItalicFont,
           color: defaultInk,
@@ -177,8 +202,8 @@ export async function applyStampsToPdf(
         formatDateString(options.dateFormat);
 
       page.drawText(dateText, {
-        x: stamp.x,
-        y: stamp.y,
+        x,
+        y,
         size: stamp.fontSize || 11,
         font: helveticaFont,
         color: defaultInk,
@@ -189,24 +214,24 @@ export async function applyStampsToPdf(
       // Draw subtle circular border around initials
       const circleRadius = (stamp.width || 30) / 2;
       page.drawCircle({
-        x: stamp.x + circleRadius,
-        y: stamp.y + circleRadius,
+        x: x + circleRadius,
+        y: y + circleRadius,
         size: circleRadius,
         borderWidth: 1.5,
         borderColor: defaultInk,
       });
 
       page.drawText(initialsText, {
-        x: stamp.x + circleRadius - 8,
-        y: stamp.y + circleRadius - 4,
+        x: x + circleRadius - 8,
+        y: y + circleRadius - 4,
         size: stamp.fontSize || 12,
         font: helveticaFont,
         color: defaultInk,
       });
     } else if (stamp.type === 'text') {
       page.drawText(stamp.text || '', {
-        x: stamp.x,
-        y: stamp.y,
+        x,
+        y,
         size: stamp.fontSize || 12,
         font: helveticaFont,
         color: defaultInk,
@@ -226,7 +251,8 @@ export async function applyStampsToPdf(
     }
   }
 
-  return pdfDoc.save();
+  const signedBytes = await pdfDoc.save();
+  return { signedBytes, pageCount };
 }
 
 // -------------------------------------------------------------
@@ -243,20 +269,11 @@ export async function processSignedPdf(
   }
 
   const stamps = options.stamps || [];
-  const signedBytes = await applyStampsToPdf(pdfBuffer, stamps, options);
+  const { signedBytes, pageCount } = await applyStampsToPdf(pdfBuffer, stamps, options);
 
   const baseName = originalFileName.replace(/\.[^/.]+$/, '');
   const outFileName = `${baseName}-signed.pdf`;
   const blob = new Blob([signedBytes.buffer as ArrayBuffer], { type: 'application/pdf' });
-
-  // Read page count
-  let pageCount = 1;
-  try {
-    const summary = await inspectPdfDocument(pdfBuffer, originalFileName);
-    pageCount = summary.pageCount;
-  } catch {
-    // Default
-  }
 
   return {
     success: true,

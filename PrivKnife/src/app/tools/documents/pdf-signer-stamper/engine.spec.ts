@@ -1,6 +1,7 @@
 import { describe, it, expect, beforeEach } from 'vitest';
 import {
   applyStampsToPdf,
+  clampStampCoordinates,
   formatDateString,
   inspectPdfDocument,
   processSignedPdf,
@@ -79,15 +80,47 @@ describe('Client-Side PDF Signer, Date Stamper & Initials Engine (Seam 1)', () =
     });
   });
 
+  describe('Coordinate Clamping & Single-Pass Stamping', () => {
+    it('should clamp stamp coordinates within page boundaries', () => {
+      // Normal within bounds
+      expect(clampStampCoordinates(100, 150, 140, 50, 600, 800)).toEqual({ x: 100, y: 150 });
+
+      // Negative coordinates clamped to 0
+      expect(clampStampCoordinates(-50, -20, 100, 50, 600, 800)).toEqual({ x: 0, y: 0 });
+
+      // Exceeding maxX = 600 - 100 = 500
+      expect(clampStampCoordinates(550, 200, 100, 50, 600, 800)).toEqual({ x: 500, y: 200 });
+
+      // Exceeding maxY = 800 - 50 = 750
+      expect(clampStampCoordinates(100, 780, 100, 50, 600, 800)).toEqual({ x: 100, y: 750 });
+
+      // Width larger than page width
+      expect(clampStampCoordinates(100, 200, 700, 50, 600, 800)).toEqual({ x: 0, y: 200 });
+    });
+
+    it('should return pageCount directly from applyStampsToPdf in single pass', async () => {
+      const result = await applyStampsToPdf(
+        samplePdfBytes.buffer as ArrayBuffer,
+        SAMPLE_PLACED_STAMPS,
+        DEFAULT_SIGNER_OPTIONS
+      );
+
+      expect(result.signedBytes).toBeDefined();
+      expect(result.pageCount).toBe(2);
+      expect(result.signedBytes.byteLength).toBeGreaterThan(samplePdfBytes.byteLength);
+    });
+  });
+
   describe('Stamp Embedding & Flattening Execution', () => {
     it('should apply signature, date, and initials stamps onto PDF pages', async () => {
-      const signedBytes = await applyStampsToPdf(
+      const { signedBytes, pageCount } = await applyStampsToPdf(
         samplePdfBytes.buffer as ArrayBuffer,
         SAMPLE_PLACED_STAMPS,
         DEFAULT_SIGNER_OPTIONS
       );
 
       expect(signedBytes).toBeDefined();
+      expect(pageCount).toBe(2);
       expect(signedBytes.byteLength).toBeGreaterThan(samplePdfBytes.byteLength);
     });
 

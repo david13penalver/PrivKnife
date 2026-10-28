@@ -1,0 +1,526 @@
+<div class="l-page">
+  <!-- Header -->
+  <div class="l-page__header c-header">
+    <div class="c-header__title-group">
+      <h1 class="c-header__title">Client-Side PDF Signer, Date Stamper & Initials</h1>
+      <p class="c-header__subtitle">
+        Sign contracts, NDAs, and forms 100% privately in your browser. Draw pressure-smoothed signatures, place date stamps and initials, and permanently flatten annotations.
+      </p>
+    </div>
+    <div class="c-badge c-badge--privacy">
+      🛡️ 100% In-Browser • Never Leaves Your Device
+    </div>
+  </div>
+
+  <!-- Quick Document Selector Bar -->
+  <div class="c-pdf-signer__preset-strip g--margin-bottom-4">
+    <span class="c-pdf-signer__preset-label">Quick Document:</span>
+    <div class="c-pdf-signer__preset-buttons">
+      <button
+        type="button"
+        class="c-button c-button--small c-button--outline"
+        (click)="loadSampleDocument('Non-Disclosure Agreement (NDA)')"
+      >
+        Sample NDA Agreement
+      </button>
+      <button
+        type="button"
+        class="c-button c-button--small c-button--outline"
+        (click)="loadSampleDocument('Consulting Services Contract')"
+      >
+        Sample Service Contract
+      </button>
+    </div>
+  </div>
+
+  <!-- Main Layout Columns -->
+  <div class="l-columns l-columns--2">
+    <!-- Controls & Stamping Tools Column -->
+    <div class="l-columns__area">
+      <!-- Document Upload Card -->
+      <app-card title="1. Select or Drop PDF" class="g--margin-bottom-4">
+        <app-dropzone
+          title="Drop your PDF document here"
+          subtitle="or click to browse from your device (zero server upload)"
+          accept=".pdf,application/pdf"
+          [multiple]="false"
+          [maxSizeMb]="50"
+          (filesSelected)="onFilesDropped($event)"
+        />
+        <div class="c-pdf-signer__doc-meta g--margin-top-2">
+          <small class="g--text-muted">
+            Active Document: <strong>{{ fileName() }}</strong>
+            @if (documentLoaded()) {
+              <span> ({{ pageCount() }} {{ pageCount() === 1 ? 'page' : 'pages' }})</span>
+            }
+          </small>
+        </div>
+      </app-card>
+
+      <!-- Signature Pad Card -->
+      <app-card title="2. Draw or Type Signature" class="g--margin-bottom-4">
+        <!-- Mode Toggle Pills -->
+        <div class="c-pdf-signer__mode-pills g--margin-bottom-3">
+          <button
+            type="button"
+            class="c-button c-button--small"
+            [class.c-button--primary]="signatureMode() === 'draw'"
+            [class.c-button--outline]="signatureMode() !== 'draw'"
+            (click)="setSignatureMode('draw')"
+          >
+            ✏️ Draw Signature
+          </button>
+          <button
+            type="button"
+            class="c-button c-button--small"
+            [class.c-button--primary]="signatureMode() === 'type'"
+            [class.c-button--outline]="signatureMode() !== 'type'"
+            (click)="setSignatureMode('type')"
+          >
+            ⌨️ Type Signature
+          </button>
+        </div>
+
+        @if (signatureMode() === 'draw') {
+          <!-- Drawing Canvas Pad -->
+          <div class="c-pdf-signer__pad-container g--margin-bottom-3">
+            <canvas
+              #signatureCanvas
+              class="c-pdf-signer__signature-canvas"
+              width="400"
+              height="150"
+              (pointerdown)="onPointerDown($event)"
+              (pointermove)="onPointerMove($event)"
+              (pointerup)="onPointerUp()"
+              (pointerleave)="onPointerUp()"
+              (pointercancel)="onPointerUp()"
+            ></canvas>
+            <div class="c-pdf-signer__baseline"></div>
+            <span class="c-pdf-signer__hint">Sign above the line</span>
+          </div>
+
+          <!-- Drawing Controls -->
+          <div class="l-extremo g--align-center g--margin-bottom-3">
+            <div class="l-extremo__area-izquierda c-pdf-signer__ink-group">
+              <span class="c-input__label g--margin-right-2">Ink Color:</span>
+              <button
+                type="button"
+                class="c-pdf-signer__color-dot c-pdf-signer__color-dot--black"
+                [class.is-active]="signatureInkColor() === 'black'"
+                (click)="setSignatureInkColor('black')"
+                title="Black Ink"
+                aria-label="Black Ink"
+              ></button>
+              <button
+                type="button"
+                class="c-pdf-signer__color-dot c-pdf-signer__color-dot--blue"
+                [class.is-active]="signatureInkColor() === 'dark_blue'"
+                (click)="setSignatureInkColor('dark_blue')"
+                title="Dark Blue Ink"
+                aria-label="Dark Blue Ink"
+              ></button>
+            </div>
+
+            <div class="l-extremo__area-derecha c-pdf-signer__signature-actions">
+              <button
+                type="button"
+                class="c-button c-button--small c-button--outline"
+                (click)="clearSignaturePad()"
+              >
+                Clear Pad
+              </button>
+              <button
+                type="button"
+                class="c-button c-button--small c-button--primary"
+                [disabled]="!documentLoaded() || !hasSignatureContent()"
+                (click)="placeCurrentSignature()"
+              >
+                + Stamp Signature
+              </button>
+            </div>
+          </div>
+
+          <!-- Pen Width Slider -->
+          <div class="c-input g--margin-bottom-2">
+            <div class="l-extremo">
+              <div class="l-extremo__area-izquierda">
+                <label class="c-input__label" for="penWidthSlider">Pen Stroke Width</label>
+              </div>
+              <div class="l-extremo__area-derecha">
+                <span class="c-input__value">{{ signaturePenWidth() }}px</span>
+              </div>
+            </div>
+            <input
+              id="penWidthSlider"
+              type="range"
+              class="c-input__slider"
+              [min]="1"
+              [max]="6"
+              [step]="1"
+              [ngModel]="signaturePenWidth()"
+              (ngModelChange)="setSignaturePenWidth($event)"
+            />
+          </div>
+        } @else {
+          <!-- Typed Signature Controls -->
+          <div class="c-input g--margin-bottom-3">
+            <label class="c-input__label g--margin-bottom-1" for="typedSigInput">Type Your Full Name</label>
+            <input
+              id="typedSigInput"
+              type="text"
+              class="c-input__control"
+              placeholder="e.g. Jane Doe"
+              [ngModel]="typedSignatureText()"
+              (ngModelChange)="setTypedSignatureText($event)"
+            />
+          </div>
+
+          <!-- Typed Signature Preview Canvas Box -->
+          <div class="c-pdf-signer__typed-preview-box g--margin-bottom-3">
+            <div
+              class="c-pdf-signer__typed-preview-text"
+              [style.color]="signatureInkColor() === 'dark_blue' ? '#1e3a8a' : '#111827'"
+            >
+              {{ typedSignatureText() || 'Jane Doe' }}
+            </div>
+            <div class="c-pdf-signer__baseline"></div>
+            <span class="c-pdf-signer__hint">Cursive Script Rendering</span>
+          </div>
+
+          <div class="l-extremo g--align-center">
+            <div class="l-extremo__area-izquierda c-pdf-signer__ink-group">
+              <span class="c-input__label g--margin-right-2">Ink Color:</span>
+              <button
+                type="button"
+                class="c-pdf-signer__color-dot c-pdf-signer__color-dot--black"
+                [class.is-active]="signatureInkColor() === 'black'"
+                (click)="setSignatureInkColor('black')"
+                title="Black Ink"
+                aria-label="Black Ink"
+              ></button>
+              <button
+                type="button"
+                class="c-pdf-signer__color-dot c-pdf-signer__color-dot--blue"
+                [class.is-active]="signatureInkColor() === 'dark_blue'"
+                (click)="setSignatureInkColor('dark_blue')"
+                title="Dark Blue Ink"
+                aria-label="Dark Blue Ink"
+              ></button>
+            </div>
+
+            <div class="l-extremo__area-derecha">
+              <button
+                type="button"
+                class="c-button c-button--small c-button--primary"
+                [disabled]="!documentLoaded() || !hasSignatureContent()"
+                (click)="placeCurrentSignature()"
+              >
+                + Stamp Signature
+              </button>
+            </div>
+          </div>
+        }
+      </app-card>
+
+      <!-- Date Stamper & Initials Card -->
+      <app-card title="3. Date Stamps & Initials" class="g--margin-bottom-4">
+        <!-- Date Stamper -->
+        <div class="c-input g--margin-bottom-3">
+          <label class="c-input__label g--margin-bottom-1">Date Format</label>
+          <div class="c-pdf-signer__date-pills g--margin-bottom-2">
+            <button
+              type="button"
+              class="c-button c-button--small"
+              [class.c-button--primary]="dateFormat() === 'YYYY-MM-DD'"
+              [class.c-button--outline]="dateFormat() !== 'YYYY-MM-DD'"
+              (click)="setDateFormat('YYYY-MM-DD')"
+            >
+              YYYY-MM-DD
+            </button>
+            <button
+              type="button"
+              class="c-button c-button--small"
+              [class.c-button--primary]="dateFormat() === 'MM/DD/YYYY'"
+              [class.c-button--outline]="dateFormat() !== 'MM/DD/YYYY'"
+              (click)="setDateFormat('MM/DD/YYYY')"
+            >
+              MM/DD/YYYY
+            </button>
+            <button
+              type="button"
+              class="c-button c-button--small"
+              [class.c-button--primary]="dateFormat() === 'DD/MM/YYYY'"
+              [class.c-button--outline]="dateFormat() !== 'DD/MM/YYYY'"
+              (click)="setDateFormat('DD/MM/YYYY')"
+            >
+              DD/MM/YYYY
+            </button>
+            <button
+              type="button"
+              class="c-button c-button--small"
+              [class.c-button--primary]="dateFormat() === 'MMM D, YYYY'"
+              [class.c-button--outline]="dateFormat() !== 'MMM D, YYYY'"
+              (click)="setDateFormat('MMM D, YYYY')"
+            >
+              MMM D, YYYY
+            </button>
+          </div>
+
+          <div class="l-extremo g--align-center">
+            <div class="l-extremo__area-izquierda">
+              <span class="c-pdf-signer__date-preview">Stamp Text: <strong>{{ computedDateText() }}</strong></span>
+            </div>
+            <div class="l-extremo__area-derecha">
+              <button
+                type="button"
+                class="c-button c-button--small c-button--primary"
+                [disabled]="!documentLoaded()"
+                (click)="placeCurrentDateStamp()"
+              >
+                + Stamp Date
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Initials Stamper -->
+        <div class="c-input">
+          <label class="c-input__label g--margin-bottom-1" for="initialsInput">Initials Text</label>
+          <div class="l-extremo g--align-center">
+            <div class="l-extremo__area-izquierda">
+              <input
+                id="initialsInput"
+                type="text"
+                class="c-input__control c-pdf-signer__initials-input"
+                maxlength="5"
+                [ngModel]="initialsText()"
+                (ngModelChange)="setInitialsText($event)"
+              />
+            </div>
+            <div class="l-extremo__area-derecha">
+              <button
+                type="button"
+                class="c-button c-button--small c-button--primary"
+                [disabled]="!documentLoaded()"
+                (click)="placeCurrentInitialsStamp()"
+              >
+                + Stamp Initials
+              </button>
+            </div>
+          </div>
+        </div>
+      </app-card>
+    </div>
+
+    <!-- Preview & Placed Annotations Column -->
+    <div class="l-columns__area">
+      <!-- Document Stamps List & Action Card -->
+      <app-card title="Placed Stamps & Live Document Viewport" class="g--margin-bottom-4">
+        <!-- Page Selector if multi-page -->
+        @if (pageCount() > 1) {
+          <div class="c-pdf-signer__page-selector-bar g--margin-bottom-3 l-extremo g--align-center">
+            <div class="l-extremo__area-izquierda">
+              <button
+                type="button"
+                class="c-button c-button--small c-button--outline"
+                [disabled]="currentPageIndex() === 0"
+                (click)="prevPage()"
+              >
+                ◀ Previous
+              </button>
+            </div>
+            <div class="c-pdf-signer__page-indicator">
+              Page {{ currentPageIndex() + 1 }} of {{ pageCount() }}
+            </div>
+            <div class="l-extremo__area-derecha">
+              <button
+                type="button"
+                class="c-button c-button--small c-button--outline"
+                [disabled]="currentPageIndex() === pageCount() - 1"
+                (click)="nextPage()"
+              >
+                Next ▶
+              </button>
+            </div>
+          </div>
+        }
+
+        <!-- Interactive Live Document Page Viewport -->
+        <div class="c-pdf-signer__viewport-card g--margin-bottom-3">
+          <div class="c-pdf-signer__viewport-header l-extremo g--align-center g--margin-bottom-2">
+            <div class="l-extremo__area-izquierda">
+              <span class="c-pdf-signer__viewport-label">
+                Interactive Page Preview ({{ Math.round(activePageWidth()) }} × {{ Math.round(activePageHeight()) }} pt)
+              </span>
+            </div>
+            <div class="l-extremo__area-derecha">
+              <span class="c-pdf-signer__viewport-tip">💡 Drag or click stamps to reposition</span>
+            </div>
+          </div>
+
+          <div class="c-pdf-signer__viewport-wrap">
+            <div
+              #pageSheet
+              class="c-pdf-signer__page-sheet"
+              [style.aspectRatio]="activePageWidth() + ' / ' + activePageHeight()"
+              (click)="onPageSheetClick($event)"
+            >
+              <!-- Document Skeleton / Watermark -->
+              <div class="c-pdf-signer__page-watermark">
+                <span>{{ fileName() }} • Page {{ currentPageIndex() + 1 }}</span>
+              </div>
+              <div class="c-pdf-signer__page-lines">
+                <div class="c-pdf-signer__page-line c-pdf-signer__page-line--title"></div>
+                <div class="c-pdf-signer__page-line"></div>
+                <div class="c-pdf-signer__page-line"></div>
+                <div class="c-pdf-signer__page-line c-pdf-signer__page-line--short"></div>
+              </div>
+
+              <!-- Placed Stamps Overlays on Active Page -->
+              @for (stamp of currentPlacedStamps(); track stamp.id) {
+                <div
+                  class="c-pdf-signer__stamp-overlay"
+                  [class.is-selected]="selectedStampId() === stamp.id"
+                  [class.c-pdf-signer__stamp-overlay--signature]="stamp.type === 'signature'"
+                  [class.c-pdf-signer__stamp-overlay--date]="stamp.type === 'date'"
+                  [class.c-pdf-signer__stamp-overlay--initials]="stamp.type === 'initials'"
+                  [style.left.%]="(stamp.x / activePageWidth()) * 100"
+                  [style.bottom.%]="(stamp.y / activePageHeight()) * 100"
+                  [style.width.%]="(stamp.width / activePageWidth()) * 100"
+                  [style.height.%]="(stamp.height / activePageHeight()) * 100"
+                  (pointerdown)="startDragStamp($event, stamp.id)"
+                  (click)="$event.stopPropagation(); selectStamp(stamp.id)"
+                  title="Drag to reposition stamp"
+                >
+                  @if (stamp.type === 'signature' && stamp.imageDataUrl) {
+                    <img [src]="stamp.imageDataUrl" alt="Signature" class="c-pdf-signer__stamp-img" />
+                  } @else if (stamp.type === 'date') {
+                    <span class="c-pdf-signer__stamp-text">{{ stamp.text }}</span>
+                  } @else if (stamp.type === 'initials') {
+                    <div class="c-pdf-signer__stamp-initials-circle">
+                      <span>{{ stamp.text }}</span>
+                    </div>
+                  } @else {
+                    <span class="c-pdf-signer__stamp-text">{{ stamp.text || 'Stamp' }}</span>
+                  }
+                  <span class="c-pdf-signer__stamp-drag-handle">⠿</span>
+                </div>
+              }
+            </div>
+          </div>
+        </div>
+
+        <!-- Stamps List & Coordinate Controls -->
+        @if (placedStamps().length > 0) {
+          <div class="c-pdf-signer__stamps-list-wrap g--margin-bottom-3">
+            <h4 class="c-pdf-signer__stamps-header">Placed Stamps on Document ({{ placedStamps().length }}):</h4>
+            <div class="c-pdf-signer__stamps-items">
+              @for (stamp of placedStamps(); track stamp.id) {
+                <div
+                  class="c-pdf-signer__stamp-row"
+                  [class.is-selected]="selectedStampId() === stamp.id"
+                  (click)="selectStamp(stamp.id)"
+                >
+                  <div class="c-pdf-signer__stamp-row-info">
+                    <span class="c-badge" [class.c-badge--success]="stamp.type === 'signature'">
+                      {{ stamp.type.toUpperCase() }}
+                    </span>
+                    <span class="c-pdf-signer__stamp-coords">
+                      Page {{ stamp.pageIndex + 1 }}
+                    </span>
+                  </div>
+
+                  <!-- Editable Coordinate Controls -->
+                  <div class="c-pdf-signer__coord-controls">
+                    <label class="c-pdf-signer__coord-label">
+                      X:
+                      <input
+                        type="number"
+                        class="c-input__control c-pdf-signer__coord-input"
+                        [ngModel]="Math.round(stamp.x)"
+                        (ngModelChange)="updateStampPosition(stamp.id, +$event, stamp.y)"
+                        (click)="$event.stopPropagation()"
+                      />
+                    </label>
+                    <label class="c-pdf-signer__coord-label">
+                      Y:
+                      <input
+                        type="number"
+                        class="c-input__control c-pdf-signer__coord-input"
+                        [ngModel]="Math.round(stamp.y)"
+                        (ngModelChange)="updateStampPosition(stamp.id, stamp.x, +$event)"
+                        (click)="$event.stopPropagation()"
+                      />
+                    </label>
+                  </div>
+
+                  <div class="c-pdf-signer__stamp-row-actions">
+                    <button
+                      type="button"
+                      class="c-button c-button--small c-button--outline"
+                      (click)="$event.stopPropagation(); removeStamp(stamp.id)"
+                      title="Remove Stamp"
+                    >
+                      ✕
+                    </button>
+                  </div>
+                </div>
+              }
+            </div>
+          </div>
+
+          <div class="l-extremo g--margin-bottom-3">
+            <div class="l-extremo__area-izquierda">
+              <button
+                type="button"
+                class="c-button c-button--small c-button--outline"
+                (click)="clearAllStamps()"
+              >
+                Clear All Stamps
+              </button>
+            </div>
+          </div>
+        } @else {
+          <div class="c-pdf-signer__empty-stamps-box g--text-center g--margin-top-3 g--margin-bottom-3">
+            <span class="c-pdf-signer__empty-icon">✍️</span>
+            <p class="g--text-muted">No stamps placed yet. Draw a signature or click "+ Stamp" on the left.</p>
+          </div>
+        }
+
+        <!-- Flatten Option Switch -->
+        <div class="c-pdf-signer__flatten-option g--margin-bottom-3">
+          <label class="c-input__switch">
+            <input
+              type="checkbox"
+              [checked]="flattenAnnotations()"
+              (change)="toggleFlattenAnnotations()"
+            />
+            <span>Permanently flatten all annotations & signatures into PDF layers</span>
+          </label>
+        </div>
+
+        @if (processingError()) {
+          <div class="c-alert c-alert--danger g--margin-bottom-3">
+            {{ processingError() }}
+          </div>
+        }
+
+        <!-- Export Primary Action -->
+        <div class="c-pdf-signer__action-bar">
+          <button
+            type="button"
+            class="c-button c-button--primary c-button--large g--width-full"
+            [disabled]="!documentLoaded() || isProcessing()"
+            (click)="exportSignedPdf()"
+          >
+            @if (isProcessing()) {
+              <span>Embedding & Flattening PDF...</span>
+            } @else {
+              <span>Download Signed PDF ({{ placedStamps().length }} Stamps)</span>
+            }
+          </button>
+        </div>
+      </app-card>
+    </div>
+  </div>
+</div>

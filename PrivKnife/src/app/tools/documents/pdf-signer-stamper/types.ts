@@ -45,3 +45,17 @@ export interface PdfDocumentSummary {
   pageCount: number;
   pages: { pageIndex: number; width: number; height: number }[];
 }
+
+export interface PdfSignerWorkerRequest {
+  type: 'sign';
+  pdfBuffer: ArrayBuffer;
+  options: PdfSignerStamperOptions;
+  originalFileName: string;
+}
+
+export interface PdfSignerWorkerResponse {
+  type: 'done';
+  success: boolean;
+  result?: PdfSignerStamperResult;
+  error?: string;
+}

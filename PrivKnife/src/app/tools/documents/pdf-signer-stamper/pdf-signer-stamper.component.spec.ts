@@ -146,6 +146,73 @@ describe('PdfSignerStamperComponent (Seam 2 & 4)', () => {
       component.clearAllStamps();
       expect(component.placedStamps().length).toBe(0);
     });
+
+    it('should update stamp position with coordinate clamping', async () => {
+      const file = new File([samplePdfBytes.buffer as ArrayBuffer], 'lease.pdf', {
+        type: 'application/pdf',
+      });
+      await component.handleFileSelected(file);
+
+      component.addDateStamp(100, 150);
+      const stampId = component.placedStamps()[0].id;
+
+      component.updateStampPosition(stampId, 250, 400);
+      expect(component.placedStamps()[0].x).toBe(250);
+      expect(component.placedStamps()[0].y).toBe(400);
+
+      // Clamps negative coordinates
+      component.updateStampPosition(stampId, -100, -50);
+      expect(component.placedStamps()[0].x).toBe(0);
+      expect(component.placedStamps()[0].y).toBe(0);
+    });
+  });
+
+  describe('Typed Signature Mode & Pointer Interactions (Task 3.1 & 3.2)', () => {
+    it('should switch between draw and type signature modes', () => {
+      expect(component.signatureMode()).toBe('draw');
+      component.setSignatureMode('type');
+      expect(component.signatureMode()).toBe('type');
+      component.setTypedSignatureText('Jane Doe');
+      expect(component.typedSignatureText()).toBe('Jane Doe');
+    });
+
+    it('should track placed stamps for active page and compute page dimensions', async () => {
+      const file = new File([samplePdfBytes.buffer as ArrayBuffer], 'lease.pdf', {
+        type: 'application/pdf',
+      });
+      await component.handleFileSelected(file);
+
+      expect(component.activePageWidth()).toBeGreaterThan(500);
+      expect(component.activePageHeight()).toBeGreaterThan(700);
+
+      component.addDateStamp(100, 100);
+      expect(component.currentPlacedStamps().length).toBe(1);
+    });
+  });
+
+  describe('Memory Hygiene & Worker Disposal (Task 2.1)', () => {
+    it('should revoke created object URLs and terminate worker on destroy', () => {
+      const revokeSpy = vi.spyOn(URL, 'revokeObjectURL');
+      (component as any).createdObjectUrls = ['blob:http://localhost/mock-1', 'blob:http://localhost/mock-2'];
+      const mockWorker = { terminate: vi.fn() };
+      (component as any).worker = mockWorker;
+
+      component.ngOnDestroy();
+
+      expect(revokeSpy).toHaveBeenCalledTimes(2);
+      expect(mockWorker.terminate).toHaveBeenCalled();
+      revokeSpy.mockRestore();
+    });
+  });
+
+  describe('BEM Architecture & Accessibility (Task 4.1)', () => {
+    it('should use proper BEM layout classes and avoid legacy classes', () => {
+      const compiled = fixture.nativeElement as HTMLElement;
+      expect(compiled.querySelector('.l-columns__area')).toBeTruthy();
+      expect(compiled.querySelector('.l-columns__column')).toBeNull();
+      expect(compiled.querySelector('.l-extremo__area-izquierda')).toBeTruthy();
+      expect(compiled.querySelector('.l-extremo__area-derecha')).toBeTruthy();
+    });
   });
 
   describe('Deliverable Export & Zero-Exfiltration Guard (Seam 4)', () => {
