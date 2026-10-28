@@ -38,6 +38,7 @@ describe('FacePlateBlurComponent (Seam 2 & 4)', () => {
       expect(component.mosaicBlockSize()).toBe(16);
       expect(component.blurRadiusPx()).toBe(12);
       expect(component.selectionMode()).toBe('manual_rect');
+      expect(component.brushRadiusPx()).toBe(20);
       expect(component.exportFormat()).toBe('jpeg');
       expect(component.exportQuality()).toBe(0.92);
       expect(component.stripExif()).toBe(true);
@@ -54,6 +55,14 @@ describe('FacePlateBlurComponent (Seam 2 & 4)', () => {
       expect(component.censorMode()).toBe('gaussian_blur');
     });
 
+    it('should update selection mode', () => {
+      component.setSelectionMode('brush_stroke');
+      expect(component.selectionMode()).toBe('brush_stroke');
+
+      component.setSelectionMode('auto_detect_faces');
+      expect(component.selectionMode()).toBe('auto_detect_faces');
+    });
+
     it('should update mosaic block size within range', () => {
       component.setMosaicBlockSize(24);
       expect(component.mosaicBlockSize()).toBe(24);
@@ -64,13 +73,18 @@ describe('FacePlateBlurComponent (Seam 2 & 4)', () => {
       expect(component.blurRadiusPx()).toBe(18);
     });
 
+    it('should update brush radius within range', () => {
+      component.setBrushRadius(35);
+      expect(component.brushRadiusPx()).toBe(35);
+    });
+
     it('should update export format between jpeg and png', () => {
       component.setExportFormat('png');
       expect(component.exportFormat()).toBe('png');
     });
   });
 
-  describe('Region Management', () => {
+  describe('Region Management & Coordinate Editing', () => {
     it('should add a censor region', () => {
       const regionId = component.addRegion({
         x: 100,
@@ -83,6 +97,25 @@ describe('FacePlateBlurComponent (Seam 2 & 4)', () => {
       expect(regionId).toBeTruthy();
       expect(component.regions().length).toBe(1);
       expect(component.regions()[0].x).toBe(100);
+    });
+
+    it('should edit region coordinates and mode dynamically', () => {
+      const regionId = component.addRegion({
+        x: 50,
+        y: 50,
+        width: 80,
+        height: 80,
+        mode: 'mosaic_pixelate',
+      });
+
+      component.updateRegionCoord(regionId, 'x', 75);
+      component.updateRegionCoord(regionId, 'width', 120);
+      component.updateRegionMode(regionId, 'gaussian_blur');
+
+      const updated = component.regions().find((r) => r.id === regionId);
+      expect(updated?.x).toBe(75);
+      expect(updated?.width).toBe(120);
+      expect(updated?.mode).toBe('gaussian_blur');
     });
 
     it('should remove a region by id', () => {
@@ -129,13 +162,115 @@ describe('FacePlateBlurComponent (Seam 2 & 4)', () => {
     });
   });
 
-  describe('File Selection & Processing', () => {
+  describe('Canvas Pointer Drawing & Auto-Detect', () => {
+    it('should add a rectangular region from canvas pointer events', () => {
+      // Mock canvas element
+      const canvasEl = document.createElement('canvas');
+      canvasEl.width = 400;
+      canvasEl.height = 300;
+      vi.spyOn(canvasEl, 'getBoundingClientRect').mockReturnValue({
+        left: 0,
+        top: 0,
+        right: 400,
+        bottom: 300,
+        width: 400,
+        height: 300,
+        x: 0,
+        y: 0,
+        toJSON: () => {},
+      });
+      component.previewCanvasRef = { nativeElement: canvasEl };
+      component.originalImage.set({
+        file: new Blob(),
+        name: 'test.jpg',
+        url: 'blob:test',
+        size: 1000,
+      });
+
+      component.setSelectionMode('manual_rect');
+      component.onCanvasPointerDown({ clientX: 50, clientY: 50, pointerId: 1 } as any);
+      component.onCanvasPointerMove({ clientX: 150, clientY: 120, pointerId: 1 } as any);
+      component.onCanvasPointerUp({ clientX: 150, clientY: 120, pointerId: 1 } as any);
+
+      expect(component.regions().length).toBe(1);
+      const reg = component.regions()[0];
+      expect(reg.x).toBe(50);
+      expect(reg.y).toBe(50);
+      expect(reg.width).toBe(100);
+      expect(reg.height).toBe(70);
+    });
+
+    it('should add a brush stroke region from canvas pointer events', () => {
+      const canvasEl = document.createElement('canvas');
+      canvasEl.width = 400;
+      canvasEl.height = 300;
+      vi.spyOn(canvasEl, 'getBoundingClientRect').mockReturnValue({
+        left: 0,
+        top: 0,
+        right: 400,
+        bottom: 300,
+        width: 400,
+        height: 300,
+        x: 0,
+        y: 0,
+        toJSON: () => {},
+      });
+      component.previewCanvasRef = { nativeElement: canvasEl };
+      component.originalImage.set({
+        file: new Blob(),
+        name: 'test.jpg',
+        url: 'blob:test',
+        size: 1000,
+      });
+
+      component.setSelectionMode('brush_stroke');
+      component.setBrushRadius(25);
+      component.onCanvasPointerDown({ clientX: 100, clientY: 100, pointerId: 1 } as any);
+      component.onCanvasPointerMove({ clientX: 110, clientY: 110, pointerId: 1 } as any);
+      component.onCanvasPointerUp({ clientX: 120, clientY: 120, pointerId: 1 } as any);
+
+      expect(component.regions().length).toBe(1);
+      const reg = component.regions()[0];
+      expect(reg.points?.length).toBeGreaterThan(0);
+      expect(reg.brushRadius).toBe(25);
+    });
+  });
+
+  describe('File Selection & State Reset', () => {
     it('should accept image file and configure preview', async () => {
       const file = createSyntheticImageFile('vehicle.jpg', 4096);
       await component.handleFileSelected(file);
 
       expect(component.originalImage()).toBeTruthy();
       expect(component.originalImage()?.name).toBe('vehicle.jpg');
+    });
+
+    it('should reset stale previewUrl, lastResult, and regions on new file selection', async () => {
+      const file1 = createSyntheticImageFile('first.jpg', 2048);
+      await component.handleFileSelected(file1);
+      component.addRegion(SAMPLE_BLUR_REGIONS[0]);
+      await component.processImage();
+
+      expect(component.previewUrl()).toBeTruthy();
+      expect(component.lastResult()).toBeTruthy();
+      expect(component.regions().length).toBe(1);
+
+      // Upload second file
+      const file2 = createSyntheticImageFile('second.jpg', 4096);
+      await component.handleFileSelected(file2);
+
+      expect(component.originalImage()?.name).toBe('second.jpg');
+      expect(component.previewUrl()).toBeNull();
+      expect(component.lastResult()).toBeNull();
+      expect(component.regions().length).toBe(0);
+    });
+
+    it('should load sample photo and populate default regions', async () => {
+      await component.loadSamplePhoto();
+
+      expect(component.originalImage()).toBeTruthy();
+      expect(component.originalImage()?.name).toBe('car-sale-sample.png');
+      expect(component.regions().length).toBe(2);
     });
 
     it('should process image with regions and produce deliverable result', async () => {

@@ -1,0 +1,442 @@
+<div class="l-page">
+  <!-- Header -->
+  <header class="l-page__header c-header">
+    <div class="c-header__title-group">
+      <h1 class="c-header__title">Face & License Plate Privacy Blur Tool</h1>
+      <p class="c-header__subtitle">
+        Permanently pixelate or blackout faces, street signs, and vehicle license plates before publishing.
+        Irreversible canvas censoring with 100% EXIF/GPS metadata stripping.
+      </p>
+    </div>
+    <div class="c-badge c-badge--privacy">
+      🛡️ 100% In-Browser • Never Leaves Your Device
+    </div>
+  </header>
+
+  <!-- Main Layout -->
+  <div class="l-columns l-columns--2">
+    <!-- Configuration Controls Area -->
+    <section class="l-columns__area c-card">
+      <div class="c-card__header">
+        <h2 class="c-card__title">Censor Controls & Options</h2>
+      </div>
+
+      <div class="c-card__body">
+        <!-- Upload Dropzone -->
+        <div
+          class="c-dropzone g--margin-bottom-4"
+          (dragover)="$event.preventDefault()"
+          (drop)="onFileDrop($event)"
+          (click)="fileInput.click()"
+        >
+          <input
+            #fileInput
+            type="file"
+            class="c-dropzone__input"
+            accept="image/jpeg,image/png,image/webp"
+            (change)="onFileInputChange($event)"
+          />
+          <div class="c-dropzone__content">
+            <span class="c-dropzone__icon">📷</span>
+            <p class="c-dropzone__text">
+              @if (originalImage()) {
+                Selected: <strong>{{ originalImage()?.name }}</strong> ({{ formatBytes(originalImage()?.size || 0) }})
+              } @else {
+                Drop photo here or <strong>browse</strong>
+              }
+            </p>
+            <div class="c-face-blur__sample-row" (click)="$event.stopPropagation()">
+              <button
+                type="button"
+                class="c-button c-button--outline c-button--small"
+                (click)="loadSamplePhoto()"
+              >
+                Load Sample Photo
+              </button>
+            </div>
+            <span class="c-dropzone__hint">Supports JPG, PNG, WebP • Never uploaded to any server</span>
+          </div>
+        </div>
+
+        <!-- Tool Selection Mode -->
+        <div class="c-input g--margin-bottom-4">
+          <label class="c-input__label">Selection Tool</label>
+          <div class="c-button-group">
+            <button
+              type="button"
+              class="c-button c-button--small"
+              [class.c-button--primary]="selectionMode() === 'manual_rect'"
+              [class.c-button--outline]="selectionMode() !== 'manual_rect'"
+              (click)="setSelectionMode('manual_rect')"
+            >
+              Manual Rectangle
+            </button>
+            <button
+              type="button"
+              class="c-button c-button--small"
+              [class.c-button--primary]="selectionMode() === 'brush_stroke'"
+              [class.c-button--outline]="selectionMode() !== 'brush_stroke'"
+              (click)="setSelectionMode('brush_stroke')"
+            >
+              Brush Stroke
+            </button>
+            <button
+              type="button"
+              class="c-button c-button--small"
+              [class.c-button--primary]="selectionMode() === 'auto_detect_faces'"
+              [class.c-button--outline]="selectionMode() !== 'auto_detect_faces'"
+              (click)="setSelectionMode('auto_detect_faces')"
+            >
+              Auto-Detect
+            </button>
+          </div>
+        </div>
+
+        <!-- Brush Radius (conditional when brush_stroke active) -->
+        @if (selectionMode() === 'brush_stroke') {
+          <div class="c-input g--margin-bottom-4">
+            <label class="c-input__label">
+              Brush Radius: <strong>{{ brushRadiusPx() }}px</strong>
+            </label>
+            <input
+              id="brushRadiusRange"
+              type="range"
+              class="c-input__slider"
+              min="5"
+              max="50"
+              step="1"
+              [ngModel]="brushRadiusPx()"
+              (ngModelChange)="setBrushRadius($event)"
+            />
+          </div>
+        }
+
+        <!-- Auto-Detect Action (conditional when auto_detect_faces active) -->
+        @if (selectionMode() === 'auto_detect_faces') {
+          <div class="c-face-blur__auto-box g--margin-bottom-4">
+            <p class="c-face-blur__auto-hint">
+              Automatically scan image pixels for face skin tones and vehicle license plates.
+            </p>
+            <button
+              type="button"
+              class="c-button c-button--secondary c-button--small"
+              [disabled]="!originalImage() || isDetecting()"
+              (click)="runAutoDetection()"
+            >
+              {{ isDetecting() ? 'Scanning image...' : '🔍 Scan for Faces & Plates' }}
+            </button>
+          </div>
+        }
+
+        <!-- Censor Mode Selector -->
+        <div class="c-input g--margin-bottom-4">
+          <label class="c-input__label">Censoring Style</label>
+          <div class="c-button-group">
+            <button
+              type="button"
+              class="c-button c-button--small"
+              [class.c-button--primary]="censorMode() === 'mosaic_pixelate'"
+              [class.c-button--outline]="censorMode() !== 'mosaic_pixelate'"
+              (click)="setCensorMode('mosaic_pixelate')"
+            >
+              Mosaic Pixelate
+            </button>
+            <button
+              type="button"
+              class="c-button c-button--small"
+              [class.c-button--primary]="censorMode() === 'blackout_box'"
+              [class.c-button--outline]="censorMode() !== 'blackout_box'"
+              (click)="setCensorMode('blackout_box')"
+            >
+              Blackout Box
+            </button>
+            <button
+              type="button"
+              class="c-button c-button--small"
+              [class.c-button--primary]="censorMode() === 'gaussian_blur'"
+              [class.c-button--outline]="censorMode() !== 'gaussian_blur'"
+              (click)="setCensorMode('gaussian_blur')"
+            >
+              Soft Blur
+            </button>
+          </div>
+        </div>
+
+        <!-- Mosaic Block Size (conditional) -->
+        @if (censorMode() === 'mosaic_pixelate') {
+          <div class="c-input g--margin-bottom-4">
+            <label class="c-input__label">
+              Mosaic Block Size: <strong>{{ mosaicBlockSize() }}px</strong>
+            </label>
+            <input
+              id="pixelSizeRange"
+              type="range"
+              class="c-input__slider"
+              min="4"
+              max="50"
+              step="2"
+              [ngModel]="mosaicBlockSize()"
+              (ngModelChange)="setMosaicBlockSize($event)"
+            />
+          </div>
+        }
+
+        <!-- Blur Radius (conditional) -->
+        @if (censorMode() === 'gaussian_blur') {
+          <div class="c-input g--margin-bottom-4">
+            <label class="c-input__label">
+              Blur Strength: <strong>{{ blurRadiusPx() }}px</strong>
+            </label>
+            <input
+              id="blurRadiusRange"
+              type="range"
+              class="c-input__slider"
+              min="2"
+              max="30"
+              step="1"
+              [ngModel]="blurRadiusPx()"
+              (ngModelChange)="setBlurRadius($event)"
+            />
+          </div>
+        }
+
+        <!-- Quick Add Preset Censor Boxes & Region List -->
+        <div class="c-input g--margin-bottom-4">
+          <label class="c-input__label">Censor Targets ({{ regions().length }})</label>
+          <div class="c-face-blur__preset-row g--margin-bottom-2">
+            <div class="c-face-blur__preset-group">
+              <button
+                type="button"
+                class="c-button c-button--outline c-button--small"
+                (click)="addPresetRegion('face')"
+              >
+                + Add Face Box
+              </button>
+              <button
+                type="button"
+                class="c-button c-button--outline c-button--small"
+                (click)="addPresetRegion('plate')"
+              >
+                + Add License Plate Box
+              </button>
+            </div>
+            @if (regions().length > 0) {
+              <button
+                type="button"
+                class="c-button c-button--danger c-button--small"
+                (click)="clearAllRegions()"
+              >
+                Clear All
+              </button>
+            }
+          </div>
+
+          <!-- List of active regions with editable coordinates -->
+          @if (regions().length > 0) {
+            <div class="c-face-blur__region-list">
+              @for (r of regions(); track r.id; let i = $index) {
+                <div class="c-face-blur__region-item">
+                  <div class="c-face-blur__region-header">
+                    <span class="c-face-blur__badge">#{{ i + 1 }}</span>
+                    <select
+                      class="c-face-blur__mode-select"
+                      [ngModel]="r.mode"
+                      (ngModelChange)="updateRegionMode(r.id, $event)"
+                    >
+                      <option value="mosaic_pixelate">Mosaic</option>
+                      <option value="blackout_box">Blackout</option>
+                      <option value="gaussian_blur">Blur</option>
+                    </select>
+                    <button
+                      type="button"
+                      class="c-button c-button--outline c-button--small c-face-blur__remove-btn"
+                      (click)="removeRegion(r.id)"
+                      title="Remove censor region"
+                    >
+                      ✕
+                    </button>
+                  </div>
+
+                  @if (!r.points || r.points.length === 0) {
+                    <!-- Rectangular Region Coordinate Editors -->
+                    <div class="c-face-blur__coords-grid">
+                      <label class="c-face-blur__coord-field">
+                        <span>X:</span>
+                        <input
+                          type="number"
+                          class="c-face-blur__coord-input"
+                          [ngModel]="r.x"
+                          (ngModelChange)="updateRegionCoord(r.id, 'x', $event)"
+                        />
+                      </label>
+                      <label class="c-face-blur__coord-field">
+                        <span>Y:</span>
+                        <input
+                          type="number"
+                          class="c-face-blur__coord-input"
+                          [ngModel]="r.y"
+                          (ngModelChange)="updateRegionCoord(r.id, 'y', $event)"
+                        />
+                      </label>
+                      <label class="c-face-blur__coord-field">
+                        <span>W:</span>
+                        <input
+                          type="number"
+                          class="c-face-blur__coord-input"
+                          min="4"
+                          [ngModel]="r.width"
+                          (ngModelChange)="updateRegionCoord(r.id, 'width', $event)"
+                        />
+                      </label>
+                      <label class="c-face-blur__coord-field">
+                        <span>H:</span>
+                        <input
+                          type="number"
+                          class="c-face-blur__coord-input"
+                          min="4"
+                          [ngModel]="r.height"
+                          (ngModelChange)="updateRegionCoord(r.id, 'height', $event)"
+                        />
+                      </label>
+                    </div>
+                  } @else {
+                    <div class="c-face-blur__brush-summary">
+                      <span>Brush stroke: <strong>{{ r.points.length }}</strong> points (radius: {{ r.brushRadius || brushRadiusPx() }}px)</span>
+                    </div>
+                  }
+                </div>
+              }
+            </div>
+          }
+        </div>
+
+        <!-- Export Format & Quality -->
+        <div class="c-input g--margin-bottom-4">
+          <label class="c-input__label">Export Format</label>
+          <div class="c-button-group">
+            <button
+              type="button"
+              class="c-button c-button--small"
+              [class.c-button--primary]="exportFormat() === 'jpeg'"
+              [class.c-button--outline]="exportFormat() !== 'jpeg'"
+              (click)="setExportFormat('jpeg')"
+            >
+              JPEG (Stripped EXIF)
+            </button>
+            <button
+              type="button"
+              class="c-button c-button--small"
+              [class.c-button--primary]="exportFormat() === 'png'"
+              [class.c-button--outline]="exportFormat() !== 'png'"
+              (click)="setExportFormat('png')"
+            >
+              PNG (Lossless)
+            </button>
+          </div>
+        </div>
+
+        <!-- Privacy Guarantee Badge -->
+        <div class="c-face-blur__privacy-notice g--margin-bottom-4">
+          <span>🔒 <strong>Zero Server Upload:</strong> All pixelation, blurring, and metadata stripping executes strictly on your local device.</span>
+        </div>
+      </div>
+
+      <div class="c-card__footer l-extremo">
+        <div class="l-extremo__area-izquierda">
+          <button
+            type="button"
+            class="c-button c-button--outline"
+            (click)="resetToDefaults()"
+          >
+            Reset
+          </button>
+        </div>
+        <div class="l-extremo__area-derecha">
+          <button
+            type="button"
+            class="c-button c-button--primary"
+            [disabled]="isProcessing() || !originalImage()"
+            (click)="processImage()"
+          >
+            {{ isProcessing() ? 'Processing...' : 'Apply Privacy Censors' }}
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <!-- Preview & Deliverable Area -->
+    <section class="l-columns__area c-card">
+      <div class="c-card__header">
+        <h2 class="c-card__title">Interactive Canvas Preview & Export</h2>
+      </div>
+
+      <div class="c-card__body">
+        <div class="c-face-blur__preview-stage">
+          <!-- Canvas Overlay & Drawing Surface -->
+          <div class="c-face-blur__canvas-wrap">
+            <canvas
+              #previewCanvas
+              class="c-face-blur__canvas"
+              (pointerdown)="onCanvasPointerDown($event)"
+              (pointermove)="onCanvasPointerMove($event)"
+              (pointerup)="onCanvasPointerUp($event)"
+              (pointerleave)="onCanvasPointerLeave($event)"
+            ></canvas>
+
+            @if (!originalImage()) {
+              <div class="c-face-blur__empty-overlay">
+                <span class="c-face-blur__empty-icon">🛡️</span>
+                <strong>No Photo Selected</strong>
+                <p>Drop an image or click "Load Sample Photo" to begin censoring.</p>
+                <button
+                  type="button"
+                  class="c-button c-button--primary c-button--small g--margin-top-2"
+                  (click)="loadSamplePhoto()"
+                >
+                  Load Sample Photo
+                </button>
+              </div>
+            } @else {
+              <div class="c-face-blur__canvas-hint">
+                @if (selectionMode() === 'manual_rect') {
+                  Drag on canvas to draw a censor box • Click "Apply Privacy Censors" to finalize
+                } @else if (selectionMode() === 'brush_stroke') {
+                  Paint on canvas to brush censor • Radius: {{ brushRadiusPx() }}px
+                } @else {
+                  Click "Scan for Faces & Plates" to auto-detect
+                }
+              </div>
+            }
+          </div>
+        </div>
+
+        <!-- Result stats -->
+        @if (lastResult()) {
+          <div class="c-face-blur__result-meta g--margin-top-4">
+            <div class="c-badge c-badge--success">
+              ✓ Ready for download ({{ formatBytes(lastResult()?.fileSize || 0) }})
+            </div>
+            <p class="g--margin-top-2 g--text-small">
+              Censored Regions: <strong>{{ lastResult()?.metadata?.regionsCensored || 0 }}</strong> |
+              Dimensions: <strong>{{ lastResult()?.metadata?.width }} x {{ lastResult()?.metadata?.height }}</strong> |
+              EXIF: <strong>Stripped</strong>
+            </p>
+          </div>
+        }
+      </div>
+
+      <div class="c-card__footer l-extremo">
+        <div class="l-extremo__area-derecha">
+          <button
+            type="button"
+            class="c-button c-button--primary"
+            [disabled]="!lastResult()"
+            (click)="downloadDeliverable()"
+          >
+            Download Sanitized Image
+          </button>
+        </div>
+      </div>
+    </section>
+  </div>
+</div>

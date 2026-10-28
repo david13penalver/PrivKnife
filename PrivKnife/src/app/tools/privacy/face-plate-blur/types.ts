@@ -2,6 +2,11 @@ export type CensorMode = 'mosaic_pixelate' | 'gaussian_blur' | 'blackout_box';
 export type SelectionMode = 'manual_rect' | 'brush_stroke' | 'auto_detect_faces';
 export type ExportImageFormat = 'jpeg' | 'png';
 
+export interface BlurPoint {
+  x: number;
+  y: number;
+}
+
 export interface BlurRegion {
   id: string;
   x: number;
@@ -11,7 +16,11 @@ export interface BlurRegion {
   mode: CensorMode;
   blockSize?: number;
   blurRadius?: number;
+  points?: BlurPoint[];
+  brushRadius?: number;
 }
+
+export type CensorRegion = BlurRegion;
 
 export interface FacePlateBlurOptions {
   censorMode: CensorMode;
@@ -37,4 +46,30 @@ export interface FacePlateBlurResult {
     regionsCensored: number;
     exifStripped: boolean;
   };
+}
+
+export interface FacePlateBlurWorkerRequest {
+  type: 'censor' | 'detect';
+  id?: string;
+  imageData?: {
+    data: Uint8ClampedArray;
+    width: number;
+    height: number;
+  };
+  regions?: BlurRegion[];
+  options?: FacePlateBlurOptions;
+}
+
+export interface FacePlateBlurWorkerResponse {
+  type: 'censor' | 'detect' | 'progress';
+  id?: string;
+  progress?: number;
+  imageData?: {
+    data: Uint8ClampedArray;
+    width: number;
+    height: number;
+  };
+  detectedRegions?: BlurRegion[];
+  success?: boolean;
+  error?: string;
 }
