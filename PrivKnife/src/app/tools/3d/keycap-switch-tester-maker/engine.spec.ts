@@ -137,6 +137,71 @@ describe('Custom Mechanical Keycap & Switch Tester Maker Engine (Seam 1)', () =>
       expect(result.metrics.heightMm).toBeGreaterThan(11);
       expect(result.metrics.totalTriangles).toBeGreaterThan(100);
     });
+
+    it('should generate connected cylindrical MX cross stem with outer barrel (DEFECT-39-02 Red test)', () => {
+      const result = generateKeycapMesh(DEFAULT_KEYCAP_OPTIONS);
+      const pos = result.stemGeometry.getAttribute('position');
+      expect(pos).toBeDefined();
+      expect(result.metrics.stemTriangles).toBeGreaterThan(100);
+
+      // Verify outer cylinder perimeter vertices exist at radius ~2.75mm
+      let hasOuterCylinderRadius = false;
+      for (let i = 0; i < pos.count; i++) {
+        const x = pos.getX(i);
+        const y = pos.getY(i);
+        const r = Math.hypot(x, y);
+        if (r >= 2.70 && r <= 2.80) {
+          hasOuterCylinderRadius = true;
+          break;
+        }
+      }
+      expect(hasOuterCylinderRadius).toBe(true);
+    });
+
+    it('should apply dish depth and profile tilt to top keycap surface and flush inlay (DEFECT-39-03 Red test)', () => {
+      const flatRes = generateKeycapMesh({
+        ...DEFAULT_KEYCAP_OPTIONS,
+        dishDepthMm: 0,
+      });
+      const dishedRes = generateKeycapMesh({
+        ...DEFAULT_KEYCAP_OPTIONS,
+        dishDepthMm: 1.2,
+      });
+
+      const flatPos = flatRes.shellGeometry.getAttribute('position');
+      const dishedPos = dishedRes.shellGeometry.getAttribute('position');
+
+      // Find center top vertex (near x=0, y=0, z > 5)
+      let flatCenterZ = 0;
+      let dishedCenterZ = 0;
+      for (let i = 0; i < flatPos.count; i++) {
+        if (Math.hypot(flatPos.getX(i), flatPos.getY(i)) < 1.0 && flatPos.getZ(i) > 5) {
+          flatCenterZ = flatPos.getZ(i);
+          break;
+        }
+      }
+      for (let i = 0; i < dishedPos.count; i++) {
+        if (Math.hypot(dishedPos.getX(i), dishedPos.getY(i)) < 1.0 && dishedPos.getZ(i) > 5) {
+          dishedCenterZ = dishedPos.getZ(i);
+          break;
+        }
+      }
+
+      expect(flatCenterZ).toBeGreaterThan(0);
+      expect(dishedCenterZ).toBeGreaterThan(0);
+      expect(flatCenterZ - dishedCenterZ).toBeCloseTo(1.2, 0.2);
+
+      // Inlaid multicolor legend should sit flush and not protrude above keycap shell
+      const inlaidRes = generateKeycapMesh({
+        ...DEFAULT_KEYCAP_OPTIONS,
+        legendStyle: 'inlaid_multicolor',
+      });
+      inlaidRes.shellGeometry.computeBoundingBox();
+      inlaidRes.legendGeometry.computeBoundingBox();
+      const shellMaxZ = inlaidRes.shellGeometry.boundingBox!.max.z;
+      const legendMaxZ = inlaidRes.legendGeometry.boundingBox!.max.z;
+      expect(legendMaxZ).toBeLessThanOrEqual(shellMaxZ + 0.05);
+    });
   });
 
   describe('3D Switch Tester Tray Generation', () => {
@@ -157,6 +222,17 @@ describe('Custom Mechanical Keycap & Switch Tester Maker Engine (Seam 1)', () =>
       });
       expect(result.metrics.widthMm).toBeGreaterThan(20);
       expect(result.metrics.totalTriangles).toBeGreaterThan(50);
+    });
+
+    it('should generate flat-bottomed switch tester base at z=0 with tray tilt (DEFECT-39-04 Red test)', () => {
+      const result = generateSwitchTesterMesh({
+        ...DEFAULT_SWITCH_TESTER_OPTIONS,
+        trayTiltAngleDeg: 8,
+      });
+      result.trayGeometry.computeBoundingBox();
+      const box = result.trayGeometry.boundingBox!;
+      expect(box.min.z).toBeCloseTo(0, 0.05);
+      expect(box.max.z).toBeGreaterThan(6.0);
     });
   });
 

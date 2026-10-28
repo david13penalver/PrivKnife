@@ -52,3 +52,21 @@ export interface KeycapPreset {
   description: string;
   options: Partial<KeycapSwitchTesterMakerOptions>;
 }
+
+export interface KeycapWorkerRequest {
+  id: number;
+  options: KeycapSwitchTesterMakerOptions;
+  format: KeycapExportFormat;
+}
+
+export interface KeycapWorkerResponse {
+  id: number;
+  type: 'progress' | 'result' | 'error';
+  percent?: number;
+  buffer?: ArrayBuffer;
+  fileName?: string;
+  fileSize?: number;
+  mimeType?: string;
+  metrics?: KeycapMetrics;
+  error?: string;
+}

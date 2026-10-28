@@ -21,6 +21,8 @@ import {
   KeycapSwitchTesterMakerOptions,
   KeyUnitSize,
   LegendStyle,
+  KeycapWorkerRequest,
+  KeycapWorkerResponse,
 } from './types';
 import {
   DEFAULT_KEYCAP_OPTIONS,
@@ -270,7 +272,7 @@ import {
                   <input
                     id="stemTolerance"
                     type="range"
-                    class="c-input c-input--range"
+                    class="c-input c-input__slider"
                     min="0.0"
                     max="0.4"
                     step="0.05"
@@ -296,7 +298,7 @@ import {
                     <input
                       id="trayRows"
                       type="range"
-                      class="c-input c-input--range"
+                      class="c-input c-input__slider"
                       min="1"
                       max="6"
                       step="1"
@@ -309,7 +311,7 @@ import {
                     <input
                       id="trayCols"
                       type="range"
-                      class="c-input c-input--range"
+                      class="c-input c-input__slider"
                       min="1"
                       max="6"
                       step="1"
@@ -326,7 +328,7 @@ import {
                   <input
                     id="trayTilt"
                     type="range"
-                    class="c-input c-input--range"
+                    class="c-input c-input__slider"
                     min="0"
                     max="18"
                     step="2"
@@ -420,7 +422,7 @@ import {
                 <div class="export-buttons-grid">
                   <button
                     type="button"
-                    class="c-button c-button--primary c-button--block"
+                    class="c-button c-button--primary c-button--block download-btn-3mf"
                     [disabled]="isGenerating()"
                     (click)="downloadFormat('3mf_multicolor')"
                   >
@@ -428,7 +430,7 @@ import {
                   </button>
                   <button
                     type="button"
-                    class="c-button c-button--outline c-button--block"
+                    class="c-button c-button--outline c-button--block download-btn-stl"
                     [disabled]="isGenerating()"
                     (click)="downloadFormat('stl_unified')"
                   >
@@ -442,173 +444,7 @@ import {
       </div>
     </div>
   `,
-  styles: [
-    `
-      .preset-strip {
-        display: flex;
-        align-items: center;
-        flex-wrap: wrap;
-        gap: 0.5rem;
-      }
-      .preset-label {
-        font-weight: 600;
-        font-size: 0.85rem;
-        color: var(--color-text-muted, #94a3b8);
-      }
-      .preset-buttons {
-        display: flex;
-        flex-wrap: wrap;
-        gap: 0.35rem;
-      }
-      .mode-tabs {
-        display: flex;
-        gap: 0.5rem;
-        border-bottom: 2px solid rgba(148, 163, 184, 0.2);
-        padding-bottom: 0.5rem;
-      }
-      .mode-tab {
-        background: transparent;
-        border: none;
-        padding: 0.5rem 1rem;
-        font-size: 0.95rem;
-        font-weight: 600;
-        cursor: pointer;
-        color: var(--color-text-muted, #94a3b8);
-        border-radius: 6px;
-        transition: all 0.2s ease;
-      }
-      .mode-tab:hover {
-        color: var(--color-text-main, #f8fafc);
-        background: rgba(148, 163, 184, 0.1);
-      }
-      .mode-tab--active {
-        color: #38bdf8 !important;
-        background: rgba(56, 189, 248, 0.15) !important;
-      }
-      .btn-grid-3 {
-        display: grid;
-        grid-template-columns: repeat(3, 1fr);
-        gap: 0.4rem;
-        margin-top: 0.25rem;
-      }
-      .grid-2-col {
-        display: grid;
-        grid-template-columns: 1fr 1fr;
-        gap: 0.75rem;
-        margin-bottom: 0.5rem;
-      }
-      .control-group {
-        display: flex;
-        flex-direction: column;
-        margin-bottom: 0.85rem;
-      }
-      .c-input__label {
-        font-size: 0.85rem;
-        font-weight: 500;
-        margin-bottom: 0.25rem;
-        color: var(--color-text-main, #e2e8f0);
-      }
-      .input-hint {
-        font-size: 0.75rem;
-        color: var(--color-text-muted, #94a3b8);
-        margin-top: 0.2rem;
-      }
-      .preview-container {
-        display: flex;
-        flex-direction: column;
-      }
-      .canvas-wrapper {
-        width: 100%;
-        height: 380px;
-        background: #0f172a;
-        border-radius: 6px;
-        position: relative;
-        overflow: hidden;
-      }
-      .three-canvas {
-        width: 100%;
-        height: 100%;
-        display: block;
-      }
-      .preview-controls-row {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        margin-top: 0.5rem;
-      }
-      .drag-hint {
-        font-size: 0.75rem;
-        color: var(--color-text-muted, #94a3b8);
-      }
-      .badge-dim {
-        font-size: 0.8rem;
-        padding: 0.2rem 0.5rem;
-        border-radius: 4px;
-        background: rgba(148, 163, 184, 0.15);
-        color: #cbd5e1;
-      }
-      .metrics-panel {
-        display: grid;
-        grid-template-columns: 1fr 1fr;
-        gap: 0.4rem;
-        background: rgba(30, 41, 59, 0.5);
-        border: 1px solid rgba(148, 163, 184, 0.15);
-        border-radius: 6px;
-        padding: 0.65rem;
-      }
-      .metric-row {
-        display: flex;
-        justify-content: space-between;
-        font-size: 0.8rem;
-      }
-      .metric-key {
-        color: var(--color-text-muted, #94a3b8);
-      }
-      .metric-val {
-        font-weight: 600;
-        color: var(--color-text-main, #f8fafc);
-      }
-      .slicer-notes-card {
-        background: rgba(15, 23, 42, 0.6);
-        border: 1px solid rgba(56, 189, 248, 0.2);
-        border-radius: 6px;
-        padding: 0.65rem;
-      }
-      .slicer-notes-title {
-        font-size: 0.8rem;
-        font-weight: 600;
-        color: #38bdf8;
-        margin-bottom: 0.25rem;
-      }
-      .slicer-notes-list {
-        margin: 0;
-        padding-left: 1.1rem;
-        font-size: 0.75rem;
-        color: #94a3b8;
-        line-height: 1.35;
-      }
-      .export-actions {
-        display: flex;
-        flex-direction: column;
-      }
-      .export-buttons-grid {
-        display: grid;
-        grid-template-columns: 1.2fr 1fr;
-        gap: 0.5rem;
-      }
-      @media (max-width: 768px) {
-        .btn-grid-3 {
-          grid-template-columns: 1fr 1fr;
-        }
-        .grid-2-col {
-          grid-template-columns: 1fr;
-        }
-        .export-buttons-grid {
-          grid-template-columns: 1fr;
-        }
-      }
-    `,
-  ],
+  styleUrl: './keycap-switch-tester-maker.component.scss',
 })
 export class KeycapSwitchTesterMakerComponent implements OnInit, OnDestroy {
   @ViewChild('previewCanvas', { static: true })
@@ -639,6 +475,8 @@ export class KeycapSwitchTesterMakerComponent implements OnInit, OnDestroy {
   readonly currentMetrics = signal<KeycapMetrics | null>(null);
 
   private readonly activeDownloadUrls: string[] = [];
+  private worker: Worker | null = null;
+  private workerRequestId = 0;
 
   // Three.js scene instances
   private scene?: THREE.Scene;
@@ -651,13 +489,28 @@ export class KeycapSwitchTesterMakerComponent implements OnInit, OnDestroy {
   // Interaction controls
   private isDragging = false;
   private previousMousePosition = { x: 0, y: 0 };
+  private readonly onWindowMouseUp = () => {
+    this.isDragging = false;
+  };
 
   ngOnInit(): void {
+    if (typeof Worker !== 'undefined') {
+      try {
+        this.worker = new Worker(new URL('./worker.ts', import.meta.url), { type: 'module' });
+      } catch {}
+    }
     this.initThree();
     this.updatePreviewMesh();
   }
 
   ngOnDestroy(): void {
+    window.removeEventListener('mouseup', this.onWindowMouseUp);
+
+    if (this.worker) {
+      this.worker.terminate();
+      this.worker = null;
+    }
+
     if (this.animationFrameId) {
       cancelAnimationFrame(this.animationFrameId);
     }
@@ -738,20 +591,73 @@ export class KeycapSwitchTesterMakerComponent implements OnInit, OnDestroy {
     this.isGenerating.set(true);
     try {
       const options = this.getCurrentOptions();
-      const result = await processKeycap(options, format);
+      let blob: Blob;
+      let fileName: string;
 
-      const url = URL.createObjectURL(result.blob);
-      this.activeDownloadUrls.push(url);
+      if (this.worker) {
+        const id = ++this.workerRequestId;
+        const result = await new Promise<{ blob: Blob; fileName: string }>((resolve, reject) => {
+          const handler = (e: MessageEvent<KeycapWorkerResponse>) => {
+            if (e.data.id === id) {
+              if (e.data.type === 'error') {
+                this.worker?.removeEventListener('message', handler);
+                reject(new Error(e.data.error || 'Worker export error'));
+              } else if (e.data.type === 'result') {
+                this.worker?.removeEventListener('message', handler);
+                if (e.data.buffer && e.data.fileName) {
+                  const b = new Blob([e.data.buffer], {
+                    type: e.data.mimeType || 'application/octet-stream',
+                  });
+                  resolve({ blob: b, fileName: e.data.fileName });
+                } else {
+                  reject(new Error('Invalid worker response payload'));
+                }
+              }
+            }
+          };
+          this.worker?.addEventListener('message', handler);
+          const request: KeycapWorkerRequest = {
+            id,
+            options,
+            format,
+          };
+          this.worker?.postMessage(request);
+        });
+        blob = result.blob;
+        fileName = result.fileName;
+      } else {
+        const result = await processKeycap(options, format);
+        if (!result.blob) {
+          throw new Error(result.error || 'Export failed');
+        }
+        blob = result.blob;
+        fileName = result.fileName;
+      }
 
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = result.fileName;
-      document.body.appendChild(a);
-      a.click();
-      document.body.removeChild(a);
+      this.triggerFileDownload(blob, fileName);
     } finally {
       this.isGenerating.set(false);
     }
+  }
+
+  private triggerFileDownload(blob: Blob, fileName: string): void {
+    const url = URL.createObjectURL(blob);
+    this.activeDownloadUrls.push(url);
+
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = fileName;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+
+    setTimeout(() => {
+      URL.revokeObjectURL(url);
+      const idx = this.activeDownloadUrls.indexOf(url);
+      if (idx !== -1) {
+        this.activeDownloadUrls.splice(idx, 1);
+      }
+    }, 100);
   }
 
   private getCurrentOptions(): KeycapSwitchTesterMakerOptions {
@@ -842,9 +748,7 @@ export class KeycapSwitchTesterMakerComponent implements OnInit, OnDestroy {
       this.previousMousePosition = { x: e.clientX, y: e.clientY };
     });
 
-    window.addEventListener('mouseup', () => {
-      this.isDragging = false;
-    });
+    window.addEventListener('mouseup', this.onWindowMouseUp);
 
     canvas.addEventListener('mousemove', (e) => {
       if (!this.isDragging || !this.objectGroup) return;
@@ -868,6 +772,42 @@ export class KeycapSwitchTesterMakerComponent implements OnInit, OnDestroy {
       },
       { passive: false }
     );
+
+    // Touch orbit interaction
+    canvas.addEventListener('touchstart', (e) => this.onTouchStart(e), { passive: false });
+    canvas.addEventListener('touchmove', (e) => this.onTouchMove(e), { passive: false });
+    canvas.addEventListener('touchend', () => this.onTouchEnd());
+    canvas.addEventListener('touchcancel', () => this.onTouchEnd());
+  }
+
+  onTouchStart(event: TouchEvent): void {
+    if (event.touches.length === 1) {
+      this.isDragging = true;
+      this.previousMousePosition = {
+        x: event.touches[0].clientX,
+        y: event.touches[0].clientY,
+      };
+      event.preventDefault();
+    }
+  }
+
+  onTouchMove(event: TouchEvent): void {
+    if (!this.isDragging || !this.objectGroup || event.touches.length !== 1) return;
+    const deltaX = event.touches[0].clientX - this.previousMousePosition.x;
+    const deltaY = event.touches[0].clientY - this.previousMousePosition.y;
+
+    this.objectGroup.rotation.z += deltaX * 0.01;
+    this.objectGroup.rotation.x += deltaY * 0.01;
+
+    this.previousMousePosition = {
+      x: event.touches[0].clientX,
+      y: event.touches[0].clientY,
+    };
+    event.preventDefault();
+  }
+
+  onTouchEnd(): void {
+    this.isDragging = false;
   }
 
   private updatePreviewMesh(): void {

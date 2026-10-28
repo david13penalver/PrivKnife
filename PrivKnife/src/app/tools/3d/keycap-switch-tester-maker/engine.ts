@@ -314,39 +314,40 @@ function buildMxStemGeometry(
   toleranceOffsetMm: number
 ): THREE.BufferGeometry {
   const outerRadius = 2.75; // 5.5mm outer cylinder diameter
-  const segments = 16;
-  const cylinder = new THREE.CylinderGeometry(outerRadius, outerRadius, heightMm, segments);
-  cylinder.rotateX(Math.PI / 2);
+  const crossSpan = 4.10 + toleranceOffsetMm;
+  const crossThick = 1.17 + toleranceOffsetMm;
 
-  // Outer cross cylinder is solid; now subtract or carve the MX cruciform
-  // In pure Three.js without heavy CSG runtime dependencies, we can build the
-  // 4 quadrant retention tabs of the MX stem post!
-  // A standard MX cross slot is 4.1mm x 1.25mm horizontal & vertical.
-  // The 4 quadrant posts are positioned at corners leaving the exact cross slot.
-  const armLen = 2.1 + toleranceOffsetMm / 2;
-  const slotHalfWidth = 0.625 + toleranceOffsetMm / 2;
+  const shape = new THREE.Shape();
+  shape.absarc(0, 0, outerRadius, 0, Math.PI * 2, false);
 
-  const tabWidth = outerRadius - slotHalfWidth;
-  const tabGeometries: THREE.BufferGeometry[] = [];
+  const hs = crossSpan / 2;
+  const ht = crossThick / 2;
 
-  // 4 quadrant posts
-  const postCenters = [
-    [slotHalfWidth + tabWidth / 2, slotHalfWidth + tabWidth / 2],
-    [-slotHalfWidth - tabWidth / 2, slotHalfWidth + tabWidth / 2],
-    [-slotHalfWidth - tabWidth / 2, -slotHalfWidth - tabWidth / 2],
-    [slotHalfWidth + tabWidth / 2, -slotHalfWidth - tabWidth / 2],
-  ];
+  // 12 vertices of cruciform hole in clockwise direction (to subtract from CCW circle)
+  const hole = new THREE.Path();
+  hole.moveTo(ht, hs);
+  hole.lineTo(ht, ht);
+  hole.lineTo(hs, ht);
+  hole.lineTo(hs, -ht);
+  hole.lineTo(ht, -ht);
+  hole.lineTo(ht, -hs);
+  hole.lineTo(-ht, -hs);
+  hole.lineTo(-ht, -ht);
+  hole.lineTo(-hs, -ht);
+  hole.lineTo(-hs, ht);
+  hole.lineTo(-ht, ht);
+  hole.lineTo(-ht, hs);
+  hole.closePath();
 
-  for (const [cx, cy] of postCenters) {
-    const post = new THREE.BoxGeometry(tabWidth, tabWidth, heightMm);
-    post.translate(cx, cy, heightMm / 2);
-    tabGeometries.push(post);
-  }
+  shape.holes.push(hole);
 
-  cylinder.dispose();
-  const merged = safeMergeGeometries(tabGeometries);
-  tabGeometries.forEach((g) => g.dispose());
-  return merged;
+  const extrudeGeom = new THREE.ExtrudeGeometry(shape, {
+    depth: heightMm,
+    bevelEnabled: false,
+    curveSegments: 24,
+  });
+
+  return extrudeGeom;
 }
 
 export function generateKeycapMesh(
@@ -366,18 +367,8 @@ export function generateKeycapMesh(
   const halfBd = bd / 2;
   const halfTw = tw / 2;
   const halfTd = td / 2;
-
-  // Vertices of outer frustum
-  // Base (z = 0):
-  // 0: (-halfBw, -halfBd, 0)
-  // 1: ( halfBw, -halfBd, 0)
-  // 2: ( halfBw,  halfBd, 0)
-  // 3: (-halfBw,  halfBd, 0)
-  // Top (z = h):
-  // 4: (-halfTw, -halfTd, h)
-  // 5: ( halfTw, -halfTd, h)
-  // 6: ( halfTw,  halfTd, h)
-  // 7: (-halfTw,  halfTd, h)
+  const tiltRad = (dim.tiltAngleDeg * Math.PI) / 180;
+  const dishDepth = options.dishDepthMm;
 
   // Inner cavity (hollow underside)
   const inHalfBw = Math.max(1.0, halfBw - wall);
@@ -385,15 +376,6 @@ export function generateKeycapMesh(
   const inHalfTw = Math.max(1.0, halfTw - wall);
   const inHalfTd = Math.max(1.0, halfTd - wall);
   const inH = Math.max(2.0, h - wall);
-
-  // 8: (-inHalfBw, -inHalfBd, 0)
-  // 9: ( inHalfBw, -inHalfBd, 0)
-  // 10: ( inHalfBw,  inHalfBd, 0)
-  // 11: (-inHalfBw,  inHalfBd, 0)
-  // 12: (-inHalfTw, -inHalfTd, inH)
-  // 13: ( inHalfTw, -inHalfTd, inH)
-  // 14: ( inHalfTw,  inHalfTd, inH)
-  // 15: (-inHalfTw,  inHalfTd, inH)
 
   const positions: number[] = [];
 
@@ -409,48 +391,89 @@ export function generateKeycapMesh(
     positions.push(...v1, ...v3, ...v4);
   }
 
-  const v = [
-    // 0..3: outer base
+  // Top surface grid with concave dish and profile tilt
+  const gridN = 8;
+  const grid: [number, number, number][][] = [];
+  for (let i = 0; i <= gridN; i++) {
+    grid[i] = [];
+    const u = i / gridN;
+    const x = -halfTw + u * tw;
+    for (let j = 0; j <= gridN; j++) {
+      const vCoord = j / gridN;
+      const y = -halfTd + vCoord * td;
+      const zTilt = y * Math.tan(tiltRad);
+      const nx = x / (halfTw || 1);
+      const ny = y / (halfTd || 1);
+      const rSq = nx * nx + ny * ny;
+      const zDish = -dishDepth * Math.max(0, 1 - rSq);
+      const z = h + zTilt + zDish;
+      grid[i][j] = [x, y, z];
+    }
+  }
+
+  // Add top grid surface
+  for (let i = 0; i < gridN; i++) {
+    for (let j = 0; j < gridN; j++) {
+      addQuad(grid[i][j], grid[i + 1][j], grid[i + 1][j + 1], grid[i][j + 1]);
+    }
+  }
+
+  // Outer base vertices
+  const outerBase: [number, number, number][] = [
     [-halfBw, -halfBd, 0],
     [halfBw, -halfBd, 0],
     [halfBw, halfBd, 0],
     [-halfBw, halfBd, 0],
-    // 4..7: outer top
-    [-halfTw, -halfTd, h],
-    [halfTw, -halfTd, h],
-    [halfTw, halfTd, h],
-    [-halfTw, halfTd, h],
-    // 8..11: inner base
+  ];
+
+  // Outer side walls connecting base to top grid perimeter
+  for (let i = 0; i < gridN; i++) {
+    const b1: [number, number, number] = [-halfBw + (i / gridN) * bw, -halfBd, 0];
+    const b2: [number, number, number] = [-halfBw + ((i + 1) / gridN) * bw, -halfBd, 0];
+    addQuad(b1, b2, grid[i + 1][0], grid[i][0]);
+  }
+  for (let j = 0; j < gridN; j++) {
+    const b1: [number, number, number] = [halfBw, -halfBd + (j / gridN) * bd, 0];
+    const b2: [number, number, number] = [halfBw, -halfBd + ((j + 1) / gridN) * bd, 0];
+    addQuad(b1, b2, grid[gridN][j + 1], grid[gridN][j]);
+  }
+  for (let i = gridN - 1; i >= 0; i--) {
+    const b1: [number, number, number] = [-halfBw + ((i + 1) / gridN) * bw, halfBd, 0];
+    const b2: [number, number, number] = [-halfBw + (i / gridN) * bw, halfBd, 0];
+    addQuad(b1, b2, grid[i][gridN], grid[i + 1][gridN]);
+  }
+  for (let j = gridN - 1; j >= 0; j--) {
+    const b1: [number, number, number] = [-halfBw, -halfBd + ((j + 1) / gridN) * bd, 0];
+    const b2: [number, number, number] = [-halfBw, -halfBd + (j / gridN) * bd, 0];
+    addQuad(b1, b2, grid[0][j], grid[0][j + 1]);
+  }
+
+  // Inner cavity vertices
+  const inBase: [number, number, number][] = [
     [-inHalfBw, -inHalfBd, 0],
     [inHalfBw, -inHalfBd, 0],
     [inHalfBw, inHalfBd, 0],
     [-inHalfBw, inHalfBd, 0],
-    // 12..15: inner top
+  ];
+  const inTop: [number, number, number][] = [
     [-inHalfTw, -inHalfTd, inH],
     [inHalfTw, -inHalfTd, inH],
     [inHalfTw, inHalfTd, inH],
     [-inHalfTw, inHalfTd, inH],
-  ] as [number, number, number][];
+  ];
 
-  // Outer sides
-  addQuad(v[0], v[1], v[5], v[4]); // front
-  addQuad(v[1], v[2], v[6], v[5]); // right
-  addQuad(v[2], v[3], v[7], v[6]); // back
-  addQuad(v[3], v[0], v[4], v[7]); // left
-  addQuad(v[4], v[5], v[6], v[7]); // top dish surface
-
-  // Bottom rim connecting outer to inner
-  addQuad(v[0], v[8], v[9], v[1]);
-  addQuad(v[1], v[9], v[10], v[2]);
-  addQuad(v[2], v[10], v[11], v[3]);
-  addQuad(v[3], v[11], v[8], v[0]);
+  // Bottom rim connecting outer to inner base
+  addQuad(outerBase[0], inBase[0], inBase[1], outerBase[1]);
+  addQuad(outerBase[1], inBase[1], inBase[2], outerBase[2]);
+  addQuad(outerBase[2], inBase[2], inBase[3], outerBase[3]);
+  addQuad(outerBase[3], inBase[3], inBase[0], outerBase[0]);
 
   // Inner cavity sides (inverted winding)
-  addQuad(v[8], v[12], v[13], v[9]);
-  addQuad(v[9], v[13], v[14], v[10]);
-  addQuad(v[10], v[14], v[15], v[11]);
-  addQuad(v[11], v[15], v[12], v[8]);
-  addQuad(v[12], v[15], v[14], v[13]); // inner ceiling
+  addQuad(inBase[0], inTop[0], inTop[1], inBase[1]);
+  addQuad(inBase[1], inTop[1], inTop[2], inBase[2]);
+  addQuad(inBase[2], inTop[2], inTop[3], inBase[3]);
+  addQuad(inBase[3], inTop[3], inTop[0], inBase[0]);
+  addQuad(inTop[0], inTop[3], inTop[2], inTop[1]); // inner ceiling
 
   const shellGeom = new THREE.BufferGeometry();
   shellGeom.setAttribute('position', new THREE.Float32BufferAttribute(positions, 3));
@@ -488,12 +511,17 @@ export function generateKeycapMesh(
   if (hasLegend) {
     const charHeight = Math.min(6.5, td * 0.45);
     const strokeWidth = charHeight * 0.2;
-    const raise = options.legendStyle === 'embossed' ? 0.4 : 0.2;
+    const isMultiColor = options.legendStyle === 'inlaid_multicolor';
+    const raise = isMultiColor ? 0.6 : 0.4;
     const textGeom = createLegendGeometry(options.legendText, charHeight, raise, strokeWidth);
 
     if (textGeom) {
-      // Place on top surface of keycap
-      textGeom.translate(0, 0, h);
+      if (isMultiColor) {
+        textGeom.translate(0, 0, h - raise);
+      } else {
+        textGeom.translate(0, 0, h);
+      }
+      textGeom.rotateX(tiltRad);
       legendGeometry = textGeom;
     } else {
       legendGeometry = new THREE.BufferGeometry();
@@ -571,53 +599,95 @@ export function generateSwitchTesterMesh(
   const extraBackHeight = depthMm * Math.tan(tiltRad);
   const totalHeightMm = Math.round((baseHeightMm + extraBackHeight) * 10) / 10;
 
-  // Build tray base shape with rounded corners
+  // Build tray base shapes with rounded corners
   const rad = 4.0;
   const halfW = widthMm / 2;
   const halfD = depthMm / 2;
 
-  const trayShape = new THREE.Shape();
-  trayShape.moveTo(-halfW + rad, -halfD);
-  trayShape.lineTo(halfW - rad, -halfD);
-  trayShape.absarc(halfW - rad, -halfD + rad, rad, -Math.PI / 2, 0, false);
-  trayShape.lineTo(halfW, halfD - rad);
-  trayShape.absarc(halfW - rad, halfD - rad, rad, 0, Math.PI / 2, false);
-  trayShape.lineTo(-halfW + rad, halfD);
-  trayShape.absarc(-halfW + rad, halfD - rad, rad, Math.PI / 2, Math.PI, false);
-  trayShape.lineTo(-halfW, -halfD + rad);
-  trayShape.absarc(-halfW + rad, -halfD + rad, rad, Math.PI, (3 * Math.PI) / 2, false);
-  trayShape.closePath();
+  function createRoundedOuterShape(): THREE.Shape {
+    const s = new THREE.Shape();
+    s.moveTo(-halfW + rad, -halfD);
+    s.lineTo(halfW - rad, -halfD);
+    s.absarc(halfW - rad, -halfD + rad, rad, -Math.PI / 2, 0, false);
+    s.lineTo(halfW, halfD - rad);
+    s.absarc(halfW - rad, halfD - rad, rad, 0, Math.PI / 2, false);
+    s.lineTo(-halfW + rad, halfD);
+    s.absarc(-halfW + rad, halfD - rad, rad, Math.PI / 2, Math.PI, false);
+    s.lineTo(-halfW, -halfD + rad);
+    s.absarc(-halfW + rad, -halfD + rad, rad, Math.PI, (3 * Math.PI) / 2, false);
+    s.closePath();
+    return s;
+  }
 
-  // Add 14mm x 14mm switch holes with snap notches
+  const upperShape = createRoundedOuterShape();
+  const lowerShape = createRoundedOuterShape();
+
+  // Grid holes:
+  // Upper: 14mm x 14mm plate cutout
+  // Lower: 15.6mm x 15.6mm switch body clearance cavity
   const gridStartX = -((cols - 1) * pitch) / 2;
   const gridStartY = ((rows - 1) * pitch) / 2;
+  const cutout14 = 14.0;
+  const cutout156 = 15.6;
 
   for (let r = 0; r < rows; r++) {
     for (let c = 0; c < cols; c++) {
       const cx = gridStartX + c * pitch;
       const cy = gridStartY - r * pitch;
-      const halfCut = cutoutSize / 2;
 
-      // 14mm square with side retention notches (0.8mm deep x 1.6mm wide on north/south edges)
-      const hole = new THREE.Path();
-      hole.moveTo(cx - halfCut, cy - halfCut);
-      hole.lineTo(cx + halfCut, cy - halfCut);
-      hole.lineTo(cx + halfCut, cy + halfCut);
-      hole.lineTo(cx - halfCut, cy + halfCut);
-      hole.closePath();
-      trayShape.holes.push(hole);
+      // 14mm hole for upper plate
+      const h14 = new THREE.Path();
+      h14.moveTo(cx - cutout14 / 2, cy - cutout14 / 2);
+      h14.lineTo(cx + cutout14 / 2, cy - cutout14 / 2);
+      h14.lineTo(cx + cutout14 / 2, cy + cutout14 / 2);
+      h14.lineTo(cx - cutout14 / 2, cy + cutout14 / 2);
+      h14.closePath();
+      upperShape.holes.push(h14);
+
+      // 15.6mm hole for lower cavity
+      const h156 = new THREE.Path();
+      h156.moveTo(cx - cutout156 / 2, cy - cutout156 / 2);
+      h156.lineTo(cx + cutout156 / 2, cy - cutout156 / 2);
+      h156.lineTo(cx + cutout156 / 2, cy + cutout156 / 2);
+      h156.lineTo(cx - cutout156 / 2, cy + cutout156 / 2);
+      h156.closePath();
+      lowerShape.holes.push(h156);
     }
   }
 
-  const trayExtrude = new THREE.ExtrudeGeometry(trayShape, {
-    depth: baseHeightMm,
+  const lowerExtrude = new THREE.ExtrudeGeometry(lowerShape, {
+    depth: 1,
+    bevelEnabled: false,
+  });
+  const upperExtrude = new THREE.ExtrudeGeometry(upperShape, {
+    depth: 1,
     bevelEnabled: false,
   });
 
-  // Apply incline tilt if specified
-  if (options.trayTiltAngleDeg > 0) {
-    trayExtrude.rotateX(tiltRad);
+  // Shear Z so bottom rests flat on z=0 and top is inclined with 1.5mm snap lip
+  const posLower = lowerExtrude.getAttribute('position') as THREE.BufferAttribute;
+  for (let i = 0; i < posLower.count; i++) {
+    const y = posLower.getY(i);
+    const z = posLower.getZ(i);
+    const zTopY = baseHeightMm + (y + halfD) * Math.tan(tiltRad);
+    const zLip = Math.max(1.5, zTopY - 1.5);
+    posLower.setZ(i, z * zLip);
   }
+  lowerExtrude.computeVertexNormals();
+
+  const posUpper = upperExtrude.getAttribute('position') as THREE.BufferAttribute;
+  for (let i = 0; i < posUpper.count; i++) {
+    const y = posUpper.getY(i);
+    const z = posUpper.getZ(i);
+    const zTopY = baseHeightMm + (y + halfD) * Math.tan(tiltRad);
+    const zLip = Math.max(1.5, zTopY - 1.5);
+    posUpper.setZ(i, zLip + z * (zTopY - zLip));
+  }
+  upperExtrude.computeVertexNormals();
+
+  const trayExtrude = safeMergeGeometries([lowerExtrude, upperExtrude]);
+  lowerExtrude.dispose();
+  upperExtrude.dispose();
 
   const pos = trayExtrude.getAttribute('position');
   const totalTriangles = pos ? Math.round(pos.count / 3) : 0;
