@@ -1,0 +1,333 @@
+<div class="l-page">
+  <!-- Header -->
+  <header class="l-page__header c-header">
+    <div class="c-header__title-group">
+      <h1 class="c-header__title">Web Font Subsetter & TTF/OTF to WOFF2 Converter</h1>
+      <p class="c-header__subtitle">
+        Compress heavy desktop typography into ultra-compact WOFF2 web fonts by stripping unused glyphs,
+        cutting payloads by up to 95% with zero server uploads.
+      </p>
+    </div>
+    <div class="c-badge c-badge--privacy">
+      🛡️ 100% In-Browser • Never Leaves Your Device
+    </div>
+  </header>
+
+  <!-- Main Columns -->
+  <div class="l-columns l-columns--2">
+    <!-- Configuration & Upload Area -->
+    <section class="l-columns__area c-card">
+      <div class="c-card__header l-extremo">
+        <h2 class="c-card__title l-extremo__area-izquierda">Font File & Subsetting</h2>
+        <div class="l-extremo__area-derecha">
+          <button
+            type="button"
+            class="c-button c-button--outline c-button--small"
+            (click)="loadSampleFont()"
+          >
+            Load Sample Font
+          </button>
+        </div>
+      </div>
+
+      <div class="c-card__body">
+        <!-- Dropzone -->
+        <div
+          class="c-dropzone g--margin-bottom-4"
+          (dragover)="$event.preventDefault()"
+          (drop)="onFileDrop($event)"
+          (click)="fileInput.click()"
+        >
+          <input
+            #fileInput
+            type="file"
+            accept=".ttf,.otf,.woff,.woff2,font/ttf,font/otf,font/woff,font/woff2"
+            style="display: none"
+            (change)="onFileInputChange($event)"
+          />
+          <div class="c-dropzone__content">
+            <span class="c-dropzone__icon">🔤</span>
+            <span class="c-dropzone__prompt">
+              @if (selectedFileName()) {
+                <strong>{{ selectedFileName() }}</strong>
+              } @else {
+                <strong>Click to upload font</strong> or drag & drop TTF, OTF, WOFF here
+              }
+            </span>
+            <span class="c-dropzone__hint">Processed strictly on your local device</span>
+          </div>
+        </div>
+
+        <!-- Subsetting Preset -->
+        <h3 class="c-card__subtitle g--margin-bottom-2">Glyph Subsetting Preset</h3>
+        <div class="c-font-subsetter__preset-buttons g--margin-bottom-3">
+          <button
+            type="button"
+            class="c-button c-button--small"
+            [class.c-button--primary]="subsetPreset() === 'basic_latin_ascii'"
+            [class.c-button--outline]="subsetPreset() !== 'basic_latin_ascii'"
+            (click)="setSubsetPreset('basic_latin_ascii')"
+          >
+            Basic Latin (ASCII)
+          </button>
+          <button
+            type="button"
+            class="c-button c-button--small"
+            [class.c-button--primary]="subsetPreset() === 'latin_supplement'"
+            [class.c-button--outline]="subsetPreset() !== 'latin_supplement'"
+            (click)="setSubsetPreset('latin_supplement')"
+          >
+            Latin Supplement (á, ñ, ü)
+          </button>
+          <button
+            type="button"
+            class="c-button c-button--small"
+            [class.c-button--primary]="subsetPreset() === 'numbers_punctuation_only'"
+            [class.c-button--outline]="subsetPreset() !== 'numbers_punctuation_only'"
+            (click)="setSubsetPreset('numbers_punctuation_only')"
+          >
+            Numbers & Punctuation
+          </button>
+          <button
+            type="button"
+            class="c-button c-button--small"
+            [class.c-button--primary]="subsetPreset() === 'custom_characters'"
+            [class.c-button--outline]="subsetPreset() !== 'custom_characters'"
+            (click)="setSubsetPreset('custom_characters')"
+          >
+            Custom Characters
+          </button>
+        </div>
+
+        <!-- Custom Characters Textarea -->
+        @if (subsetPreset() === 'custom_characters') {
+          <div class="c-input g--margin-bottom-3">
+            <label class="c-input__label" for="customCharsInput">Custom Characters to Retain</label>
+            <textarea
+              id="customCharsInput"
+              class="c-input__textarea"
+              rows="3"
+              placeholder="Paste only the exact characters needed..."
+              [ngModel]="customCharacters()"
+              (ngModelChange)="setCustomCharacters($event)"
+            ></textarea>
+          </div>
+        }
+
+        <!-- Table Stripping Options -->
+        <h3 class="c-card__subtitle g--margin-bottom-2">Optimization Toggles</h3>
+        <div class="c-font-subsetter__options-grid g--margin-bottom-4">
+          <label class="c-checkbox-label">
+            <input
+              type="checkbox"
+              id="stripOpenTypeLayout"
+              [checked]="dropLayoutFeatures()"
+              (change)="toggleDropLayoutFeatures()"
+            />
+            Drop OpenType Layout Features (GSUB, GPOS, GDEF)
+          </label>
+
+          <label class="c-checkbox-label">
+            <input
+              type="checkbox"
+              id="stripKerning"
+              [checked]="keepKerningTables()"
+              (change)="toggleKeepKerningTables()"
+            />
+            Preserve Kerning Tables (kern)
+          </label>
+        </div>
+
+        <!-- Output Format & Family Name -->
+        <h3 class="c-card__subtitle g--margin-bottom-2">Output Format</h3>
+        <div class="c-font-subsetter__preset-buttons g--margin-bottom-3">
+          <button
+            type="button"
+            class="c-button c-button--small"
+            [class.c-button--primary]="outputFormat() === 'woff2'"
+            [class.c-button--outline]="outputFormat() !== 'woff2'"
+            (click)="setOutputFormat('woff2')"
+          >
+            WOFF2 (Modern Web)
+          </button>
+          <button
+            type="button"
+            class="c-button c-button--small"
+            [class.c-button--primary]="outputFormat() === 'woff'"
+            [class.c-button--outline]="outputFormat() !== 'woff'"
+            (click)="setOutputFormat('woff')"
+          >
+            WOFF 1.0 (Legacy)
+          </button>
+          <button
+            type="button"
+            class="c-button c-button--small"
+            [class.c-button--primary]="outputFormat() === 'ttf'"
+            [class.c-button--outline]="outputFormat() !== 'ttf'"
+            (click)="setOutputFormat('ttf')"
+          >
+            TrueType (.ttf)
+          </button>
+        </div>
+
+        <div class="c-input g--margin-bottom-2">
+          <label class="c-input__label" for="fontFamilyName">Font Family Name</label>
+          <input
+            id="fontFamilyName"
+            type="text"
+            class="c-input__field"
+            [ngModel]="fontFamilyName()"
+            (ngModelChange)="setFontFamilyName($event)"
+            placeholder="CustomFont"
+          />
+        </div>
+      </div>
+
+      <div class="c-card__footer l-extremo">
+        <div class="l-extremo__area-izquierda">
+          <button
+            type="button"
+            class="c-button c-button--outline"
+            (click)="reset()"
+          >
+            Reset to Defaults
+          </button>
+        </div>
+        <div class="l-extremo__area-derecha">
+          <button
+            type="button"
+            class="c-button c-button--primary"
+            [disabled]="!result() || !result()?.success"
+            (click)="downloadFont()"
+          >
+            Download {{ result()?.fileName || 'Font' }}
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <!-- Preview & Deliverable Column -->
+    <section class="l-columns__area c-card">
+      <div class="c-card__header l-extremo">
+        <h2 class="c-card__title l-extremo__area-izquierda">Live Specimen & CSS</h2>
+        <div class="l-extremo__area-derecha">
+          <button
+            type="button"
+            class="c-button c-button--outline c-button--small"
+            [disabled]="!result() || !result()?.success"
+            (click)="downloadCss()"
+          >
+            Download .css
+          </button>
+        </div>
+      </div>
+
+      <div class="c-card__body">
+        @if (result() && result()?.success) {
+          <!-- Stats Banner -->
+          <div class="c-font-subsetter__stats-banner g--margin-bottom-4">
+            <div class="c-font-subsetter__stat-item">
+              <span class="c-font-subsetter__stat-label">Original</span>
+              <span class="c-font-subsetter__stat-value">{{ formatBytes(result()!.stats.originalBytes) }}</span>
+            </div>
+            <div class="c-font-subsetter__stat-arrow">➔</div>
+            <div class="c-font-subsetter__stat-item">
+              <span class="c-font-subsetter__stat-label">Subset</span>
+              <span class="c-font-subsetter__stat-value c-font-subsetter__stat-value--highlight">
+                {{ formatBytes(result()!.stats.subsetBytes) }}
+              </span>
+            </div>
+            <div class="c-font-subsetter__stat-item">
+              <span class="c-font-subsetter__stat-label">Savings</span>
+              <span class="c-font-subsetter__stat-value c-font-subsetter__stat-value--positive">
+                -{{ result()!.stats.savingsPercent }}%
+              </span>
+            </div>
+            <div class="c-font-subsetter__stat-item">
+              <span class="c-font-subsetter__stat-label">Glyphs</span>
+              <span class="c-font-subsetter__stat-value">{{ result()!.stats.retainedGlyphCount }}</span>
+            </div>
+          </div>
+
+          <!-- Specimen Controls -->
+          <div class="c-font-subsetter__specimen-controls g--margin-bottom-2 l-extremo">
+            <label class="c-input__label l-extremo__area-izquierda" for="fontSizeRange">
+              Specimen Size: {{ specimenFontSize() }}px
+            </label>
+            <input
+              id="fontSizeRange"
+              type="range"
+              min="14"
+              max="48"
+              class="c-input__range l-extremo__area-derecha"
+              [ngModel]="specimenFontSize()"
+              (ngModelChange)="specimenFontSize.set(+$event)"
+            />
+          </div>
+
+          <!-- Specimen Preview Area -->
+          <div class="c-font-subsetter__specimen-box g--margin-bottom-4">
+            <textarea
+              class="c-font-subsetter__specimen-textarea"
+              [style.font-family]="previewFontFamily()"
+              [style.font-size.px]="specimenFontSize()"
+              [ngModel]="specimenText()"
+              (ngModelChange)="specimenText.set($event)"
+              rows="3"
+            ></textarea>
+          </div>
+
+          <!-- Waterfall Multi-size Preview -->
+          <div class="c-font-subsetter__waterfall g--margin-bottom-4">
+            <div class="c-font-subsetter__waterfall-line" [style.font-family]="previewFontFamily()" style="font-size: 12px">
+              12px: {{ specimenText() }}
+            </div>
+            <div class="c-font-subsetter__waterfall-line" [style.font-family]="previewFontFamily()" style="font-size: 18px">
+              18px: {{ specimenText() }}
+            </div>
+            <div class="c-font-subsetter__waterfall-line" [style.font-family]="previewFontFamily()" style="font-size: 28px">
+              28px: {{ specimenText() }}
+            </div>
+          </div>
+
+          <!-- @font-face Code Snippet -->
+          <div class="c-font-subsetter__code-box">
+            <div class="c-font-subsetter__code-header l-extremo">
+              <span class="c-font-subsetter__code-title l-extremo__area-izquierda">@font-face CSS snippet</span>
+              <button
+                type="button"
+                class="c-button c-button--outline c-button--small l-extremo__area-derecha"
+                (click)="copyCssSnippet()"
+              >
+                {{ copiedCssFeedback() ? '✓ Copied CSS!' : 'Copy CSS' }}
+              </button>
+            </div>
+            <pre class="c-font-subsetter__code-block"><code>{{ result()?.cssSnippet }}</code></pre>
+          </div>
+        } @else if (result() && !result()?.success) {
+          <div class="c-alert c-alert--danger">
+            <strong>Error:</strong> {{ result()?.error }}
+          </div>
+        } @else {
+          <div class="empty-state">
+            <span class="empty-state__icon">🔤</span>
+            <p>Upload a font or load the sample preset to inspect glyph subsetting and @font-face rules.</p>
+          </div>
+        }
+      </div>
+
+      <div class="c-card__footer l-extremo">
+        <div class="l-extremo__area-derecha">
+          <button
+            type="button"
+            class="c-button c-button--primary"
+            [disabled]="!result() || !result()?.success"
+            (click)="copyCssSnippet()"
+          >
+            {{ copiedCssFeedback() ? '✓ Copied to Clipboard!' : 'Copy @font-face CSS' }}
+          </button>
+        </div>
+      </div>
+    </section>
+  </div>
+</div>

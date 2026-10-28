@@ -144,6 +144,37 @@ describe('FontSubsetterConverterComponent (Seam 2 & 4)', () => {
       fixture.destroy();
       expect(component).toBeTruthy();
     });
+
+    it('should terminate web worker on ngOnDestroy (DEFECT-56-05)', () => {
+      const mockWorker = {
+        postMessage: vi.fn(),
+        terminate: vi.fn(),
+        onmessage: null,
+      };
+      (component as any).worker = mockWorker;
+      component.ngOnDestroy();
+      expect(mockWorker.terminate).toHaveBeenCalled();
+    });
+
+    it('should register dynamic font family and render waterfall lines (DEFECT-56-04)', () => {
+      component.loadSampleFont();
+      fixture.detectChanges();
+
+      expect(component.previewFontFamily()).not.toBe('');
+      const compiled = fixture.nativeElement as HTMLElement;
+      const waterfallLines = compiled.querySelectorAll('.c-font-subsetter__waterfall-line');
+      expect(waterfallLines.length).toBe(3);
+    });
+
+    it('should use strict BEM namespaces in DOM (DEFECT-56-05)', () => {
+      component.loadSampleFont();
+      fixture.detectChanges();
+
+      const compiled = fixture.nativeElement as HTMLElement;
+      expect(compiled.querySelector('.c-font-subsetter__stats-banner')).toBeTruthy();
+      expect(compiled.querySelector('.c-font-subsetter__specimen-box')).toBeTruthy();
+      expect(compiled.querySelector('.c-font-subsetter__code-box')).toBeTruthy();
+    });
   });
 
   describe('Task 4.1: Privacy & Zero-Exfiltration Guard', () => {

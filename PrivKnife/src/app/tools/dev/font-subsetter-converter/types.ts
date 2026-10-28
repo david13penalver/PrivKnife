@@ -46,3 +46,14 @@ export interface FontSubsetterConverterResult {
   metadata?: FontMetadata;
   error?: string;
 }
+
+export interface FontSubsetWorkerRequest {
+  id: number;
+  buffer: ArrayBuffer;
+  options: FontSubsetterConverterOptions;
+}
+
+export interface FontSubsetWorkerResponse {
+  id: number;
+  result: FontSubsetterConverterResult;
+}

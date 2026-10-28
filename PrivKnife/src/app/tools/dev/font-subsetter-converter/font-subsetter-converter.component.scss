@@ -1,0 +1,230 @@
+:host {
+  display: block;
+  max-width: 100%;
+  overflow-x: hidden;
+}
+
+.l-page {
+  max-width: 100%;
+  overflow-x: hidden;
+  box-sizing: border-box;
+}
+
+.c-header__title {
+  overflow-wrap: anywhere;
+  word-break: break-word;
+}
+
+.c-badge {
+  max-width: 100%;
+  overflow-wrap: anywhere;
+}
+
+.l-columns__area {
+  min-width: 0;
+  max-width: 100%;
+}
+
+.c-card {
+  max-width: 100%;
+  box-sizing: border-box;
+}
+
+.l-extremo {
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.c-button {
+  max-width: 100%;
+  white-space: normal;
+  text-align: center;
+}
+
+.c-font-subsetter__preset-buttons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.375rem;
+}
+
+.c-font-subsetter__options-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 0.5rem;
+}
+
+.c-checkbox-label {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.875rem;
+  cursor: pointer;
+  min-height: 44px;
+  user-select: none;
+
+  input[type="checkbox"] {
+    width: 24px;
+    height: 24px;
+    min-width: 24px;
+    min-height: 24px;
+    cursor: pointer;
+  }
+}
+
+.c-input__field {
+  min-height: 44px;
+  font-size: 1rem;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.c-input__textarea {
+  font-size: 1rem;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.c-input__range {
+  height: 24px;
+  min-height: 24px;
+}
+
+.c-font-subsetter__stats-banner {
+  display: flex;
+  align-items: center;
+  justify-content: space-around;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  background: var(--color-surface-variant, #f1f5f9);
+  padding: 0.75rem 1rem;
+  border-radius: 0.5rem;
+  border: 1px solid var(--color-border, #cbd5e1);
+  box-sizing: border-box;
+}
+
+.c-font-subsetter__stat-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.c-font-subsetter__stat-label {
+  font-size: 0.75rem;
+  color: var(--color-text-muted, #64748b);
+  text-transform: uppercase;
+  font-weight: 600;
+}
+
+.c-font-subsetter__stat-value {
+  font-size: 1.125rem;
+  font-weight: 700;
+  color: var(--color-text, #0f172a);
+
+  &--highlight {
+    color: var(--color-primary, #2563eb);
+  }
+
+  &--positive {
+    color: #16a34a;
+  }
+}
+
+.c-font-subsetter__stat-arrow {
+  font-size: 1.25rem;
+  color: var(--color-text-muted, #94a3b8);
+}
+
+.c-font-subsetter__specimen-controls {
+  align-items: center;
+}
+
+.c-font-subsetter__specimen-box {
+  border: 1px solid var(--color-border, #cbd5e1);
+  border-radius: 0.375rem;
+  padding: 0.5rem;
+  background: var(--color-surface, #ffffff);
+}
+
+.c-font-subsetter__specimen-textarea {
+  width: 100%;
+  border: none;
+  outline: none;
+  background: transparent;
+  color: var(--color-text, #0f172a);
+  resize: vertical;
+  line-height: 1.4;
+  box-sizing: border-box;
+}
+
+.c-font-subsetter__waterfall {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  padding: 0.75rem;
+  border: 1px solid var(--color-border, #e2e8f0);
+  border-radius: 0.375rem;
+  background: var(--color-surface-variant, #f8fafc);
+}
+
+.c-font-subsetter__waterfall-line {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  color: var(--color-text, #0f172a);
+}
+
+.c-font-subsetter__code-box {
+  border: 1px solid var(--color-border, #cbd5e1);
+  border-radius: 0.375rem;
+  overflow: hidden;
+  max-width: 100%;
+}
+
+.c-font-subsetter__code-header {
+  background: var(--color-surface-variant, #e2e8f0);
+  color: var(--color-text, #1e293b);
+  padding: 0.375rem 0.75rem;
+  font-family: monospace;
+  font-size: 0.8125rem;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.c-font-subsetter__code-block {
+  max-height: 240px;
+  overflow-x: auto;
+  overflow-y: auto;
+  max-width: 100%;
+  box-sizing: border-box;
+  padding: 0.75rem;
+  margin: 0;
+  background: #0f172a;
+  color: #f8fafc;
+  font-size: 0.8125rem;
+  line-height: 1.4;
+  font-family: 'Fira Code', monospace;
+}
+
+.empty-state {
+  padding: 3rem 1rem;
+  text-align: center;
+  color: var(--color-text-muted, #64748b);
+}
+
+.empty-state__icon {
+  font-size: 2.5rem;
+  display: block;
+  margin-bottom: 0.5rem;
+}
+
+.c-alert {
+  padding: 0.75rem 1rem;
+  border-radius: 0.375rem;
+  font-size: 0.875rem;
+}
+
+.c-alert--danger {
+  background: #fee2e2;
+  color: #991b1b;
+  border: 1px solid #f87171;
+}

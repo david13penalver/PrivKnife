@@ -44,6 +44,7 @@ describe('FontSubsetEngine (engine.ts) - Seam 1', () => {
       expect(meta.tables).toContain('kern');
       expect(meta.tables).toContain('GSUB');
       expect(meta.originalSize).toBe(fontBuffer.byteLength);
+      expect(meta.numGlyphs).toBe(192); // DEFECT-56-01: reads numGlyphs from maxp
     });
   });
 
@@ -152,6 +153,80 @@ describe('FontSubsetEngine (engine.ts) - Seam 1', () => {
       expect(result.success).toBe(false);
       expect(result.error).toBeDefined();
       expect(result.fileSize).toBe(0);
+    });
+
+    it('should produce strictly smaller output as characterSet shrinks (DEFECT-56-01)', () => {
+      const fontBuffer = createSyntheticTrueTypeFont(false, false);
+
+      const customRes = processFontSubset(fontBuffer, {
+        ...DEFAULT_FONT_OPTIONS,
+        subsetPreset: 'custom_characters',
+        customCharacters: 'ABC',
+        outputFormat: 'ttf',
+      });
+
+      const numPunctRes = processFontSubset(fontBuffer, {
+        ...DEFAULT_FONT_OPTIONS,
+        subsetPreset: 'numbers_punctuation_only',
+        outputFormat: 'ttf',
+      });
+
+      const basicLatinRes = processFontSubset(fontBuffer, {
+        ...DEFAULT_FONT_OPTIONS,
+        subsetPreset: 'basic_latin_ascii',
+        outputFormat: 'ttf',
+      });
+
+      const latinSuppRes = processFontSubset(fontBuffer, {
+        ...DEFAULT_FONT_OPTIONS,
+        subsetPreset: 'latin_supplement',
+        outputFormat: 'ttf',
+      });
+
+      expect(customRes.fileSize).toBeLessThan(numPunctRes.fileSize);
+      expect(numPunctRes.fileSize).toBeLessThan(basicLatinRes.fileSize);
+      expect(basicLatinRes.fileSize).toBeLessThanOrEqual(latinSuppRes.fileSize);
+      expect(customRes.stats.retainedGlyphCount).toBeLessThan(numPunctRes.stats.retainedGlyphCount);
+    });
+
+    it('should compress WOFF and WOFF2 outputs to be smaller than raw TTF even when layout tables are kept (DEFECT-56-02)', () => {
+      const fontBuffer = createSyntheticTrueTypeFont(true, true);
+
+      const woff2Res = processFontSubset(fontBuffer, {
+        ...DEFAULT_FONT_OPTIONS,
+        outputFormat: 'woff2',
+        dropLayoutFeatures: false,
+        keepKerningTables: true,
+      });
+
+      const woffRes = processFontSubset(fontBuffer, {
+        ...DEFAULT_FONT_OPTIONS,
+        outputFormat: 'woff',
+        dropLayoutFeatures: false,
+        keepKerningTables: true,
+      });
+
+      expect(woff2Res.fileSize).toBeLessThan(fontBuffer.byteLength);
+      expect(woffRes.fileSize).toBeLessThan(fontBuffer.byteLength);
+    });
+
+    it('should unpack WOFF 1.0 input buffer without corrupting numTables (DEFECT-56-03)', () => {
+      const fontBuffer = createSyntheticTrueTypeFont(true, true);
+      const woffOutput = processFontSubset(fontBuffer, {
+        ...DEFAULT_FONT_OPTIONS,
+        outputFormat: 'woff',
+      });
+
+      const woffArrayBuffer = new Uint8Array(woffOutput.blob.size);
+      // Create an ArrayBuffer from the output blob
+      return woffOutput.blob.arrayBuffer().then((buf) => {
+        const roundTripRes = processFontSubset(buf, {
+          ...DEFAULT_FONT_OPTIONS,
+          outputFormat: 'ttf',
+        });
+        expect(roundTripRes.success).toBe(true);
+        expect(roundTripRes.metadata?.tables.length).toBeGreaterThan(4);
+      });
     });
   });
 });
