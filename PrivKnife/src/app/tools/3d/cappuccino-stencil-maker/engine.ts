@@ -363,15 +363,30 @@ export function buildMotifCutouts(options: CappuccinoStencilMakerOptions): Motif
       if (glyph) {
         for (const stroke of glyph) {
           const [p1, p2] = stroke;
-          const x1 = startX + p1[0] * charWidth;
-          const y1 = startY + p1[1] * charHeight - charHeight / 2;
-          const x2 = startX + p2[0] * charWidth;
-          const y2 = startY + p2[1] * charHeight - charHeight / 2;
+          let x1 = startX + p1[0] * charWidth;
+          let y1 = startY + p1[1] * charHeight - charHeight / 2;
+          let x2 = startX + p2[0] * charWidth;
+          let y2 = startY + p2[1] * charHeight - charHeight / 2;
 
           const dx = x2 - x1;
           const dy = y2 - y1;
           const len = Math.sqrt(dx * dx + dy * dy);
           if (len < 0.001) continue;
+
+          // If letter has an island and bridging is enabled, shorten the stroke at both ends by half of bridgeWidth
+          // so adjacent strokes do not close off the island
+          let effectiveLen = len;
+          if (hasIsland && options.autoBridgeIslands) {
+            const bridgeGap = Math.min(len * 0.4, options.bridgeWidthMm / 2);
+            if (len <= bridgeGap * 2 + 0.05) continue;
+            const ux = dx / len;
+            const uy = dy / len;
+            x1 += ux * bridgeGap;
+            y1 += uy * bridgeGap;
+            x2 -= ux * bridgeGap;
+            y2 -= uy * bridgeGap;
+            effectiveLen = len - bridgeGap * 2;
+          }
 
           // Create stroke slot polygon
           const angle = Math.atan2(dy, dx);
@@ -389,13 +404,13 @@ export function buildMotifCutouts(options: CappuccinoStencilMakerOptions): Motif
           slot.lineTo(x1 - nx, y1 - ny);
           slot.closePath();
           holes.push(slot);
+
+          approxCutoutAreaMm2 += effectiveLen * strokeWidth;
         }
       }
 
       startX += charWidth + spacing;
     }
-
-    approxCutoutAreaMm2 = text.length * charHeight * strokeWidth * 2;
   }
 
   return {
@@ -426,9 +441,15 @@ export function generateStencilMesh(
   }
 
   const depth = options.stencilThicknessMm;
+  const bevelThickness = Math.min(0.2, depth * 0.15);
+  const bevelSize = 0.2;
   const stencilGeometry = new THREE.ExtrudeGeometry(shape, {
-    depth,
-    bevelEnabled: false,
+    depth: options.rimBevel ? Math.max(0.2, depth - bevelThickness * 2) : depth,
+    bevelEnabled: !!options.rimBevel,
+    bevelThickness: options.rimBevel ? bevelThickness : 0,
+    bevelSize: options.rimBevel ? bevelSize : 0,
+    bevelSegments: options.rimBevel ? 1 : 0,
+    curveSegments: 48,
   });
 
   const pos = stencilGeometry.getAttribute('position');
@@ -478,15 +499,26 @@ export function generateStencilSvg(options: CappuccinoStencilMakerOptions): stri
   const totalH = options.stencilDiameterMm + padding * 2;
 
   function pathDataFromPoints(curves: THREE.Curve<THREE.Vector2>[]): string {
+    if (!curves || curves.length === 0) return '';
     let d = '';
+    let isFirst = true;
     for (let i = 0; i < curves.length; i++) {
       const c = curves[i];
-      const p1 = c.getPoint(0);
-      const p2 = c.getPoint(1);
-      if (i === 0) {
-        d += `M ${(p1.x + r + padding).toFixed(2)} ${(-p1.y + r + padding).toFixed(2)} `;
+      const isCurved = !(c instanceof THREE.LineCurve);
+      const divisions = isCurved ? 32 : 1;
+      const pts = c.getPoints(divisions);
+      for (let j = 0; j < pts.length; j++) {
+        if (!isFirst && j === 0) continue;
+        const pt = pts[j];
+        const sx = (pt.x + r + padding).toFixed(2);
+        const sy = (-pt.y + r + padding).toFixed(2);
+        if (isFirst) {
+          d += `M ${sx} ${sy} `;
+          isFirst = false;
+        } else {
+          d += `L ${sx} ${sy} `;
+        }
       }
-      d += `L ${(p2.x + r + padding).toFixed(2)} ${(-p2.y + r + padding).toFixed(2)} `;
     }
     d += 'Z ';
     return d;
@@ -494,6 +526,13 @@ export function generateStencilSvg(options: CappuccinoStencilMakerOptions): stri
 
   // Generate outer path
   let pathD = pathDataFromPoints(shape.curves);
+
+  // Generate handle holes if present in outer shape
+  for (const handleHole of shape.holes) {
+    if (handleHole.curves.length > 0) {
+      pathD += pathDataFromPoints(handleHole.curves);
+    }
+  }
 
   // Generate cutout holes paths
   for (const hole of holes) {

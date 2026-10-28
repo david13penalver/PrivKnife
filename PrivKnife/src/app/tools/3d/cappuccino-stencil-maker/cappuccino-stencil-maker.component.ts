@@ -19,6 +19,8 @@ import {
   StencilMetrics,
   StencilMotif,
   StencilPreset,
+  StencilWorkerRequest,
+  StencilWorkerResponse,
 } from './types';
 import {
   DEFAULT_STENCIL_OPTIONS,
@@ -82,7 +84,7 @@ import {
                 <input
                   id="stencilDiameter"
                   type="range"
-                  class="c-input c-input--range"
+                  class="c-input c-input__slider"
                   min="60"
                   max="150"
                   step="1"
@@ -100,7 +102,7 @@ import {
                   <input
                     id="stencilThickness"
                     type="range"
-                    class="c-input c-input--range"
+                    class="c-input c-input__slider"
                     min="0.8"
                     max="3.0"
                     step="0.2"
@@ -169,7 +171,7 @@ import {
                   <input
                     id="handleLength"
                     type="range"
-                    class="c-input c-input--range"
+                    class="c-input c-input__slider"
                     min="15"
                     max="80"
                     step="5"
@@ -302,7 +304,7 @@ import {
                   <input
                     id="bridgeWidth"
                     type="range"
-                    class="c-input c-input--range"
+                    class="c-input c-input__slider"
                     min="1.0"
                     max="4.0"
                     step="0.2"
@@ -413,7 +415,7 @@ import {
               <div class="export-buttons-grid">
                 <button
                   type="button"
-                  class="c-button c-button--primary"
+                  class="c-button c-button--primary download-btn-stl"
                   [disabled]="isGenerating()"
                   (click)="downloadFormat('stl')"
                 >
@@ -421,7 +423,7 @@ import {
                 </button>
                 <button
                   type="button"
-                  class="c-button c-button--outline"
+                  class="c-button c-button--outline download-btn-svg"
                   [disabled]="isGenerating()"
                   (click)="downloadFormat('svg')"
                 >
@@ -437,159 +439,7 @@ import {
       </div>
     </div>
   `,
-  styles: [
-    `
-      .preset-strip {
-        display: flex;
-        align-items: center;
-        flex-wrap: wrap;
-        gap: 0.5rem;
-      }
-      .preset-label {
-        font-weight: 600;
-        font-size: 0.85rem;
-        color: var(--color-text-muted, #94a3b8);
-      }
-      .preset-buttons {
-        display: flex;
-        flex-wrap: wrap;
-        gap: 0.35rem;
-      }
-      .btn-grid-3 {
-        display: grid;
-        grid-template-columns: repeat(3, 1fr);
-        gap: 0.4rem;
-        margin-top: 0.25rem;
-      }
-      .grid-2-col {
-        display: grid;
-        grid-template-columns: 1fr 1fr;
-        gap: 0.75rem;
-        margin-bottom: 0.5rem;
-      }
-      .control-group {
-        display: flex;
-        flex-direction: column;
-        margin-bottom: 0.85rem;
-      }
-      .c-input__label {
-        font-size: 0.85rem;
-        font-weight: 500;
-        margin-bottom: 0.25rem;
-        color: var(--color-text-main, #e2e8f0);
-      }
-      .input-hint {
-        font-size: 0.75rem;
-        color: var(--color-text-muted, #94a3b8);
-        margin-top: 0.2rem;
-      }
-      .checkbox-label {
-        display: flex;
-        align-items: center;
-        gap: 0.5rem;
-        font-size: 0.85rem;
-        cursor: pointer;
-        color: var(--color-text-main, #e2e8f0);
-        margin-top: 0.25rem;
-      }
-      .preview-container {
-        display: flex;
-        flex-direction: column;
-      }
-      .canvas-wrapper {
-        width: 100%;
-        height: 380px;
-        background: #0f172a;
-        border-radius: 6px;
-        position: relative;
-        overflow: hidden;
-      }
-      .three-canvas {
-        width: 100%;
-        height: 100%;
-        display: block;
-      }
-      .preview-controls-row {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        margin-top: 0.5rem;
-      }
-      .drag-hint {
-        font-size: 0.75rem;
-        color: var(--color-text-muted, #94a3b8);
-      }
-      .badge-dim {
-        font-size: 0.8rem;
-        padding: 0.2rem 0.5rem;
-        border-radius: 4px;
-        background: rgba(148, 163, 184, 0.15);
-        color: #cbd5e1;
-      }
-      .metrics-panel {
-        display: grid;
-        grid-template-columns: repeat(3, 1fr);
-        gap: 0.75rem;
-      }
-      .metric-item {
-        background: rgba(255, 255, 255, 0.03);
-        border: 1px solid rgba(148, 163, 184, 0.1);
-        border-radius: 6px;
-        padding: 0.5rem 0.75rem;
-        display: flex;
-        flex-direction: column;
-      }
-      .metric-label {
-        font-size: 0.75rem;
-        color: var(--color-text-muted, #94a3b8);
-      }
-      .metric-value {
-        font-size: 0.95rem;
-        font-weight: 600;
-        color: var(--color-text-main, #f8fafc);
-        margin-top: 0.15rem;
-      }
-      .safety-box {
-        background: rgba(245, 158, 11, 0.07);
-        border: 1px solid rgba(245, 158, 11, 0.25);
-        border-radius: 6px;
-        padding: 0.75rem;
-      }
-      .safety-title {
-        font-size: 0.85rem;
-        font-weight: 600;
-        color: #f59e0b;
-        margin: 0 0 0.4rem 0;
-      }
-      .safety-list {
-        margin: 0;
-        padding-left: 1.2rem;
-        font-size: 0.75rem;
-        color: #d1d5db;
-        line-height: 1.4;
-      }
-      .export-buttons-grid {
-        display: grid;
-        grid-template-columns: 1fr 1fr;
-        gap: 0.75rem;
-      }
-
-      @media (max-width: 768px) {
-        .btn-grid-3 {
-          grid-template-columns: 1fr 1fr;
-        }
-        .grid-2-col {
-          grid-template-columns: 1fr;
-        }
-        .export-buttons-grid {
-          grid-template-columns: 1fr;
-        }
-        .metrics-panel {
-          grid-template-columns: repeat(2, 1fr);
-        }
-      }
-    `,
-  ],
+  styleUrl: './cappuccino-stencil-maker.component.scss',
 })
 export class CappuccinoStencilMakerComponent implements OnInit, OnDestroy {
   @ViewChild('previewCanvas', { static: true })
@@ -620,6 +470,8 @@ export class CappuccinoStencilMakerComponent implements OnInit, OnDestroy {
   readonly currentMetrics = signal<StencilMetrics | null>(null);
 
   private readonly activeDownloadUrls: string[] = [];
+  private worker: Worker | null = null;
+  private workerRequestId = 0;
 
   // Three.js scene instances
   private scene?: THREE.Scene;
@@ -632,13 +484,28 @@ export class CappuccinoStencilMakerComponent implements OnInit, OnDestroy {
   // Interaction controls
   private isDragging = false;
   private previousMousePosition = { x: 0, y: 0 };
+  private readonly onWindowMouseUp = () => {
+    this.isDragging = false;
+  };
 
   ngOnInit(): void {
+    if (typeof Worker !== 'undefined') {
+      try {
+        this.worker = new Worker(new URL('./worker.ts', import.meta.url), { type: 'module' });
+      } catch {}
+    }
     this.initThree();
     this.updatePreviewMesh();
   }
 
   ngOnDestroy(): void {
+    window.removeEventListener('mouseup', this.onWindowMouseUp);
+
+    if (this.worker) {
+      this.worker.terminate();
+      this.worker = null;
+    }
+
     if (this.animationFrameId) {
       cancelAnimationFrame(this.animationFrameId);
     }
@@ -720,20 +587,76 @@ export class CappuccinoStencilMakerComponent implements OnInit, OnDestroy {
     this.isGenerating.set(true);
     try {
       const options = this.getCurrentOptions();
-      const result = await processStencil(options, format);
+      let blob: Blob;
+      let fileName: string;
 
-      const url = URL.createObjectURL(result.blob);
-      this.activeDownloadUrls.push(url);
+      if (this.worker) {
+        const id = ++this.workerRequestId;
+        const result = await new Promise<{ blob: Blob; fileName: string }>((resolve, reject) => {
+          const handler = (e: MessageEvent<StencilWorkerResponse>) => {
+            if (e.data.id === id) {
+              if (e.data.type === 'error') {
+                this.worker?.removeEventListener('message', handler);
+                reject(new Error(e.data.error || 'Worker export error'));
+              } else if (e.data.type === 'result') {
+                this.worker?.removeEventListener('message', handler);
+                if (e.data.buffer && e.data.fileName) {
+                  const b = new Blob([e.data.buffer], {
+                    type: e.data.mimeType || 'application/octet-stream',
+                  });
+                  resolve({ blob: b, fileName: e.data.fileName });
+                } else if (e.data.svgContent && e.data.fileName) {
+                  const b = new Blob([e.data.svgContent], { type: 'image/svg+xml' });
+                  resolve({ blob: b, fileName: e.data.fileName });
+                } else {
+                  reject(new Error('Invalid worker response payload'));
+                }
+              }
+            }
+          };
+          this.worker?.addEventListener('message', handler);
+          const request: StencilWorkerRequest = {
+            id,
+            options,
+            format,
+          };
+          this.worker?.postMessage(request);
+        });
+        blob = result.blob;
+        fileName = result.fileName;
+      } else {
+        const result = await processStencil(options, format);
+        if (!result.blob) {
+          throw new Error(result.error || 'Export failed');
+        }
+        blob = result.blob;
+        fileName = result.fileName;
+      }
 
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = result.fileName;
-      document.body.appendChild(a);
-      a.click();
-      document.body.removeChild(a);
+      this.triggerFileDownload(blob, fileName);
     } finally {
       this.isGenerating.set(false);
     }
+  }
+
+  private triggerFileDownload(blob: Blob, fileName: string): void {
+    const url = URL.createObjectURL(blob);
+    this.activeDownloadUrls.push(url);
+
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = fileName;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+
+    setTimeout(() => {
+      URL.revokeObjectURL(url);
+      const idx = this.activeDownloadUrls.indexOf(url);
+      if (idx !== -1) {
+        this.activeDownloadUrls.splice(idx, 1);
+      }
+    }, 100);
   }
 
   updatePreviewMesh(): void {
@@ -849,9 +772,7 @@ export class CappuccinoStencilMakerComponent implements OnInit, OnDestroy {
       this.previousMousePosition = { x: e.clientX, y: e.clientY };
     });
 
-    window.addEventListener('mouseup', () => {
-      this.isDragging = false;
-    });
+    window.addEventListener('mouseup', this.onWindowMouseUp);
 
     canvas.addEventListener('mousemove', (e) => {
       if (!this.isDragging || !this.objectGroup) return;
@@ -872,6 +793,42 @@ export class CappuccinoStencilMakerComponent implements OnInit, OnDestroy {
       const zoomFactor = e.deltaY > 0 ? 1.05 : 0.95;
       this.camera.position.z = Math.min(Math.max(this.camera.position.z * zoomFactor, 30), 500);
     });
+
+    // Touch orbit interaction
+    canvas.addEventListener('touchstart', (e) => this.onTouchStart(e), { passive: false });
+    canvas.addEventListener('touchmove', (e) => this.onTouchMove(e), { passive: false });
+    canvas.addEventListener('touchend', () => this.onTouchEnd());
+    canvas.addEventListener('touchcancel', () => this.onTouchEnd());
+  }
+
+  onTouchStart(event: TouchEvent): void {
+    if (event.touches.length === 1) {
+      this.isDragging = true;
+      this.previousMousePosition = {
+        x: event.touches[0].clientX,
+        y: event.touches[0].clientY,
+      };
+      event.preventDefault();
+    }
+  }
+
+  onTouchMove(event: TouchEvent): void {
+    if (!this.isDragging || !this.objectGroup || event.touches.length !== 1) return;
+    const deltaX = event.touches[0].clientX - this.previousMousePosition.x;
+    const deltaY = event.touches[0].clientY - this.previousMousePosition.y;
+
+    this.objectGroup.rotation.z += deltaX * 0.01;
+    this.objectGroup.rotation.x += deltaY * 0.01;
+
+    this.previousMousePosition = {
+      x: event.touches[0].clientX,
+      y: event.touches[0].clientY,
+    };
+    event.preventDefault();
+  }
+
+  onTouchEnd(): void {
+    this.isDragging = false;
   }
 
   private fitCameraToObject(): void {

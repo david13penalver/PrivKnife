@@ -55,3 +55,22 @@ export interface StencilPreset {
   description: string;
   options: Partial<CappuccinoStencilMakerOptions>;
 }
+
+export interface StencilWorkerRequest {
+  id: number;
+  options: CappuccinoStencilMakerOptions;
+  format: StencilExportFormat;
+}
+
+export interface StencilWorkerResponse {
+  id: number;
+  type: 'progress' | 'result' | 'error';
+  percent?: number;
+  buffer?: ArrayBuffer;
+  svgContent?: string;
+  fileName?: string;
+  fileSize?: number;
+  mimeType?: string;
+  metrics?: StencilMetrics;
+  error?: string;
+}

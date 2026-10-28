@@ -162,6 +162,88 @@ describe('Cappuccino Stencil & Airbrush Template Maker Engine (Seam 1)', () => {
       expect(svg).toContain('<path');
       expect(svg).toContain('</svg>');
     });
+
+    it('should sample circular arcs and emit full 360-degree contours and multi-point holes (DEFECT-40-01)', () => {
+      const svg = generateStencilSvg({
+        ...DEFAULT_STENCIL_OPTIONS,
+        stencilDiameterMm: 95,
+        handleHole: true,
+      });
+
+      // Extract path commands
+      const pathMatches = svg.match(/d="([^"]+)"/);
+      expect(pathMatches).toBeTruthy();
+      const pathD = pathMatches![1];
+
+      // Extract all (x, y) coordinates
+      const coords: { x: number; y: number }[] = [];
+      const regex = /[ML]\s+([\d.-]+)\s+([\d.-]+)/g;
+      let match: RegExpExecArray | null;
+      while ((match = regex.exec(pathD)) !== null) {
+        coords.push({ x: parseFloat(match[1]), y: parseFloat(match[2]) });
+      }
+
+      // Outer disc + tab must have >= 60 vertices (dense arc sampling)
+      expect(coords.length).toBeGreaterThanOrEqual(60);
+
+      // Verify the contour spans the full 95mm disc:
+      // Left edge of disc should reach x < 20 mm (center ~57.5, radius 47.5 => x_left ~ 10.0)
+      const minX = Math.min(...coords.map((c) => c.x));
+      const maxX = Math.max(...coords.map((c) => c.x));
+      expect(minX).toBeLessThan(20);
+      expect(maxX).toBeGreaterThan(95);
+
+      // Verify handle hole is included and sampled with multiple points (not degenerate point-to-point)
+      const subpaths = pathD.trim().split('Z').filter((sp) => sp.trim().length > 0);
+      expect(subpaths.length).toBeGreaterThanOrEqual(2); // Outer + handle hole + motif
+      for (const sp of subpaths) {
+        const spCoords = Array.from(sp.matchAll(/[ML]\s+([\d.-]+)\s+([\d.-]+)/g));
+        expect(spCoords.length).toBeGreaterThan(2); // Non-degenerate
+      }
+    });
+  });
+
+  describe('Procedural Geometry Modifiers (DEFECT-40-03)', () => {
+    it('should modify geometry and reduce cutout area when autoBridgeIslands is enabled', () => {
+      const resWithoutBridge = generateStencilMesh({
+        ...DEFAULT_STENCIL_OPTIONS,
+        motif: 'custom_text',
+        customText: 'O',
+        autoBridgeIslands: false,
+        bridgeWidthMm: 2.0,
+      });
+
+      const resWithBridge = generateStencilMesh({
+        ...DEFAULT_STENCIL_OPTIONS,
+        motif: 'custom_text',
+        customText: 'O',
+        autoBridgeIslands: true,
+        bridgeWidthMm: 2.0,
+      });
+
+      expect(resWithBridge.metrics.bridgeTabCount).toBeGreaterThan(0);
+      expect(resWithBridge.metrics.cutoutAreaMm2).toBeLessThan(
+        resWithoutBridge.metrics.cutoutAreaMm2
+      );
+
+      const posWithout = resWithoutBridge.stencilGeometry.getAttribute('position');
+      const posWith = resWithBridge.stencilGeometry.getAttribute('position');
+      expect(posWith.count).not.toBe(posWithout.count);
+    });
+
+    it('should increase triangle count and enable chamfer when rimBevel is true', () => {
+      const resFlat = generateStencilMesh({
+        ...DEFAULT_STENCIL_OPTIONS,
+        rimBevel: false,
+      });
+
+      const resBevel = generateStencilMesh({
+        ...DEFAULT_STENCIL_OPTIONS,
+        rimBevel: true,
+      });
+
+      expect(resBevel.metrics.totalTriangles).toBeGreaterThan(resFlat.metrics.totalTriangles);
+    });
   });
 
   describe('File Serialization & Export (STL & SVG)', () => {
