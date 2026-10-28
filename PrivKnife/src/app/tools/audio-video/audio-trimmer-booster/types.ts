@@ -44,3 +44,14 @@ export interface AudioTrimmerBoosterResult {
   metadata?: AudioMetadata;
   error?: string;
 }
+
+export interface AudioTrimmerWorkerRequest {
+  id: number;
+  options: AudioTrimmerBoosterOptions;
+}
+
+export interface AudioTrimmerWorkerResponse {
+  id: number;
+  result?: AudioTrimmerBoosterResult;
+  error?: string;
+}

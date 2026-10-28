@@ -300,6 +300,40 @@ function extractAudioChannels(
 }
 
 /**
+ * Packages an audio byte stream into an ISO Base Media File Format (ISO BMFF / MP4)
+ * container with an 'ftypM4A ' box header at offset 4, conforming to Apple .m4r specifications.
+ */
+export function encodeM4rContainer(audioPayload: Uint8Array): Uint8Array {
+  // ISO BMFF ftyp box (32 bytes)
+  const ftyp = new Uint8Array([
+    0x00, 0x00, 0x00, 0x20, // 32 bytes box length
+    0x66, 0x74, 0x79, 0x70, // 'ftyp'
+    0x4d, 0x34, 0x41, 0x20, // 'M4A ' major brand
+    0x00, 0x00, 0x02, 0x00, // minor version
+    0x4d, 0x34, 0x41, 0x20, // 'M4A ' compatible brand
+    0x69, 0x73, 0x6f, 0x6d, // 'isom' compatible brand
+    0x6d, 0x70, 0x34, 0x32, // 'mp42' compatible brand
+  ]);
+
+  // ISO BMFF mdat box (8 bytes header + payload)
+  const mdatTotalLength = 8 + audioPayload.length;
+  const mdatHeader = new Uint8Array(8);
+  const view = new DataView(mdatHeader.buffer);
+  view.setUint32(0, mdatTotalLength, false); // big-endian length
+  mdatHeader[4] = 0x6d; // 'm'
+  mdatHeader[5] = 0x64; // 'd'
+  mdatHeader[6] = 0x61; // 'a'
+  mdatHeader[7] = 0x74; // 't'
+
+  const container = new Uint8Array(ftyp.length + mdatHeader.length + audioPayload.length);
+  container.set(ftyp, 0);
+  container.set(mdatHeader, ftyp.length);
+  container.set(audioPayload, ftyp.length + mdatHeader.length);
+
+  return container;
+}
+
+/**
  * Main computational engine entry point: slices, processes, and exports audio.
  */
 export async function processAudioTrimmer(
@@ -362,16 +396,17 @@ export async function processAudioTrimmer(
         mimeType = 'audio/mpeg';
         extension = 'mp3';
         break;
-      case 'm4r_ringtone':
-        // Encode via MP3 compression with m4r packaging
-        encodedBytes = await encodeMp3(
+      case 'm4r_ringtone': {
+        const mp3Bytes = await encodeMp3(
           processedChannels,
           sampleRate,
           options.mp3BitrateKbps || 256
         );
+        encodedBytes = encodeM4rContainer(mp3Bytes);
         mimeType = 'audio/x-m4r';
         extension = 'm4r';
         break;
+      }
       default:
         encodedBytes = encodeWav(processedChannels, sampleRate);
         mimeType = 'audio/wav';

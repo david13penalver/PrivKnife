@@ -186,7 +186,7 @@ describe('AudioTrimmerBooster Engine (Seam 1)', () => {
       expect(result.metadata?.gainApplied).toBe(2.5);
     });
 
-    it('should export iPhone M4R ringtone with max duration cap', async () => {
+    it('should export iPhone M4R ringtone with max duration cap and ftypM4A box container header (DEFECT-51-03)', async () => {
       const result = await processAudioTrimmer(RINGTONE_M4R_OPTIONS);
 
       expect(result.success).toBe(true);
@@ -194,6 +194,11 @@ describe('AudioTrimmerBooster Engine (Seam 1)', () => {
       expect(result.fileName).toMatch(/\.m4r$/);
       expect(result.blob.size).toBeGreaterThan(500);
       expect(result.metadata?.format).toBe('m4r_ringtone');
+
+      const arrayBuffer = await result.blob.arrayBuffer();
+      const uint8 = new Uint8Array(arrayBuffer);
+      const headerStr = String.fromCharCode(...uint8.slice(4, 12));
+      expect(headerStr).toBe('ftypM4A ');
     });
 
     it('should handle mono audio input properly', async () => {

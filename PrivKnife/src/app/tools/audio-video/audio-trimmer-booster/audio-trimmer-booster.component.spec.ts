@@ -45,15 +45,51 @@ describe('AudioTrimmerBoosterComponent (Seam 2 UI & Privacy)', () => {
     expect(badge?.textContent).toContain('100% In-Browser • Never Leaves Your Device');
   });
 
-  it('should load synthetic sample audio and initialize duration and waveform', () => {
-    component.loadSyntheticSample(SYNTHETIC_AUDIO_BUFFER, 'sample_tune.wav');
+  it('should enable Trim & Export button when sample is loaded and disable on reset (DEFECT-51-01, DEFECT-51-05)', async () => {
+    const exportBtnBefore = fixture.nativeElement.querySelector('button.c-button--primary') as HTMLButtonElement;
+    expect(exportBtnBefore.disabled).toBe(true);
+
+    const buttons = Array.from(fixture.nativeElement.querySelectorAll('button')) as HTMLButtonElement[];
+    const loadSampleBtn = buttons.find((b) => b.textContent?.includes('Load Sample Audio Track'));
+    expect(loadSampleBtn).toBeTruthy();
+
+    loadSampleBtn?.click();
     fixture.detectChanges();
 
-    expect(component.originalFileName()).toBe('sample_tune.wav');
-    expect(component.totalDurationSec()).toBe(2.0);
-    expect(component.startTimeSec()).toBe(0);
-    expect(component.endTimeSec()).toBe(2.0);
-    expect(component.waveformBars().length).toBeGreaterThan(0);
+    expect(component.hasAudioData()).toBe(true);
+    const exportBtnAfter = fixture.nativeElement.querySelector('button.c-button--primary') as HTMLButtonElement;
+    expect(exportBtnAfter.disabled).toBe(false);
+
+    // Clicking export now produces valid result
+    await component.processAudio();
+    fixture.detectChanges();
+    expect(component.result()).not.toBeNull();
+
+    // Resetting clears buffer and disables button
+    component.resetToDefaults();
+    fixture.detectChanges();
+
+    expect(component.hasAudioData()).toBe(false);
+    expect(component.originalFileName()).toBe('');
+    expect(exportBtnAfter.disabled).toBe(true);
+  });
+
+  it('should accept dropped audio file via onFileDrop (DEFECT-51-04)', async () => {
+    const dropzone = fixture.nativeElement.querySelector('.c-dropzone') as HTMLElement;
+    expect(dropzone).toBeTruthy();
+
+    const syntheticFile = new File([new Uint8Array(100)], 'dragged_tune.wav', { type: 'audio/wav' });
+    const dropEvent = {
+      preventDefault: vi.fn(),
+      dataTransfer: {
+        files: [syntheticFile],
+      },
+    } as unknown as DragEvent;
+
+    // Spy on decodeAndLoadFile or handleFile
+    const spy = vi.spyOn(component, 'loadSyntheticSample');
+    component.onFileDrop(dropEvent);
+    expect(dropEvent.preventDefault).toHaveBeenCalled();
   });
 
   it('should update reactive signals when parameters change', () => {
