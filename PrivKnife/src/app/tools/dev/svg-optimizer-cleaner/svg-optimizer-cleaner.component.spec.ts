@@ -141,4 +141,25 @@ describe('SvgOptimizerCleanerComponent (Seam 2 & 4)', () => {
       expect(xhrSpy).not.toHaveBeenCalled();
     });
   });
+
+  describe('DOM Security & Sanitization (DEFECT-54-01)', () => {
+    it('should sanitize unsafe user SVG input in preview render areas', () => {
+      const maliciousSvg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" onload="alert('pwn')">
+        <script>alert('pwn')</script>
+        <circle cx="50" cy="50" r="40" onclick="alert('pwn')"/>
+      </svg>`;
+
+      component.setInputSvg(maliciousSvg);
+      fixture.detectChanges();
+
+      const compiled = fixture.nativeElement as HTMLElement;
+      const previewAreas = compiled.querySelectorAll('.svg-render-area');
+      expect(previewAreas.length).toBeGreaterThan(0);
+      previewAreas.forEach((area) => {
+        expect(area.innerHTML).not.toContain('<script');
+        expect(area.innerHTML).not.toContain('onload');
+        expect(area.innerHTML).not.toContain('onclick');
+      });
+    });
+  });
 });

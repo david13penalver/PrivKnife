@@ -131,9 +131,102 @@ function cleanMetadataElements(doc: Document) {
 }
 
 /**
+ * Sanitizes SVG markup to prevent XSS attacks by removing executable elements,
+ * on* event handlers, and javascript: pseudo-protocols.
+ */
+export function sanitizeSvgMarkup(svgContent: string): string {
+  if (!svgContent || typeof svgContent !== 'string') return '';
+  try {
+    const parser = new DOMParser();
+    const doc = parser.parseFromString(svgContent.trim(), 'image/svg+xml');
+    if (doc.querySelector('parsererror')) {
+      return '';
+    }
+
+    // Remove dangerous elements
+    const dangerousTags = [
+      'script',
+      'foreignObject',
+      'foreignobject',
+      'iframe',
+      'object',
+      'embed',
+      'meta',
+      'link',
+      'applet',
+    ];
+    dangerousTags.forEach((tag) => {
+      doc.querySelectorAll(tag).forEach((el) => el.parentNode?.removeChild(el));
+    });
+
+    // Remove on* event attributes and javascript: URLs
+    const allEls = doc.querySelectorAll('*');
+    allEls.forEach((el) => {
+      const toRemove: string[] = [];
+      for (let i = 0; i < el.attributes.length; i++) {
+        const attr = el.attributes[i];
+        const name = attr.name.toLowerCase();
+        const val = attr.value.trim().toLowerCase();
+
+        if (name.startsWith('on')) {
+          toRemove.push(attr.name);
+        } else if (
+          (name === 'href' || name === 'xlink:href') &&
+          (val.startsWith('javascript:') || val.startsWith('data:text/html'))
+        ) {
+          toRemove.push(attr.name);
+        }
+      }
+      toRemove.forEach((a) => el.removeAttribute(a));
+    });
+
+    return new XMLSerializer().serializeToString(doc.documentElement);
+  } catch {
+    return svgContent
+      .replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, '')
+      .replace(/<foreignObject\b[^<]*(?:(?!<\/foreignObject>)<[^<]*)*<\/foreignObject>/gi, '')
+      .replace(/\son\w+\s*=\s*(['"]).*?\1/gi, '')
+      .replace(/href\s*=\s*(['"])javascript:.*?\1/gi, '');
+  }
+}
+
+/**
+ * Collects all IDs referenced via url(#id), href="#id", or clip-path in the document.
+ */
+function getReferencedIds(doc: Document): Set<string> {
+  const referenced = new Set<string>();
+  const xml = doc.documentElement.innerHTML;
+  const urlRegex = /url\(#([^)]+)\)/g;
+  let match: RegExpExecArray | null;
+  while ((match = urlRegex.exec(xml)) !== null) {
+    referenced.add(match[1].trim());
+  }
+
+  const allElements = doc.querySelectorAll('*');
+  allElements.forEach((el) => {
+    for (let i = 0; i < el.attributes.length; i++) {
+      const a = el.attributes[i];
+      const val = a.value.trim();
+      if ((a.name === 'href' || a.name === 'xlink:href') && val.startsWith('#')) {
+        referenced.add(val.slice(1));
+      }
+      if (a.name === 'clip-path' || a.name === 'mask' || a.name === 'filter') {
+        const m = val.match(/url\(#([^)]+)\)/);
+        if (m) referenced.add(m[1].trim());
+      }
+    }
+  });
+  return referenced;
+}
+
+/**
  * Clean editor namespaces and attributes
  */
-function cleanEditorAttributes(element: Element, cleanupIds: boolean) {
+function cleanEditorAttributes(
+  element: Element,
+  cleanupIds: boolean,
+  referencedIds?: Set<string>
+) {
   const attrsToRemove: string[] = [];
 
   for (let i = 0; i < element.attributes.length; i++) {
@@ -168,16 +261,10 @@ function cleanEditorAttributes(element: Element, cleanupIds: boolean) {
       attrsToRemove.push(attr.name);
     }
 
-    // Cleanup generic IDs
-    if (
-      cleanupIds &&
-      name === 'id' &&
-      /^(Layer_\d+|Page-\d+|Artboard-\d+|path-\d+|g\d+|svg\d+)$/i.test(attr.value)
-    ) {
-      // Check if id is referenced in document
+    // Cleanup generic and unreferenced IDs
+    if (cleanupIds && name === 'id') {
       const idVal = attr.value;
-      const rootHtml = element.ownerDocument.documentElement.innerHTML;
-      if (!rootHtml.includes(`url(#${idVal})`) && !rootHtml.includes(`href="#${idVal}"`)) {
+      if (!referencedIds || !referencedIds.has(idVal)) {
         attrsToRemove.push(attr.name);
       }
     }
@@ -187,7 +274,7 @@ function cleanEditorAttributes(element: Element, cleanupIds: boolean) {
 
   // Recurse children
   for (let i = 0; i < element.children.length; i++) {
-    cleanEditorAttributes(element.children[i], cleanupIds);
+    cleanEditorAttributes(element.children[i], cleanupIds, referencedIds);
   }
 }
 
@@ -308,6 +395,41 @@ export function optimizeSvg(
     const doc = parser.parseFromString(svgContent.trim(), 'image/svg+xml');
     const svgRoot = doc.documentElement;
 
+    // 0. Security sanitization pass: strip executable script tags, foreignObject, on* handlers
+    const dangerousTags = [
+      'script',
+      'foreignObject',
+      'foreignobject',
+      'iframe',
+      'object',
+      'embed',
+      'meta',
+      'link',
+      'applet',
+    ];
+    dangerousTags.forEach((tag) => {
+      doc.querySelectorAll(tag).forEach((el) => el.parentNode?.removeChild(el));
+    });
+
+    const allElements = doc.querySelectorAll('*');
+    allElements.forEach((el) => {
+      const dangerousAttrs: string[] = [];
+      for (let i = 0; i < el.attributes.length; i++) {
+        const attr = el.attributes[i];
+        const aName = attr.name.toLowerCase();
+        const aVal = attr.value.trim().toLowerCase();
+        if (aName.startsWith('on')) {
+          dangerousAttrs.push(attr.name);
+        } else if (
+          (aName === 'href' || aName === 'xlink:href') &&
+          (aVal.startsWith('javascript:') || aVal.startsWith('data:text/html'))
+        ) {
+          dangerousAttrs.push(attr.name);
+        }
+      }
+      dangerousAttrs.forEach((a) => el.removeAttribute(a));
+    });
+
     // 1. Comments
     if (options.stripMetadataComments) {
       removeComments(doc);
@@ -315,7 +437,8 @@ export function optimizeSvg(
     }
 
     // 2. Editor attributes & IDs
-    cleanEditorAttributes(svgRoot, options.cleanupIds);
+    const referencedIds = getReferencedIds(doc);
+    cleanEditorAttributes(svgRoot, options.cleanupIds, referencedIds);
 
     // 3. Collapse groups
     if (options.collapseUselessGroups) {

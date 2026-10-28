@@ -1,0 +1,333 @@
+<div class="l-page">
+  <!-- Header -->
+  <header class="l-page__header c-header">
+    <div class="c-header__title-group">
+      <h1 class="c-header__title">SVG Optimizer, Path Cleaner & React/Vue Exporter</h1>
+      <p class="c-header__subtitle">
+        Minify bloated vector SVGs, strip metadata and editor junk, round coordinates,
+        and export ready-to-paste React JSX/TSX or Vue 3 component code with instant visual diffing.
+      </p>
+    </div>
+    <div class="c-badge c-badge--privacy">
+      🛡️ 100% In-Browser • Never Leaves Your Device
+    </div>
+  </header>
+
+  <!-- Main Columns -->
+  <div class="l-columns l-columns--2">
+    <!-- Configuration & Input Column -->
+    <section class="l-columns__area c-card">
+      <div class="c-card__header l-extremo">
+        <div class="l-extremo__area-izquierda">
+          <h2 class="c-card__title">SVG Input & Settings</h2>
+        </div>
+        <div class="l-extremo__area-derecha">
+          <button
+            type="button"
+            class="c-button c-button--outline c-button--small"
+            (click)="loadSampleSvg()"
+          >
+            Load Sample SVG
+          </button>
+        </div>
+      </div>
+
+      <div class="c-card__body">
+        <!-- Dropzone -->
+        <div
+          class="c-dropzone g--margin-bottom-4"
+          (dragover)="$event.preventDefault()"
+          (drop)="onFileDrop($event)"
+          (click)="fileInput.click()"
+        >
+          <input
+            #fileInput
+            type="file"
+            accept=".svg,image/svg+xml"
+            style="display: none"
+            (change)="onFileInputChange($event)"
+          />
+          <div class="c-dropzone__content">
+            <span class="c-dropzone__icon">📄</span>
+            <span class="c-dropzone__prompt">
+              <strong>Click to upload</strong> or drag & drop an SVG file here
+            </span>
+            <span class="c-dropzone__hint">Processed strictly inside your browser</span>
+          </div>
+        </div>
+
+        <!-- Paste Raw SVG -->
+        <div class="c-input g--margin-bottom-4">
+          <label class="c-input__label" for="rawSvgInput">Raw SVG Markup</label>
+          <textarea
+            id="rawSvgInput"
+            class="c-input__textarea"
+            rows="5"
+            placeholder="Paste <svg>...</svg> markup here..."
+            [ngModel]="inputSvg()"
+            (ngModelChange)="setInputSvg($event)"
+          ></textarea>
+        </div>
+
+        <!-- Optimization Parameters -->
+        <h3 class="c-card__subtitle g--margin-bottom-2">Optimization Parameters</h3>
+
+        <div class="c-input g--margin-bottom-3">
+          <div class="l-extremo g--margin-bottom-1">
+            <label class="c-input__label l-extremo__area-izquierda" for="floatPrecision">
+              Coordinate Precision (Decimal Places)
+            </label>
+            <span class="c-badge l-extremo__area-derecha">{{ floatPrecision() }}</span>
+          </div>
+          <input
+            id="floatPrecision"
+            type="range"
+            min="0"
+            max="5"
+            step="1"
+            class="c-input__range"
+            [ngModel]="floatPrecision()"
+            (ngModelChange)="setFloatPrecision(+$event)"
+          />
+        </div>
+
+        <!-- Checkboxes Grid -->
+        <div class="options-grid g--margin-bottom-4">
+          <label class="c-checkbox-label">
+            <input
+              type="checkbox"
+              [checked]="stripMetadataComments()"
+              (change)="toggleStripMetadata()"
+            />
+            Strip Metadata, Titles & Comments
+          </label>
+
+          <label class="c-checkbox-label">
+            <input
+              type="checkbox"
+              [checked]="cleanupIds()"
+              (change)="toggleCleanupIds()"
+            />
+            Clean Unused Editor IDs
+          </label>
+
+          <label class="c-checkbox-label">
+            <input
+              type="checkbox"
+              [checked]="collapseUselessGroups()"
+              (change)="toggleCollapseGroups()"
+            />
+            Collapse Redundant Groups (&lt;g&gt;)
+          </label>
+
+          <label class="c-checkbox-label">
+            <input
+              type="checkbox"
+              [checked]="convertColorsToHex()"
+              (change)="toggleConvertColors()"
+            />
+            Compact Colors to Short Hex
+          </label>
+
+          <label class="c-checkbox-label">
+            <input
+              type="checkbox"
+              [checked]="removeDimensionsForViewBox()"
+              (change)="toggleRemoveDimensions()"
+            />
+            Make Responsive (Remove width/height for viewBox)
+          </label>
+        </div>
+
+        <!-- Component Exporter Options -->
+        <h3 class="c-card__subtitle g--margin-bottom-2">Target Code Format</h3>
+        <div class="format-buttons g--margin-bottom-3">
+          <button
+            type="button"
+            class="c-button c-button--small"
+            [class.c-button--primary]="codeExportFormat() === 'svg'"
+            [class.c-button--outline]="codeExportFormat() !== 'svg'"
+            (click)="setCodeExportFormat('svg')"
+          >
+            SVG File
+          </button>
+          <button
+            type="button"
+            class="c-button c-button--small"
+            [class.c-button--primary]="codeExportFormat() === 'react_tsx'"
+            [class.c-button--outline]="codeExportFormat() !== 'react_tsx'"
+            (click)="setCodeExportFormat('react_tsx')"
+          >
+            React TSX
+          </button>
+          <button
+            type="button"
+            class="c-button c-button--small"
+            [class.c-button--primary]="codeExportFormat() === 'vue_sfc'"
+            [class.c-button--outline]="codeExportFormat() !== 'vue_sfc'"
+            (click)="setCodeExportFormat('vue_sfc')"
+          >
+            Vue 3 SFC
+          </button>
+          <button
+            type="button"
+            class="c-button c-button--small"
+            [class.c-button--primary]="codeExportFormat() === 'svelte'"
+            [class.c-button--outline]="codeExportFormat() !== 'svelte'"
+            (click)="setCodeExportFormat('svelte')"
+          >
+            Svelte
+          </button>
+          <button
+            type="button"
+            class="c-button c-button--small"
+            [class.c-button--primary]="codeExportFormat() === 'data_uri'"
+            [class.c-button--outline]="codeExportFormat() !== 'data_uri'"
+            (click)="setCodeExportFormat('data_uri')"
+          >
+            Data URI
+          </button>
+        </div>
+
+        <div class="c-input g--margin-bottom-2">
+          <label class="c-input__label" for="compName">Component Name</label>
+          <input
+            id="compName"
+            type="text"
+            class="c-input__field"
+            [ngModel]="componentName()"
+            (ngModelChange)="setComponentName($event)"
+            placeholder="CustomSvgIcon"
+          />
+        </div>
+      </div>
+
+      <div class="c-card__footer l-extremo">
+        <div class="l-extremo__area-izquierda">
+          <button
+            type="button"
+            class="c-button c-button--outline"
+            (click)="reset()"
+          >
+            Reset to Defaults
+          </button>
+        </div>
+        <div class="l-extremo__area-derecha">
+          <button
+            type="button"
+            class="c-button c-button--primary"
+            [disabled]="!result() || !result()?.success"
+            (click)="downloadResult()"
+          >
+            Download {{ result()?.fileName || 'File' }}
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <!-- Preview & Deliverable Output Column -->
+    <section class="l-columns__area c-card">
+      <div class="c-card__header l-extremo">
+        <div class="l-extremo__area-izquierda">
+          <h2 class="c-card__title">Optimization Output</h2>
+        </div>
+        <div class="l-extremo__area-derecha">
+          <div class="tab-buttons">
+            <button
+              type="button"
+              class="c-button c-button--small"
+              [class.c-button--primary]="activeTab() === 'preview'"
+              [class.c-button--outline]="activeTab() !== 'preview'"
+              (click)="setActiveTab('preview')"
+            >
+              Visual Preview
+            </button>
+            <button
+              type="button"
+              class="c-button c-button--small"
+              [class.c-button--primary]="activeTab() === 'code'"
+              [class.c-button--outline]="activeTab() !== 'code'"
+              (click)="setActiveTab('code')"
+            >
+              Code Inspector
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <div class="c-card__body">
+        @if (result() && result()?.success) {
+          <!-- Savings Stats Banner -->
+          <div class="stats-banner g--margin-bottom-3">
+            <div class="stat-item">
+              <span class="stat-label">Original</span>
+              <span class="stat-value">{{ formatBytes(result()!.stats.originalBytes) }}</span>
+            </div>
+            <div class="stat-arrow">➔</div>
+            <div class="stat-item">
+              <span class="stat-label">Optimized</span>
+              <span class="stat-value stat-value--highlight">
+                {{ formatBytes(result()!.stats.optimizedBytes) }}
+              </span>
+            </div>
+            <div class="stat-item">
+              <span class="stat-label">Savings</span>
+              <span class="stat-value stat-value--positive">
+                -{{ result()!.stats.savingsPercent }}%
+              </span>
+            </div>
+          </div>
+
+          @if (activeTab() === 'preview') {
+            <div class="preview-split">
+              <div class="preview-box">
+                <span class="preview-tag">Before Optimization</span>
+                <div class="svg-render-area" [innerHTML]="safeOriginalSvg()"></div>
+              </div>
+              <div class="preview-box">
+                <span class="preview-tag preview-tag--optimized">After Optimization</span>
+                <div class="svg-render-area" [innerHTML]="safeOptimizedSvg()"></div>
+              </div>
+            </div>
+          } @else {
+            <div class="code-container">
+              <div class="code-header l-extremo">
+                <span class="code-filename l-extremo__area-izquierda">{{ result()?.fileName }}</span>
+                <button
+                  type="button"
+                  class="c-button c-button--small c-button--outline l-extremo__area-derecha"
+                  (click)="copyCode()"
+                >
+                  {{ copiedFeedback() ? '✓ Copied!' : 'Copy Code' }}
+                </button>
+              </div>
+              <pre class="code-block"><code>{{ result()?.code }}</code></pre>
+            </div>
+          }
+        } @else if (result() && !result()?.success) {
+          <div class="c-alert c-alert--danger">
+            <strong>Error:</strong> {{ result()?.error }}
+          </div>
+        } @else {
+          <div class="empty-state">
+            <span class="empty-state__icon">⚡</span>
+            <p>Paste or upload an SVG to view real-time optimization and export code.</p>
+          </div>
+        }
+      </div>
+
+      <div class="c-card__footer l-extremo">
+        <div class="l-extremo__area-derecha">
+          <button
+            type="button"
+            class="c-button c-button--primary"
+            [disabled]="!result() || !result()?.success"
+            (click)="copyCode()"
+          >
+            {{ copiedFeedback() ? '✓ Copied to Clipboard!' : 'Copy Code' }}
+          </button>
+        </div>
+      </div>
+    </section>
+  </div>
+</div>

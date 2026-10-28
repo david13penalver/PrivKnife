@@ -120,6 +120,44 @@ describe('SvgOptimizerEngine (engine.ts) - Seam 1', () => {
       expect(result.error).toBeDefined();
       expect(result.fileSize).toBe(0);
     });
+
+    it('should strip XSS payloads (<script>, <foreignObject>, on* handlers, and javascript: urls) from optimized SVG (DEFECT-54-01)', () => {
+      const maliciousSvg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" onload="alert('xss1')">
+        <script>alert('xss2')</script>
+        <foreignObject width="100" height="100">
+          <body xmlns="http://www.w3.org/1999/xhtml">
+            <script>alert('xss3')</script>
+          </body>
+        </foreignObject>
+        <a href="javascript:alert('xss4')">
+          <circle cx="50" cy="50" r="40" onclick="alert('xss5')" onmouseover="alert('xss6')" />
+        </a>
+      </svg>`;
+
+      const result = optimizeSvg(maliciousSvg, DEFAULT_SVG_OPTIONS);
+      expect(result.success).toBe(true);
+      expect(result.optimizedSvg).not.toContain('<script');
+      expect(result.optimizedSvg).not.toContain('foreignObject');
+      expect(result.optimizedSvg).not.toContain('onload');
+      expect(result.optimizedSvg).not.toContain('onclick');
+      expect(result.optimizedSvg).not.toContain('onmouseover');
+      expect(result.optimizedSvg).not.toContain('javascript:');
+      expect(result.optimizedSvg).toContain('<circle');
+    });
+
+    it('should strip unreferenced OuterGroup and InnerUselessGroup IDs and collapse redundant <g> wrappers in SAMPLE_BLOATED_SVG (DEFECT-54-03)', () => {
+      const result = optimizeSvg(SAMPLE_BLOATED_SVG, {
+        ...DEFAULT_SVG_OPTIONS,
+        cleanupIds: true,
+        collapseUselessGroups: true,
+      });
+
+      expect(result.success).toBe(true);
+      expect(result.optimizedSvg).not.toContain('OuterGroup');
+      expect(result.optimizedSvg).not.toContain('InnerUselessGroup');
+      // Both redundant <g> groups should be collapsed so no <g> tag remains
+      expect(result.optimizedSvg).not.toContain('<g');
+    });
   });
 
   describe('generateExportCode', () => {
