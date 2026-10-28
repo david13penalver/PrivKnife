@@ -1,0 +1,300 @@
+<div class="l-page">
+  <!-- Header -->
+  <header class="l-page__header c-header">
+    <div class="c-header__title-group">
+      <h1 class="c-header__title">Bank Statement CSV &amp; OFX to Excel &amp; QIF Converter</h1>
+      <p class="c-header__subtitle">
+        Normalize chaotic bank exports, credit card statements, and OFX/QFX files into clean spreadsheets
+        and Quicken/QuickBooks-ready QIF exports. 100% private in-browser accounting.
+      </p>
+    </div>
+    <div class="c-badge c-badge--privacy">
+      🛡️ 100% In-Browser • Never Leaves Your Device
+    </div>
+  </header>
+
+  <!-- Main Layout Columns -->
+  <div class="l-columns l-columns--2">
+    <!-- Configuration & Upload Area -->
+    <section class="l-columns__area c-card">
+      <div class="c-card__header l-extremo">
+        <div class="l-extremo__area-izquierda">
+          <h2 class="c-card__title">Statement Input &amp; Options</h2>
+        </div>
+        <div class="l-extremo__area-derecha">
+          <button
+            type="button"
+            class="c-button c-button--outline c-button--small"
+            (click)="loadSampleData()"
+          >
+            Load Sample Statement
+          </button>
+        </div>
+      </div>
+
+      <div class="c-card__body">
+        <!-- Dropzone -->
+        <div
+          class="c-dropzone g--margin-bottom-4"
+          (dragover)="$event.preventDefault()"
+          (drop)="onFileDrop($event)"
+          (click)="fileInput.click()"
+        >
+          <input
+            #fileInput
+            type="file"
+            class="c-dropzone__input"
+            accept=".csv,.txt,.ofx,.qfx"
+            (change)="onFileInputChange($event)"
+          />
+          <div class="c-dropzone__content">
+            <span class="c-dropzone__icon">💳</span>
+            <p class="c-dropzone__text">
+              @if (selectedFile()) {
+                Selected: <strong>{{ selectedFile()?.name }}</strong> ({{ formatBytes(selectedFile()?.size || 0) }})
+              } @else {
+                Drop bank CSV or OFX/QFX file here, or <strong>paste below</strong>
+              }
+            </p>
+            <span class="c-dropzone__hint">Supports CSV, TSV, OFX, QFX</span>
+          </div>
+        </div>
+
+        <!-- Content Textarea -->
+        <div class="c-input g--margin-bottom-4">
+          <label class="c-input__label">Raw Statement Data</label>
+          <textarea
+            class="c-statement-textarea"
+            placeholder="Paste CSV lines or OFX XML here..."
+            [ngModel]="inputContent()"
+            (ngModelChange)="inputContent.set($event)"
+          ></textarea>
+        </div>
+
+        <!-- Date Format Output -->
+        <div class="c-input g--margin-bottom-4">
+          <label class="c-input__label">Output Date Format</label>
+          <div class="c-button-group">
+            <button
+              type="button"
+              class="c-button c-button--small"
+              [class.c-button--primary]="dateFormatOutput() === 'YYYY-MM-DD'"
+              [class.c-button--outline]="dateFormatOutput() !== 'YYYY-MM-DD'"
+              (click)="setDateFormat('YYYY-MM-DD')"
+            >
+              YYYY-MM-DD (ISO)
+            </button>
+            <button
+              type="button"
+              class="c-button c-button--small"
+              [class.c-button--primary]="dateFormatOutput() === 'MM/DD/YYYY'"
+              [class.c-button--outline]="dateFormatOutput() !== 'MM/DD/YYYY'"
+              (click)="setDateFormat('MM/DD/YYYY')"
+            >
+              MM/DD/YYYY (US)
+            </button>
+            <button
+              type="button"
+              class="c-button c-button--small"
+              [class.c-button--primary]="dateFormatOutput() === 'DD/MM/YYYY'"
+              [class.c-button--outline]="dateFormatOutput() !== 'DD/MM/YYYY'"
+              (click)="setDateFormat('DD/MM/YYYY')"
+            >
+              DD/MM/YYYY (EU/UK)
+            </button>
+          </div>
+        </div>
+
+        <!-- Export Format -->
+        <div class="c-input g--margin-bottom-4">
+          <label class="c-input__label">Export Format</label>
+          <div class="c-button-group">
+            <button
+              type="button"
+              class="c-button c-button--small"
+              [class.c-button--primary]="exportFormat() === 'csv'"
+              [class.c-button--outline]="exportFormat() !== 'csv'"
+              (click)="setExportFormat('csv')"
+            >
+              Normalized CSV (.csv)
+            </button>
+            <button
+              type="button"
+              class="c-button c-button--small"
+              [class.c-button--primary]="exportFormat() === 'xlsx'"
+              [class.c-button--outline]="exportFormat() !== 'xlsx'"
+              (click)="setExportFormat('xlsx')"
+            >
+              Excel (.xlsx)
+            </button>
+            <button
+              type="button"
+              class="c-button c-button--small"
+              [class.c-button--primary]="exportFormat() === 'qif'"
+              [class.c-button--outline]="exportFormat() !== 'qif'"
+              (click)="setExportFormat('qif')"
+            >
+              Quicken / QIF (.qif)
+            </button>
+          </div>
+        </div>
+
+        <!-- Cleaning & Normalization Toggles -->
+        <div class="c-input g--margin-bottom-4">
+          <label class="c-input__label">Cleansing &amp; Normalization</label>
+          <div class="c-entity-grid">
+            <label class="c-checkbox-label">
+              <input
+                type="checkbox"
+                class="c-checkbox-input"
+                [checked]="cleanMerchantDescriptions()"
+                (change)="toggleCleanDescriptions()"
+              />
+              <span>Clean merchant names (strip noise &amp; store #s)</span>
+            </label>
+            <label class="c-checkbox-label">
+              <input
+                type="checkbox"
+                class="c-checkbox-input"
+                [checked]="stripPosCodes()"
+                (change)="stripPosCodes.set(!stripPosCodes())"
+              />
+              <span>Strip POS card auth codes</span>
+            </label>
+            <label class="c-checkbox-label">
+              <input
+                type="checkbox"
+                class="c-checkbox-input"
+                [checked]="invertAmountSigns()"
+                (change)="toggleInvertSigns()"
+              />
+              <span>Invert signs (switch debits &amp; credits)</span>
+            </label>
+          </div>
+        </div>
+
+        <!-- Privacy Guarantee Badge -->
+        <div class="c-privacy-notice g--margin-bottom-4">
+          <span>🔒 <strong>Zero Server Ingestion:</strong> Financial statement normalization runs entirely in your local browser sandbox. Financial records are never sent over the network.</span>
+        </div>
+      </div>
+
+      <div class="c-card__footer l-extremo">
+        <div class="l-extremo__area-izquierda">
+          <button
+            type="button"
+            class="c-button c-button--outline"
+            (click)="resetToDefaults()"
+          >
+            Reset
+          </button>
+        </div>
+        <div class="l-extremo__area-derecha">
+          <button
+            type="button"
+            class="c-button c-button--primary"
+            [disabled]="isProcessing() || !inputContent().trim()"
+            (click)="convertStatement()"
+          >
+            {{ isProcessing() ? 'Converting...' : 'Normalize & Convert' }}
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <!-- Preview & Output Area -->
+    <section class="l-columns__area c-card">
+      <div class="c-card__header l-extremo">
+        <div class="l-extremo__area-izquierda">
+          <h2 class="c-card__title">Normalized Preview &amp; Summary</h2>
+        </div>
+        <div class="l-extremo__area-derecha">
+          @if (lastResult()) {
+            <button
+              type="button"
+              class="c-button c-button--outline c-button--small"
+              (click)="copyToClipboard()"
+            >
+              {{ copySuccess() ? '✓ Copied!' : 'Copy Formatted' }}
+            </button>
+          }
+        </div>
+      </div>
+
+      <div class="c-card__body">
+        @if (isProcessing()) {
+          <div class="c-progress g--margin-bottom-4">
+            <div class="c-progress__bar" style="width: 100%"></div>
+            <small class="g--text-small g--margin-top-2">Parsing statements and normalising columns...</small>
+          </div>
+        }
+
+        @if (lastResult()) {
+          <!-- Summary Metrics Cards -->
+          <div class="c-summary-row g--margin-bottom-4">
+            <div class="c-summary-card">
+              <small>Transactions</small>
+              <strong>{{ lastResult()?.summary?.transactionCount }}</strong>
+            </div>
+            <div class="c-summary-card c-summary-card--income">
+              <small>Total Income</small>
+              <strong>+{{ formatCurrency(lastResult()?.summary?.totalIncome || 0) }}</strong>
+            </div>
+            <div class="c-summary-card c-summary-card--expense">
+              <small>Total Expense</small>
+              <strong>-{{ formatCurrency(lastResult()?.summary?.totalExpense || 0) }}</strong>
+            </div>
+            <div class="c-summary-card" [class.c-summary-card--income]="(lastResult()?.summary?.netFlow || 0) >= 0" [class.c-summary-card--expense]="(lastResult()?.summary?.netFlow || 0) < 0">
+              <small>Net Cashflow</small>
+              <strong>{{ formatCurrency(lastResult()?.summary?.netFlow || 0) }}</strong>
+            </div>
+          </div>
+
+          <!-- Transactions Table Preview -->
+          <div class="c-table-scroll">
+            <table class="c-tx-table">
+              <thead>
+                <tr>
+                  <th>Date</th>
+                  <th>Description</th>
+                  <th class="g--text-right">Amount</th>
+                  <th class="g--text-right">Balance</th>
+                </tr>
+              </thead>
+              <tbody>
+                @for (tx of lastResult()?.transactions; track $index) {
+                  <tr>
+                    <td>{{ tx.date }}</td>
+                    <td class="c-tx-desc">{{ tx.description }}</td>
+                    <td class="g--text-right" [class.c-amount--pos]="tx.amount > 0" [class.c-amount--neg]="tx.amount < 0">
+                      {{ tx.amount > 0 ? '+' : '' }}{{ tx.amount.toFixed(2) }}
+                    </td>
+                    <td class="g--text-right">{{ tx.balance !== undefined ? tx.balance.toFixed(2) : '-' }}</td>
+                  </tr>
+                }
+              </tbody>
+            </table>
+          </div>
+        } @else {
+          <div class="c-preview__empty">
+            <span>No statement loaded</span>
+            <small>Upload a CSV/OFX file or load sample data to inspect normalized transactions</small>
+          </div>
+        }
+      </div>
+
+      <div class="c-card__footer l-extremo">
+        <div class="l-extremo__area-derecha">
+          <button
+            type="button"
+            class="c-button c-button--primary"
+            [disabled]="!lastResult()"
+            (click)="downloadDeliverable()"
+          >
+            Download {{ exportFormat().toUpperCase() }} Deliverable
+          </button>
+        </div>
+      </div>
+    </section>
+  </div>
+</div>

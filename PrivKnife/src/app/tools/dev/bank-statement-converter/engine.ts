@@ -113,9 +113,15 @@ export function formatTransactionDate(
 // -------------------------------------------------------------
 export function parseOfxContent(
   ofxText: string,
-  targetDateFormat: DateFormatOutput = 'YYYY-MM-DD'
+  optionsOrDateFormat: BankStatementConverterOptions | DateFormatOutput = 'YYYY-MM-DD'
 ): BankTransaction[] {
   const transactions: BankTransaction[] = [];
+  const targetDateFormat =
+    typeof optionsOrDateFormat === 'string'
+      ? optionsOrDateFormat
+      : optionsOrDateFormat.dateFormatOutput;
+  const options =
+    typeof optionsOrDateFormat === 'object' ? optionsOrDateFormat : undefined;
 
   // Match all <STMTTRN>...</STMTTRN> blocks
   const trnRegex = /<STMTTRN>([\s\S]*?)(?:<\/STMTTRN>|(?=<STMTTRN>)|$)/gi;
@@ -131,9 +137,16 @@ export function parseOfxContent(
 
     if (dtMatch && amtMatch) {
       const date = formatTransactionDate(dtMatch[1], targetDateFormat);
-      const amount = parseFloat(amtMatch[1]);
-      const description = nameMatch ? nameMatch[1].trim() : 'Transaction';
+      let amount = parseFloat(amtMatch[1]);
+      let description = nameMatch ? nameMatch[1].trim() : 'Transaction';
       const category = memoMatch ? memoMatch[1].trim() : undefined;
+
+      if (options?.cleanMerchantDescriptions) {
+        description = cleanMerchantName(description, options.stripPosCodes);
+      }
+      if (options?.invertAmountSigns) {
+        amount = -amount || 0;
+      }
 
       transactions.push({
         date,
@@ -321,6 +334,23 @@ export function buildXlsxExport(
 // -------------------------------------------------------------
 // 6. Summary Calculator
 // -------------------------------------------------------------
+function getChronologicalSortKey(dateStr: string, isDayFirst: boolean): string {
+  if (!dateStr) return '';
+  if (dateStr.includes('-')) {
+    return dateStr;
+  }
+  const parts = dateStr.split('/');
+  if (parts.length === 3) {
+    const y = parts[2].padStart(4, '0');
+    if (isDayFirst) {
+      return `${y}-${parts[1].padStart(2, '0')}-${parts[0].padStart(2, '0')}`;
+    } else {
+      return `${y}-${parts[0].padStart(2, '0')}-${parts[1].padStart(2, '0')}`;
+    }
+  }
+  return dateStr;
+}
+
 export function calculateSummary(
   transactions: BankTransaction[]
 ): StatementSummary {
@@ -335,9 +365,39 @@ export function calculateSummary(
     }
   }
 
-  const dates = transactions.map((t) => t.date).filter(Boolean).sort();
-  const startDate = dates.length > 0 ? dates[0] : '';
-  const endDate = dates.length > 0 ? dates[dates.length - 1] : '';
+  // Determine if dates are formatted DD/MM/YYYY vs MM/DD/YYYY
+  let isDayFirst = false;
+  for (const t of transactions) {
+    if (t.date && t.date.includes('/')) {
+      const parts = t.date.split('/');
+      if (parts.length === 3) {
+        const p0 = parseInt(parts[0], 10);
+        const p1 = parseInt(parts[1], 10);
+        if (p0 > 12) {
+          isDayFirst = true;
+          break;
+        }
+        if (p1 > 12) {
+          isDayFirst = false;
+          break;
+        }
+      }
+    }
+  }
+
+  const validTransactions = transactions.filter((t) => Boolean(t.date));
+  const sortedDates = validTransactions
+    .slice()
+    .sort((a, b) =>
+      getChronologicalSortKey(a.date, isDayFirst).localeCompare(
+        getChronologicalSortKey(b.date, isDayFirst)
+      )
+    )
+    .map((t) => t.date);
+
+  const startDate = sortedDates.length > 0 ? sortedDates[0] : '';
+  const endDate =
+    sortedDates.length > 0 ? sortedDates[sortedDates.length - 1] : '';
 
   return {
     transactionCount: transactions.length,
@@ -376,7 +436,7 @@ export async function processBankStatement(
 
   let transactions: BankTransaction[] = [];
   if (isOfx) {
-    transactions = parseOfxContent(textContent, options.dateFormatOutput);
+    transactions = parseOfxContent(textContent, options);
   } else {
     transactions = parseCsvContent(textContent, options);
   }
@@ -402,6 +462,7 @@ export async function processBankStatement(
       outFileName = `${baseName}-normalized.xlsx`;
       mimeType =
         'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet';
+      formattedText = buildCsvExport(transactions);
       break;
 
     case 'csv':

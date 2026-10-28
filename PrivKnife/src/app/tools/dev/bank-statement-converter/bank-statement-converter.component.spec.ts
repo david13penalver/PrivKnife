@@ -145,15 +145,42 @@ describe('BankStatementConverterComponent (Seam 2 & 4)', () => {
       await component.copyToClipboard();
       expect(writeTextSpy).toHaveBeenCalled();
     });
+
+    it('should copy formatted text in xlsx mode without silent failure (DEFECT-50-03)', async () => {
+      const writeTextSpy = vi.fn().mockResolvedValue(undefined);
+      Object.assign(navigator, {
+        clipboard: {
+          writeText: writeTextSpy,
+        },
+      });
+
+      component.setExportFormat('xlsx');
+      component.inputContent.set(SAMPLE_BANK_CSV);
+      await component.convertStatement();
+
+      await component.copyToClipboard();
+      expect(component.copySuccess()).toBe(true);
+      expect(writeTextSpy).toHaveBeenCalledWith(expect.stringContaining('Date,Description,Amount'));
+    });
   });
 
   describe('Memory Hygiene & Disposal', () => {
+    it('should not call URL.createObjectURL during handleFileSelected (DEFECT-50-05)', async () => {
+      const createSpy = vi.spyOn(URL, 'createObjectURL');
+      const file = createSyntheticBankCsvFile();
+      await component.handleFileSelected(file);
+
+      expect(createSpy).not.toHaveBeenCalled();
+      createSpy.mockRestore();
+    });
+
     it('should revoke created object URLs upon reset and destroy', async () => {
       const revokeSpy = vi.spyOn(URL, 'revokeObjectURL');
       const file = createSyntheticBankCsvFile();
       await component.handleFileSelected(file);
       await component.convertStatement();
 
+      component.downloadDeliverable();
       component.resetToDefaults();
       expect(revokeSpy).toHaveBeenCalled();
     });

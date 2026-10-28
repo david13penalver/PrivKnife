@@ -6,6 +6,7 @@ import {
   parseCsvContent,
   buildCsvExport,
   buildQifExport,
+  calculateSummary,
   processBankStatement,
 } from './engine';
 import {
@@ -85,6 +86,32 @@ describe('Bank Statement CSV & OFX Converter Engine (Seam 1)', () => {
       expect(txs[1].amount).toBe(2500.00);
       expect(txs[1].description).toContain('PAYROLL');
       expect(txs[1].date).toBe('2026-10-15');
+    });
+
+    it('should apply merchant cleaning, POS code stripping, and sign inversion to OFX (DEFECT-50-02)', async () => {
+      const customOfx = `<OFX><BANKMSGSRSV1><STMTTRNRS><STMTRS><BANKTRANLIST>
+<STMTTRN>
+<TRNTYPE>DEBIT
+<DTPOSTED>20261014120000
+<TRNAMT>-48.50
+<NAME>WHOLEFDS SFO POS CARD 8812
+</STMTTRN>
+</BANKTRANLIST></STMTRS></STMTTRNRS></BANKMSGSRSV1></OFX>`;
+
+      const result = await processBankStatement(
+        customOfx,
+        {
+          ...DEFAULT_CONVERTER_OPTIONS,
+          cleanMerchantDescriptions: true,
+          stripPosCodes: true,
+          invertAmountSigns: true,
+        },
+        'account.ofx'
+      );
+
+      expect(result.transactions.length).toBe(1);
+      expect(result.transactions[0].description).toBe('WHOLEFDS SFO');
+      expect(result.transactions[0].amount).toBe(48.5);
     });
   });
 
@@ -172,7 +199,7 @@ describe('Bank Statement CSV & OFX Converter Engine (Seam 1)', () => {
       expect(result.transactions.length).toBe(2);
     });
 
-    it('should process CSV into Excel XLSX deliverable', async () => {
+    it('should process CSV into Excel XLSX deliverable and populate formattedText (DEFECT-50-03)', async () => {
       const file = createSyntheticBankCsvFile();
       const result = await processBankStatement(
         file,
@@ -186,6 +213,34 @@ describe('Bank Statement CSV & OFX Converter Engine (Seam 1)', () => {
         'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
       );
       expect(result.blob.size).toBeGreaterThan(500);
+      expect(result.formattedText).toBeDefined();
+      expect(result.formattedText).toContain('Date,Description,Amount');
+    });
+  });
+
+  describe('Chronological Summary Date Ordering (DEFECT-50-04)', () => {
+    it('should sort DD/MM/YYYY dates chronologically instead of lexicographically', () => {
+      const txs = [
+        { date: '15/10/2026', description: 'Oct Tx', amount: -20 },
+        { date: '02/11/2026', description: 'Nov Tx', amount: -30 },
+        { date: '01/01/2027', description: 'Jan Next Year', amount: 100 },
+      ];
+
+      const summary = calculateSummary(txs);
+      expect(summary.startDate).toBe('15/10/2026');
+      expect(summary.endDate).toBe('01/01/2027');
+    });
+
+    it('should sort MM/DD/YYYY dates chronologically across month and year boundaries', () => {
+      const txs = [
+        { date: '10/15/2026', description: 'Oct Tx', amount: -20 },
+        { date: '11/02/2026', description: 'Nov Tx', amount: -30 },
+        { date: '01/05/2027', description: 'Jan Next Year', amount: 100 },
+      ];
+
+      const summary = calculateSummary(txs);
+      expect(summary.startDate).toBe('10/15/2026');
+      expect(summary.endDate).toBe('01/05/2027');
     });
   });
 });
