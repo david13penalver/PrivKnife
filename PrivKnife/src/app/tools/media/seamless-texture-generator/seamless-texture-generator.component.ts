@@ -12,423 +12,29 @@ import {
   SeamlessTextureGeneratorResult,
   TextureBlendMode,
   TextureImageData,
+  TextureWorkerRequest,
+  TextureWorkerResponse,
 } from './types';
-import {
-  generateCssBackgroundSnippet,
-  generateNormalMap,
-  makeSeamlessTexture,
-  processTexture,
-} from './engine';
+import { processTexture } from './engine';
 import { createSyntheticSurface } from './test-fixtures';
 
 @Component({
   selector: 'app-seamless-texture-generator',
   standalone: true,
   imports: [CommonModule, FormsModule],
-  template: `
-    <div class="l-page">
-      <!-- Header -->
-      <header class="l-page__header c-header">
-        <div class="c-header__title-group">
-          <h1 class="c-header__title">Seamless Tileable Texture & Pattern Generator</h1>
-          <p class="c-header__subtitle">
-            Transform ordinary surfaces and photos into seamless, repeating 3D textures with edge blending,
-            normal map generation, and live interactive tiling preview.
-          </p>
-        </div>
-        <div class="c-badge c-badge--privacy">
-          🛡️ 100% In-Browser • Never Leaves Your Device
-        </div>
-      </header>
-
-      <!-- Main Layout Columns -->
-      <div class="l-columns l-columns--2">
-        <!-- Configuration & Upload Area -->
-        <section class="l-columns__area c-card">
-          <div class="c-card__header l-extremo">
-            <h2 class="c-card__title l-extremo__area-izquierda">Texture Settings</h2>
-            <div class="l-extremo__area-derecha">
-              <button
-                type="button"
-                class="c-button c-button--outline c-button--small"
-                (click)="loadSampleSurface()"
-              >
-                Load Sample Surface
-              </button>
-            </div>
-          </div>
-
-          <div class="c-card__body">
-            <!-- Dropzone -->
-            <div
-              class="c-dropzone g--margin-bottom-4"
-              (dragover)="$event.preventDefault()"
-              (drop)="onFileDrop($event)"
-              (click)="fileInput.click()"
-            >
-              <input
-                #fileInput
-                type="file"
-                accept="image/png,image/jpeg,image/webp"
-                style="display: none"
-                (change)="onFileInputChange($event)"
-              />
-              <div class="c-dropzone__content">
-                <span class="c-dropzone__icon">🧱</span>
-                <span class="c-dropzone__prompt">
-                  @if (selectedFileName()) {
-                    <strong>{{ selectedFileName() }}</strong>
-                  } @else {
-                    <strong>Click to upload texture</strong> or drag & drop PNG/JPG image
-                  }
-                </span>
-                <span class="c-dropzone__hint">Processed strictly on your local device</span>
-              </div>
-            </div>
-
-            <!-- Blend Mode Selection -->
-            <h3 class="c-card__subtitle g--margin-bottom-2">Seamless Blending Algorithm</h3>
-            <div class="preset-buttons g--margin-bottom-3">
-              <button
-                type="button"
-                class="c-button c-button--small"
-                [class.c-button--primary]="blendMode() === 'linear_crossfade'"
-                [class.c-button--outline]="blendMode() !== 'linear_crossfade'"
-                (click)="setBlendMode('linear_crossfade')"
-              >
-                Linear Crossfade
-              </button>
-              <button
-                type="button"
-                class="c-button c-button--small"
-                [class.c-button--primary]="blendMode() === 'mirror_repeat'"
-                [class.c-button--outline]="blendMode() !== 'mirror_repeat'"
-                (click)="setBlendMode('mirror_repeat')"
-              >
-                Mirror Repeat
-              </button>
-              <button
-                type="button"
-                class="c-button c-button--small"
-                [class.c-button--primary]="blendMode() === 'poisson_blend'"
-                [class.c-button--outline]="blendMode() !== 'poisson_blend'"
-                (click)="setBlendMode('poisson_blend')"
-              >
-                Poisson Hermite
-              </button>
-            </div>
-
-            <!-- Edge Overlap Percentage -->
-            @if (blendMode() !== 'mirror_repeat') {
-              <div class="c-input g--margin-bottom-3">
-                <div class="l-extremo g--margin-bottom-1">
-                  <label class="c-input__label l-extremo__area-izquierda" for="overlapRange">
-                    Edge Overlap: {{ edgeOverlapPercentage() }}%
-                  </label>
-                </div>
-                <input
-                  id="overlapRange"
-                  type="range"
-                  min="5"
-                  max="45"
-                  step="1"
-                  class="c-input__range"
-                  [ngModel]="edgeOverlapPercentage()"
-                  (ngModelChange)="setEdgeOverlap(+$event)"
-                />
-              </div>
-            }
-
-            <!-- Normal Map Toggles -->
-            <h3 class="c-card__subtitle g--margin-bottom-2">3D Normal Map</h3>
-            <div class="options-grid g--margin-bottom-3">
-              <label class="c-checkbox-label">
-                <input
-                  type="checkbox"
-                  [checked]="generateNormalMap()"
-                  (change)="toggleGenerateNormalMap()"
-                />
-                Generate Sobel Normal Map
-              </label>
-
-              @if (generateNormalMap()) {
-                <label class="c-checkbox-label">
-                  <input
-                    type="checkbox"
-                    [checked]="invertNormalY()"
-                    (change)="toggleInvertNormalY()"
-                  />
-                  Invert Normal Y (DirectX standard)
-                </label>
-              }
-            </div>
-
-            @if (generateNormalMap()) {
-              <div class="c-input g--margin-bottom-3">
-                <div class="l-extremo g--margin-bottom-1">
-                  <label class="c-input__label l-extremo__area-izquierda" for="strengthRange">
-                    Normal Depth Strength: {{ normalMapStrength() }}
-                  </label>
-                </div>
-                <input
-                  id="strengthRange"
-                  type="range"
-                  min="0.5"
-                  max="8.0"
-                  step="0.5"
-                  class="c-input__range"
-                  [ngModel]="normalMapStrength()"
-                  (ngModelChange)="setNormalStrength(+$event)"
-                />
-              </div>
-            }
-
-            <!-- Tiling Multiplier for Preview -->
-            <h3 class="c-card__subtitle g--margin-bottom-2">Preview Tiling Repeat</h3>
-            <div class="preset-buttons g--margin-bottom-3">
-              <button
-                type="button"
-                class="c-button c-button--small"
-                [class.c-button--primary]="previewTilingMultiplier() === 2"
-                [class.c-button--outline]="previewTilingMultiplier() !== 2"
-                (click)="setTiling(2)"
-              >
-                2x2 Grid
-              </button>
-              <button
-                type="button"
-                class="c-button c-button--small"
-                [class.c-button--primary]="previewTilingMultiplier() === 3"
-                [class.c-button--outline]="previewTilingMultiplier() !== 3"
-                (click)="setTiling(3)"
-              >
-                3x3 Grid
-              </button>
-              <button
-                type="button"
-                class="c-button c-button--small"
-                [class.c-button--primary]="previewTilingMultiplier() === 4"
-                [class.c-button--outline]="previewTilingMultiplier() !== 4"
-                (click)="setTiling(4)"
-              >
-                4x4 Grid
-              </button>
-            </div>
-          </div>
-
-          <div class="c-card__footer l-extremo">
-            <div class="l-extremo__area-izquierda">
-              <button
-                type="button"
-                class="c-button c-button--outline"
-                (click)="reset()"
-              >
-                Reset / Clear
-              </button>
-            </div>
-            <div class="l-extremo__area-derecha">
-              <button
-                type="button"
-                class="c-button c-button--primary"
-                [disabled]="!result() || !result()?.success"
-                (click)="downloadZip()"
-              >
-                Download Texture Pack (.zip)
-              </button>
-            </div>
-          </div>
-        </section>
-
-        <!-- Preview & Deliverable Area -->
-        <section class="l-columns__area c-card">
-          <div class="c-card__header l-extremo">
-            <h2 class="c-card__title l-extremo__area-izquierda">Texture Viewport</h2>
-            <div class="l-extremo__area-derecha tab-buttons">
-              <button
-                type="button"
-                class="c-button c-button--small"
-                [class.c-button--primary]="activePreviewTab() === 'tiled'"
-                [class.c-button--outline]="activePreviewTab() !== 'tiled'"
-                (click)="setActivePreviewTab('tiled')"
-              >
-                Tiled Repeat
-              </button>
-              <button
-                type="button"
-                class="c-button c-button--small"
-                [class.c-button--primary]="activePreviewTab() === 'diffuse'"
-                [class.c-button--outline]="activePreviewTab() !== 'diffuse'"
-                (click)="setActivePreviewTab('diffuse')"
-              >
-                Diffuse Map
-              </button>
-              <button
-                type="button"
-                class="c-button c-button--small"
-                [class.c-button--primary]="activePreviewTab() === 'normal'"
-                [class.c-button--outline]="activePreviewTab() !== 'normal'"
-                (click)="setActivePreviewTab('normal')"
-              >
-                Normal Map
-              </button>
-              <button
-                type="button"
-                class="c-button c-button--small"
-                [class.c-button--primary]="activePreviewTab() === 'css'"
-                [class.c-button--outline]="activePreviewTab() !== 'css'"
-                (click)="setActivePreviewTab('css')"
-              >
-                CSS Snippet
-              </button>
-            </div>
-          </div>
-
-          <div class="c-card__body">
-            @if (result() && result()?.success) {
-              @if (activePreviewTab() === 'css') {
-                <div class="css-container">
-                  <div class="code-header l-extremo">
-                    <span class="code-title l-extremo__area-izquierda">CSS background-repeat</span>
-                    <button
-                      type="button"
-                      class="c-button c-button--outline c-button--small l-extremo__area-derecha"
-                      (click)="copyCssSnippet()"
-                    >
-                      {{ copiedCssFeedback() ? '✓ Copied!' : 'Copy CSS' }}
-                    </button>
-                  </div>
-                  <pre class="code-block"><code>{{ result()?.cssSnippet }}</code></pre>
-                </div>
-              } @else {
-                <div class="canvas-viewport">
-                  <canvas #previewCanvas class="preview-canvas-element"></canvas>
-                </div>
-              }
-            } @else if (result() && !result()?.success) {
-              <div class="c-alert c-alert--danger">
-                <strong>Error:</strong> {{ result()?.error }}
-              </div>
-            } @else {
-              <div class="empty-state">
-                <span class="empty-state__icon">🖼️</span>
-                <p>Upload a texture or load the sample surface to generate seamless repeating textures.</p>
-              </div>
-            }
-          </div>
-
-          <div class="c-card__footer l-extremo">
-            <div class="l-extremo__area-izquierda">
-              <button
-                type="button"
-                class="c-button c-button--outline c-button--small"
-                [disabled]="!result() || !result()?.success"
-                (click)="downloadDiffuse()"
-              >
-                Download Diffuse PNG
-              </button>
-            </div>
-            <div class="l-extremo__area-derecha">
-              <button
-                type="button"
-                class="c-button c-button--outline c-button--small"
-                [disabled]="!result() || !result()?.success || !result()?.normalMapBlob"
-                (click)="downloadNormal()"
-              >
-                Download Normal PNG
-              </button>
-            </div>
-          </div>
-        </section>
-      </div>
-    </div>
-  `,
-  styles: [`
-    .preset-buttons, .tab-buttons {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 0.375rem;
-    }
-    .options-grid {
-      display: grid;
-      grid-template-columns: 1fr;
-      gap: 0.5rem;
-    }
-    .c-checkbox-label {
-      display: flex;
-      align-items: center;
-      gap: 0.5rem;
-      font-size: 0.8125rem;
-      cursor: pointer;
-    }
-    .canvas-viewport {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      background: #0f172a;
-      border: 1px solid var(--color-border, #cbd5e1);
-      border-radius: 0.375rem;
-      padding: 0.5rem;
-      min-height: 280px;
-      max-height: 380px;
-      overflow: auto;
-    }
-    .preview-canvas-element {
-      max-width: 100%;
-      height: auto;
-      image-rendering: pixelated;
-      border-radius: 2px;
-    }
-    .css-container {
-      border: 1px solid var(--color-border, #cbd5e1);
-      border-radius: 0.375rem;
-      overflow: hidden;
-    }
-    .code-header {
-      background: #e2e8f0;
-      padding: 0.375rem 0.75rem;
-      font-size: 0.8125rem;
-      font-family: monospace;
-    }
-    .code-block {
-      max-height: 240px;
-      overflow: auto;
-      padding: 0.75rem;
-      margin: 0;
-      background: #0f172a;
-      color: #f8fafc;
-      font-size: 0.8125rem;
-      line-height: 1.4;
-      font-family: 'Fira Code', Consolas, monospace;
-    }
-    .empty-state {
-      padding: 3rem 1rem;
-      text-align: center;
-      color: var(--color-text-muted, #64748b);
-    }
-    .empty-state__icon {
-      font-size: 2.5rem;
-      display: block;
-      margin-bottom: 0.5rem;
-    }
-    .c-alert {
-      padding: 0.75rem 1rem;
-      border-radius: 0.375rem;
-      font-size: 0.875rem;
-    }
-    .c-alert--danger {
-      background: #fee2e2;
-      color: #991b1b;
-      border: 1px solid #f87171;
-    }
-  `],
+  templateUrl: './seamless-texture-generator.component.html',
+  styleUrl: './seamless-texture-generator.component.scss',
 })
 export class SeamlessTextureGeneratorComponent implements OnDestroy {
   @ViewChild('previewCanvas') previewCanvasRef?: ElementRef<HTMLCanvasElement>;
   private activeObjectUrls = new Set<string>();
+  private worker?: Worker;
+  private requestId = 0;
 
   // State Signals
   readonly sourceImageData = signal<TextureImageData | null>(null);
   readonly selectedFileName = signal<string>('');
+  readonly errorMessage = signal<string | null>(null);
   readonly blendMode = signal<TextureBlendMode>('linear_crossfade');
   readonly edgeOverlapPercentage = signal<number>(20);
   readonly generateNormalMap = signal<boolean>(true);
@@ -467,6 +73,11 @@ export class SeamlessTextureGeneratorComponent implements OnDestroy {
     this.recomputeTexture();
   }
 
+  setOutputResolution(resolution: number) {
+    this.outputResolutionPx.set(resolution);
+    this.recomputeTexture();
+  }
+
   setTiling(tiling: number) {
     this.previewTilingMultiplier.set(tiling);
     this.renderCanvas();
@@ -478,6 +89,7 @@ export class SeamlessTextureGeneratorComponent implements OnDestroy {
   }
 
   async loadSampleSurface() {
+    this.errorMessage.set(null);
     const surface = createSyntheticSurface(64, 64);
     this.sourceImageData.set(surface);
     this.selectedFileName.set('sample_brick_surface.png');
@@ -487,34 +99,40 @@ export class SeamlessTextureGeneratorComponent implements OnDestroy {
   async handleFileSelected(file: File) {
     if (!file) return;
     this.selectedFileName.set(file.name);
+    this.errorMessage.set(null);
 
-    if (typeof createImageBitmap === 'function') {
-      try {
-        const bitmap = await createImageBitmap(file);
+    let bitmap: ImageBitmap | null = null;
+    try {
+      if (typeof createImageBitmap === 'function') {
+        bitmap = await createImageBitmap(file);
         const canvas = document.createElement('canvas');
-        canvas.width = Math.min(512, bitmap.width);
-        canvas.height = Math.min(512, bitmap.height);
+        canvas.width = bitmap.width;
+        canvas.height = bitmap.height;
         const ctx = canvas.getContext('2d');
-        if (ctx) {
-          ctx.drawImage(bitmap, 0, 0, canvas.width, canvas.height);
-          const imgData = ctx.getImageData(0, 0, canvas.width, canvas.height);
-          this.sourceImageData.set({
-            width: canvas.width,
-            height: canvas.height,
-            data: imgData.data,
-          });
-          await this.recomputeTexture();
-          return;
+        if (!ctx) {
+          throw new Error('Canvas 2D context unavailable');
         }
-      } catch {
-        // Fallback below
+        ctx.drawImage(bitmap, 0, 0);
+        const imgData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+        this.sourceImageData.set({
+          width: canvas.width,
+          height: canvas.height,
+          data: imgData.data,
+        });
+        await this.recomputeTexture();
+      } else {
+        throw new Error('createImageBitmap is not supported');
+      }
+    } catch {
+      this.errorMessage.set(
+        'Failed to decode image file. Please upload a valid PNG, JPG, or WebP texture.'
+      );
+      this.result.set(null);
+    } finally {
+      if (bitmap && typeof bitmap.close === 'function') {
+        bitmap.close();
       }
     }
-
-    // Fallback using synthetic surface
-    const surface = createSyntheticSurface(64, 64);
-    this.sourceImageData.set(surface);
-    await this.recomputeTexture();
   }
 
   onFileInputChange(event: Event) {
@@ -548,6 +166,41 @@ export class SeamlessTextureGeneratorComponent implements OnDestroy {
       outputResolutionPx: this.outputResolutionPx(),
     };
 
+    if (typeof Worker !== 'undefined') {
+      try {
+        if (!this.worker) {
+          this.worker = new Worker(new URL('./worker.ts', import.meta.url), {
+            type: 'module',
+          });
+          this.worker.onmessage = (event: MessageEvent<TextureWorkerResponse>) => {
+            const data = event.data;
+            if (data.id === this.requestId) {
+              if (data.type === 'SUCCESS' && data.result) {
+                this.result.set(data.result);
+                setTimeout(() => this.renderCanvas(), 10);
+              } else if (data.type === 'ERROR') {
+                this.errorMessage.set(data.error || 'Failed to process texture in worker.');
+                this.result.set(null);
+              }
+            }
+          };
+        }
+
+        const id = ++this.requestId;
+        const request: TextureWorkerRequest = {
+          id,
+          type: 'PROCESS_TEXTURE',
+          source: src,
+          options,
+        };
+        this.worker.postMessage(request);
+        return;
+      } catch {
+        // Fall back to main thread execution
+      }
+    }
+
+    // Direct synchronous fallback in test or worker-unsupported environments
     const res = await processTexture(src, options);
     this.result.set(res);
     setTimeout(() => this.renderCanvas(), 10);
@@ -559,34 +212,20 @@ export class SeamlessTextureGeneratorComponent implements OnDestroy {
     const ctx = canvas.getContext('2d');
     if (!ctx) return;
 
-    const src = this.sourceImageData();
-    if (!src) return;
+    const res = this.result();
+    if (!res || !res.success || !res.diffusePixels) return;
 
-    const options: SeamlessTextureGeneratorOptions = {
-      blendMode: this.blendMode(),
-      edgeOverlapPercentage: this.edgeOverlapPercentage(),
-      generateNormalMap: this.generateNormalMap(),
-      normalMapStrength: this.normalMapStrength(),
-      invertNormalY: this.invertNormalY(),
-      previewTilingMultiplier: this.previewTilingMultiplier(),
-      outputResolutionPx: this.outputResolutionPx(),
-    };
-
-    const seamless = makeSeamlessTexture(src, options);
+    const diffuse = res.diffusePixels;
     const tab = this.activePreviewTab();
 
     if (tab === 'diffuse') {
-      canvas.width = seamless.width;
-      canvas.height = seamless.height;
-      const imgData = ctx.createImageData(seamless.width, seamless.height);
-      imgData.data.set(seamless.data);
+      canvas.width = diffuse.width;
+      canvas.height = diffuse.height;
+      const imgData = ctx.createImageData(diffuse.width, diffuse.height);
+      imgData.data.set(diffuse.data);
       ctx.putImageData(imgData, 0, 0);
-    } else if (tab === 'normal') {
-      const normalMap = generateNormalMap(
-        seamless,
-        options.normalMapStrength,
-        options.invertNormalY
-      );
+    } else if (tab === 'normal' && res.normalPixels) {
+      const normalMap = res.normalPixels;
       canvas.width = normalMap.width;
       canvas.height = normalMap.height;
       const imgData = ctx.createImageData(normalMap.width, normalMap.height);
@@ -595,21 +234,21 @@ export class SeamlessTextureGeneratorComponent implements OnDestroy {
     } else {
       // Tiled repeat
       const tiles = this.previewTilingMultiplier();
-      canvas.width = seamless.width * tiles;
-      canvas.height = seamless.height * tiles;
+      canvas.width = diffuse.width * tiles;
+      canvas.height = diffuse.height * tiles;
 
       const singleCanvas = document.createElement('canvas');
-      singleCanvas.width = seamless.width;
-      singleCanvas.height = seamless.height;
+      singleCanvas.width = diffuse.width;
+      singleCanvas.height = diffuse.height;
       const sCtx = singleCanvas.getContext('2d');
       if (sCtx) {
-        const imgData = sCtx.createImageData(seamless.width, seamless.height);
-        imgData.data.set(seamless.data);
+        const imgData = sCtx.createImageData(diffuse.width, diffuse.height);
+        imgData.data.set(diffuse.data);
         sCtx.putImageData(imgData, 0, 0);
 
         for (let y = 0; y < tiles; y++) {
           for (let x = 0; x < tiles; x++) {
-            ctx.drawImage(singleCanvas, x * seamless.width, y * seamless.height);
+            ctx.drawImage(singleCanvas, x * diffuse.width, y * diffuse.height);
           }
         }
       }
@@ -688,12 +327,14 @@ export class SeamlessTextureGeneratorComponent implements OnDestroy {
   reset() {
     this.sourceImageData.set(null);
     this.selectedFileName.set('');
+    this.errorMessage.set(null);
     this.blendMode.set('linear_crossfade');
     this.edgeOverlapPercentage.set(20);
     this.generateNormalMap.set(true);
     this.normalMapStrength.set(2.5);
     this.invertNormalY.set(false);
     this.previewTilingMultiplier.set(3);
+    this.outputResolutionPx.set(256);
     this.activePreviewTab.set('tiled');
     this.copiedCssFeedback.set(false);
     this.result.set(null);
@@ -703,6 +344,10 @@ export class SeamlessTextureGeneratorComponent implements OnDestroy {
   }
 
   ngOnDestroy() {
+    if (this.worker) {
+      this.worker.terminate();
+      this.worker = undefined;
+    }
     this.activeObjectUrls.forEach((url) => URL.revokeObjectURL(url));
     this.activeObjectUrls.clear();
   }

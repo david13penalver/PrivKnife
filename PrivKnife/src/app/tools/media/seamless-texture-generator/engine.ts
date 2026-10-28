@@ -1,12 +1,186 @@
 import JSZip from 'jszip';
+import pako from 'pako';
 import {
   SeamlessTextureGeneratorOptions,
   SeamlessTextureGeneratorResult,
+  TextureBlendMode,
   TextureImageData,
 } from './types';
 
+// Precomputed CRC-32 table
+const CRC_TABLE = new Uint32Array(256);
+for (let n = 0; n < 256; n++) {
+  let c = n;
+  for (let k = 0; k < 8; k++) {
+    c = c & 1 ? 0xedb88320 ^ (c >>> 1) : c >>> 1;
+  }
+  CRC_TABLE[n] = c;
+}
+
+function crc32(buf: Uint8Array): number {
+  let c = 0xffffffff;
+  for (let i = 0; i < buf.length; i++) {
+    c = CRC_TABLE[(c ^ buf[i]) & 0xff] ^ (c >>> 8);
+  }
+  return (c ^ 0xffffffff) >>> 0;
+}
+
+function makePngChunk(type: string, data: Uint8Array): Uint8Array {
+  const len = data.length;
+  const chunk = new Uint8Array(12 + len);
+  const dv = new DataView(chunk.buffer);
+  dv.setUint32(0, len);
+  for (let i = 0; i < 4; i++) {
+    chunk[4 + i] = type.charCodeAt(i);
+  }
+  chunk.set(data, 8);
+  const crc = crc32(chunk.subarray(4, 8 + len));
+  dv.setUint32(8 + len, crc);
+  return chunk;
+}
+
 /**
- * Creates seamless texture using offset & edge blending or mirroring
+ * Pure TypeScript PNG encoder without DOM canvas
+ */
+export function pixelDataToPngBytes(img: TextureImageData): Uint8Array {
+  const { width, height, data } = img;
+  // Scanlines: 1 filter byte (0 = none) + width * 4 bytes per row
+  const rawScanlines = new Uint8Array(height * (1 + width * 4));
+  for (let y = 0; y < height; y++) {
+    const rawOffset = y * (1 + width * 4);
+    rawScanlines[rawOffset] = 0; // Filter: None
+    const dataOffset = y * width * 4;
+    rawScanlines.set(data.subarray(dataOffset, dataOffset + width * 4), rawOffset + 1);
+  }
+
+  const deflated = pako.deflate(rawScanlines);
+
+  // IHDR (13 bytes)
+  const ihdr = new Uint8Array(13);
+  const dvIhdr = new DataView(ihdr.buffer);
+  dvIhdr.setUint32(0, width);
+  dvIhdr.setUint32(4, height);
+  ihdr[8] = 8; // Bit depth: 8
+  ihdr[9] = 6; // Color type: 6 (RGBA)
+  ihdr[10] = 0; // Compression: 0
+  ihdr[11] = 0; // Filter: 0
+  ihdr[12] = 0; // Interlace: 0
+
+  const signature = new Uint8Array([0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a]);
+  const ihdrChunk = makePngChunk('IHDR', ihdr);
+  const idatChunk = makePngChunk('IDAT', deflated);
+  const iendChunk = makePngChunk('IEND', new Uint8Array(0));
+
+  const totalLength = signature.length + ihdrChunk.length + idatChunk.length + iendChunk.length;
+  const pngBytes = new Uint8Array(totalLength);
+  let offset = 0;
+
+  pngBytes.set(signature, offset);
+  offset += signature.length;
+
+  pngBytes.set(ihdrChunk, offset);
+  offset += ihdrChunk.length;
+
+  pngBytes.set(idatChunk, offset);
+  offset += idatChunk.length;
+
+  pngBytes.set(iendChunk, offset);
+
+  return pngBytes;
+}
+
+export function textureToPngBlob(img: TextureImageData): Blob {
+  const bytes = pixelDataToPngBytes(img);
+  return new Blob([bytes as BlobPart], { type: 'image/png' });
+}
+
+function bytesToBase64DataUrl(bytes: Uint8Array, mimeType: string): string {
+  if (typeof btoa === 'function') {
+    let binary = '';
+    const chunk = 8192;
+    for (let i = 0; i < bytes.length; i += chunk) {
+      const slice = bytes.subarray(i, Math.min(i + chunk, bytes.length));
+      binary += String.fromCharCode.apply(null, Array.from(slice));
+    }
+    return `data:${mimeType};base64,${btoa(binary)}`;
+  }
+  if (typeof Buffer !== 'undefined') {
+    return `data:${mimeType};base64,${Buffer.from(bytes).toString('base64')}`;
+  }
+  return '';
+}
+
+/**
+ * Resamples image pixel data to target width and height using bilinear interpolation
+ */
+export function resamplePixelData(
+  src: TextureImageData,
+  targetWidth: number,
+  targetHeight: number
+): TextureImageData {
+  if (src.width === targetWidth && src.height === targetHeight) {
+    return src;
+  }
+  if (targetWidth <= 0 || targetHeight <= 0) {
+    return src;
+  }
+
+  const outData = new Uint8ClampedArray(targetWidth * targetHeight * 4);
+  const xRatio = src.width / targetWidth;
+  const yRatio = src.height / targetHeight;
+
+  for (let y = 0; y < targetHeight; y++) {
+    const srcY = y * yRatio;
+    const y0 = Math.floor(srcY);
+    const y1 = Math.min(src.height - 1, y0 + 1);
+    const yWeight = srcY - y0;
+
+    for (let x = 0; x < targetWidth; x++) {
+      const srcX = x * xRatio;
+      const x0 = Math.floor(srcX);
+      const x1 = Math.min(src.width - 1, x0 + 1);
+      const xWeight = srcX - x0;
+
+      const idx00 = (y0 * src.width + x0) * 4;
+      const idx10 = (y0 * src.width + x1) * 4;
+      const idx01 = (y1 * src.width + x0) * 4;
+      const idx11 = (y1 * src.width + x1) * 4;
+
+      const outIdx = (y * targetWidth + x) * 4;
+      for (let c = 0; c < 4; c++) {
+        const top = src.data[idx00 + c] * (1 - xWeight) + src.data[idx10 + c] * xWeight;
+        const bottom = src.data[idx01 + c] * (1 - xWeight) + src.data[idx11 + c] * xWeight;
+        outData[outIdx + c] = Math.round(top * (1 - yWeight) + bottom * yWeight);
+      }
+    }
+  }
+
+  return { width: targetWidth, height: targetHeight, data: outData };
+}
+
+/**
+ * Computes seam crossfade blend weight (1.0 at seam center dist=0, decaying to 0.0 at radius)
+ */
+export function computeSeamAlpha(
+  dist: number,
+  radius: number,
+  blendMode: TextureBlendMode
+): number {
+  if (radius <= 0 || dist >= radius) {
+    return 0;
+  }
+  const t = Math.max(0, Math.min(1, 1 - dist / radius));
+  if (blendMode === 'poisson_blend') {
+    // Hermite cubic smoothstep: 3t^2 - 2t^3
+    return t * t * (3 - 2 * t);
+  }
+  // Cosine crossfade
+  return 0.5 * (1 - Math.cos(Math.PI * t));
+}
+
+/**
+ * Creates seamless texture using offset & edge blending or mirroring.
+ * Uses a two-pass separable toroidal crossfade for full vertical and horizontal seam continuity.
  */
 export function makeSeamlessTexture(
   src: TextureImageData,
@@ -38,69 +212,68 @@ export function makeSeamlessTexture(
     return { width, height, data: outData };
   }
 
-  // Linear crossfade or Poisson blend via wrap-around offset and central blending
   const halfW = Math.floor(width / 2);
   const halfH = Math.floor(height / 2);
 
-  // 1. Shifted buffer (seams brought to the center)
-  const shifted = new Uint8ClampedArray(width * height * 4);
+  const overlapRadiusX = Math.min(
+    halfW - 1,
+    Math.max(2, Math.floor(width * (options.edgeOverlapPercentage / 100)))
+  );
+  const overlapRadiusY = Math.min(
+    halfH - 1,
+    Math.max(2, Math.floor(height * (options.edgeOverlapPercentage / 100)))
+  );
+
+  // Pass 1: Horizontal wrap by halfW & vertical seam crossfade at x = halfW across all y
+  const pass1 = new Uint8ClampedArray(width * height * 4);
   for (let y = 0; y < height; y++) {
     for (let x = 0; x < width; x++) {
-      const srcX = (x + halfW) % width;
-      const srcY = (y + halfH) % height;
-
-      const srcIdx = (srcY * width + srcX) * 4;
+      const shiftedX = (x + halfW) % width;
       const targetIdx = (y * width + x) * 4;
+      const shiftedIdx = (y * width + shiftedX) * 4;
+      const distX = Math.abs(x - halfW);
 
-      shifted[targetIdx] = src.data[srcIdx];
-      shifted[targetIdx + 1] = src.data[srcIdx + 1];
-      shifted[targetIdx + 2] = src.data[srcIdx + 2];
-      shifted[targetIdx + 3] = src.data[srcIdx + 3];
+      if (distX < overlapRadiusX) {
+        const weight = computeSeamAlpha(distX, overlapRadiusX, options.blendMode);
+        const origIdx = (y * width + x) * 4;
+        for (let c = 0; c < 3; c++) {
+          pass1[targetIdx + c] = Math.round(
+            weight * src.data[origIdx + c] + (1 - weight) * src.data[shiftedIdx + c]
+          );
+        }
+        pass1[targetIdx + 3] = 255;
+      } else {
+        pass1[targetIdx] = src.data[shiftedIdx];
+        pass1[targetIdx + 1] = src.data[shiftedIdx + 1];
+        pass1[targetIdx + 2] = src.data[shiftedIdx + 2];
+        pass1[targetIdx + 3] = src.data[shiftedIdx + 3];
+      }
     }
   }
 
-  // 2. Blend original center over the shifted cross
-  const overlapRadiusX = Math.max(2, Math.floor(width * (options.edgeOverlapPercentage / 100)));
-  const overlapRadiusY = Math.max(2, Math.floor(height * (options.edgeOverlapPercentage / 100)));
-
+  // Pass 2: Vertical wrap by halfH & horizontal seam crossfade at y = halfH across all x
   for (let y = 0; y < height; y++) {
+    const shiftedY = (y + halfH) % height;
+    const distY = Math.abs(y - halfH);
+
     for (let x = 0; x < width; x++) {
-      const idx = (y * width + x) * 4;
+      const targetIdx = (y * width + x) * 4;
+      const shiftedIdx = (shiftedY * width + x) * 4;
 
-      const distX = Math.abs(x - halfW);
-      const distY = Math.abs(y - halfH);
-
-      if (distX < overlapRadiusX && distY < overlapRadiusY) {
-        // Normalized distance from center cross [0, 1]
-        const factorX = distX / overlapRadiusX;
-        const factorY = distY / overlapRadiusY;
-        const maxDist = Math.max(factorX, factorY);
-
-        let blendWeight = 0;
-        if (options.blendMode === 'poisson_blend') {
-          // Smooth Hermite curve
-          const t = 1 - maxDist;
-          blendWeight = t * t * (3 - 2 * t);
-        } else {
-          // Cosine crossfade
-          blendWeight = 0.5 * (1 + Math.cos(Math.PI * maxDist));
+      if (distY < overlapRadiusY) {
+        const weight = computeSeamAlpha(distY, overlapRadiusY, options.blendMode);
+        const origIdx = (y * width + x) * 4;
+        for (let c = 0; c < 3; c++) {
+          outData[targetIdx + c] = Math.round(
+            weight * pass1[origIdx + c] + (1 - weight) * pass1[shiftedIdx + c]
+          );
         }
-
-        outData[idx] = Math.round(
-          (1 - blendWeight) * shifted[idx] + blendWeight * src.data[idx]
-        );
-        outData[idx + 1] = Math.round(
-          (1 - blendWeight) * shifted[idx + 1] + blendWeight * src.data[idx + 1]
-        );
-        outData[idx + 2] = Math.round(
-          (1 - blendWeight) * shifted[idx + 2] + blendWeight * src.data[idx + 2]
-        );
-        outData[idx + 3] = 255;
+        outData[targetIdx + 3] = 255;
       } else {
-        outData[idx] = shifted[idx];
-        outData[idx + 1] = shifted[idx + 1];
-        outData[idx + 2] = shifted[idx + 2];
-        outData[idx + 3] = shifted[idx + 3];
+        outData[targetIdx] = pass1[shiftedIdx];
+        outData[targetIdx + 1] = pass1[shiftedIdx + 1];
+        outData[targetIdx + 2] = pass1[shiftedIdx + 2];
+        outData[targetIdx + 3] = pass1[shiftedIdx + 3];
       }
     }
   }
@@ -168,65 +341,13 @@ export function generateNormalMap(
 /**
  * Generate CSS background snippet
  */
-export function generateCssBackgroundSnippet(fileName = 'texture_seamless.png'): string {
+export function generateCssBackgroundSnippet(fileName = 'diffuse_seamless.png'): string {
   return `.tileable-surface {
   background-image: url("${fileName}");
   background-repeat: repeat;
   background-size: auto;
 }
 `;
-}
-
-/**
- * Helper to convert TextureImageData to a PNG Blob
- */
-export function textureToPngBlob(img: TextureImageData): Blob {
-  if (typeof document !== 'undefined') {
-    try {
-      const canvas = document.createElement('canvas');
-      canvas.width = img.width;
-      canvas.height = img.height;
-      const ctx = canvas.getContext('2d');
-      if (ctx) {
-        const imgData = ctx.createImageData(img.width, img.height);
-        imgData.data.set(img.data);
-        ctx.putImageData(imgData, 0, 0);
-
-        const dataUrl = canvas.toDataURL('image/png');
-        const bstr = atob(dataUrl.split(',')[1]);
-        const u8arr = new Uint8Array(bstr.length);
-        for (let i = 0; i < bstr.length; i++) {
-          u8arr[i] = bstr.charCodeAt(i);
-        }
-        return new Blob([u8arr], { type: 'image/png' });
-      }
-    } catch {
-      // Fall through to deterministic minimal PNG
-    }
-  }
-
-  // Minimal deterministic PNG builder
-  const width = img.width;
-  const height = img.height;
-  const rawBytes = new Uint8Array([
-    0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a, // PNG Signature
-    0x00, 0x00, 0x00, 0x0d, // IHDR length
-    0x49, 0x48, 0x44, 0x52, // IHDR
-    (width >> 24) & 0xff,
-    (width >> 16) & 0xff,
-    (width >> 8) & 0xff,
-    width & 0xff,
-    (height >> 24) & 0xff,
-    (height >> 16) & 0xff,
-    (height >> 8) & 0xff,
-    height & 0xff,
-    0x08, 0x06, 0x00, 0x00, 0x00, // 8-bit RGBA
-    0x00, 0x00, 0x00, 0x00, // CRC
-    0x00, 0x00, 0x00, 0x00, // IEND length
-    0x49, 0x45, 0x4e, 0x44, // IEND
-    0xae, 0x42, 0x60, 0x82,
-  ]);
-  return new Blob([rawBytes], { type: 'image/png' });
 }
 
 /**
@@ -252,21 +373,36 @@ export async function processTexture(
   }
 
   try {
-    const seamlessDiffuse = makeSeamlessTexture(src, options);
-    const diffuseBlob = textureToPngBlob(seamlessDiffuse);
-    const diffuseDataUrl = `data:image/png;base64,mock`;
+    let workingSource = src;
+    if (
+      options.outputResolutionPx > 0 &&
+      (src.width !== options.outputResolutionPx || src.height !== options.outputResolutionPx)
+    ) {
+      workingSource = resamplePixelData(
+        src,
+        options.outputResolutionPx,
+        options.outputResolutionPx
+      );
+    }
 
+    const seamlessDiffuse = makeSeamlessTexture(workingSource, options);
+    const diffuseBytes = pixelDataToPngBytes(seamlessDiffuse);
+    const diffuseBlob = new Blob([diffuseBytes as BlobPart], { type: 'image/png' });
+    const diffuseDataUrl = bytesToBase64DataUrl(diffuseBytes, 'image/png');
+
+    let normalMap: TextureImageData | undefined;
     let normalMapBlob: Blob | undefined;
     let normalMapDataUrl: string | undefined;
 
     if (options.generateNormalMap) {
-      const normalMap = generateNormalMap(
+      normalMap = generateNormalMap(
         seamlessDiffuse,
         options.normalMapStrength,
         options.invertNormalY
       );
-      normalMapBlob = textureToPngBlob(normalMap);
-      normalMapDataUrl = `data:image/png;base64,mockNormal`;
+      const normalBytes = pixelDataToPngBytes(normalMap);
+      normalMapBlob = new Blob([normalBytes as BlobPart], { type: 'image/png' });
+      normalMapDataUrl = bytesToBase64DataUrl(normalBytes, 'image/png');
     }
 
     const cssSnippet = generateCssBackgroundSnippet('diffuse_seamless.png');
@@ -293,6 +429,8 @@ export async function processTexture(
       diffuseDataUrl,
       normalMapDataUrl,
       cssSnippet,
+      diffusePixels: seamlessDiffuse,
+      normalPixels: normalMap,
       metadata: {
         width: seamlessDiffuse.width,
         height: seamlessDiffuse.height,
@@ -315,3 +453,6 @@ export async function processTexture(
     };
   }
 }
+
+// Alias for convenience
+export const processSeamlessTexture = processTexture;

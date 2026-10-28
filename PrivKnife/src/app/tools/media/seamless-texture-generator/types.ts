@@ -30,4 +30,20 @@ export interface SeamlessTextureGeneratorResult {
   cssSnippet: string;
   metadata?: Record<string, unknown>;
   error?: string;
+  diffusePixels?: TextureImageData;
+  normalPixels?: TextureImageData;
+}
+
+export interface TextureWorkerRequest {
+  id: number;
+  type: 'PROCESS_TEXTURE';
+  source: TextureImageData;
+  options: SeamlessTextureGeneratorOptions;
+}
+
+export interface TextureWorkerResponse {
+  id: number;
+  type: 'SUCCESS' | 'ERROR';
+  result?: SeamlessTextureGeneratorResult;
+  error?: string;
 }

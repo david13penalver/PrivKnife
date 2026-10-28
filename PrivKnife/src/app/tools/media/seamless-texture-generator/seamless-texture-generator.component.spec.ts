@@ -40,7 +40,9 @@ describe('SeamlessTextureGeneratorComponent (Seam 2 & 4)', () => {
       expect(component.normalMapStrength()).toBe(2.5);
       expect(component.invertNormalY()).toBe(false);
       expect(component.previewTilingMultiplier()).toBe(3);
+      expect(component.outputResolutionPx()).toBe(256);
       expect(component.sourceImageData()).toBeNull();
+      expect(component.errorMessage()).toBeNull();
     });
 
     it('should load sample surface and trigger texture generation', async () => {
@@ -50,6 +52,7 @@ describe('SeamlessTextureGeneratorComponent (Seam 2 & 4)', () => {
       expect(component.result()).not.toBeNull();
       expect(component.result()?.success).toBe(true);
       expect(component.result()?.diffuseBlob).toBeDefined();
+      expect(component.result()?.diffusePixels).toBeDefined();
     });
 
     it('should update blendMode and recompute texture', async () => {
@@ -59,6 +62,16 @@ describe('SeamlessTextureGeneratorComponent (Seam 2 & 4)', () => {
       expect(component.blendMode()).toBe('mirror_repeat');
       await component.recomputeTexture();
       expect(component.result()?.metadata?.['blendMode']).toBe('mirror_repeat');
+    });
+
+    it('should update output resolution and resample texture dimensions (DEFECT-57-04)', async () => {
+      await component.loadSampleSurface();
+      component.setOutputResolution(128);
+
+      expect(component.outputResolutionPx()).toBe(128);
+      await component.recomputeTexture();
+      expect(component.result()?.diffusePixels?.width).toBe(128);
+      expect(component.result()?.diffusePixels?.height).toBe(128);
     });
 
     it('should toggle normal map generation and invertNormalY', async () => {
@@ -106,6 +119,17 @@ describe('SeamlessTextureGeneratorComponent (Seam 2 & 4)', () => {
       createObjectURLSpy.mockRestore();
     });
 
+    it('should download normal PNG and revoke object URL immediately', async () => {
+      await component.loadSampleSurface();
+      const createObjectURLSpy = vi.spyOn(URL, 'createObjectURL').mockReturnValue('blob:mock-normal');
+
+      component.downloadNormal();
+
+      expect(createObjectURLSpy).toHaveBeenCalled();
+      expect(revokeObjectURLSpy).toHaveBeenCalledWith('blob:mock-normal');
+      createObjectURLSpy.mockRestore();
+    });
+
     it('should copy CSS snippet to clipboard with feedback', async () => {
       await component.loadSampleSurface();
       const writeTextMock = vi.fn().mockResolvedValue(undefined);
@@ -121,7 +145,67 @@ describe('SeamlessTextureGeneratorComponent (Seam 2 & 4)', () => {
     });
   });
 
-  describe('Task 3.3: Memory Hygiene & Disposal', () => {
+  describe('Task 3.3: Error Handling & Resource Disposal (DEFECT-57-02)', () => {
+    it('should set errorMessage and not load sample brick texture when file decoding fails', async () => {
+      const corruptFile = new File(['CORRUPT_BYTES'], 'corrupt.png', { type: 'image/png' });
+      // In jsdom / test environment, createImageBitmap might not exist or fail
+      await component.handleFileSelected(corruptFile);
+
+      expect(component.errorMessage()).toContain('Failed to decode image file');
+      expect(component.result()).toBeNull();
+      fixture.detectChanges();
+      const compiled = fixture.nativeElement as HTMLElement;
+      expect(compiled.querySelector('.c-alert--danger')).toBeTruthy();
+      expect(compiled.querySelector('.c-alert--danger')?.textContent).toContain(
+        'Failed to decode image file'
+      );
+    });
+
+    it('should call bitmap.close() in finally block when createImageBitmap succeeds', async () => {
+      const closeMock = vi.fn();
+      const mockBitmap = {
+        width: 32,
+        height: 32,
+        close: closeMock,
+      } as unknown as ImageBitmap;
+
+      const origCreateImageBitmap = (window as unknown as { createImageBitmap?: unknown })
+        .createImageBitmap;
+      (window as unknown as { createImageBitmap: unknown }).createImageBitmap = vi
+        .fn()
+        .mockResolvedValue(mockBitmap);
+
+      // Mock canvas getContext
+      const mockCtx = {
+        drawImage: vi.fn(),
+        getImageData: vi.fn().mockReturnValue({
+          width: 32,
+          height: 32,
+          data: new Uint8ClampedArray(32 * 32 * 4),
+        }),
+      };
+      const origCreateElement = document.createElement.bind(document);
+      const createElementSpy = vi.spyOn(document, 'createElement').mockImplementation((tagName) => {
+        if (tagName === 'canvas') {
+          const fakeCanvas = origCreateElement('canvas');
+          fakeCanvas.getContext = vi.fn().mockReturnValue(mockCtx);
+          return fakeCanvas;
+        }
+        return origCreateElement(tagName);
+      });
+
+      try {
+        const testFile = new File(['valid'], 'valid.png', { type: 'image/png' });
+        await component.handleFileSelected(testFile);
+
+        expect(closeMock).toHaveBeenCalledTimes(1);
+      } finally {
+        createElementSpy.mockRestore();
+        (window as unknown as { createImageBitmap?: unknown }).createImageBitmap =
+          origCreateImageBitmap;
+      }
+    });
+
     it('should reset inputs and revoke cached URLs upon reset', async () => {
       await component.loadSampleSurface();
       expect(component.sourceImageData()).not.toBeNull();
@@ -130,6 +214,7 @@ describe('SeamlessTextureGeneratorComponent (Seam 2 & 4)', () => {
 
       expect(component.sourceImageData()).toBeNull();
       expect(component.result()).toBeNull();
+      expect(component.errorMessage()).toBeNull();
     });
 
     it('should cleanly dispose and revoke resources on ngOnDestroy', async () => {
@@ -139,11 +224,24 @@ describe('SeamlessTextureGeneratorComponent (Seam 2 & 4)', () => {
     });
   });
 
-  describe('Task 4.1: Privacy & Zero-Exfiltration Guard', () => {
+  describe('Task 4.1: BEM Compliance & Privacy (DEFECT-57-05)', () => {
+    it('should render BEM compliant .c-texture-gen__* elements and #outputResolution', () => {
+      fixture.detectChanges();
+      const compiled = fixture.nativeElement as HTMLElement;
+
+      expect(compiled.querySelector('.c-texture-gen')).toBeTruthy();
+      expect(compiled.querySelector('.c-texture-gen__preset-group')).toBeTruthy();
+      expect(compiled.querySelector('#outputResolution')).toBeTruthy();
+      expect(compiled.querySelector('.c-texture-gen__select')).toBeTruthy();
+      expect(compiled.querySelector('.c-texture-gen__checkbox-label')).toBeTruthy();
+      expect(compiled.querySelector('.c-texture-gen__checkbox-input')).toBeTruthy();
+    });
+
     it('should execute texture generation and download with 0 network calls', async () => {
       await component.loadSampleSurface();
       component.downloadZip();
       component.downloadDiffuse();
+      component.downloadNormal();
 
       expect(fetchSpy).not.toHaveBeenCalled();
       expect(xhrSpy).not.toHaveBeenCalled();
