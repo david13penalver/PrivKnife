@@ -1,0 +1,202 @@
+:host {
+  display: block;
+  max-width: 100%;
+  overflow-x: hidden;
+}
+
+.c-emergency-kit {
+  max-width: 100%;
+  overflow-x: hidden;
+
+  .c-header__title {
+    overflow-wrap: anywhere;
+    word-break: break-word;
+  }
+
+  .c-emergency-kit__controls-card,
+  .c-emergency-kit__preview-card {
+    min-width: 0;
+  }
+
+  .c-emergency-kit__preset-group {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+  }
+
+  .c-emergency-kit__preset-btn {
+    min-height: 44px;
+    padding: 0 14px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.875rem;
+  }
+
+  .c-emergency-kit__input,
+  .c-emergency-kit__select {
+    min-height: 44px;
+    font-size: 1rem;
+    width: 100%;
+    box-sizing: border-box;
+  }
+
+  .c-emergency-kit__format-row {
+    gap: 12px;
+  }
+
+  .c-emergency-kit__checkbox-grid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+  }
+
+  .c-emergency-kit__checkbox-label {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    cursor: pointer;
+    min-height: 44px;
+    padding: 4px 8px;
+    font-size: 0.875rem;
+    user-select: none;
+  }
+
+  .c-emergency-kit__checkbox {
+    width: 20px;
+    height: 20px;
+    cursor: pointer;
+  }
+
+  .c-emergency-kit__directives-input {
+    width: 100%;
+    min-height: 80px;
+    font-size: 1rem; // Prevents iOS automatic zoom on focus
+    resize: vertical;
+    box-sizing: border-box;
+  }
+
+  .c-emergency-kit__zero-notice {
+    background: #f0fdf4;
+    border: 1px solid #bbf7d0;
+    padding: 12px;
+    border-radius: 6px;
+    margin-top: 8px;
+  }
+
+  .c-emergency-kit__zero-title {
+    font-size: 0.8125rem;
+    color: #166534;
+    font-weight: 600;
+  }
+
+  .c-emergency-kit__zero-desc {
+    font-size: 0.75rem;
+    color: #15803d;
+    margin-top: 4px;
+    line-height: 1.4;
+  }
+
+  .c-emergency-kit__action-btn,
+  .c-emergency-kit__download-btn {
+    min-height: 44px;
+    padding: 0 16px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .c-emergency-kit__meta {
+    font-size: 0.75rem;
+    opacity: 0.85;
+    font-family: monospace;
+  }
+
+  .c-emergency-kit__preview {
+    min-height: 480px;
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
+    overflow: auto;
+    background: #e2e8f0;
+    border-radius: 6px;
+    padding: 16px;
+  }
+
+  .c-emergency-kit__preview-stage {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
+
+    ::ng-deep svg {
+      width: 100%;
+      height: auto;
+      max-height: 780px;
+      display: block;
+    }
+  }
+
+  .c-emergency-kit__fingerprint {
+    font-size: 0.75rem;
+    color: #64748b;
+    font-family: monospace;
+    word-break: break-all;
+    overflow-wrap: anywhere;
+  }
+}
+
+/* Print Isolation Stylesheet */
+@media print {
+  body {
+    background: #ffffff !important;
+  }
+
+  /* Hide navigation, chrome, headers, controls and non-sheet elements */
+  .c-header,
+  .l-page__header,
+  .c-emergency-kit__controls-card,
+  .c-card__header,
+  .c-card__footer,
+  .c-emergency-kit__fingerprint,
+  app-header,
+  app-footer {
+    display: none !important;
+  }
+
+  .l-page {
+    padding: 0 !important;
+    margin: 0 !important;
+  }
+
+  .l-columns {
+    display: block !important;
+  }
+
+  .c-card {
+    border: none !important;
+    box-shadow: none !important;
+    padding: 0 !important;
+    background: transparent !important;
+  }
+
+  .c-preview,
+  .c-emergency-kit__preview {
+    background: transparent !important;
+    padding: 0 !important;
+    border: none !important;
+    overflow: visible !important;
+    min-height: auto !important;
+  }
+
+  .c-emergency-kit__preview-stage {
+    box-shadow: none !important;
+    width: 100% !important;
+
+    ::ng-deep svg {
+      width: 100% !important;
+      height: auto !important;
+      max-height: none !important;
+    }
+  }
+}

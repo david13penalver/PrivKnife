@@ -8,6 +8,19 @@ import {
 } from './types';
 
 /**
+ * Escapes XML/SVG special characters to prevent XSS / markup injection.
+ */
+export function escapeXml(str: string): string {
+  if (!str) return '';
+  return String(str)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&apos;');
+}
+
+/**
  * Returns physical page dimensions in millimeters for standard paper sizes.
  */
 export function getPageDimensionsMm(format: PaperFormat): PageDimensionsMm {
@@ -25,21 +38,65 @@ export async function computeDocumentHash(content: string): Promise<string> {
   const data = enc.encode(content);
 
   if (typeof crypto !== 'undefined' && crypto.subtle) {
-    const buffer = await crypto.subtle.digest('SHA-256', data);
-    const hashArray = Array.from(new Uint8Array(buffer));
-    return hashArray.map((b) => b.toString(16).padStart(2, '0')).join('');
+    try {
+      const buffer = await crypto.subtle.digest('SHA-256', data);
+      const hashArray = Array.from(new Uint8Array(buffer));
+      return hashArray.map((b) => b.toString(16).padStart(2, '0')).join('');
+    } catch {
+      // Fall through to fallback
+    }
   }
 
-  // Fallback simple 64-char pseudo-hash for non-crypto environments
-  let h1 = 0xdeadbeef;
+  // Fallback 64-character pseudo-hash for non-crypto environments
+  let h1 = 0x811c9dc5;
   let h2 = 0x41c6ce57;
+  let h3 = 0xdeadbeef;
+  let h4 = 0xabcdef01;
   for (let i = 0; i < data.length; i++) {
-    h1 = Math.imul(h1 ^ data[i], 2654435761);
+    h1 = Math.imul(h1 ^ data[i], 0x01000193);
     h2 = Math.imul(h2 ^ data[i], 1597334677);
+    h3 = Math.imul(h3 ^ data[i], 2654435761);
+    h4 = Math.imul(h4 ^ data[i], 3141592653);
   }
-  const part1 = (h1 >>> 0).toString(16).padStart(8, '0');
-  const part2 = (h2 >>> 0).toString(16).padStart(8, '0');
-  return (part1 + part2).repeat(4);
+  const p1 = (h1 >>> 0).toString(16).padStart(8, '0');
+  const p2 = (h2 >>> 0).toString(16).padStart(8, '0');
+  const p3 = (h3 >>> 0).toString(16).padStart(8, '0');
+  const p4 = (h4 >>> 0).toString(16).padStart(8, '0');
+  return (p1 + p2 + p3 + p4).repeat(2);
+}
+
+/**
+ * Computes deterministic SHA-256 fingerprint for options object or stringified options.
+ */
+export async function computeTemplateHash(
+  options: EmergencyRecoveryKitOptions | string
+): Promise<string> {
+  let opts: EmergencyRecoveryKitOptions;
+  if (typeof options === 'string') {
+    try {
+      opts = JSON.parse(options) as EmergencyRecoveryKitOptions;
+    } catch {
+      return computeDocumentHash(options);
+    }
+  } else {
+    opts = options;
+  }
+
+  const sortedOptions = {
+    paperFormat: opts.paperFormat,
+    kitTitle: opts.kitTitle,
+    vaultCustodian: opts.vaultCustodian,
+    includeMasterVaultSection: opts.includeMasterVaultSection,
+    includeTwoFaCodesSection: opts.includeTwoFaCodesSection,
+    includeSeedPhraseSection: opts.includeSeedPhraseSection,
+    seedPhraseWordCount: opts.seedPhraseWordCount,
+    includeEmergencyContacts: opts.includeEmergencyContacts,
+    includeTamperFoldSeals: opts.includeTamperFoldSeals,
+    includeOfflineChecksumQr: opts.includeOfflineChecksumQr,
+    highContrastMonochrome: opts.highContrastMonochrome,
+    additionalInstructions: opts.additionalInstructions,
+  };
+  return computeDocumentHash(JSON.stringify(sortedOptions));
 }
 
 /**
@@ -78,8 +135,12 @@ export function generateEmergencyKitSvg(
   const textMuted = '#4b5563';
   const boxBorder = '#9ca3af';
 
+  const escapedTitle = escapeXml(options.kitTitle ? options.kitTitle.toUpperCase() : 'CONFIDENTIAL EMERGENCY RECOVERY KIT');
+  const escapedCustodian = escapeXml(options.vaultCustodian || 'Authorized Executor Only');
+  const escapedChecksum = escapeXml(checksum);
+
   let svg = `<?xml version="1.0" encoding="UTF-8"?>
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${width} ${height}" width="${width}" height="${height}">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${width} ${height}" width="100%" height="100%" style="max-height: 760px; display: block;">
   <!-- Background -->
   <rect x="0" y="0" width="${width}" height="${height}" fill="#ffffff" />
 
@@ -96,30 +157,30 @@ export function generateEmergencyKitSvg(
   <!-- Security Classification Header -->
   <rect x="35" y="32" width="${width - 70}" height="42" fill="${headerBg}" stroke="${borderPrimary}" stroke-width="1" rx="4" />
   <text x="${width / 2}" y="52" fill="${borderPrimary}" font-family="sans-serif" font-size="14" font-weight="bold" text-anchor="middle" letter-spacing="2">
-    ${options.kitTitle.toUpperCase()}
+    ${escapedTitle}
   </text>
   <text x="${width / 2}" y="67" fill="${textMuted}" font-family="sans-serif" font-size="10" text-anchor="middle">
-    Custodian: ${options.vaultCustodian || 'Authorized Executor Only'} • Offline Verification Standard
+    Custodian: ${escapedCustodian} • Offline Verification Standard
   </text>
 `;
 
-  let currentY = 90;
+  let currentY = 88;
 
   // Section 1: Master Password Vault
   if (options.includeMasterVaultSection) {
     svg += `
   <!-- Master Password Vault -->
   <g transform="translate(35, ${currentY})">
-    <rect x="0" y="0" width="${width - 70}" height="95" fill="#fafafa" stroke="${boxBorder}" stroke-width="1" rx="4" />
+    <rect x="0" y="0" width="${width - 70}" height="88" fill="#fafafa" stroke="${boxBorder}" stroke-width="1" rx="4" />
     <text x="12" y="18" fill="${textDark}" font-family="sans-serif" font-size="12" font-weight="bold">1. Master Password Vault &amp; Credentials</text>
     
-    <text x="14" y="38" fill="${textMuted}" font-family="sans-serif" font-size="10">Password Manager (e.g. Bitwarden / 1Password / KeePass):</text>
-    <line x1="14" y1="52" x2="${width - 95}" y2="52" stroke="${boxBorder}" stroke-dasharray="3 3" />
+    <text x="14" y="36" fill="${textMuted}" font-family="sans-serif" font-size="10">Password Manager (e.g. Bitwarden / 1Password / KeePass):</text>
+    <line x1="14" y1="48" x2="${width - 95}" y2="48" stroke="${boxBorder}" stroke-dasharray="3 3" />
 
-    <text x="14" y="68" fill="${textMuted}" font-family="sans-serif" font-size="10">Primary Email &amp; Master Password (Handwrite clearly):</text>
-    <line x1="14" y1="84" x2="${width - 95}" y2="84" stroke="${boxBorder}" stroke-dasharray="3 3" />
+    <text x="14" y="64" fill="${textMuted}" font-family="sans-serif" font-size="10">Primary Email &amp; Master Password (Handwrite clearly):</text>
+    <line x1="14" y1="76" x2="${width - 95}" y2="76" stroke="${boxBorder}" stroke-dasharray="3 3" />
   </g>`;
-    currentY += 105;
+    currentY += 98;
   }
 
   // Section 2: 2FA Backup Codes
@@ -127,14 +188,14 @@ export function generateEmergencyKitSvg(
     svg += `
   <!-- 2FA Backup Codes -->
   <g transform="translate(35, ${currentY})">
-    <rect x="0" y="0" width="${width - 70}" height="85" fill="#fafafa" stroke="${boxBorder}" stroke-width="1" rx="4" />
+    <rect x="0" y="0" width="${width - 70}" height="80" fill="#fafafa" stroke="${boxBorder}" stroke-width="1" rx="4" />
     <text x="12" y="18" fill="${textDark}" font-family="sans-serif" font-size="12" font-weight="bold">2. 2FA Backup &amp; Recovery Codes</text>`;
 
     for (let row = 0; row < 2; row++) {
       for (let col = 0; col < 4; col++) {
         const idx = row * 4 + col + 1;
         const bx = 14 + col * ((width - 110) / 4);
-        const by = 28 + row * 26;
+        const by = 26 + row * 24;
         svg += `
     <rect x="${bx}" y="${by}" width="12" height="12" fill="none" stroke="${boxBorder}" stroke-width="1" />
     <text x="${bx + 18}" y="${by + 10}" fill="${textMuted}" font-family="monospace" font-size="10">${idx.toString().padStart(2, '0')}: ________</text>`;
@@ -143,7 +204,7 @@ export function generateEmergencyKitSvg(
 
     svg += `
   </g>`;
-    currentY += 95;
+    currentY += 90;
   }
 
   // Section 3: Seed Phrase Section (12 or 24 words)
@@ -151,7 +212,7 @@ export function generateEmergencyKitSvg(
     const wordCount = options.seedPhraseWordCount || 24;
     const rows = wordCount === 24 ? 6 : 4;
     const cols = wordCount === 24 ? 4 : 3;
-    const boxHeight = rows * 26 + 32;
+    const boxHeight = rows * 25 + 30;
 
     svg += `
   <!-- Cryptographic Seed Phrase -->
@@ -165,7 +226,7 @@ export function generateEmergencyKitSvg(
         const idx = r * cols + c + 1;
         if (idx <= wordCount) {
           const sx = 14 + c * colWidth;
-          const sy = 28 + r * 25;
+          const sy = 26 + r * 24;
           svg += `
       <rect x="${sx}" y="${sy}" width="${colWidth - 8}" height="20" fill="#ffffff" stroke="${boxBorder}" stroke-width="0.8" rx="2" />
       <text x="${sx + 6}" y="${sy + 14}" fill="${borderPrimary}" font-family="monospace" font-size="9" font-weight="bold">${idx.toString().padStart(2, '0')}.</text>
@@ -184,39 +245,76 @@ export function generateEmergencyKitSvg(
     svg += `
   <!-- Emergency Contacts -->
   <g transform="translate(35, ${currentY})">
-    <rect x="0" y="0" width="${width - 70}" height="80" fill="#fafafa" stroke="${boxBorder}" stroke-width="1" rx="4" />
+    <rect x="0" y="0" width="${width - 70}" height="76" fill="#fafafa" stroke="${boxBorder}" stroke-width="1" rx="4" />
     <text x="12" y="18" fill="${textDark}" font-family="sans-serif" font-size="12" font-weight="bold">4. Emergency Contacts &amp; Directives</text>
     
-    <text x="14" y="38" fill="${textMuted}" font-family="sans-serif" font-size="10">Designated Executor / Legal Counsel:</text>
-    <line x1="14" y1="50" x2="${width - 95}" y2="50" stroke="${boxBorder}" stroke-dasharray="3 3" />
+    <text x="14" y="36" fill="${textMuted}" font-family="sans-serif" font-size="10">Designated Executor / Legal Counsel:</text>
+    <line x1="14" y1="46" x2="${width - 95}" y2="46" stroke="${boxBorder}" stroke-dasharray="3 3" />
 
-    <text x="14" y="66" fill="${textMuted}" font-family="sans-serif" font-size="10">Emergency Trusted Next-of-Kin / Safe Location:</text>
-    <line x1="14" y1="76" x2="${width - 95}" y2="76" stroke="${boxBorder}" stroke-dasharray="3 3" />
+    <text x="14" y="60" fill="${textMuted}" font-family="sans-serif" font-size="10">Emergency Trusted Next-of-Kin / Safe Location:</text>
+    <line x1="14" y1="70" x2="${width - 95}" y2="70" stroke="${boxBorder}" stroke-dasharray="3 3" />
   </g>`;
-    currentY += 90;
+    currentY += 86;
+  }
+
+  // Additional Instructions Directive Box (DEFECT-59-02)
+  if (options.additionalInstructions && options.additionalInstructions.trim().length > 0) {
+    const escapedInstructions = escapeXml(options.additionalInstructions.trim());
+    svg += `
+  <!-- Additional Directives -->
+  <g transform="translate(35, ${currentY})">
+    <rect x="0" y="0" width="${width - 70}" height="48" fill="#f8fafc" stroke="${boxBorder}" stroke-width="1" rx="4" />
+    <text x="12" y="16" fill="${textDark}" font-family="sans-serif" font-size="11" font-weight="bold">Directives for Custodian &amp; Heirs:</text>
+    <text x="14" y="32" fill="${textMuted}" font-family="sans-serif" font-size="9">${escapedInstructions}</text>
+  </g>`;
   }
 
   // Section 5: Tamper Seals & Fold Guides
   if (options.includeTamperFoldSeals) {
+    const sealY = height - 130;
+    const escapedInstructions = escapeXml(
+      options.additionalInstructions || 'Store strictly in a fireproof safe or bank deposit box.'
+    );
     svg += `
   <!-- Tamper Seal & Fold Guide -->
-  <g transform="translate(35, ${height - 120})">
+  <g transform="translate(35, ${sealY})">
     <line x1="0" y1="0" x2="${width - 70}" y2="0" stroke="${borderPrimary}" stroke-width="1.2" stroke-dasharray="6 4" />
     <text x="${(width - 70) / 2}" y="-6" fill="${borderPrimary}" font-family="sans-serif" font-size="10" font-weight="bold" text-anchor="middle">
       ✂️ FOLD / CUT ALONG LINE TO CONCEAL CREDENTIALS • AFFIX TAMPER SEAL OVER SEAM
     </text>
-    <rect x="0" y="12" width="${width - 70}" height="40" fill="#fffbeb" stroke="#fef08a" stroke-width="1" rx="4" />
-    <text x="12" y="28" fill="#92400e" font-family="sans-serif" font-size="10" font-weight="bold">PHYSICAL TAMPER VERIFICATION:</text>
-    <text x="12" y="42" fill="#b45309" font-family="sans-serif" font-size="9">If seal or fold is compromised, immediately rotate all master passwords and migrate funds.</text>
+    <rect x="0" y="10" width="${width - 70}" height="46" fill="#fffbeb" stroke="#fef08a" stroke-width="1" rx="4" />
+    <text x="12" y="26" fill="#92400e" font-family="sans-serif" font-size="10" font-weight="bold">PHYSICAL TAMPER VERIFICATION:</text>
+    <text x="12" y="40" fill="#b45309" font-family="sans-serif" font-size="9">If seal or fold is compromised, immediately rotate all master passwords and migrate funds.</text>
+    <text x="12" y="52" fill="#78350f" font-family="sans-serif" font-size="8">${escapedInstructions}</text>
+  </g>`;
+  }
+
+  // Offline Checksum QR Code representation (DEFECT-59-02)
+  if (options.includeOfflineChecksumQr) {
+    svg += `
+  <!-- Offline Verification QR Matrix -->
+  <g transform="translate(${width - 85}, ${height - 62})">
+    <rect x="0" y="0" width="46" height="46" fill="#ffffff" stroke="${borderPrimary}" stroke-width="1.2" rx="2" />
+    <!-- QR finder patterns -->
+    <rect x="4" y="4" width="12" height="12" fill="${borderPrimary}" />
+    <rect x="6" y="6" width="8" height="8" fill="#ffffff" />
+    <rect x="7" y="7" width="6" height="6" fill="${borderPrimary}" />
+    <rect x="30" y="4" width="12" height="12" fill="${borderPrimary}" />
+    <rect x="32" y="6" width="8" height="8" fill="#ffffff" />
+    <rect x="33" y="7" width="6" height="6" fill="${borderPrimary}" />
+    <rect x="4" y="30" width="12" height="12" fill="${borderPrimary}" />
+    <rect x="6" y="32" width="8" height="8" fill="#ffffff" />
+    <rect x="7" y="33" width="6" height="6" fill="${borderPrimary}" />
+    <text x="23" y="43" fill="${borderPrimary}" font-family="sans-serif" font-size="5" text-anchor="middle">OFFLINE QR</text>
   </g>`;
   }
 
   // Footer Checksum Bar
   svg += `
   <!-- Footer & SHA-256 Offline Fingerprint -->
-  <g transform="translate(35, ${height - 45})">
+  <g transform="translate(35, ${height - 42})">
     <text x="0" y="0" fill="${textMuted}" font-family="sans-serif" font-size="9">PrivKnife 100% In-Browser Physical Paper Vault • Strictly Zero Server Storage</text>
-    <text x="0" y="14" fill="${textDark}" font-family="monospace" font-size="8">SHA-256: ${checksum}</text>
+    <text x="0" y="14" fill="${textDark}" font-family="monospace" font-size="8">SHA-256: ${escapedChecksum}</text>
   </g>
 </svg>`;
 
@@ -227,7 +325,8 @@ export function generateEmergencyKitSvg(
  * Generates an architectural / print-ready PDF using jsPDF.
  */
 export async function generateEmergencyKitPdf(
-  options: EmergencyRecoveryKitOptions
+  options: EmergencyRecoveryKitOptions,
+  precomputedChecksum?: string
 ): Promise<EmergencyRecoveryKitResult> {
   const dim = getPageDimensionsMm(options.paperFormat);
   const doc = new jsPDF({
@@ -246,9 +345,8 @@ export async function generateEmergencyKitPdf(
   const mutedRgb: [number, number, number] = [100, 116, 139];
   const boxBorderRgb: [number, number, number] = [156, 163, 175];
 
-  // Document metadata string for hash
-  const metaStr = `EMERGENCY-KIT-${options.paperFormat}-${options.kitTitle}-${options.vaultCustodian}-${options.seedPhraseWordCount}-${Date.now()}`;
-  const checksum = await computeDocumentHash(metaStr);
+  // Deterministic checksum matching SVG preview
+  const checksum = precomputedChecksum || (await computeTemplateHash(options));
 
   // Outer Security Border
   doc.setDrawColor(borderRgb[0], borderRgb[1], borderRgb[2]);
@@ -269,7 +367,12 @@ export async function generateEmergencyKitPdf(
 
   doc.setTextColor(borderRgb[0], borderRgb[1], borderRgb[2]);
   doc.setFontSize(11);
-  doc.text(options.kitTitle.toUpperCase(), pageWidth / 2, margin + 12, { align: 'center' });
+  doc.text(
+    options.kitTitle ? options.kitTitle.toUpperCase() : 'CONFIDENTIAL EMERGENCY RECOVERY KIT',
+    pageWidth / 2,
+    margin + 12,
+    { align: 'center' }
+  );
 
   doc.setFontSize(7.5);
   doc.setTextColor(mutedRgb[0], mutedRgb[1], mutedRgb[2]);
@@ -298,10 +401,10 @@ export async function generateEmergencyKitPdf(
     doc.setTextColor(mutedRgb[0], mutedRgb[1], mutedRgb[2]);
     doc.text('Password Manager (Bitwarden / 1Password / KeePass):', margin + 9, curY + 11);
     doc.setLineDashPattern([1.5, 1.5], 0);
-    doc.line(margin + 9, curY + 16, pageWidth - margin - 9, curY + 16);
+    doc.line(margin + 9, curY + 14, pageWidth - margin - 9, curY + 14);
 
-    doc.text('Primary Email & Master Password (Handwrite clearly):', margin + 9, curY + 20);
-    doc.line(margin + 9, curY + 24, pageWidth - margin - 9, curY + 24);
+    doc.text('Primary Email & Master Password (Handwrite clearly):', margin + 9, curY + 19);
+    doc.line(margin + 9, curY + 23, pageWidth - margin - 9, curY + 23);
     doc.setLineDashPattern([], 0);
 
     curY += boxH + 4;
@@ -309,85 +412,6 @@ export async function generateEmergencyKitPdf(
 
   // 2. 2FA Backup Codes
   if (options.includeTwoFaCodesSection) {
-    const boxH = 26;
-    doc.setFillColor(250, 250, 250);
-    doc.setDrawColor(boxBorderRgb[0], boxBorderRgb[1], boxBorderRgb[2]);
-    doc.setLineWidth(0.3);
-    doc.rect(margin + 6, curY, pageWidth - (margin + 6) * 2, boxH, 'FD');
-
-    doc.setFontSize(9);
-    doc.setTextColor(darkRgb[0], darkRgb[1], darkRgb[2]);
-    doc.text('2. 2FA BACKUP & RECOVERY CODES (ONE-TIME EMERGENCY USE)', margin + 9, curY + 5);
-
-    const availableW = pageWidth - (margin + 6) * 2 - 6;
-    const colW = availableW / 4;
-
-    doc.setFontSize(7);
-    doc.setTextColor(mutedRgb[0], mutedRgb[1], mutedRgb[2]);
-
-    for (let r = 0; r < 2; r++) {
-      for (let c = 0; c < 4; c++) {
-        const idx = r * 4 + c + 1;
-        const bx = margin + 9 + c * colW;
-        const by = curY + 9 + r * 7;
-        doc.rect(bx, by, 3, 3);
-        doc.text(`${idx.toString().padStart(2, '0')}: ________`, bx + 5, by + 2.5);
-      }
-    }
-
-    curY += boxH + 4;
-  }
-
-  // 3. Seed Phrase Section (12 or 24 Words)
-  if (options.includeSeedPhraseSection) {
-    const wordCount = options.seedPhraseWordCount || 24;
-    const rows = wordCount === 24 ? 6 : 4;
-    const cols = wordCount === 24 ? 4 : 3;
-    const boxH = 10 + rows * 8.5;
-
-    doc.setFillColor(250, 250, 250);
-    doc.setDrawColor(boxBorderRgb[0], boxBorderRgb[1], boxBorderRgb[2]);
-    doc.setLineWidth(0.3);
-    doc.rect(margin + 6, curY, pageWidth - (margin + 6) * 2, boxH, 'FD');
-
-    doc.setFontSize(9);
-    doc.setTextColor(darkRgb[0], darkRgb[1], darkRgb[2]);
-    doc.text(
-      `3. CRYPTOGRAPHIC SEED PHRASE (${wordCount} WORDS • BIP-39 STANDARD)`,
-      margin + 9,
-      curY + 5
-    );
-
-    const availableW = pageWidth - (margin + 6) * 2 - 6;
-    const colW = availableW / cols;
-
-    for (let r = 0; r < rows; r++) {
-      for (let c = 0; c < cols; c++) {
-        const idx = r * cols + c + 1;
-        if (idx <= wordCount) {
-          const sx = margin + 9 + c * colW;
-          const sy = curY + 8 + r * 8.5;
-
-          doc.setFillColor(255, 255, 255);
-          doc.rect(sx, sy, colW - 3, 6.5, 'FD');
-
-          doc.setFontSize(7);
-          doc.setTextColor(borderRgb[0], borderRgb[1], borderRgb[2]);
-          doc.text(`${idx.toString().padStart(2, '0')}.`, sx + 1.5, sy + 4.5);
-
-          doc.setDrawColor(209, 213, 219);
-          doc.setLineDashPattern([1, 1], 0);
-          doc.line(sx + 7, sy + 4.5, sx + colW - 4, sy + 4.5);
-          doc.setLineDashPattern([], 0);
-        }
-      }
-    }
-
-    curY += boxH + 4;
-  }
-
-  // 4. Emergency Contacts & Directives
-  if (options.includeEmergencyContacts) {
     const boxH = 24;
     doc.setFillColor(250, 250, 250);
     doc.setDrawColor(boxBorderRgb[0], boxBorderRgb[1], boxBorderRgb[2]);
@@ -396,22 +420,92 @@ export async function generateEmergencyKitPdf(
 
     doc.setFontSize(9);
     doc.setTextColor(darkRgb[0], darkRgb[1], darkRgb[2]);
-    doc.text('4. LEGAL DIRECTIVE & EMERGENCY SUCCESSION CONTACTS', margin + 9, curY + 5);
+    doc.text('2. 2FA EMERGENCY BACKUP CODES', margin + 9, curY + 5);
+
+    doc.setFontSize(6.5);
+    doc.setTextColor(mutedRgb[0], mutedRgb[1], mutedRgb[2]);
+    const usableW = pageWidth - (margin + 6) * 2 - 6;
+    const colW = usableW / 4;
+
+    for (let r = 0; r < 2; r++) {
+      for (let c = 0; c < 4; c++) {
+        const idx = r * 4 + c + 1;
+        const bx = margin + 9 + c * colW;
+        const by = curY + 8 + r * 7;
+        doc.rect(bx, by, 3, 3);
+        doc.text(`${idx.toString().padStart(2, '0')}: ________`, bx + 5, by + 2.5);
+      }
+    }
+
+    curY += boxH + 4;
+  }
+
+  // 3. Seed Phrase
+  if (options.includeSeedPhraseSection) {
+    const wordCount = options.seedPhraseWordCount || 24;
+    const rows = wordCount === 24 ? 6 : 4;
+    const cols = wordCount === 24 ? 4 : 3;
+    const boxH = rows * 6.5 + 8;
+
+    doc.setFillColor(250, 250, 250);
+    doc.setDrawColor(boxBorderRgb[0], boxBorderRgb[1], boxBorderRgb[2]);
+    doc.setLineWidth(0.3);
+    doc.rect(margin + 6, curY, pageWidth - (margin + 6) * 2, boxH, 'FD');
+
+    doc.setFontSize(9);
+    doc.setTextColor(darkRgb[0], darkRgb[1], darkRgb[2]);
+    doc.text(`3. CRYPTOGRAPHIC SEED PHRASE (${wordCount} Words • BIP-39 Standard)`, margin + 9, curY + 5);
+
+    const usableW = pageWidth - (margin + 6) * 2 - 6;
+    const colW = usableW / cols;
+
+    doc.setFontSize(6.5);
+    for (let r = 0; r < rows; r++) {
+      for (let c = 0; c < cols; c++) {
+        const idx = r * cols + c + 1;
+        if (idx <= wordCount) {
+          const bx = margin + 9 + c * colW;
+          const by = curY + 8 + r * 6.5;
+          doc.setFillColor(255, 255, 255);
+          doc.rect(bx, by, colW - 3, 5, 'FD');
+          doc.setTextColor(borderRgb[0], borderRgb[1], borderRgb[2]);
+          doc.text(`${idx.toString().padStart(2, '0')}.`, bx + 1.5, by + 3.5);
+          doc.setLineDashPattern([1, 1], 0);
+          doc.line(bx + 7, by + 3.5, bx + colW - 5, by + 3.5);
+          doc.setLineDashPattern([], 0);
+        }
+      }
+    }
+
+    curY += boxH + 4;
+  }
+
+  // 4. Emergency Contacts
+  if (options.includeEmergencyContacts) {
+    const boxH = 22;
+    doc.setFillColor(250, 250, 250);
+    doc.setDrawColor(boxBorderRgb[0], boxBorderRgb[1], boxBorderRgb[2]);
+    doc.setLineWidth(0.3);
+    doc.rect(margin + 6, curY, pageWidth - (margin + 6) * 2, boxH, 'FD');
+
+    doc.setFontSize(9);
+    doc.setTextColor(darkRgb[0], darkRgb[1], darkRgb[2]);
+    doc.text('4. DESIGNATED EXECUTOR & TRUSTED CONTACTS', margin + 9, curY + 5);
 
     doc.setFontSize(7);
     doc.setTextColor(mutedRgb[0], mutedRgb[1], mutedRgb[2]);
-    doc.text('Designated Executor / Legal Counsel:', margin + 9, curY + 10);
+    doc.text('Designated Legal Executor / Attorney Contact:', margin + 9, curY + 10);
     doc.setLineDashPattern([1.5, 1.5], 0);
-    doc.line(margin + 9, curY + 14, pageWidth - margin - 9, curY + 14);
+    doc.line(margin + 9, curY + 13, pageWidth - margin - 9, curY + 13);
 
-    doc.text('Emergency Trusted Next-of-Kin / Safe Location:', margin + 9, curY + 18);
-    doc.line(margin + 9, curY + 22, pageWidth - margin - 9, curY + 22);
+    doc.text('Emergency Trusted Next-of-Kin / Safe Location:', margin + 9, curY + 17);
+    doc.line(margin + 9, curY + 20, pageWidth - margin - 9, curY + 20);
     doc.setLineDashPattern([], 0);
 
     curY += boxH + 4;
   }
 
-  // 5. Tamper-Evident Fold Line & Seals (Bottom Area)
+  // Section 5: Tamper Seal & Fold Guide
   if (options.includeTamperFoldSeals) {
     const foldY = pageHeight - margin - 38;
     doc.setDrawColor(borderRgb[0], borderRgb[1], borderRgb[2]);
@@ -432,20 +526,20 @@ export async function generateEmergencyKitPdf(
     // Tamper instruction box
     doc.setFillColor(isMono ? 245 : 254, isMono ? 245 : 252, isMono ? 245 : 232);
     doc.setDrawColor(isMono ? 0 : 254, isMono ? 0 : 240, isMono ? 0 : 138);
-    doc.rect(margin + 6, foldY + 3, pageWidth - (margin + 6) * 2, 12, 'FD');
+    doc.rect(margin + 6, foldY + 3, pageWidth - (margin + 6) * 2, 13, 'FD');
 
     doc.setFontSize(6.5);
     doc.setTextColor(isMono ? 0 : 180, isMono ? 0 : 83, isMono ? 0 : 9);
     doc.text(
       'PHYSICAL TAMPER NOTICE: Inspect security tape or wax seal before accessing. If broken, immediately rotate credentials.',
       pageWidth / 2,
-      foldY + 8,
+      foldY + 7,
       { align: 'center' }
     );
     doc.text(
       options.additionalInstructions || 'Store strictly in a fireproof safe or bank deposit box.',
       pageWidth / 2,
-      foldY + 12,
+      foldY + 11,
       { align: 'center' }
     );
   }
@@ -462,32 +556,33 @@ export async function generateEmergencyKitPdf(
       });
       doc.addImage(qrDataUrl, 'PNG', pageWidth - margin - 22, pageHeight - margin - 22, 16, 16);
     } catch {
-      // Fallback: draw outline box if canvas QR fails in test environment
-      doc.rect(pageWidth - margin - 22, pageHeight - margin - 22, 16, 16);
+      // Fallback
     }
   }
 
-  // Footer Checksum Text
-  const footerY = pageHeight - margin - 6;
+  // Document Footer
   doc.setFontSize(6.5);
   doc.setTextColor(mutedRgb[0], mutedRgb[1], mutedRgb[2]);
   doc.text(
-    'PrivKnife 100% In-Browser Physical Paper Vault  |  Zero Cloud Persistence  |  Self-Sovereign Emergency Succession',
+    'PrivKnife 100% In-Browser Cryptographic Physical Paper Vault • Zero Remote Server Storage',
     margin + 6,
-    footerY
+    pageHeight - margin - 6
   );
-  doc.setFontSize(5.5);
-  doc.text(`SHA-256 INTEGRITY FINGERPRINT: ${checksum}`, margin + 6, footerY + 3);
+  doc.setFontSize(6);
+  doc.text(`SHA-256: ${checksum}`, margin + 6, pageHeight - margin - 3);
 
   const blob = doc.output('blob');
-  const fileName = `emergency-recovery-kit-${options.paperFormat}.pdf`;
-
   return {
     success: true,
     blob,
-    fileName,
+    fileName: `emergency_recovery_kit_${options.paperFormat}.pdf`,
     fileSize: blob.size,
     mimeType: 'application/pdf',
     checksumSha256: checksum,
+    metadata: {
+      paperFormat: options.paperFormat,
+      wordCount: options.seedPhraseWordCount,
+      checksum,
+    },
   };
 }

@@ -1,0 +1,275 @@
+<div class="l-page c-emergency-kit">
+  <!-- Header -->
+  <div class="l-page__header c-header">
+    <div class="c-header__title-group">
+      <h1 class="c-header__title">Printable Emergency Recovery &amp; Password Kit Sheet</h1>
+      <p class="c-header__subtitle">
+        Generate tamper-evident physical paper vaults for In-Case-of-Emergency (ICE) digital succession:
+        master passwords, 2FA backup codes, 12/24-word cryptocurrency seeds, and legal directives with offline SHA-256 verification.
+      </p>
+    </div>
+    <div class="c-badge c-badge--privacy">
+      🛡️ 100% In-Browser • Never Leaves Your Device
+    </div>
+  </div>
+
+  <!-- Main Layout -->
+  <div class="l-columns l-columns--2">
+    <!-- Controls Column -->
+    <div class="l-columns__area c-card c-emergency-kit__controls-card">
+      <div class="c-card__header l-extremo">
+        <div class="l-extremo__area-izquierda">
+          <h2 class="c-card__title">Security Configuration &amp; Directives</h2>
+        </div>
+      </div>
+
+      <div class="c-card__body c-emergency-kit__body">
+        <!-- Preset Selector -->
+        <div class="g--margin-bottom-4">
+          <label class="c-input__label" id="lbl-presets">Vault Templates</label>
+          <div class="c-emergency-kit__preset-group g--margin-top-1" role="group" aria-labelledby="lbl-presets">
+            <button
+              type="button"
+              class="c-button c-button--small c-emergency-kit__preset-btn"
+              [class.c-button--primary]="activePreset() === 'comprehensive'"
+              [class.c-button--outline]="activePreset() !== 'comprehensive'"
+              (click)="loadPreset('comprehensive')"
+            >
+              Comprehensive Succession Kit
+            </button>
+            <button
+              type="button"
+              class="c-button c-button--small c-emergency-kit__preset-btn"
+              [class.c-button--primary]="activePreset() === 'crypto_vault'"
+              [class.c-button--outline]="activePreset() !== 'crypto_vault'"
+              (click)="loadPreset('crypto_vault')"
+            >
+              Cold Storage Crypto Sheet
+            </button>
+          </div>
+        </div>
+
+        <!-- Title & Custodian -->
+        <div class="g--margin-bottom-4">
+          <label class="c-input__label" for="kit-title-input">Kit Header Title</label>
+          <input
+            id="kit-title-input"
+            type="text"
+            class="c-input c-emergency-kit__input"
+            [ngModel]="options().kitTitle"
+            (ngModelChange)="updateKitTitle($event)"
+          />
+        </div>
+
+        <div class="g--margin-bottom-4">
+          <label class="c-input__label" for="custodian-input">Designated Vault Custodian / Executor</label>
+          <input
+            id="custodian-input"
+            type="text"
+            class="c-input c-emergency-kit__input"
+            [ngModel]="options().vaultCustodian"
+            (ngModelChange)="updateCustodian($event)"
+            placeholder="e.g. Attorney John Doe / Primary Keyholder"
+          />
+        </div>
+
+        <!-- Paper Format & Seed Count -->
+        <div class="l-columns l-columns--2 g--margin-bottom-4 c-emergency-kit__format-row">
+          <div class="l-columns__area">
+            <label class="c-input__label" for="format-select">Paper Size Format</label>
+            <select
+              id="format-select"
+              class="c-input c-input--select c-emergency-kit__select"
+              [ngModel]="options().paperFormat"
+              (ngModelChange)="updateFormat($event)"
+            >
+              <option value="a4">ISO A4 (210 × 297 mm)</option>
+              <option value="us_letter">US Letter (8.5 × 11 in)</option>
+            </select>
+          </div>
+
+          <div class="l-columns__area">
+            <label class="c-input__label" for="word-count-select">Seed Phrase Words</label>
+            <select
+              id="word-count-select"
+              class="c-input c-input--select c-emergency-kit__select"
+              [ngModel]="options().seedPhraseWordCount"
+              (ngModelChange)="updateWordCount($event)"
+            >
+              <option [ngValue]="12">12 Words (Standard BIP-39)</option>
+              <option [ngValue]="24">24 Words (High Security BIP-39)</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Included Sections -->
+        <div class="g--margin-bottom-4">
+          <span class="c-input__label">Included Vault Sections</span>
+          <div class="c-emergency-kit__checkbox-grid g--margin-top-1">
+            <label class="c-emergency-kit__checkbox-label">
+              <input
+                type="checkbox"
+                class="c-emergency-kit__checkbox"
+                [checked]="options().includeMasterVaultSection"
+                (change)="toggleOption('includeMasterVaultSection')"
+              />
+              <span>Master Password</span>
+            </label>
+
+            <label class="c-emergency-kit__checkbox-label">
+              <input
+                type="checkbox"
+                class="c-emergency-kit__checkbox"
+                [checked]="options().includeTwoFaCodesSection"
+                (change)="toggleOption('includeTwoFaCodesSection')"
+              />
+              <span>2FA Backup Codes</span>
+            </label>
+
+            <label class="c-emergency-kit__checkbox-label">
+              <input
+                type="checkbox"
+                class="c-emergency-kit__checkbox"
+                [checked]="options().includeSeedPhraseSection"
+                (change)="toggleOption('includeSeedPhraseSection')"
+              />
+              <span>Crypto Seed Grid</span>
+            </label>
+
+            <label class="c-emergency-kit__checkbox-label">
+              <input
+                type="checkbox"
+                class="c-emergency-kit__checkbox"
+                [checked]="options().includeEmergencyContacts"
+                (change)="toggleOption('includeEmergencyContacts')"
+              />
+              <span>Emergency Contacts</span>
+            </label>
+          </div>
+        </div>
+
+        <!-- Security & Physical Tamper Controls -->
+        <div class="g--margin-bottom-4">
+          <span class="c-input__label">Physical Tamper &amp; Style Options</span>
+          <div class="c-emergency-kit__checkbox-grid g--margin-top-1">
+            <label class="c-emergency-kit__checkbox-label">
+              <input
+                type="checkbox"
+                class="c-emergency-kit__checkbox"
+                [checked]="options().includeTamperFoldSeals"
+                (change)="toggleOption('includeTamperFoldSeals')"
+              />
+              <span>Tamper Fold Lines</span>
+            </label>
+
+            <label class="c-emergency-kit__checkbox-label">
+              <input
+                type="checkbox"
+                class="c-emergency-kit__checkbox"
+                [checked]="options().includeOfflineChecksumQr"
+                (change)="toggleOption('includeOfflineChecksumQr')"
+              />
+              <span>Offline Checksum QR</span>
+            </label>
+
+            <label class="c-emergency-kit__checkbox-label">
+              <input
+                type="checkbox"
+                class="c-emergency-kit__checkbox"
+                [checked]="options().highContrastMonochrome"
+                (change)="toggleOption('highContrastMonochrome')"
+              />
+              <span>Monochrome Laser Print</span>
+            </label>
+          </div>
+        </div>
+
+        <!-- Instructions Textarea -->
+        <div class="g--margin-bottom-4">
+          <label class="c-input__label" for="instructions-textarea">Directives for Custodian / Heirs</label>
+          <textarea
+            id="instructions-textarea"
+            class="c-input c-emergency-kit__directives-input"
+            rows="3"
+            [ngModel]="options().additionalInstructions"
+            (ngModelChange)="updateInstructions($event)"
+            placeholder="e.g. In case of emergency or incapacitation, deliver this sealed envelope to Attorney..."
+          ></textarea>
+        </div>
+
+        <!-- Zero Persistence Warning -->
+        <div class="c-emergency-kit__zero-notice" role="note">
+          <div class="c-emergency-kit__zero-title">
+            🛡️ Zero Cloud Persistence Guarantee:
+          </div>
+          <div class="c-emergency-kit__zero-desc">
+            Credentials are never typed or stored in browser memory. This tool formats a clean, physical template designed to be filled out with archival ink by hand and sealed.
+          </div>
+        </div>
+      </div>
+
+      <div class="c-card__footer l-extremo">
+        <div class="l-extremo__area-izquierda">
+          <button
+            type="button"
+            class="c-button c-button--outline c-emergency-kit__action-btn"
+            (click)="resetToDefaults()"
+          >
+            Reset to Defaults
+          </button>
+        </div>
+        <div class="l-extremo__area-derecha">
+          <button
+            type="button"
+            class="c-button c-button--outline c-emergency-kit__action-btn"
+            (click)="printSheet()"
+          >
+            🖨️ Print Directly
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Preview Column -->
+    <div class="l-columns__area c-card c-emergency-kit__preview-card">
+      <div class="c-card__header l-extremo">
+        <div class="l-extremo__area-izquierda">
+          <h2 class="c-card__title">Print-Ready Sheet Preview</h2>
+        </div>
+        <div class="l-extremo__area-derecha">
+          <div class="c-emergency-kit__meta">
+            {{ options().paperFormat.toUpperCase() }} • SHA-256 Offline
+          </div>
+        </div>
+      </div>
+
+      <div class="c-card__body">
+        <!-- Scaled Sheet Viewport -->
+        <div class="c-preview c-emergency-kit__preview">
+          <div
+            class="c-emergency-kit__preview-stage"
+            [innerHTML]="sanitizedSvg()"
+          ></div>
+        </div>
+
+        <!-- Fingerprint Display -->
+        <div class="c-emergency-kit__fingerprint g--margin-top-3">
+          Fingerprint: {{ ephemeralChecksum() }}
+        </div>
+      </div>
+
+      <!-- Download Action Bar -->
+      <div class="c-card__footer l-extremo">
+        <div class="l-extremo__area-derecha">
+          <button
+            type="button"
+            class="c-button c-button--primary c-emergency-kit__download-btn"
+            (click)="downloadPdf()"
+          >
+            Download Vector PDF Sheet
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
