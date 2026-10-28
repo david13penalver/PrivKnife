@@ -53,3 +53,18 @@ export interface PetTagPreset {
   description: string;
   options: Partial<PetIdTagGeneratorOptions>;
 }
+
+export interface PetTagWorkerRequest {
+  options: PetIdTagGeneratorOptions;
+  format: TagExportFormat;
+}
+
+export interface PetTagWorkerResponse {
+  success: boolean;
+  blob?: Blob;
+  fileName?: string;
+  fileSize?: number;
+  mimeType?: string;
+  metrics?: PetTagMetrics;
+  error?: string;
+}

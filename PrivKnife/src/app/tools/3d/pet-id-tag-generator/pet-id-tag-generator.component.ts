@@ -16,8 +16,11 @@ import {
   CharmShape,
   EmergencyIcon,
   PetIdTagGeneratorOptions,
+  PetIdTagGeneratorResult,
   PetTagMetrics,
   PetTagPreset,
+  PetTagWorkerRequest,
+  PetTagWorkerResponse,
   TagExportFormat,
   TagFormat,
 } from './types';
@@ -154,7 +157,7 @@ import {
                     <input
                       id="tagWidth"
                       type="range"
-                      class="c-input c-input--range"
+                      class="c-input c-input--range c-input__slider"
                       min="20"
                       max="65"
                       step="1"
@@ -167,7 +170,7 @@ import {
                     <input
                       id="tagHeight"
                       type="range"
-                      class="c-input c-input--range"
+                      class="c-input c-input--range c-input__slider"
                       min="15"
                       max="50"
                       step="1"
@@ -183,7 +186,7 @@ import {
                     <input
                       id="tagThickness"
                       type="range"
-                      class="c-input c-input--range"
+                      class="c-input c-input--range c-input__slider"
                       min="1.6"
                       max="4.5"
                       step="0.2"
@@ -196,7 +199,7 @@ import {
                     <input
                       id="holeDiameter"
                       type="range"
-                      class="c-input c-input--range"
+                      class="c-input c-input--range c-input__slider"
                       min="3.0"
                       max="6.5"
                       step="0.5"
@@ -204,6 +207,20 @@ import {
                       (ngModelChange)="holeDiameterMm.set($event); updatePreviewMesh()"
                     />
                   </div>
+                </div>
+
+                <div class="control-group">
+                  <label class="c-input__label">Engraving Side</label>
+                  <label class="checkbox-label">
+                    <input
+                      id="dualSided"
+                      data-testid="dual-sided-checkbox"
+                      type="checkbox"
+                      [checked]="dualSided()"
+                      (change)="dualSided.set(!dualSided()); updatePreviewMesh()"
+                    />
+                    Dual-Sided (Back-Face Contact Text)
+                  </label>
                 </div>
               } @else {
                 <div class="control-group">
@@ -254,7 +271,7 @@ import {
                     <input
                       id="slideTagWidth"
                       type="range"
-                      class="c-input c-input--range"
+                      class="c-input c-input--range c-input__slider"
                       min="35"
                       max="68"
                       step="1"
@@ -267,7 +284,7 @@ import {
                     <input
                       id="slideTagHeight"
                       type="range"
-                      class="c-input c-input--range"
+                      class="c-input c-input--range c-input__slider"
                       min="20"
                       max="48"
                       step="1"
@@ -283,7 +300,7 @@ import {
                     <input
                       id="slideSlotWidth"
                       type="range"
-                      class="c-input c-input--range"
+                      class="c-input c-input--range c-input__slider"
                       min="2.5"
                       max="5.5"
                       step="0.5"
@@ -360,7 +377,7 @@ import {
                 <input
                   id="raisedHeight"
                   type="range"
-                  class="c-input c-input--range"
+                  class="c-input c-input--range c-input__slider"
                   min="0.4"
                   max="1.8"
                   step="0.2"
@@ -526,7 +543,7 @@ import {
               <div class="export-buttons-grid">
                 <button
                   type="button"
-                  class="c-button c-button--primary"
+                  class="c-button c-button--primary download-btn-3mf"
                   [disabled]="isGenerating()"
                   (click)="downloadFormat('3mf_multicolor')"
                 >
@@ -534,7 +551,7 @@ import {
                 </button>
                 <button
                   type="button"
-                  class="c-button c-button--outline"
+                  class="c-button c-button--outline download-btn-stl"
                   [disabled]="isGenerating()"
                   (click)="downloadFormat('stl_unified')"
                 >
@@ -550,191 +567,7 @@ import {
       </div>
     </div>
   `,
-  styles: [
-    `
-      .preset-strip {
-        display: flex;
-        align-items: center;
-        flex-wrap: wrap;
-        gap: 0.5rem;
-      }
-      .preset-label {
-        font-weight: 600;
-        font-size: 0.85rem;
-        color: var(--color-text-muted, #94a3b8);
-      }
-      .preset-buttons {
-        display: flex;
-        flex-wrap: wrap;
-        gap: 0.35rem;
-      }
-      .mode-tabs {
-        display: flex;
-        gap: 0.5rem;
-        border-bottom: 2px solid rgba(148, 163, 184, 0.2);
-        padding-bottom: 0.5rem;
-      }
-      .mode-tab {
-        background: transparent;
-        border: none;
-        padding: 0.5rem 1rem;
-        font-size: 0.95rem;
-        font-weight: 600;
-        cursor: pointer;
-        color: var(--color-text-muted, #94a3b8);
-        border-radius: 6px;
-        transition: all 0.2s ease;
-      }
-      .mode-tab:hover {
-        color: var(--color-text-main, #f8fafc);
-        background: rgba(148, 163, 184, 0.1);
-      }
-      .mode-tab--active {
-        color: #38bdf8 !important;
-        background: rgba(56, 189, 248, 0.15) !important;
-      }
-      .btn-grid-5 {
-        display: grid;
-        grid-template-columns: repeat(5, 1fr);
-        gap: 0.35rem;
-        margin-top: 0.25rem;
-      }
-      .btn-grid-4 {
-        display: grid;
-        grid-template-columns: repeat(4, 1fr);
-        gap: 0.35rem;
-        margin-top: 0.25rem;
-      }
-      .grid-2-col {
-        display: grid;
-        grid-template-columns: 1fr 1fr;
-        gap: 0.75rem;
-        margin-bottom: 0.5rem;
-      }
-      .control-group {
-        display: flex;
-        flex-direction: column;
-        margin-bottom: 0.85rem;
-      }
-      .c-input__label {
-        font-size: 0.85rem;
-        font-weight: 500;
-        margin-bottom: 0.25rem;
-        color: var(--color-text-main, #e2e8f0);
-      }
-      .input-hint {
-        font-size: 0.75rem;
-        color: var(--color-text-muted, #94a3b8);
-        margin-top: 0.2rem;
-      }
-      .checkbox-label {
-        display: flex;
-        align-items: center;
-        gap: 0.5rem;
-        font-size: 0.85rem;
-        cursor: pointer;
-        color: var(--color-text-main, #e2e8f0);
-        margin-top: 0.25rem;
-      }
-      .preview-container {
-        display: flex;
-        flex-direction: column;
-      }
-      .canvas-wrapper {
-        width: 100%;
-        height: 380px;
-        background: #0f172a;
-        border-radius: 6px;
-        position: relative;
-        overflow: hidden;
-      }
-      .three-canvas {
-        width: 100%;
-        height: 100%;
-        display: block;
-      }
-      .preview-controls-row {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        margin-top: 0.5rem;
-      }
-      .drag-hint {
-        font-size: 0.75rem;
-        color: var(--color-text-muted, #94a3b8);
-      }
-      .badge-dim {
-        font-size: 0.8rem;
-        padding: 0.2rem 0.5rem;
-        border-radius: 4px;
-        background: rgba(148, 163, 184, 0.15);
-        color: #cbd5e1;
-      }
-      .metrics-panel {
-        display: grid;
-        grid-template-columns: repeat(3, 1fr);
-        gap: 0.75rem;
-      }
-      .metric-item {
-        background: rgba(255, 255, 255, 0.03);
-        border: 1px solid rgba(148, 163, 184, 0.1);
-        border-radius: 6px;
-        padding: 0.5rem 0.75rem;
-        display: flex;
-        flex-direction: column;
-      }
-      .metric-label {
-        font-size: 0.75rem;
-        color: var(--color-text-muted, #94a3b8);
-      }
-      .metric-value {
-        font-size: 0.95rem;
-        font-weight: 600;
-        color: var(--color-text-main, #f8fafc);
-        margin-top: 0.15rem;
-      }
-      .safety-box {
-        background: rgba(56, 189, 248, 0.07);
-        border: 1px solid rgba(56, 189, 248, 0.25);
-        border-radius: 6px;
-        padding: 0.75rem;
-      }
-      .safety-title {
-        font-size: 0.85rem;
-        font-weight: 600;
-        color: #38bdf8;
-        margin: 0 0 0.4rem 0;
-      }
-      .safety-list {
-        margin: 0;
-        padding-left: 1.2rem;
-        font-size: 0.75rem;
-        color: #d1d5db;
-        line-height: 1.4;
-      }
-      .export-buttons-grid {
-        display: grid;
-        grid-template-columns: 1fr 1fr;
-        gap: 0.75rem;
-      }
-
-      @media (max-width: 768px) {
-        .btn-grid-5,
-        .btn-grid-4 {
-          grid-template-columns: repeat(2, 1fr);
-        }
-        .grid-2-col {
-          grid-template-columns: 1fr;
-        }
-        .export-buttons-grid {
-          grid-template-columns: 1fr;
-        }
-        .metrics-panel {
-          grid-template-columns: repeat(2, 1fr);
-        }
-      }
-    `,
-  ],
+  styleUrl: './pet-id-tag-generator.component.scss',
 })
 export class PetIdTagGeneratorComponent implements OnInit, OnDestroy {
   @ViewChild('previewCanvas', { static: true })
@@ -768,6 +601,7 @@ export class PetIdTagGeneratorComponent implements OnInit, OnDestroy {
   readonly currentMetrics = signal<PetTagMetrics | null>(null);
 
   private readonly activeDownloadUrls: string[] = [];
+  private worker: Worker | null = null;
 
   // Three.js scene instances
   private scene?: THREE.Scene;
@@ -780,6 +614,9 @@ export class PetIdTagGeneratorComponent implements OnInit, OnDestroy {
   // Interaction controls
   private isDragging = false;
   private previousMousePosition = { x: 0, y: 0 };
+  private readonly onWindowMouseUp = () => {
+    this.isDragging = false;
+  };
 
   ngOnInit(): void {
     this.initThree();
@@ -792,6 +629,14 @@ export class PetIdTagGeneratorComponent implements OnInit, OnDestroy {
     }
     if (this.resizeObserver) {
       this.resizeObserver.disconnect();
+    }
+
+    window.removeEventListener('mouseup', this.onWindowMouseUp);
+    window.removeEventListener('touchend', this.onWindowMouseUp);
+
+    if (this.worker) {
+      this.worker.terminate();
+      this.worker = null;
     }
 
     this.disposeThreeObjects();
@@ -880,7 +725,21 @@ export class PetIdTagGeneratorComponent implements OnInit, OnDestroy {
     this.isGenerating.set(true);
     try {
       const options = this.getCurrentOptions();
-      const result = await processPetTag(options, format);
+      let result: PetIdTagGeneratorResult;
+
+      if (typeof Worker !== 'undefined') {
+        try {
+          result = await this.runWorkerProcess(options, format);
+        } catch {
+          result = await processPetTag(options, format);
+        }
+      } else {
+        result = await processPetTag(options, format);
+      }
+
+      if (!result.success || !result.blob) {
+        return;
+      }
 
       const url = URL.createObjectURL(result.blob);
       this.activeDownloadUrls.push(url);
@@ -891,9 +750,59 @@ export class PetIdTagGeneratorComponent implements OnInit, OnDestroy {
       document.body.appendChild(a);
       a.click();
       document.body.removeChild(a);
+
+      setTimeout(() => {
+        URL.revokeObjectURL(url);
+        const idx = this.activeDownloadUrls.indexOf(url);
+        if (idx !== -1) {
+          this.activeDownloadUrls.splice(idx, 1);
+        }
+      }, 100);
     } finally {
       this.isGenerating.set(false);
     }
+  }
+
+  private runWorkerProcess(
+    options: PetIdTagGeneratorOptions,
+    format: TagExportFormat
+  ): Promise<PetIdTagGeneratorResult> {
+    return new Promise((resolve, reject) => {
+      try {
+        const worker = new Worker(new URL('./worker', import.meta.url), { type: 'module' });
+        this.worker = worker;
+        worker.onmessage = (event: MessageEvent<PetTagWorkerResponse>) => {
+          worker.terminate();
+          if (this.worker === worker) {
+            this.worker = null;
+          }
+          if (event.data.success && event.data.blob) {
+            resolve({
+              success: true,
+              blob: event.data.blob,
+              fileName:
+                event.data.fileName ||
+                `pet-tag.${format === '3mf_multicolor' ? '3mf' : 'stl'}`,
+              fileSize: event.data.fileSize || event.data.blob.size,
+              mimeType: event.data.mimeType || 'application/octet-stream',
+              metrics: event.data.metrics!,
+            });
+          } else {
+            reject(new Error(event.data.error || 'Worker generation failed'));
+          }
+        };
+        worker.onerror = (err) => {
+          worker.terminate();
+          if (this.worker === worker) {
+            this.worker = null;
+          }
+          reject(err);
+        };
+        worker.postMessage({ options, format } as PetTagWorkerRequest);
+      } catch (err) {
+        reject(err);
+      }
+    });
   }
 
   updatePreviewMesh(): void {
@@ -1035,9 +944,7 @@ export class PetIdTagGeneratorComponent implements OnInit, OnDestroy {
       this.previousMousePosition = { x: e.clientX, y: e.clientY };
     });
 
-    window.addEventListener('mouseup', () => {
-      this.isDragging = false;
-    });
+    window.addEventListener('mouseup', this.onWindowMouseUp);
 
     canvas.addEventListener('mousemove', (e) => {
       if (!this.isDragging || !this.objectGroup) return;
@@ -1050,6 +957,41 @@ export class PetIdTagGeneratorComponent implements OnInit, OnDestroy {
 
       this.previousMousePosition = { x: e.clientX, y: e.clientY };
     });
+
+    canvas.addEventListener(
+      'touchstart',
+      (e) => {
+        if (e.touches && e.touches.length > 0) {
+          this.isDragging = true;
+          this.previousMousePosition = {
+            x: e.touches[0].clientX,
+            y: e.touches[0].clientY,
+          };
+        }
+      },
+      { passive: true }
+    );
+
+    window.addEventListener('touchend', this.onWindowMouseUp);
+
+    canvas.addEventListener(
+      'touchmove',
+      (e) => {
+        if (!this.isDragging || !this.objectGroup || !e.touches || e.touches.length === 0) return;
+
+        const deltaX = e.touches[0].clientX - this.previousMousePosition.x;
+        const deltaY = e.touches[0].clientY - this.previousMousePosition.y;
+
+        this.objectGroup.rotation.z += deltaX * 0.01;
+        this.objectGroup.rotation.x += deltaY * 0.01;
+
+        this.previousMousePosition = {
+          x: e.touches[0].clientX,
+          y: e.touches[0].clientY,
+        };
+      },
+      { passive: true }
+    );
 
     canvas.addEventListener('wheel', (e) => {
       e.preventDefault();

@@ -345,11 +345,18 @@ function buildTagShape(options: PetIdTagGeneratorOptions): THREE.Shape {
     // Rounded rectangle with collar strap slots
     const r = Math.min(4.0, h * 0.2);
     shape.moveTo(-halfW + r, -halfH);
-    shape.lineTo(halfW - r, -halfH);
+    const segs = 24;
+    for (let i = 1; i <= segs; i++) {
+      const x = -halfW + r + (2 * (halfW - r)) * (i / segs);
+      shape.lineTo(x, -halfH);
+    }
     shape.absarc(halfW - r, -halfH + r, r, -Math.PI / 2, 0, false);
     shape.lineTo(halfW, halfH - r);
     shape.absarc(halfW - r, halfH - r, r, 0, Math.PI / 2, false);
-    shape.lineTo(-halfW + r, halfH);
+    for (let i = 1; i <= segs; i++) {
+      const x = halfW - r - (2 * (halfW - r)) * (i / segs);
+      shape.lineTo(x, halfH);
+    }
     shape.absarc(-halfW + r, halfH - r, r, Math.PI / 2, Math.PI, false);
     shape.lineTo(-halfW, -halfH + r);
     shape.absarc(-halfW + r, -halfH + r, r, Math.PI, (3 * Math.PI) / 2, false);
@@ -384,16 +391,34 @@ function buildTagShape(options: PetIdTagGeneratorOptions): THREE.Shape {
   }
 
   // --- Hanging Charm Formats ---
+  const holeR = options.holeDiameterMm / 2;
+  const holeY = halfH - holeR - 2.5;
+
   switch (options.charmShape) {
     case 'bone': {
-      // Iconic 4-lobe dog bone contour
+      // Iconic 4-lobe dog bone contour with integrated top eyelet lug
       const lobeR = h * 0.35;
       const neckW = w * 0.45;
-      const neckH = h * 0.4;
+      const neckH = h * 0.58;
       const lx = halfW - lobeR;
       const ly = halfH - lobeR;
+      const lugR = holeR + 2.2;
+
+      const dy = neckH / 2 - holeY;
+      let dx = lugR;
+      let theta1 = Math.PI;
+      let theta2 = 0;
+      if (Math.abs(dy) < lugR) {
+        dx = Math.sqrt(lugR * lugR - dy * dy);
+        theta1 = Math.atan2(dy, -dx);
+        theta2 = Math.atan2(dy, dx);
+      }
 
       shape.moveTo(-neckW / 2, neckH / 2);
+      shape.lineTo(-dx, neckH / 2);
+      shape.absarc(0, holeY, lugR, theta1, theta2, true);
+      shape.lineTo(neckW / 2, neckH / 2);
+
       shape.lineTo(lx - lobeR, neckH / 2);
       // Top-right lobe
       shape.absarc(lx, ly, lobeR, Math.PI * 0.75, -Math.PI * 0.1, true);
@@ -415,11 +440,14 @@ function buildTagShape(options: PetIdTagGeneratorOptions): THREE.Shape {
     }
     case 'heart': {
       const s = Math.min(halfW, halfH) * 0.9;
-      shape.moveTo(0, s * 0.35);
-      shape.bezierCurveTo(0, s * 0.9, -s, s * 0.9, -s, s * 0.25);
-      shape.bezierCurveTo(-s, -s * 0.35, 0, -s * 0.7, 0, -s);
-      shape.bezierCurveTo(0, -s * 0.7, s, -s * 0.35, s, s * 0.25);
-      shape.bezierCurveTo(s, s * 0.9, 0, s * 0.9, 0, s * 0.35);
+      const lugR = holeR + 2.2;
+
+      shape.moveTo(0, -s);
+      shape.bezierCurveTo(-s, -s * 0.7, -s, -s * 0.35, -s, s * 0.25);
+      shape.bezierCurveTo(-s, s * 0.9, -lugR, s * 0.9, -lugR, holeY);
+      shape.absarc(0, holeY, lugR, Math.PI, 0, true);
+      shape.bezierCurveTo(lugR, s * 0.9, s, s * 0.9, s, s * 0.25);
+      shape.bezierCurveTo(s, -s * 0.35, 0, -s * 0.7, 0, -s);
       shape.closePath();
       break;
     }
@@ -451,8 +479,6 @@ function buildTagShape(options: PetIdTagGeneratorOptions): THREE.Shape {
   }
 
   // Add split-ring hanging hole near top edge
-  const holeR = options.holeDiameterMm / 2;
-  const holeY = halfH - holeR - 2.5;
   const holePath = new THREE.Path();
   holePath.absarc(0, holeY, holeR, 0, Math.PI * 2, true);
   shape.holes.push(holePath);
@@ -496,40 +522,186 @@ export function generatePetTagMesh(options: PetIdTagGeneratorOptions): PetTagMes
     }
   }
 
-  // Text Lettering Placement
+  // Text Lettering & Emergency Icon Placement
   const h = options.tagHeightMm;
-  const textGeometries: THREE.BufferGeometry[] = [];
+  const isCharm = options.tagFormat === 'hanging_charm';
+  const holeR = options.holeDiameterMm / 2;
+  const holeY = (h / 2) - holeR - 2.5;
+  const holeBottomY = isCharm ? (holeY - holeR) : (h / 2);
 
-  // Line 1: Pet Name
-  const nameHeight = Math.max(4.0, Math.min(8.0, h * 0.28));
-  const nameStroke = Math.max(0.6, nameHeight * 0.16);
-  const nameY = options.emergencyIcon !== 'none' ? h * 0.08 : h * 0.12;
-  const nameGeom = renderTextGeometry(options.petName, nameHeight, raise, nameStroke, nameY);
-  if (nameGeom) textGeometries.push(nameGeom);
+  const isDualSided = !!options.dualSided;
+  const isBone = isCharm && options.charmShape === 'bone';
+  const neckHalfH = isBone ? (h * 0.58) / 2 : (h / 2);
 
-  // Line 2: Primary Phone
-  if (options.primaryPhone) {
-    const phoneHeight = Math.max(3.0, Math.min(5.5, h * 0.18));
-    const phoneStroke = Math.max(0.5, phoneHeight * 0.15);
-    const phoneY = options.secondaryPhone ? -h * 0.14 : -h * 0.22;
-    const phoneGeom = renderTextGeometry(options.primaryPhone, phoneHeight, raise, phoneStroke, phoneY);
-    if (phoneGeom) textGeometries.push(phoneGeom);
+  // Emergency Icon Geometry
+  const iconSize = isBone ? Math.max(3.0, Math.min(4.2, h * 0.17)) : Math.max(3.5, Math.min(6.5, h * 0.22));
+  let iconY = 0;
+  if (options.emergencyIcon !== 'none') {
+    if (isBone) {
+      iconY = holeBottomY - (iconSize / 2) - 0.5;
+    } else if (isCharm) {
+      iconY = holeBottomY - (iconSize / 2) - 1.2;
+    } else {
+      iconY = h * 0.28;
+    }
+  }
+  const iconGeom = buildEmergencyIconGeometry(options.emergencyIcon, iconSize, raise, { x: 0, y: iconY });
+  let iconGeometry = iconGeom ? iconGeom : new THREE.BufferGeometry();
+
+  const frontGeometries: THREE.BufferGeometry[] = [];
+  const backGeometries: THREE.BufferGeometry[] = [];
+
+  if (isDualSided) {
+    // Front face: Pet Name + Emergency Icon
+    const nameHeight = isBone ? Math.min(4.8, h * 0.20) : Math.max(4.0, Math.min(8.0, h * 0.28));
+    const nameStroke = Math.max(0.5, nameHeight * 0.16);
+    const nameY = options.emergencyIcon !== 'none'
+      ? (isBone ? -1.0 : iconY - (iconSize / 2) - (nameHeight / 2) - 1.0)
+      : 0;
+    const nameGeom = renderTextGeometry(options.petName, nameHeight, raise, nameStroke, nameY);
+    if (nameGeom) frontGeometries.push(nameGeom);
+
+    // Back face: Primary Phone + Secondary Phone
+    const hasSec = !!options.secondaryPhone;
+    if (options.primaryPhone) {
+      const phoneHeight = Math.max(3.0, Math.min(5.0, h * 0.18));
+      const phoneStroke = Math.max(0.45, phoneHeight * 0.15);
+      const phoneY = hasSec ? (isBone ? 2.0 : 3.0) : 0;
+      const phoneGeom = renderTextGeometry(options.primaryPhone, phoneHeight, raise, phoneStroke, phoneY);
+      if (phoneGeom) backGeometries.push(phoneGeom);
+    }
+    if (options.secondaryPhone) {
+      const secHeight = Math.max(2.4, Math.min(4.2, h * 0.15));
+      const secStroke = Math.max(0.4, secHeight * 0.15);
+      const secY = isBone ? -2.0 : -3.0;
+      const secGeom = renderTextGeometry(options.secondaryPhone, secHeight, raise, secStroke, secY);
+      if (secGeom) backGeometries.push(secGeom);
+    }
+  } else {
+    // Single-sided: all text on front face
+    if (isBone) {
+      // Clamped layout to strictly fit within bone waist [-neckHalfH + 0.8, neckHalfH - 0.8]
+      const hasIcon = options.emergencyIcon !== 'none';
+      const hasPhone = !!options.primaryPhone;
+      const hasSec = !!options.secondaryPhone;
+
+      if (hasIcon) {
+        if (hasSec) {
+          const nameH = 3.2;
+          const nameY = 0.5;
+          const nameGeom = renderTextGeometry(options.petName, nameH, raise, nameH * 0.16, nameY);
+          if (nameGeom) frontGeometries.push(nameGeom);
+
+          if (hasPhone) {
+            const phoneH = 2.4;
+            const phoneY = -2.0;
+            const phoneGeom = renderTextGeometry(options.primaryPhone, phoneH, raise, phoneH * 0.15, phoneY);
+            if (phoneGeom) frontGeometries.push(phoneGeom);
+          }
+
+          const secH = 2.0;
+          const secY = -4.3;
+          const secGeom = renderTextGeometry(options.secondaryPhone, secH, raise, secH * 0.15, secY);
+          if (secGeom) frontGeometries.push(secGeom);
+        } else if (hasPhone) {
+          const nameH = 4.0;
+          const nameY = 0.4;
+          const nameGeom = renderTextGeometry(options.petName, nameH, raise, nameH * 0.16, nameY);
+          if (nameGeom) frontGeometries.push(nameGeom);
+
+          const phoneH = 2.8;
+          const phoneY = -2.5;
+          const phoneGeom = renderTextGeometry(options.primaryPhone, phoneH, raise, phoneH * 0.15, phoneY);
+          if (phoneGeom) frontGeometries.push(phoneGeom);
+        } else {
+          const nameH = 4.8;
+          const nameY = -0.6;
+          const nameGeom = renderTextGeometry(options.petName, nameH, raise, nameH * 0.16, nameY);
+          if (nameGeom) frontGeometries.push(nameGeom);
+        }
+      } else {
+        if (hasSec) {
+          const nameH = 3.6;
+          const nameY = 2.8;
+          const nameGeom = renderTextGeometry(options.petName, nameH, raise, nameH * 0.16, nameY);
+          if (nameGeom) frontGeometries.push(nameGeom);
+
+          if (hasPhone) {
+            const phoneH = 2.6;
+            const phoneY = 0.2;
+            const phoneGeom = renderTextGeometry(options.primaryPhone, phoneH, raise, phoneH * 0.15, phoneY);
+            if (phoneGeom) frontGeometries.push(phoneGeom);
+          }
+
+          const secH = 2.2;
+          const secY = -2.6;
+          const secGeom = renderTextGeometry(options.secondaryPhone, secH, raise, secH * 0.15, secY);
+          if (secGeom) frontGeometries.push(secGeom);
+        } else if (hasPhone) {
+          const nameH = 4.5;
+          const nameY = 1.8;
+          const nameGeom = renderTextGeometry(options.petName, nameH, raise, nameH * 0.16, nameY);
+          if (nameGeom) frontGeometries.push(nameGeom);
+
+          const phoneH = 3.2;
+          const phoneY = -1.8;
+          const phoneGeom = renderTextGeometry(options.primaryPhone, phoneH, raise, phoneH * 0.15, phoneY);
+          if (phoneGeom) frontGeometries.push(phoneGeom);
+        } else {
+          const nameH = 5.5;
+          const nameY = 0;
+          const nameGeom = renderTextGeometry(options.petName, nameH, raise, nameH * 0.16, nameY);
+          if (nameGeom) frontGeometries.push(nameGeom);
+        }
+      }
+    } else {
+      // Standard charm / slide-on layout
+      const nameHeight = Math.max(4.0, Math.min(8.0, h * 0.28));
+      const nameStroke = Math.max(0.6, nameHeight * 0.16);
+      const nameY = options.emergencyIcon !== 'none' ? h * 0.08 : h * 0.12;
+      const nameGeom = renderTextGeometry(options.petName, nameHeight, raise, nameStroke, nameY);
+      if (nameGeom) frontGeometries.push(nameGeom);
+
+      if (options.primaryPhone) {
+        const phoneHeight = Math.max(3.0, Math.min(5.5, h * 0.18));
+        const phoneStroke = Math.max(0.5, phoneHeight * 0.15);
+        const phoneY = options.secondaryPhone ? -h * 0.14 : -h * 0.22;
+        const phoneGeom = renderTextGeometry(options.primaryPhone, phoneHeight, raise, phoneStroke, phoneY);
+        if (phoneGeom) frontGeometries.push(phoneGeom);
+      }
+
+      if (options.secondaryPhone) {
+        const secHeight = Math.max(2.4, Math.min(4.5, h * 0.14));
+        const secStroke = Math.max(0.45, secHeight * 0.15);
+        const secY = -h * 0.32;
+        const secGeom = renderTextGeometry(options.secondaryPhone, secHeight, raise, secStroke, secY);
+        if (secGeom) frontGeometries.push(secGeom);
+      }
+    }
   }
 
-  // Line 3: Secondary Phone or Microchip
-  if (options.secondaryPhone) {
-    const secHeight = Math.max(2.4, Math.min(4.5, h * 0.14));
-    const secStroke = Math.max(0.45, secHeight * 0.15);
-    const secY = -h * 0.32;
-    const secGeom = renderTextGeometry(options.secondaryPhone, secHeight, raise, secStroke, secY);
-    if (secGeom) textGeometries.push(secGeom);
+  // Front text: placed on top face (z = thickness)
+  let frontText = safeMergeGeometries(frontGeometries);
+  frontGeometries.forEach((g) => g.dispose());
+  if (frontText.getAttribute('position')) {
+    frontText.translate(0, 0, thickness);
   }
 
-  let textGeometry = safeMergeGeometries(textGeometries);
-  textGeometries.forEach((g) => g.dispose());
+  // Back text: mirrored in X, placed on back face (z <= 0)
+  let backText = safeMergeGeometries(backGeometries);
+  backGeometries.forEach((g) => g.dispose());
+  if (backText.getAttribute('position')) {
+    backText.scale(-1, 1, 1);
+    backText.translate(0, 0, -raise);
+  }
 
-  // Translate text to sit on top of base plate
-  textGeometry.translate(0, 0, thickness);
+  const allMergedText: THREE.BufferGeometry[] = [];
+  if (frontText.getAttribute('position')) allMergedText.push(frontText);
+  if (backText.getAttribute('position')) allMergedText.push(backText);
+
+  let textGeometry = safeMergeGeometries(allMergedText);
+  frontText.dispose();
+  backText.dispose();
 
   // Apply curve to text if curvedBand is enabled
   if (options.tagFormat === 'collar_slide_on' && options.curvedBand) {
@@ -545,12 +717,6 @@ export function generatePetTagMesh(options: PetIdTagGeneratorOptions): PetTagMes
       textGeometry.computeVertexNormals();
     }
   }
-
-  // Emergency Icon Geometry
-  const iconSize = Math.max(4.0, Math.min(9.0, h * 0.3));
-  const iconY = h * 0.32;
-  const iconGeom = buildEmergencyIconGeometry(options.emergencyIcon, iconSize, raise, { x: 0, y: iconY });
-  let iconGeometry = iconGeom ? iconGeom : new THREE.BufferGeometry();
 
   if (iconGeom) {
     iconGeometry.translate(0, 0, thickness);

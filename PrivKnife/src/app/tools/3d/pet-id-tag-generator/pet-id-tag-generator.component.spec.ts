@@ -126,6 +126,54 @@ describe('PetIdTagGeneratorComponent (Seam 2 & 4)', () => {
       expect(revokeSpy).toHaveBeenCalledWith('blob:dummy-pettag-url');
       revokeSpy.mockRestore();
     });
+
+    it('should remove mouseup listener on window when component is destroyed (DEFECT-41-05)', () => {
+      const removeSpy = vi.spyOn(window, 'removeEventListener');
+      fixture.destroy();
+      expect(removeSpy).toHaveBeenCalledWith('mouseup', expect.any(Function));
+      removeSpy.mockRestore();
+    });
+  });
+
+  describe('Touch Orbit Controls & Dual-Sided UI (DEFECT-41-03 & DEFECT-41-05)', () => {
+    it('should support touch rotation events on canvas', () => {
+      const canvas = fixture.nativeElement.querySelector('canvas') as HTMLCanvasElement;
+      expect(canvas).toBeTruthy();
+
+      const touchStart = new TouchEvent('touchstart', {
+        touches: [{ clientX: 100, clientY: 100 } as Touch],
+      });
+      canvas.dispatchEvent(touchStart);
+
+      const touchMove = new TouchEvent('touchmove', {
+        touches: [{ clientX: 120, clientY: 110 } as Touch],
+      });
+      canvas.dispatchEvent(touchMove);
+
+      const touchEnd = new TouchEvent('touchend', {
+        touches: [],
+      });
+      canvas.dispatchEvent(touchEnd);
+    });
+
+    it('should toggle dualSided signal and update preview', () => {
+      expect(component.dualSided()).toBe(false);
+      component.dualSided.set(true);
+      expect(component.dualSided()).toBe(true);
+    });
+
+    it('should render dual-sided checkbox in DOM', () => {
+      const dualSidedCheckbox = fixture.nativeElement.querySelector('input[data-testid="dual-sided-checkbox"]') ||
+        fixture.nativeElement.querySelector('#dualSided');
+      expect(dualSidedCheckbox).toBeTruthy();
+    });
+
+    it('should render export buttons with dedicated action classes', () => {
+      const btn3mf = fixture.nativeElement.querySelector('.download-btn-3mf');
+      const btnStl = fixture.nativeElement.querySelector('.download-btn-stl');
+      expect(btn3mf).toBeTruthy();
+      expect(btnStl).toBeTruthy();
+    });
   });
 
   describe('Privacy & Zero Exfiltration (Directive 1 & 2)', () => {

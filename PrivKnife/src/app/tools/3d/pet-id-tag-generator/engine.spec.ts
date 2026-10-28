@@ -156,6 +156,94 @@ describe('Pet ID Tag & Collar Slide-On Generator Engine (Seam 1)', () => {
       result.textGeometry.dispose();
       result.iconGeometry.dispose();
     });
+
+    it('should enclose split-ring hole with solid material on bone and heart charms (DEFECT-41-01)', () => {
+      const boneResult = generatePetTagMesh({
+        ...DEFAULT_PET_TAG_OPTIONS,
+        tagFormat: 'hanging_charm',
+        charmShape: 'bone',
+        tagWidthMm: 42,
+        tagHeightMm: 24,
+        holeDiameterMm: 4.5,
+      });
+
+      boneResult.baseGeometry.computeBoundingBox();
+      const boneBox = boneResult.baseGeometry.boundingBox!;
+      const holeR = 4.5 / 2;
+      const holeY = 12 - holeR - 2.5; // 7.25
+
+      // Base plate at x=0 must extend at least 1.8mm above holeY + holeR
+      expect(boneBox.max.y).toBeGreaterThanOrEqual(holeY + holeR + 1.8);
+
+      // Icon must not overlap split ring hole
+      boneResult.iconGeometry.computeBoundingBox();
+      const iconBox = boneResult.iconGeometry.boundingBox!;
+      expect(iconBox.max.y).toBeLessThanOrEqual(holeY - holeR);
+
+      // Text must remain within vertical waist bounds of the bone
+      boneResult.textGeometry.computeBoundingBox();
+      const textBox = boneResult.textGeometry.boundingBox!;
+      const neckHalfH = (24 * 0.58) / 2;
+      expect(textBox.min.y).toBeGreaterThanOrEqual(-neckHalfH - 0.5);
+      expect(textBox.max.y).toBeLessThanOrEqual(neckHalfH + 0.5);
+
+      boneResult.baseGeometry.dispose();
+      boneResult.textGeometry.dispose();
+      boneResult.iconGeometry.dispose();
+
+      const heartResult = generatePetTagMesh({
+        ...DEFAULT_PET_TAG_OPTIONS,
+        tagFormat: 'hanging_charm',
+        charmShape: 'heart',
+        tagWidthMm: 28,
+        tagHeightMm: 28,
+        holeDiameterMm: 4.5,
+      });
+
+      heartResult.baseGeometry.computeBoundingBox();
+      const heartBox = heartResult.baseGeometry.boundingBox!;
+      const heartHoleY = 14 - holeR - 2.5;
+      expect(heartBox.max.y).toBeGreaterThanOrEqual(heartHoleY + holeR + 1.8);
+
+      heartResult.iconGeometry.computeBoundingBox();
+      const heartIconBox = heartResult.iconGeometry.boundingBox!;
+      expect(heartIconBox.max.y).toBeLessThanOrEqual(heartHoleY - holeR);
+
+      heartResult.baseGeometry.dispose();
+      heartResult.textGeometry.dispose();
+      heartResult.iconGeometry.dispose();
+    });
+
+    it('should generate subdivided smooth curved band and back-face text when dualSided (DEFECT-41-03)', () => {
+      const resultCurved = generatePetTagMesh({
+        ...SLIDE_ON_PET_TAG_OPTIONS,
+        curvedBand: true,
+      });
+
+      // Subdivided edge should have multiple vertices along X between -halfW and +halfW
+      const pos = resultCurved.baseGeometry.getAttribute('position');
+      expect(pos.count).toBeGreaterThan(300);
+
+      const resultDual = generatePetTagMesh({
+        ...DEFAULT_PET_TAG_OPTIONS,
+        dualSided: true,
+        primaryPhone: '555-1234',
+        secondaryPhone: 'MICROCHIPPED',
+      });
+
+      resultDual.textGeometry.computeBoundingBox();
+      const textBox = resultDual.textGeometry.boundingBox!;
+      // When dual-sided, secondary text is engraved/placed on the back face (z <= 0)
+      expect(textBox.min.z).toBeLessThanOrEqual(0.01);
+
+      resultCurved.baseGeometry.dispose();
+      resultCurved.textGeometry.dispose();
+      resultCurved.iconGeometry.dispose();
+
+      resultDual.baseGeometry.dispose();
+      resultDual.textGeometry.dispose();
+      resultDual.iconGeometry.dispose();
+    });
   });
 
   describe('File Serialization & Export (STL & 3MF)', () => {
