@@ -1,4 +1,5 @@
 import { describe, it, expect } from 'vitest';
+import * as THREE from 'three';
 import {
   validateClampOptions,
   generateClampGeometries,
@@ -6,6 +7,7 @@ import {
   exportClampSTL,
   exportClamp3MF,
   processClamp,
+  createHollowTubeGeometry,
 } from './engine';
 import {
   DEFAULT_CLAMP_OPTIONS,
@@ -133,6 +135,120 @@ describe('UnderDeskClampEngine (Seam 1: Pure Processing Engine)', () => {
       exploded.boltGeometry.dispose();
       exploded.footPadGeometry.dispose();
       exploded.combinedGeometry.dispose();
+    });
+
+    describe('Mechanical Correctness & Algorithmic Remediation (DEFECT-35-01)', () => {
+      it('should create hollow tube geometry with inner and outer radii vertices', () => {
+        const tube = createHollowTubeGeometry(45, 40, 20, 24);
+        expect(tube).toBeDefined();
+        const pos = tube.getAttribute('position');
+        expect(pos.count).toBeGreaterThan(0);
+
+        let hasOuterVertex = false;
+        let hasInnerVertex = false;
+        for (let i = 0; i < pos.count; i++) {
+          const x = pos.getX(i);
+          const z = pos.getZ(i);
+          const r = Math.sqrt(x * x + z * z);
+          if (Math.abs(r - 45) < 0.5) hasOuterVertex = true;
+          if (Math.abs(r - 40) < 0.5) hasInnerVertex = true;
+        }
+
+        expect(hasOuterVertex).toBe(true);
+        expect(hasInnerVertex).toBe(true);
+        tube.dispose();
+      });
+
+      it('should generate a hollow ring for cup_holder with vertices at ringInnerR = 40mm', () => {
+        const { clampGeometry } = generateClampGeometries(CUP_HOLDER_OPTIONS);
+        const pos = clampGeometry.getAttribute('position');
+        let hasInnerRingVertex = false;
+
+        // Cup center X is throatDepthMm + armLength + ringOuterR = 55 + 35 + 45 = 135, Z = 0
+        const cupCenterX = 135;
+        for (let i = 0; i < pos.count; i++) {
+          const dx = pos.getX(i) - cupCenterX;
+          const dz = pos.getZ(i);
+          const dist = Math.sqrt(dx * dx + dz * dz);
+          if (Math.abs(dist - 40) < 0.8) {
+            hasInnerRingVertex = true;
+            break;
+          }
+        }
+
+        expect(hasInnerRingVertex).toBe(true);
+        clampGeometry.dispose();
+      });
+
+      it('should alter cable_raceway clamp frame geometry when racewaySlotDiameterMm changes', () => {
+        const geom8 = generateClampGeometries({
+          ...CABLE_RACEWAY_OPTIONS,
+          racewaySlotDiameterMm: 8,
+        }).clampGeometry;
+
+        const geom16 = generateClampGeometries({
+          ...CABLE_RACEWAY_OPTIONS,
+          racewaySlotDiameterMm: 16,
+        }).clampGeometry;
+
+        const pos8 = geom8.getAttribute('position');
+        const pos16 = geom16.getAttribute('position');
+
+        // Either vertex count changes or vertex positions differ
+        let isDifferent = pos8.count !== pos16.count;
+        if (!isDifferent) {
+          for (let i = 0; i < pos8.count * 3; i++) {
+            if (pos8.array[i] !== pos16.array[i]) {
+              isDifferent = true;
+              break;
+            }
+          }
+        }
+
+        expect(isDifferent).toBe(true);
+        geom8.dispose();
+        geom16.dispose();
+      });
+
+      it('should generate lower jaw boss and swivel foot pad socket with hollow bores', () => {
+        const { clampGeometry, footPadGeometry } = generateClampGeometries(DEFAULT_CLAMP_OPTIONS);
+
+        // Lower jaw boss is at screwCenterX = throatDepthMm * 0.65 = 55 * 0.65 = 35.75, Z = 0
+        const screwCenterX = DEFAULT_CLAMP_OPTIONS.throatDepthMm * 0.65;
+        const bossInnerR = DEFAULT_CLAMP_OPTIONS.screwDiameterMm / 2 + 0.25;
+
+        const clampPos = clampGeometry.getAttribute('position');
+        let hasBossInnerVertex = false;
+        for (let i = 0; i < clampPos.count; i++) {
+          const dx = clampPos.getX(i) - screwCenterX;
+          const dz = clampPos.getZ(i);
+          const dist = Math.sqrt(dx * dx + dz * dz);
+          if (Math.abs(dist - bossInnerR) < 0.6) {
+            hasBossInnerVertex = true;
+            break;
+          }
+        }
+        expect(hasBossInnerVertex).toBe(true);
+
+        // Swivel foot pad socket bore at center (dx, dz = 0 relative to pad center)
+        const socketInnerR = DEFAULT_CLAMP_OPTIONS.screwDiameterMm * 0.36 + 0.25;
+        const padPos = footPadGeometry.getAttribute('position');
+        let hasSocketInnerVertex = false;
+        for (let i = 0; i < padPos.count; i++) {
+          // Foot pad socket is centered in X and Z before translation, or translated to screwCenterX
+          const dx = padPos.getX(i) - screwCenterX;
+          const dz = padPos.getZ(i);
+          const dist = Math.sqrt(dx * dx + dz * dz);
+          if (Math.abs(dist - socketInnerR) < 0.6) {
+            hasSocketInnerVertex = true;
+            break;
+          }
+        }
+        expect(hasSocketInnerVertex).toBe(true);
+
+        clampGeometry.dispose();
+        footPadGeometry.dispose();
+      });
     });
   });
 

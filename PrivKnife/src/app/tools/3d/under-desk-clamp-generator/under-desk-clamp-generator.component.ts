@@ -3,6 +3,7 @@ import {
   ElementRef,
   OnDestroy,
   OnInit,
+  AfterViewInit,
   ViewChild,
   signal,
 } from '@angular/core';
@@ -17,6 +18,8 @@ import {
   PresetClamp,
   UnderDeskClampGeneratorOptions,
   UnderDeskClampMetrics,
+  UnderDeskClampWorkerRequest,
+  UnderDeskClampWorkerResponse,
 } from './types';
 import {
   CLAMP_PRESETS,
@@ -91,7 +94,7 @@ import {
                 </label>
                 <input
                   type="range"
-                  class="c-input c-input--slider"
+                  class="c-input c-input__slider"
                   min="12"
                   max="65"
                   step="1"
@@ -108,7 +111,7 @@ import {
                 </label>
                 <input
                   type="range"
-                  class="c-input c-input--slider"
+                  class="c-input c-input__slider"
                   [min]="deskThicknessMm() + 5"
                   max="90"
                   step="1"
@@ -125,7 +128,7 @@ import {
                   </label>
                   <input
                     type="range"
-                    class="c-input c-input--slider"
+                    class="c-input c-input__slider"
                     min="35"
                     max="110"
                     step="5"
@@ -140,7 +143,7 @@ import {
                   </label>
                   <input
                     type="range"
-                    class="c-input c-input--slider"
+                    class="c-input c-input__slider"
                     min="24"
                     max="60"
                     step="2"
@@ -158,7 +161,7 @@ import {
                 </label>
                 <input
                   type="range"
-                  class="c-input c-input--slider"
+                  class="c-input c-input__slider"
                   min="8"
                   max="20"
                   step="1"
@@ -220,7 +223,7 @@ import {
                     <label class="c-input__label">Cable Slots: <strong>{{ racewaySlots() }}</strong></label>
                     <input
                       type="range"
-                      class="c-input c-input--slider"
+                      class="c-input c-input__slider"
                       min="1"
                       max="6"
                       step="1"
@@ -232,7 +235,7 @@ import {
                     <label class="c-input__label">Slot Dia: <strong>{{ racewaySlotDiameterMm() }} mm</strong></label>
                     <input
                       type="range"
-                      class="c-input c-input--slider"
+                      class="c-input c-input__slider"
                       min="5"
                       max="14"
                       step="1"
@@ -258,7 +261,7 @@ import {
                   </label>
                   <input
                     type="range"
-                    class="c-input c-input--slider"
+                    class="c-input c-input__slider"
                     min="14"
                     max="26"
                     step="2"
@@ -273,7 +276,7 @@ import {
                   </label>
                   <input
                     type="range"
-                    class="c-input c-input--slider"
+                    class="c-input c-input__slider"
                     min="2"
                     max="5"
                     step="0.5"
@@ -341,6 +344,10 @@ import {
                 (mouseup)="onMouseUp()"
                 (mouseleave)="onMouseUp()"
                 (wheel)="onWheel($event)"
+                (touchstart)="onTouchStart($event)"
+                (touchmove)="onTouchMove($event)"
+                (touchend)="onTouchEnd()"
+                (touchcancel)="onTouchEnd()"
               >
                 <div class="viewport-hints">
                   Left-drag to rotate • Scroll to zoom • Dual-color assembly preview
@@ -426,164 +433,9 @@ import {
       </div>
     </div>
   `,
-  styles: [
-    `
-      .preset-strip {
-        display: flex;
-        align-items: center;
-        gap: 12px;
-        flex-wrap: wrap;
-      }
-
-      .preset-label {
-        font-size: 0.85rem;
-        font-weight: 600;
-        color: #94a3b8;
-      }
-
-      .preset-buttons {
-        display: flex;
-        flex-wrap: wrap;
-        gap: 6px;
-      }
-
-      .control-group {
-        display: flex;
-        flex-direction: column;
-      }
-
-      .control-row-2 {
-        display: grid;
-        grid-template-columns: 1fr 1fr;
-        gap: 16px;
-      }
-
-      .control-hint {
-        font-size: 0.75rem;
-        color: #64748b;
-        font-weight: 400;
-        margin-left: 4px;
-      }
-
-      .c-input--slider {
-        width: 100%;
-        margin-top: 4px;
-      }
-
-      .c-input__checkbox-label {
-        display: flex;
-        align-items: center;
-        gap: 8px;
-        cursor: pointer;
-        font-size: 0.9rem;
-      }
-
-      .accessory-btn-grid {
-        display: grid;
-        grid-template-columns: 1fr 1fr;
-        gap: 8px;
-      }
-
-      .clamp-viewport {
-        position: relative;
-        width: 100%;
-        height: 380px;
-        background: #090d16;
-        border-radius: 8px;
-        overflow: hidden;
-        cursor: grab;
-      }
-
-      .clamp-viewport:active {
-        cursor: grabbing;
-      }
-
-      .viewport-hints {
-        position: absolute;
-        bottom: 8px;
-        left: 8px;
-        font-size: 0.75rem;
-        color: rgba(255, 255, 255, 0.5);
-        pointer-events: none;
-        user-select: none;
-      }
-
-      .metrics-grid {
-        display: grid;
-        grid-template-columns: repeat(2, 1fr);
-        gap: 10px;
-      }
-
-      .metric-card {
-        background: rgba(255, 255, 255, 0.04);
-        border: 1px solid rgba(255, 255, 255, 0.08);
-        border-radius: 6px;
-        padding: 8px 12px;
-        display: flex;
-        flex-direction: column;
-      }
-
-      .metric-label {
-        font-size: 0.75rem;
-        color: #9ca3af;
-      }
-
-      .metric-value {
-        font-size: 0.95rem;
-        font-weight: 600;
-        color: #f3f4f6;
-        margin-top: 2px;
-      }
-
-      .slicer-tips-card {
-        background: rgba(56, 189, 248, 0.05);
-        border: 1px solid rgba(56, 189, 248, 0.2);
-        border-radius: 6px;
-        padding: 10px 14px;
-      }
-
-      .tips-title {
-        font-size: 0.85rem;
-        font-weight: 600;
-        color: #38bdf8;
-        margin: 0 0 6px 0;
-      }
-
-      .tips-list {
-        margin: 0;
-        padding-left: 18px;
-        font-size: 0.8rem;
-        color: #cbd5e1;
-        line-height: 1.4;
-      }
-
-      .export-box {
-        background: rgba(255, 255, 255, 0.02);
-        border: 1px solid rgba(255, 255, 255, 0.06);
-        border-radius: 8px;
-        padding: 14px;
-      }
-
-      .export-format-selector {
-        display: flex;
-        flex-direction: column;
-        gap: 6px;
-      }
-
-      .format-radios {
-        display: flex;
-        flex-wrap: wrap;
-        gap: 8px;
-      }
-
-      .download-btn {
-        width: 100%;
-        justify-content: center;
-      }
-    `,
-  ],
+  styleUrl: './under-desk-clamp-generator.component.scss',
 })
-export class UnderDeskClampGeneratorComponent implements OnInit, OnDestroy {
+export class UnderDeskClampGeneratorComponent implements OnInit, AfterViewInit, OnDestroy {
   @ViewChild('viewportContainer', { static: false })
   viewportContainer!: ElementRef<HTMLDivElement>;
 
@@ -625,6 +477,7 @@ export class UnderDeskClampGeneratorComponent implements OnInit, OnDestroy {
 
   // Track created object URLs for memory hygiene
   private activeDownloadUrls: string[] = [];
+  private worker?: Worker;
 
   // Three.js Scene References
   private scene: THREE.Scene | null = null;
@@ -634,7 +487,7 @@ export class UnderDeskClampGeneratorComponent implements OnInit, OnDestroy {
   private deskPreviewMesh: THREE.Mesh | null = null;
   private animationFrameId: number | null = null;
 
-  // Mouse interaction state
+  // Mouse & Touch interaction state
   private isDragging = false;
   private previousMouseX = 0;
   private previousMouseY = 0;
@@ -643,7 +496,14 @@ export class UnderDeskClampGeneratorComponent implements OnInit, OnDestroy {
   private cameraDistance = 180;
 
   ngOnInit(): void {
-    this.recalculateMetrics();
+    if (typeof Worker !== 'undefined') {
+      try {
+        this.worker = new Worker(new URL('./worker.ts', import.meta.url), { type: 'module' });
+      } catch {
+        // Fallback to inline engine execution
+      }
+    }
+    this.rebuildMesh();
   }
 
   ngAfterViewInit(): void {
@@ -669,8 +529,22 @@ export class UnderDeskClampGeneratorComponent implements OnInit, OnDestroy {
       });
     }
 
+    if (this.deskPreviewMesh) {
+      this.deskPreviewMesh.geometry.dispose();
+      if (Array.isArray(this.deskPreviewMesh.material)) {
+        this.deskPreviewMesh.material.forEach((m) => m.dispose());
+      } else {
+        this.deskPreviewMesh.material.dispose();
+      }
+    }
+
     if (this.renderer) {
       this.renderer.dispose();
+    }
+
+    if (this.worker) {
+      this.worker.terminate();
+      this.worker = undefined;
     }
 
     for (const url of this.activeDownloadUrls) {
@@ -823,21 +697,59 @@ export class UnderDeskClampGeneratorComponent implements OnInit, OnDestroy {
     };
 
     try {
+      if (this.worker) {
+        await new Promise<void>((resolve, reject) => {
+          const reqId = Date.now();
+          const handler = (event: MessageEvent<UnderDeskClampWorkerResponse>) => {
+            if (event.data.id !== reqId) return;
+            if (event.data.type === 'error') {
+              this.worker?.removeEventListener('message', handler);
+              reject(new Error(event.data.error || 'Export failed'));
+            } else if (event.data.type === 'result' && event.data.buffer) {
+              this.worker?.removeEventListener('message', handler);
+              const blob = new Blob([event.data.buffer], {
+                type: event.data.mimeType || 'application/octet-stream',
+              });
+              this.triggerFileDownload(blob, event.data.fileName || `clamp.${format}`);
+              resolve();
+            }
+          };
+          this.worker!.addEventListener('message', handler);
+          this.worker!.postMessage({ id: reqId, options, format } as UnderDeskClampWorkerRequest);
+        });
+      } else {
+        const result = await processClamp(options, format);
+        if (result.success && result.blob) {
+          this.triggerFileDownload(result.blob, result.fileName);
+        }
+      }
+    } catch {
+      // In case worker fails, fallback to inline
       const result = await processClamp(options, format);
-      if (!result.success || !result.blob) return;
-
-      const url = URL.createObjectURL(result.blob);
-      this.activeDownloadUrls.push(url);
-
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = result.fileName;
-      document.body.appendChild(a);
-      a.click();
-      document.body.removeChild(a);
+      if (result.success && result.blob) {
+        this.triggerFileDownload(result.blob, result.fileName);
+      }
     } finally {
       this.isGenerating.set(false);
     }
+  }
+
+  private triggerFileDownload(blob: Blob, fileName: string): void {
+    const url = URL.createObjectURL(blob);
+    this.activeDownloadUrls.push(url);
+
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = fileName;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+
+    setTimeout(() => {
+      URL.revokeObjectURL(url);
+      const idx = this.activeDownloadUrls.indexOf(url);
+      if (idx !== -1) this.activeDownloadUrls.splice(idx, 1);
+    }, 100);
   }
 
   // --- THREE.JS VIEWPORT & RENDERING ---
@@ -861,21 +773,26 @@ export class UnderDeskClampGeneratorComponent implements OnInit, OnDestroy {
       this.renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
       container.appendChild(this.renderer.domElement);
 
-      const ambientLight = new THREE.AmbientLight(0xffffff, 0.55);
-      this.scene.add(ambientLight);
+      // Studio Lighting
+      const ambLight = new THREE.AmbientLight(0xffffff, 0.7);
+      this.scene.add(ambLight);
 
-      const keyLight = new THREE.DirectionalLight(0xffffff, 0.85);
-      keyLight.position.set(120, 160, 140);
-      this.scene.add(keyLight);
+      const dirLight1 = new THREE.DirectionalLight(0xffffff, 0.9);
+      dirLight1.position.set(60, 100, 80);
+      this.scene.add(dirLight1);
 
-      const rimLight = new THREE.DirectionalLight(0x38bdf8, 0.4);
-      rimLight.position.set(-100, -80, -100);
-      this.scene.add(rimLight);
+      const dirLight2 = new THREE.DirectionalLight(0x38bdf8, 0.4);
+      dirLight2.position.set(-60, -40, -60);
+      this.scene.add(dirLight2);
 
-      // Desk tabletop representation (translucent plate)
-      const deskGeom = new THREE.BoxGeometry(160, 25, 120);
+      // Desk Slice Preview (semi-transparent wooden/grey board)
+      const deskGeom = new THREE.BoxGeometry(
+        this.throatDepthMm() + 60,
+        this.deskThicknessMm(),
+        this.frameWidthMm() + 40
+      );
       const deskMat = new THREE.MeshStandardMaterial({
-        color: 0x334155,
+        color: 0x64748b,
         transparent: true,
         opacity: 0.35,
         roughness: 0.6,
@@ -917,49 +834,7 @@ export class UnderDeskClampGeneratorComponent implements OnInit, OnDestroy {
     this.camera.lookAt(20, 15, 0);
   }
 
-  private recalculateMetrics(): void {
-    const options: UnderDeskClampGeneratorOptions = {
-      deskThicknessMm: this.deskThicknessMm(),
-      maxClampGapMm: this.maxClampGapMm(),
-      throatDepthMm: this.throatDepthMm(),
-      frameThicknessMm: this.frameThicknessMm(),
-      frameWidthMm: this.frameWidthMm(),
-      accessoryType: this.accessoryType(),
-      racewaySlots: this.racewaySlots(),
-      racewaySlotDiameterMm: this.racewaySlotDiameterMm(),
-      screwDiameterMm: this.screwDiameterMm(),
-      screwPitchMm: this.screwPitchMm(),
-      swivelFootPad: this.swivelFootPad(),
-    };
-
-    const { clampGeometry, boltGeometry, footPadGeometry } = generateClampGeometries(options);
-    const m = calculateClampMetrics(clampGeometry, boltGeometry, footPadGeometry, options);
-    this.metrics.set(m);
-
-    clampGeometry.dispose();
-    boltGeometry.dispose();
-    footPadGeometry.dispose();
-  }
-
   private rebuildMesh(): void {
-    this.recalculateMetrics();
-
-    if (!this.scene || !this.clampMeshGroup) return;
-
-    // Clear existing group meshes
-    while (this.clampMeshGroup.children.length > 0) {
-      const child = this.clampMeshGroup.children[0];
-      this.clampMeshGroup.remove(child);
-      if (child instanceof THREE.Mesh) {
-        child.geometry.dispose();
-        if (Array.isArray(child.material)) {
-          child.material.forEach((m) => m.dispose());
-        } else {
-          child.material.dispose();
-        }
-      }
-    }
-
     const options: UnderDeskClampGeneratorOptions = {
       deskThicknessMm: this.deskThicknessMm(),
       maxClampGapMm: this.maxClampGapMm(),
@@ -975,10 +850,35 @@ export class UnderDeskClampGeneratorComponent implements OnInit, OnDestroy {
       explodedView: this.explodedView(),
     };
 
-    const { clampGeometry, boltGeometry, footPadGeometry } = generateClampGeometries(
-      options,
-      options.explodedView
-    );
+    const { clampGeometry, boltGeometry, footPadGeometry, combinedGeometry } =
+      generateClampGeometries(options, options.explodedView);
+
+    const m = calculateClampMetrics(clampGeometry, boltGeometry, footPadGeometry, options);
+    this.metrics.set(m);
+
+    // Dispose combinedGeometry as it is only needed for monolithic STL export
+    combinedGeometry.dispose();
+
+    if (!this.scene || !this.clampMeshGroup) {
+      clampGeometry.dispose();
+      boltGeometry.dispose();
+      footPadGeometry.dispose();
+      return;
+    }
+
+    // Clear existing group meshes
+    while (this.clampMeshGroup.children.length > 0) {
+      const child = this.clampMeshGroup.children[0];
+      this.clampMeshGroup.remove(child);
+      if (child instanceof THREE.Mesh) {
+        child.geometry.dispose();
+        if (Array.isArray(child.material)) {
+          child.material.forEach((mat) => mat.dispose());
+        } else {
+          child.material.dispose();
+        }
+      }
+    }
 
     // Frame Material: Industrial matte deep blue/charcoal
     const frameMat = new THREE.MeshStandardMaterial({
@@ -1007,6 +907,8 @@ export class UnderDeskClampGeneratorComponent implements OnInit, OnDestroy {
       });
       const padMesh = new THREE.Mesh(footPadGeometry, padMat);
       this.clampMeshGroup.add(padMesh);
+    } else {
+      footPadGeometry.dispose();
     }
 
     // Update desk representation thickness and location
@@ -1025,7 +927,7 @@ export class UnderDeskClampGeneratorComponent implements OnInit, OnDestroy {
     }
   }
 
-  // --- MOUSE & VIEWPORT NAVIGATION ---
+  // --- MOUSE & TOUCH NAVIGATION ---
 
   onMouseDown(event: MouseEvent): void {
     this.isDragging = true;
@@ -1049,6 +951,33 @@ export class UnderDeskClampGeneratorComponent implements OnInit, OnDestroy {
   }
 
   onMouseUp(): void {
+    this.isDragging = false;
+  }
+
+  onTouchStart(event: TouchEvent): void {
+    if (event.touches.length === 1) {
+      this.isDragging = true;
+      this.previousMouseX = event.touches[0].clientX;
+      this.previousMouseY = event.touches[0].clientY;
+      event.preventDefault();
+    }
+  }
+
+  onTouchMove(event: TouchEvent): void {
+    if (!this.isDragging || event.touches.length !== 1) return;
+    const deltaX = event.touches[0].clientX - this.previousMouseX;
+    const deltaY = event.touches[0].clientY - this.previousMouseY;
+
+    this.meshRotationY += deltaX * 0.01;
+    this.meshRotationX += deltaY * 0.01;
+    this.meshRotationX = Math.max(-Math.PI / 2.2, Math.min(Math.PI / 2.2, this.meshRotationX));
+
+    this.previousMouseX = event.touches[0].clientX;
+    this.previousMouseY = event.touches[0].clientY;
+    event.preventDefault();
+  }
+
+  onTouchEnd(): void {
     this.isDragging = false;
   }
 

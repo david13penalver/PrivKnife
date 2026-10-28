@@ -46,3 +46,21 @@ export interface PresetClamp {
   description: string;
   options: Partial<UnderDeskClampGeneratorOptions>;
 }
+
+export interface UnderDeskClampWorkerRequest {
+  id: number;
+  options: UnderDeskClampGeneratorOptions;
+  format: 'stl' | '3mf';
+}
+
+export interface UnderDeskClampWorkerResponse {
+  id: number;
+  type: 'progress' | 'result' | 'error';
+  percent?: number;
+  buffer?: ArrayBuffer;
+  fileName?: string;
+  fileSize?: number;
+  mimeType?: string;
+  metrics?: UnderDeskClampMetrics;
+  error?: string;
+}

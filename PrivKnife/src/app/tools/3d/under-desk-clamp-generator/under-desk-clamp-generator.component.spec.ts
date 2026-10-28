@@ -1,5 +1,7 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
+import * as THREE from 'three';
+import * as engine from './engine';
 import { UnderDeskClampGeneratorComponent } from './under-desk-clamp-generator.component';
 import { CLAMP_PRESETS } from './test-fixtures';
 
@@ -115,6 +117,75 @@ describe('UnderDeskClampGeneratorComponent (Seam 2 & 4)', () => {
 
       expect(revokeSpy).toHaveBeenCalledWith('blob:dummy-clamp-url');
       revokeSpy.mockRestore();
+    });
+
+    it('should update metrics and scene meshes during single-pass rebuildMesh', () => {
+      component.deskThicknessMm.set(40);
+      component['rebuildMesh']();
+
+      expect(component.metrics().totalTriangles).toBeGreaterThan(0);
+      if (component['clampMeshGroup']) {
+        expect(component['clampMeshGroup'].children.length).toBeGreaterThanOrEqual(2);
+      }
+    });
+
+    it('should dispose deskPreviewMesh geometry and material on destroy', () => {
+      const dummyGeom = new THREE.BoxGeometry(10, 10, 10);
+      const dummyMat = new THREE.MeshBasicMaterial();
+      const geomSpy = vi.spyOn(dummyGeom, 'dispose');
+      const matSpy = vi.spyOn(dummyMat, 'dispose');
+
+      component['deskPreviewMesh'] = new THREE.Mesh(dummyGeom, dummyMat);
+      component.ngOnDestroy();
+
+      expect(geomSpy).toHaveBeenCalled();
+      expect(matSpy).toHaveBeenCalled();
+    });
+  });
+
+  describe('Touch Viewport Navigation (DEFECT-35-05)', () => {
+    it('should orbit camera on touchstart and touchmove events', () => {
+      const initialRotX = component['meshRotationX'];
+      const initialRotY = component['meshRotationY'];
+
+      const touchStartEvent = {
+        touches: [{ clientX: 100, clientY: 100 }],
+        preventDefault: vi.fn(),
+      } as unknown as TouchEvent;
+
+      (component as any).onTouchStart(touchStartEvent);
+      expect(component['isDragging']).toBe(true);
+
+      const touchMoveEvent = {
+        touches: [{ clientX: 120, clientY: 110 }],
+        preventDefault: vi.fn(),
+      } as unknown as TouchEvent;
+
+      (component as any).onTouchMove(touchMoveEvent);
+      expect(component['meshRotationY']).not.toBe(initialRotY);
+      expect(component['meshRotationX']).not.toBe(initialRotX);
+
+      (component as any).onTouchEnd();
+      expect(component['isDragging']).toBe(false);
+    });
+  });
+
+  describe('Mobile Responsive & BEM Styling (DEFECT-35-03, DEFECT-35-04, DEFECT-35-05)', () => {
+    it('should use .c-input__slider on all range slider inputs', () => {
+      const compiled = fixture.nativeElement as HTMLElement;
+      const rangeInputs = compiled.querySelectorAll('input[type="range"]');
+      expect(rangeInputs.length).toBeGreaterThan(0);
+
+      rangeInputs.forEach((input) => {
+        expect(input.classList.contains('c-input__slider')).toBe(true);
+      });
+    });
+
+    it('should not contain hardcoded #f3f4f6 or #cbd5e1 in styles', () => {
+      const compiled = fixture.nativeElement as HTMLElement;
+      const html = compiled.innerHTML;
+      expect(html).not.toContain('#f3f4f6');
+      expect(html).not.toContain('#cbd5e1');
     });
   });
 

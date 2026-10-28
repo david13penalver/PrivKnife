@@ -82,6 +82,33 @@ export function validateClampOptions(options: UnderDeskClampGeneratorOptions): {
 /**
  * Merges multiple BufferGeometries into a single BufferGeometry.
  */
+/**
+ * Creates a hollow annular tube geometry extruded along Y (centered at origin).
+ */
+export function createHollowTubeGeometry(
+  outerR: number,
+  innerR: number,
+  height: number,
+  segments = 32
+): THREE.BufferGeometry {
+  const shape = new THREE.Shape();
+  shape.absarc(0, 0, outerR, 0, Math.PI * 2, false);
+  const hole = new THREE.Path();
+  hole.absarc(0, 0, innerR, 0, Math.PI * 2, true);
+  shape.holes.push(hole);
+
+  const extrudeSettings: THREE.ExtrudeGeometryOptions = {
+    depth: height,
+    bevelEnabled: false,
+    curveSegments: segments,
+  };
+  const geom = new THREE.ExtrudeGeometry(shape, extrudeSettings);
+  geom.translate(0, 0, -height / 2);
+  geom.rotateX(Math.PI / 2);
+  geom.computeVertexNormals();
+  return geom;
+}
+
 export function mergeBufferGeometries(
   geometries: THREE.BufferGeometry[]
 ): THREE.BufferGeometry {
@@ -196,29 +223,6 @@ function createClampFrameGeometry(options: UnderDeskClampGeneratorOptions): THRE
   parts.push(spine);
 
   // 3. Reinforcement Gussets / Fillets (triangular braces in corners)
-  const gussetGeom = new THREE.BufferGeometry();
-  const gussetVertices = new Float32Array([
-    // Top Gusset
-    0, maxClampGapMm, -frameWidthMm / 2,
-    frameThicknessMm * 1.2, maxClampGapMm, -frameWidthMm / 2,
-    0, maxClampGapMm - (frameThicknessMm * 1.2), -frameWidthMm / 2,
-
-    0, maxClampGapMm, frameWidthMm / 2,
-    frameThicknessMm * 1.2, maxClampGapMm, frameWidthMm / 2,
-    0, maxClampGapMm - (frameThicknessMm * 1.2), frameWidthMm / 2,
-
-    // Bottom Gusset
-    0, 0, -frameWidthMm / 2,
-    frameThicknessMm * 1.2, 0, -frameWidthMm / 2,
-    0, frameThicknessMm * 1.2, -frameWidthMm / 2,
-
-    0, 0, frameWidthMm / 2,
-    frameThicknessMm * 1.2, 0, frameWidthMm / 2,
-    0, frameThicknessMm * 1.2, frameWidthMm / 2,
-  ]);
-  gussetGeom.setAttribute('position', new THREE.BufferAttribute(gussetVertices, 3));
-  gussetGeom.computeVertexNormals();
-  // Extruded / box representation for gusset corners
   const topGussetBox = new THREE.BoxGeometry(frameThicknessMm * 1.2, frameThicknessMm * 1.2, frameWidthMm);
   topGussetBox.rotateZ(Math.PI / 4);
   topGussetBox.translate(frameThicknessMm * 0.4, maxClampGapMm - (frameThicknessMm * 0.4), 0);
@@ -244,9 +248,10 @@ function createClampFrameGeometry(options: UnderDeskClampGeneratorOptions): THRE
   const screwCenterX = throatDepthMm * 0.65;
   const bossOuterDiameter = Math.max(screwDiameterMm + 12, frameWidthMm * 0.85);
   const bossHeight = frameThicknessMm + 8;
-  const threadBoss = new THREE.CylinderGeometry(
+  const bossInnerR = screwDiameterMm / 2 + 0.25;
+  const threadBoss = createHollowTubeGeometry(
     bossOuterDiameter / 2,
-    bossOuterDiameter / 2,
+    bossInnerR,
     bossHeight,
     24
   );
@@ -288,13 +293,21 @@ function createClampFrameGeometry(options: UnderDeskClampGeneratorOptions): THRE
       racewayBase.translate(throatDepthMm * 0.5, -frameThicknessMm - racewayHeight, 0);
       parts.push(racewayBase);
 
-      // Raceway outer wall
-      const racewayOuterWall = new THREE.BoxGeometry(5, racewayHeight, racewayWidth);
-      racewayOuterWall.translate(throatDepthMm * 0.5 + racewayDepth / 2, -frameThicknessMm - racewayHeight / 2, 0);
-      parts.push(racewayOuterWall);
+      // Raceway outer wall segmented with cable pass-through slots of width racewaySlotDiameterMm
+      const slotWidth = Math.max(3, Math.min(racewayWidth / 2, racewaySlotDiameterMm || 8));
+      const slots = Math.max(1, Math.min(6, racewaySlots || 3));
+      const fingerWidth = Math.max(2, (racewayWidth - slots * slotWidth) / (slots + 1));
+      const totalWidth = (slots + 1) * fingerWidth + slots * slotWidth;
+      const startZ = -totalWidth / 2 + fingerWidth / 2;
+
+      for (let i = 0; i <= slots; i++) {
+        const fingerZ = startZ + i * (fingerWidth + slotWidth);
+        const wallFinger = new THREE.BoxGeometry(5, racewayHeight, fingerWidth);
+        wallFinger.translate(throatDepthMm * 0.5 + racewayDepth / 2, -frameThicknessMm - racewayHeight / 2, fingerZ);
+        parts.push(wallFinger);
+      }
 
       // Raceway slotted divider combs
-      const slots = Math.max(1, Math.min(6, racewaySlots || 3));
       const slotSpacing = racewayWidth / (slots + 1);
       for (let s = 1; s <= slots; s++) {
         const slotZ = -racewayWidth / 2 + s * slotSpacing;
@@ -337,7 +350,7 @@ function createClampFrameGeometry(options: UnderDeskClampGeneratorOptions): THRE
       const ringHeight = 22;
 
       // Outer ring
-      const ring = new THREE.CylinderGeometry(ringOuterR, ringOuterR, ringHeight, 32);
+      const ring = createHollowTubeGeometry(ringOuterR, ringInnerR, ringHeight, 32);
       // Support connecting strut from clamp to cup holder
       const armLength = 35;
       const arm = new THREE.BoxGeometry(armLength, 8, 20);
@@ -488,13 +501,16 @@ function createFootPadGeometry(
   parts.push(padDisk);
 
   // Recessed socket sleeve on underside
-  const socketSleeve = new THREE.CylinderGeometry(
-    screwDiameterMm * 0.45,
-    screwDiameterMm * 0.45,
-    4,
-    16
+  const socketOuterR = screwDiameterMm * 0.45;
+  const socketInnerR = screwDiameterMm * 0.36 + 0.25;
+  const socketHeight = 4;
+  const socketSleeve = createHollowTubeGeometry(
+    socketOuterR,
+    socketInnerR,
+    socketHeight,
+    24
   );
-  socketSleeve.translate(0, -2, 0);
+  socketSleeve.translate(0, -socketHeight / 2, 0);
   parts.push(socketSleeve);
 
   const padGeom = mergeBufferGeometries(parts);
