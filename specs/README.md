@@ -164,6 +164,45 @@ gantt
 
 ---
 
+### 🛠️ Batch 2 QA & Mobile Remediation Specifications Catalog (Specs 61–90 for Tools 31–60)
+
+> Based on [`tools_31_60_audit.md`](../tools_31_60_audit.md), each tool from Batch 2 (`31`–`60`) has a dedicated remediation specification (`spec.md`), TDD implementation plan (`plan.md`), and task breakdown (`tasks.md`).
+
+| # | Spec Folder | Target Tool | Priority | Audit Verdict | Status |
+|---|---|---|---|---|:---:|
+| **61** | [61 - Remediation - 3D Parametric Lamp & Lampshade Designer](61%20-%20Remediation%20-%203D%20Parametric%20Lamp%20%26%20Lampshade%20Designer/spec.md) | #31 (`parametric-lamp-designer`) | High | ⚠️ (`✅ Works` / `⚠️ Minor issues`) | [ ] |
+| **62** | [62 - Remediation - Curved & Flat 3D Lithophane Maker](62%20-%20Remediation%20-%20Curved%20%26%20Flat%203D%20Lithophane%20Maker/spec.md) | #32 (`lithophane-maker`) | High | ⚠️ (`✅ Works` / `⚠️ Minor issues`) | [ ] |
+| **63** | [63 - Remediation - Gridfinity & Modular Drawer Bin Generator](63%20-%20Remediation%20-%20Gridfinity%20%26%20Modular%20Drawer%20Bin%20Generator/spec.md) | #33 (`gridfinity-bin-generator`) | High | ⚠️ (`⚠️ Partial` / `❌ Poor`) | [ ] |
+| **64** | [64 - Remediation - Parametric Electronics Box & Snap-Fit Enclosure](64%20-%20Remediation%20-%20Parametric%20Electronics%20Box%20%26%20Snap-Fit%20Enclosure/spec.md) | #34 (`electronics-box-enclosure`) | High | ⚠️ (`⚠️ Partial` / `❌ Poor`) | [ ] |
+| **65** | [65 - Remediation - Under-Desk Clamp & Cable Management Generator](65%20-%20Remediation%20-%20Under-Desk%20Clamp%20%26%20Cable%20Management%20Generator/spec.md) | #35 (`under-desk-clamp-generator`) | High | ⚠️ (`⚠️ Partial` / `❌ Poor`) | [ ] |
+| **66** | [66 - Remediation - IKEA Skadis & Pegboard Hook_Holder Maker](66%20-%20Remediation%20-%20IKEA%20Skadis%20%26%20Pegboard%20Hook_Holder%20Maker/spec.md) | #36 (`skadis-pegboard-maker`) | High | ⚠️ (`⚠️ Partial` / `❌ Poor`) | [ ] |
+| **67** | [67 - Remediation - Geometric Plant Pot & Self-Watering Planter](67%20-%20Remediation%20-%20Geometric%20Plant%20Pot%20%26%20Self-Watering%20Planter/spec.md) | #37 (`geometric-plant-pot`) | High | ⚠️ (`✅ Works` / `⚠️ Minor issues`) | [ ] |
+| **68** | [68 - Remediation - Braille & ADA Tactile Door Sign Generator](68%20-%20Remediation%20-%20Braille%20%26%20ADA%20Tactile%20Door%20Sign%20Generator/spec.md) | #38 (`braille-ada-sign-generator`) | Critical | ❌ (`❌ Broken` / `⚠️ Minor issues`) | [ ] |
+| **69** | [69 - Remediation - Custom Mechanical Keycap & Switch Tester Maker](69%20-%20Remediation%20-%20Custom%20Mechanical%20Keycap%20%26%20Switch%20Tester%20Maker/spec.md) | #39 (`keycap-switch-tester-maker`) | High | ⚠️ (`⚠️ Partial` / `⚠️ Minor issues`) | [ ] |
+| **70** | [70 - Remediation - Cappuccino Stencil & Airbrush Template Maker](70%20-%20Remediation%20-%20Cappuccino%20Stencil%20%26%20Airbrush%20Template%20Maker/spec.md) | #40 (`cappuccino-stencil-maker`) | High | ⚠️ (`⚠️ Partial` / `⚠️ Minor issues`) | [ ] |
+| **71** | [71 - Remediation - Pet ID Tag & Collar Slide-On Generator](71%20-%20Remediation%20-%20Pet%20ID%20Tag%20%26%20Collar%20Slide-On%20Generator/spec.md) | #41 (`pet-id-tag-generator`) | High | ⚠️ (`⚠️ Partial` / `⚠️ Minor issues`) | [ ] |
+| **72** | [72 - Remediation - Honeycomb Storage Wall (HSW) Insert & Adapter](72%20-%20Remediation%20-%20Honeycomb%20Storage%20Wall%20%28HSW%29%20Insert%20%26%20Adapter/spec.md) | #42 (`hsw-insert-adapter`) | High | ⚠️ (`⚠️ Partial` / `⚠️ Minor issues`) | [ ] |
+| **73** | [73 - Remediation - Passport, Visa & ID Biometric Photo Maker](73%20-%20Remediation%20-%20Passport%2C%20Visa%20%26%20ID%20Biometric%20Photo%20Maker/spec.md) | #43 (`passport-biometric-photo`) | High | ⚠️ (`⚠️ Partial` / `⚠️ Minor issues`) | [ ] |
+| **74** | [74 - Remediation - HEIC & AVIF to JPG_PNG Batch Converter](74%20-%20Remediation%20-%20HEIC%20%26%20AVIF%20to%20JPG_PNG%20Batch%20Converter/spec.md) | #44 (`heic-avif-converter`) | Critical | ⚠️ (`⚠️ Partial` / `⚠️ Minor issues`) | [ ] |
+| **75** | [75 - Remediation - Client-Side PDF Signer, Date Stamper & Initials](75%20-%20Remediation%20-%20Client-Side%20PDF%20Signer%2C%20Date%20Stamper%20%26%20Initials/spec.md) | #45 (`pdf-signer-stamper`) | High | ⚠️ (`⚠️ Partial` / `❌ Poor`) | [ ] |
+| **76** | [76 - Remediation - Face & License Plate Privacy Blur Tool](76%20-%20Remediation%20-%20Face%20%26%20License%20Plate%20Privacy%20Blur%20Tool/spec.md) | #46 (`face-plate-blur`) | High | ⚠️ (`⚠️ Partial` / `⚠️ Minor issues`) | [ ] |
+| **77** | [77 - Remediation - Local OCR Image & Scanned PDF to Text_Word](77%20-%20Remediation%20-%20Local%20OCR%20Image%20%26%20Scanned%20PDF%20to%20Text_Word/spec.md) | #47 (`local-ocr-text-extractor`) | Critical | ❌ (`❌ Broken` / `⚠️ Minor issues`) | [ ] |
+| **78** | [78 - Remediation - Zero-Knowledge File Encryptor & Vault](78%20-%20Remediation%20-%20Zero-Knowledge%20File%20Encryptor%20%26%20Vault/spec.md) | #48 (`file-encryptor-vault`) | Medium | ✅ (`✅ Works` / `⚠️ Minor issues`) | [ ] |
+| **79** | [79 - Remediation - PII Log & CSV Scrubber _ Data Anonymizer](79%20-%20Remediation%20-%20PII%20Log%20%26%20CSV%20Scrubber%20_%20Data%20Anonymizer/spec.md) | #49 (`pii-scrubber-anonymizer`) | High | ⚠️ (`✅ Works` / `⚠️ Minor issues`) | [ ] |
+| **80** | [80 - Remediation - Bank Statement CSV _ OFX to Excel & QIF Converter](80%20-%20Remediation%20-%20Bank%20Statement%20CSV%20_%20OFX%20to%20Excel%20%26%20QIF%20Converter/spec.md) | #50 (`bank-statement-converter`) | High | ⚠️ (`✅ Works` / `❌ Poor`) | [ ] |
+| **81** | [81 - Remediation - Audio Trimmer, Volume Booster & Ringtone Maker](81%20-%20Remediation%20-%20Audio%20Trimmer%2C%20Volume%20Booster%20%26%20Ringtone%20Maker/spec.md) | #51 (`audio-trimmer-booster`) | Critical | ❌ (`❌ Broken` / `❌ Poor`) | [ ] |
+| **82** | [82 - Remediation - Client-Side Video Compressor & Social Resizer](82%20-%20Remediation%20-%20Client-Side%20Video%20Compressor%20%26%20Social%20Resizer/spec.md) | #52 (`video-compressor-resizer`) | Critical | ❌ (`❌ Broken` / `❌ Poor`) | [ ] |
+| **83** | [83 - Remediation - FDA _ EU Nutrition Facts & Supplement Label Maker](83%20-%20Remediation%20-%20FDA%20_%20EU%20Nutrition%20Facts%20%26%20Supplement%20Label%20Maker/spec.md) | #53 (`nutrition-label-maker`) | High | ⚠️ (`⚠️ Partial` / `❌ Poor`) | [ ] |
+| **84** | [84 - Remediation - SVG Optimizer, Path Cleaner & React_Vue Exporter](84%20-%20Remediation%20-%20SVG%20Optimizer%2C%20Path%20Cleaner%20%26%20React_Vue%20Exporter/spec.md) | #54 (`svg-optimizer-cleaner`) | Critical | ⚠️ (`✅ Works` / `❌ Poor`) | [ ] |
+| **85** | [85 - Remediation - Side-by-Side Code & Contract Diff Checker](85%20-%20Remediation%20-%20Side-by-Side%20Code%20%26%20Contract%20Diff%20Checker/spec.md) | #55 (`diff-checker`) | High | ⚠️ (`✅ Works` / `⚠️ Minor issues`) | [ ] |
+| **86** | [86 - Remediation - Web Font Subsetter & TTF_OTF to WOFF2 Converter](86%20-%20Remediation%20-%20Web%20Font%20Subsetter%20%26%20TTF_OTF%20to%20WOFF2%20Converter/spec.md) | #56 (`font-subsetter-converter`) | High | ⚠️ (`⚠️ Partial` / `⚠️ Minor issues`) | [ ] |
+| **87** | [87 - Remediation - Seamless Tileable Texture & Pattern Generator](87%20-%20Remediation%20-%20Seamless%20Tileable%20Texture%20%26%20Pattern%20Generator/spec.md) | #57 (`seamless-texture-generator`) | High | ⚠️ (`✅ Works` / `⚠️ Minor issues`) | [ ] |
+| **88** | [88 - Remediation - Interactive 2D Floor Plan & Room Furniture Scaler](88%20-%20Remediation%20-%20Interactive%202D%20Floor%20Plan%20%26%20Room%20Furniture%20Scaler/spec.md) | #58 (`floor-plan-furniture-scaler`) | Critical | ⚠️ (`⚠️ Partial` / `⚠️ Minor issues`) | [ ] |
+| **89** | [89 - Remediation - Printable Emergency Recovery & Password Kit Sheet](89%20-%20Remediation%20-%20Printable%20Emergency%20Recovery%20%26%20Password%20Kit%20Sheet/spec.md) | #59 (`emergency-recovery-kit`) | Critical | ⚠️ (`✅ Works` / `⚠️ Minor issues`) | [ ] |
+| **90** | [90 - Remediation - CSV_Paste to Vector Chart & Infographic Builder](90%20-%20CSV_Paste%20to%20Vector%20Chart%20%26%20Infographic%20Builder/spec.md) | #60 (`csv-vector-chart-builder`) | Critical | ⚠️ (`⚠️ Partial` / `⚠️ Minor issues`) | [ ] |
+
+---
+
 ## 📖 How to Use These Specs
 
 When implementing any tool:
