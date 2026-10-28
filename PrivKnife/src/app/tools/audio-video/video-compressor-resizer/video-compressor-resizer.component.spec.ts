@@ -160,4 +160,43 @@ describe('VideoCompressorResizerComponent (Seam 2 UI & Privacy)', () => {
     expect(fetchSpy).not.toHaveBeenCalled();
     expect(xhrOpenSpy).not.toHaveBeenCalled();
   });
+
+  describe('Adaptive Size Formatting & Demo Video Sizing (DEFECT-52-02)', () => {
+    it('should format sub-MB sizes in KB and >= 1MB in MB', () => {
+      expect(component.formatSize(0)).toBe('0 KB');
+      expect(component.formatSize(512 * 1024)).toBe('512.0 KB');
+      expect(component.formatSize(10 * 1024 * 1024)).toBe('10.00 MB');
+    });
+
+    it('should load demo video with realistic size and display non-zero space savings', async () => {
+      component.loadDemoVideo();
+      expect(component.sourceSizeBytes()).toBeGreaterThanOrEqual(40 * 1024 * 1024);
+
+      await component.compressVideo();
+      fixture.detectChanges();
+
+      const compiled = fixture.nativeElement as HTMLElement;
+      const stats = compiled.querySelector('.c-preview__stats');
+      expect(stats).toBeTruthy();
+      expect(stats?.textContent).not.toContain('0.00 MB');
+      expect(stats?.textContent).not.toMatch(/\b0% Reduced/);
+      expect(component.result()?.metadata?.compressionRatio).toBeLessThan(1.0);
+    });
+  });
+
+  describe('Dropzone Drag-and-Drop (DEFECT-52-04)', () => {
+    it('should handle onFileDrop and load dropped file', () => {
+      const mockFile = new File(['mock content'], 'dropped_vlog.mp4', { type: 'video/mp4' });
+      const dragEvent = {
+        preventDefault: vi.fn(),
+        dataTransfer: {
+          files: [mockFile],
+        },
+      } as unknown as DragEvent;
+
+      component.onFileDrop(dragEvent);
+      expect(dragEvent.preventDefault).toHaveBeenCalled();
+      expect(component.originalFileName()).toBe('dropped_vlog.mp4');
+    });
+  });
 });

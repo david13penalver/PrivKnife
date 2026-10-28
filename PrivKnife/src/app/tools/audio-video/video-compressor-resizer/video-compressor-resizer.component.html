@@ -1,0 +1,278 @@
+<div class="l-page">
+  <div class="l-page__header c-header">
+    <div class="c-header__title-group">
+      <h1 class="c-header__title">Client-Side Video Compressor & Social Resizer</h1>
+      <p class="c-header__subtitle">
+        Compress large MP4/MOV videos to fit Discord (8MB/25MB/50MB), WhatsApp, and email limits with intelligent bitrate budgeting and instant social cropping (TikTok 9:16, Instagram 1:1, 4:5) 100% locally in your browser.
+      </p>
+    </div>
+    <div class="c-badge c-badge--privacy">
+      🛡️ 100% In-Browser • Never Leaves Your Device
+    </div>
+  </div>
+
+  <div class="l-columns l-columns--2">
+    <!-- Controls Column -->
+    <div class="l-columns__area c-card">
+      <div class="c-card__header">
+        <h2 class="c-card__title">Compression & Resize Parameters</h2>
+      </div>
+      <div class="c-card__body">
+        <!-- Dropzone -->
+        <div
+          class="c-dropzone g--margin-bottom-4"
+          (dragover)="$event.preventDefault()"
+          (drop)="onFileDrop($event)"
+        >
+          <input
+            type="file"
+            id="videoFileInput"
+            class="c-dropzone__input"
+            accept="video/*,.mp4,.webm,.mov,.mkv"
+            (change)="onFileSelected($event)"
+          />
+          <label for="videoFileInput" class="c-dropzone__label">
+            <span class="c-dropzone__icon">🎬</span>
+            <span class="c-dropzone__text">
+              {{ originalFileName() || 'Drop video file here or click to browse' }}
+            </span>
+            <span class="c-dropzone__hint">
+              Supports MP4, WebM, MOV &bull; Zero Server Uploads
+            </span>
+          </label>
+        </div>
+
+        <div class="g--margin-bottom-4">
+          <button
+            type="button"
+            class="c-button c-button--outline c-button--small"
+            (click)="loadDemoVideo()"
+          >
+            Load Sample Video Clip
+          </button>
+        </div>
+
+        <!-- Target Size Preset -->
+        <div class="g--margin-bottom-4">
+          <label class="c-input__label" for="compressionPresetSelect">Target Size Constraint</label>
+          <select
+            id="compressionPresetSelect"
+            class="c-input c-input--select"
+            [ngModel]="compressionPreset()"
+            (ngModelChange)="updatePreset($event)"
+          >
+            <option value="target_size_8mb">Discord Free (8 MB Limit)</option>
+            <option value="target_size_25mb">Discord Nitro / WhatsApp (25 MB)</option>
+            <option value="target_size_50mb">Email / Slack Attachment (50 MB)</option>
+            <option value="custom_mb">Custom Target Size (MB)</option>
+          </select>
+
+          @if (compressionPreset() === 'custom_mb') {
+            <div class="g--margin-top-2">
+              <label class="c-input__sublabel" for="customSizeInput">Custom Target Size (MB)</label>
+              <input
+                id="customSizeInput"
+                type="number"
+                min="1"
+                max="500"
+                step="1"
+                class="c-input c-input--number"
+                [ngModel]="customTargetSizeMb()"
+                (ngModelChange)="updateCustomTargetSize($event)"
+              />
+            </div>
+          }
+        </div>
+
+        <!-- Social Media Aspect Ratio Crop -->
+        <div class="g--margin-bottom-4">
+          <label class="c-input__label" for="aspectRatioSelect">Social Aspect Ratio & Crop</label>
+          <select
+            id="aspectRatioSelect"
+            class="c-input c-input--select"
+            [ngModel]="aspectRatio()"
+            (ngModelChange)="updateAspectRatio($event)"
+          >
+            <option value="original">Original Aspect Ratio (Preserve Source)</option>
+            <option value="9:16_vertical">9:16 Vertical (TikTok, Reels, Shorts)</option>
+            <option value="1:1_square">1:1 Square (Instagram Feed Post)</option>
+            <option value="4:5_portrait">4:5 Portrait (Instagram Portrait Post)</option>
+            <option value="16:9_landscape">16:9 Landscape (YouTube Standard)</option>
+          </select>
+        </div>
+
+        <!-- Maximum Resolution -->
+        <div class="g--margin-bottom-4">
+          <label class="c-input__label" for="maxResolutionSelect">Maximum Resolution</label>
+          <select
+            id="maxResolutionSelect"
+            class="c-input c-input--select"
+            [ngModel]="maxResolution()"
+            (ngModelChange)="updateResolution($event)"
+          >
+            <option value="1080p">1080p Full HD (Sharper, higher bitrate needed)</option>
+            <option value="720p">720p HD (Recommended balance)</option>
+            <option value="480p">480p SD (Compact, great for small file targets)</option>
+            <option value="360p">360p Low (Ultra compact for tiny byte budgets)</option>
+          </select>
+        </div>
+
+        <!-- Audio Track Muting -->
+        <div class="g--margin-bottom-4">
+          <label class="c-input__checkbox-label">
+            <input
+              type="checkbox"
+              class="c-input__checkbox"
+              [checked]="audioMute()"
+              (change)="toggleAudioMute($any($event.target).checked)"
+            />
+            <span>Mute Audio Track (Saves 96 kbps budget for extra video quality)</span>
+          </label>
+        </div>
+
+        <!-- Output Container Format -->
+        <div class="g--margin-bottom-4">
+          <label class="c-input__label" for="outputFormatSelect">Output Format</label>
+          <select
+            id="outputFormatSelect"
+            class="c-input c-input--select"
+            [ngModel]="outputFormat()"
+            (ngModelChange)="updateFormat($event)"
+          >
+            <option value="mp4">MP4 (Universal mobile & web compatibility)</option>
+            <option value="webm">WebM (Open web standard, VP9 compression)</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="c-card__footer l-extremo">
+        <div class="l-extremo__area-izquierda">
+          <button
+            type="button"
+            class="c-button c-button--outline"
+            (click)="resetToDefaults()"
+            [disabled]="isProcessing()"
+          >
+            Reset
+          </button>
+        </div>
+        <div class="l-extremo__area-derecha">
+          <button
+            type="button"
+            class="c-button c-button--primary"
+            (click)="compressVideo()"
+            [disabled]="isProcessing() || !hasVideoData()"
+          >
+            {{ isProcessing() ? 'Compressing Video...' : 'Compress & Resize Video' }}
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Preview & Output Column -->
+    <div class="l-columns__area c-card">
+      <div class="c-card__header">
+        <h2 class="c-card__title">Bitrate Budget & Preview</h2>
+      </div>
+
+      <div class="c-card__body">
+        <!-- Compression Plan Diagnostics -->
+        <div class="c-preview g--margin-bottom-4">
+          <div class="c-preview__plan-grid">
+            <div class="c-preview__plan-item">
+              <span class="c-preview__stat-label">Target Size:</span>
+              <span class="c-preview__stat-value">{{ targetSizeFormatted() }}</span>
+            </div>
+            <div class="c-preview__plan-item">
+              <span class="c-preview__stat-label">Target Video Bitrate:</span>
+              <span class="c-preview__stat-value">
+                {{ (compressionPlan().videoBitrateBps / 1000).toFixed(0) }} kbps
+              </span>
+            </div>
+            <div class="c-preview__plan-item">
+              <span class="c-preview__stat-label">Output Dimensions:</span>
+              <span class="c-preview__stat-value">
+                {{ compressionPlan().targetWidth }} x {{ compressionPlan().targetHeight }}
+              </span>
+            </div>
+            <div class="c-preview__plan-item">
+              <span class="c-preview__stat-label">Audio Track:</span>
+              <span class="c-preview__stat-value">
+                {{ audioMute() ? 'Muted (0 kbps)' : 'Stereo (96 kbps)' }}
+              </span>
+            </div>
+          </div>
+
+          <!-- Visual Aspect Ratio Silhouette -->
+          <div class="c-preview__aspect-box-wrapper g--margin-top-3">
+            <div
+              class="c-preview__aspect-box"
+              [style.aspect-ratio]="aspectRatioStyle()"
+            >
+              <span class="c-preview__aspect-tag">{{ aspectRatioLabel() }}</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Video Player Preview -->
+        @if (videoPreviewUrl()) {
+          <div class="c-preview__player g--margin-bottom-4">
+            <label class="c-input__label g--margin-bottom-2">Video Preview</label>
+            <video
+              controls
+              class="c-preview__video-element"
+              [src]="videoPreviewUrl()"
+            ></video>
+          </div>
+        }
+
+        <!-- Compression Results Details -->
+        @if (result()?.metadata; as meta) {
+          <div class="c-preview__stats g--margin-bottom-4">
+            <div class="c-preview__stat-row">
+              <span class="c-preview__stat-label">Delivered Size:</span>
+              <span class="c-preview__stat-value">
+                {{ formatSize(meta.compressedSizeBytes) }}
+              </span>
+            </div>
+            <div class="c-preview__stat-row">
+              <span class="c-preview__stat-label">Original Size:</span>
+              <span class="c-preview__stat-value">
+                {{ formatSize(meta.originalSizeBytes) }}
+              </span>
+            </div>
+            <div class="c-preview__stat-row">
+              <span class="c-preview__stat-label">Space Savings:</span>
+              <span class="c-preview__stat-value c-badge--success">
+                {{ Math.max(0, Math.round((1 - meta.compressionRatio) * 100)) }}% Reduced
+              </span>
+            </div>
+            <div class="c-preview__stat-row">
+              <span class="c-preview__stat-label">Dimensions:</span>
+              <span class="c-preview__stat-value">{{ meta.dimensions }} ({{ meta.aspectRatio }})</span>
+            </div>
+          </div>
+        }
+
+        @if (errorMessage()) {
+          <div class="c-alert c-alert--danger g--margin-bottom-4">
+            {{ errorMessage() }}
+          </div>
+        }
+      </div>
+
+      <div class="c-card__footer l-extremo">
+        <div class="l-extremo__area-derecha">
+          <button
+            type="button"
+            class="c-button c-button--primary"
+            [disabled]="!downloadUrl()"
+            (click)="downloadResult()"
+          >
+            Download {{ result()?.fileName || 'Compressed Video' }}
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

@@ -66,3 +66,13 @@ export interface VideoCompressorResizerResult {
   metadata?: VideoCompressorMetadata;
   error?: string;
 }
+
+export interface VideoCompressorWorkerRequest {
+  id: number;
+  options: VideoCompressorResizerOptions;
+}
+
+export interface VideoCompressorWorkerResponse {
+  id: number;
+  result: VideoCompressorResizerResult;
+}

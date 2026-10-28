@@ -188,5 +188,85 @@ describe('VideoCompressorResizer Engine (Seam 1)', () => {
       expect(result.error).toBeDefined();
       expect(result.blob.size).toBe(0);
     });
+
+    it('should transform an MP4 input into a valid WebM EBML container when outputFormat is webm (DEFECT-52-01)', async () => {
+      const mp4Blob = new Blob([new Uint8Array([0x00, 0x00, 0x00, 0x18, 0x66, 0x74, 0x79, 0x70, 0x6d, 0x70, 0x34, 0x32, ...new Array(5000).fill(1)])], { type: 'video/mp4' });
+      const result = await processVideoCompressor({
+        ...DEFAULT_VIDEO_COMPRESS_OPTIONS,
+        videoBlob: mp4Blob,
+        outputFormat: 'webm',
+        originalSizeBytes: 10000,
+      });
+
+      expect(result.success).toBe(true);
+      expect(result.mimeType).toBe('video/webm');
+      expect(result.fileName.endsWith('.webm')).toBe(true);
+
+      const buffer = new Uint8Array(await result.blob.arrayBuffer());
+      // EBML header signature: 0x1a, 0x45, 0xdf, 0xa3
+      expect(buffer[0]).toBe(0x1a);
+      expect(buffer[1]).toBe(0x45);
+      expect(buffer[2]).toBe(0xdf);
+      expect(buffer[3]).toBe(0xa3);
+
+      // Must NOT be byte-identical to the input MP4
+      const inputBuffer = new Uint8Array(await mp4Blob.arrayBuffer());
+      let identical = true;
+      if (buffer.length !== inputBuffer.length) {
+        identical = false;
+      } else {
+        for (let i = 0; i < buffer.length; i++) {
+          if (buffer[i] !== inputBuffer[i]) {
+            identical = false;
+            break;
+          }
+        }
+      }
+      expect(identical).toBe(false);
+    });
+
+    it('should encode targetWidth and targetHeight into MP4 tkhd header (DEFECT-52-01)', async () => {
+      const result = await processVideoCompressor(TIKTOK_REELS_OPTIONS);
+      expect(result.success).toBe(true);
+      expect(result.mimeType).toBe('video/mp4');
+
+      const buf = new Uint8Array(await result.blob.arrayBuffer());
+      let tkhdOffset = -1;
+      for (let i = 0; i < buf.length - 8; i++) {
+        if (
+          buf[i] === 0x74 && // 't'
+          buf[i + 1] === 0x6b && // 'k'
+          buf[i + 2] === 0x68 && // 'h'
+          buf[i + 3] === 0x64    // 'd'
+        ) {
+          tkhdOffset = i;
+          break;
+        }
+      }
+      expect(tkhdOffset).toBeGreaterThan(-1);
+
+      // Width and Height are at tkhdOffset + 76 and tkhdOffset + 80 (16.16 fixed point)
+      const width = (buf[tkhdOffset + 76] << 8) | buf[tkhdOffset + 77];
+      const height = (buf[tkhdOffset + 80] << 8) | buf[tkhdOffset + 81];
+      const plan = generateCompressionPlan(TIKTOK_REELS_OPTIONS);
+      expect(width).toBe(plan.targetWidth);
+      expect(height).toBe(plan.targetHeight);
+    });
+
+    it('should reduce output file size when source exceeds target budget (DEFECT-52-01)', async () => {
+      const largeBlob = new Blob([new Uint8Array(64 * 1024).fill(0xaa)], { type: 'video/mp4' });
+      const result = await processVideoCompressor({
+        ...DEFAULT_VIDEO_COMPRESS_OPTIONS,
+        videoBlob: largeBlob,
+        originalSizeBytes: 64 * 1024,
+        compressionPreset: 'custom_mb',
+        customTargetSizeMb: 1,
+        durationSec: 10,
+      });
+
+      expect(result.success).toBe(true);
+      expect(result.fileSize).toBeLessThan(64 * 1024);
+      expect(result.metadata?.compressionRatio).toBeLessThan(1.0);
+    });
   });
 });
