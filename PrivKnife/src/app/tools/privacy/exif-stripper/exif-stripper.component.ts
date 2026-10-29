@@ -1,3 +1,4 @@
+import { TranslatePipe } from '../../../core/i18n';
 import {
   ChangeDetectionStrategy,
   Component,
@@ -18,19 +19,19 @@ import { ParsedMetadata, StrippedResult } from './types';
   selector: 'app-exif-stripper',
   standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [Badge, Button, Card, Dropzone, ProgressBar],
+  imports: [Badge, Button, Card, Dropzone, ProgressBar, TranslatePipe],
   template: `
     <div class="l-columns l-columns--1 g--margin-x-auto" style="max-width: 960px;">
       <!-- Tool Header -->
       <div class="l-columns__area g--margin-bottom-6 g--text-center">
         <div class="g--flex-center g--margin-bottom-3">
           <app-badge variant="privacy">
-            🛡️ 100% In-Browser &bull; Never Leaves Your Device
+            {{ 'common.privacyBadge' | translate }}
           </app-badge>
         </div>
-        <h1>EXIF & Privacy Metadata Stripper</h1>
+        <h1>{{ 'tools.exifStripper.name' | translate }}</h1>
         <p class="g--margin-top-2" style="color: var(--color-text-muted); font-size: 1.125rem;">
-          Purge hidden GPS coordinates, camera model, and device timestamps from your photos in one click.
+          {{ 'tools.exifStripper.description' | translate }}
         </p>
       </div>
 

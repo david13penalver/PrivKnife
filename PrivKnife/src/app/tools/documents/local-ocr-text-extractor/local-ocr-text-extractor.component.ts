@@ -1,3 +1,4 @@
+import { TranslatePipe } from '../../../core/i18n';
 import { Component, OnDestroy, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
@@ -15,7 +16,7 @@ import { createSampleReceiptImageBlob, processLocalOcr } from './engine';
 @Component({
   selector: 'app-local-ocr-text-extractor',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, TranslatePipe],
   templateUrl: './local-ocr-text-extractor.component.html',
   styleUrls: ['./local-ocr-text-extractor.component.scss'],
 })

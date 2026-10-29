@@ -40,7 +40,7 @@ describe('CsvConverterComponent (Seam 2: UI & Privacy Boundary)', () => {
     expect(component.parsedTable()).toBeTruthy();
     expect(component.parsedTable()!.rowCount).toBeGreaterThan(0);
     expect(component.activeFormat()).toBe('json');
-    expect(compiled.textContent).toContain('CSV / Excel to JSON, SQL & Markdown');
+    expect(compiled.textContent).toContain('JSON, SQL & Markdown');
     expect(compiled.textContent).toContain('100% In-Browser');
   });
 

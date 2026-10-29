@@ -1,3 +1,4 @@
+import { TranslatePipe } from '../../../core/i18n';
 import { Component, OnDestroy, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
@@ -15,7 +16,7 @@ import { SAMPLE_SERVER_LOG } from './test-fixtures';
 @Component({
   selector: 'app-pii-scrubber-anonymizer',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, TranslatePipe],
   templateUrl: './pii-scrubber-anonymizer.component.html',
   styleUrl: './pii-scrubber-anonymizer.component.scss',
 })

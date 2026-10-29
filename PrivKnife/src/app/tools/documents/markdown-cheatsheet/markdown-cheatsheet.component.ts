@@ -1,3 +1,4 @@
+import { TranslatePipe } from '../../../core/i18n';
 import {
   ChangeDetectionStrategy,
   Component,
@@ -32,7 +33,7 @@ import {
   selector: 'app-markdown-cheatsheet',
   standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [Badge, Button, Card, FormsModule],
+  imports: [Badge, Button, Card, FormsModule, TranslatePipe],
   template: `
     <div
       class="l-columns l-columns--1 g--margin-x-auto"
@@ -41,15 +42,12 @@ import {
       <div class="l-columns__area g--margin-bottom-4 g--text-center">
         <div class="g--flex-center g--margin-bottom-2">
           <app-badge variant="privacy">
-            🛡️ 100% In-Browser &bull; Never Leaves Your Device
+            {{ 'common.privacyBadge' | translate }}
           </app-badge>
         </div>
-        <h1 style="font-size: 2.25rem; font-weight: 800; margin-bottom: 8px; letter-spacing: -0.025em;">
-          Markdown to Academic &amp; Tech PDF Cheatsheet
-        </h1>
+        <h1 style="font-size: 2.25rem; font-weight: 800; margin-bottom: 8px; letter-spacing: -0.025em;">{{ 'tools.markdownCheatsheet.name' | translate }}</h1>
         <p style="color: var(--color-text-muted); font-size: 1.0625rem; max-width: 820px; margin: 0 auto; line-height: 1.6;">
-          Convert raw Markdown notes into dense, multi-column print-ready reference sheets.
-          Vector-sharp PDF generation with code syntax blocks, tables, and customizable columns.
+          {{ 'tools.markdownCheatsheet.description' | translate }}
         </p>
       </div>
 

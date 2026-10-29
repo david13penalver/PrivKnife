@@ -1,3 +1,4 @@
+import { TranslatePipe } from '../../../core/i18n';
 import {
   Component,
   ElementRef,
@@ -30,7 +31,7 @@ import {
 @Component({
   selector: 'app-face-plate-blur',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, TranslatePipe],
   templateUrl: './face-plate-blur.component.html',
   styleUrls: ['./face-plate-blur.component.scss'],
 })

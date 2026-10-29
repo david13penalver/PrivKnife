@@ -1,3 +1,4 @@
+import { TranslatePipe } from '../../../core/i18n';
 import {
   Component,
   ChangeDetectionStrategy,
@@ -51,7 +52,7 @@ function getSanitizer(): { sanitize: (html: string, options?: any) => string } {
 @Component({
   selector: 'app-floor-plan-furniture-scaler',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, TranslatePipe],
   templateUrl: './floor-plan-furniture-scaler.component.html',
   styleUrl: './floor-plan-furniture-scaler.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,

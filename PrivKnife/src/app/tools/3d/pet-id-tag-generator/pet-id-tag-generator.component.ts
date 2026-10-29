@@ -1,3 +1,4 @@
+import { TranslatePipe } from '../../../core/i18n';
 import {
   Component,
   ElementRef,
@@ -36,19 +37,19 @@ import {
 @Component({
   selector: 'app-pet-id-tag-generator',
   standalone: true,
-  imports: [CommonModule, FormsModule, Card],
+  imports: [CommonModule, FormsModule, Card, TranslatePipe],
   template: `
     <div class="l-page">
       <!-- Header -->
       <div class="l-page__header c-header">
         <div class="c-header__title-group">
-          <h1 class="c-header__title">Pet ID Tag & Collar Slide-On Generator</h1>
+          <h1 class="c-header__title">{{ 'tools.petIdTagGenerator.name' | translate }}</h1>
           <p class="c-header__subtitle">
-            Create custom 3D printable, rattle-free pet tags in traditional hanging charm shapes or curved silent collar slide-on bands, optimized for multi-color 3MF printing.
+            {{ 'tools.petIdTagGenerator.description' | translate }}
           </p>
         </div>
         <div class="c-badge c-badge--privacy">
-          🛡️ 100% In-Browser • Never Leaves Your Device
+          {{ 'common.privacyBadge' | translate }}
         </div>
       </div>
 

@@ -1,3 +1,4 @@
+import { TranslatePipe } from '../../../core/i18n';
 import {
   ChangeDetectionStrategy,
   Component,
@@ -23,19 +24,19 @@ import {
   selector: 'app-crypto-hash-uuid',
   standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [Badge, Button, Card, FormsModule],
+  imports: [Badge, Button, Card, FormsModule, TranslatePipe],
   template: `
     <div class="l-columns l-columns--1 g--margin-x-auto" style="max-width: 1040px;">
       <!-- Tool Header -->
       <div class="l-columns__area g--margin-bottom-6 g--text-center">
         <div class="g--flex-center g--margin-bottom-3">
           <app-badge variant="privacy">
-            🛡️ 100% In-Browser &bull; Never Leaves Your Device
+            {{ 'common.privacyBadge' | translate }}
           </app-badge>
         </div>
-        <h1>Cryptographic Hash &amp; UUID Batch Generator</h1>
+        <h1>{{ 'tools.cryptoHash.name' | translate }}</h1>
         <p class="g--margin-top-2" style="color: var(--color-text-muted); font-size: 1.125rem;">
-          Generate cryptographically secure RFC 4122 UUIDv4 identifiers and calculate SHA-256, SHA-512, SHA-1, or MD5 digests in bulk.
+          {{ 'tools.cryptoHash.description' | translate }}
         </p>
       </div>
 

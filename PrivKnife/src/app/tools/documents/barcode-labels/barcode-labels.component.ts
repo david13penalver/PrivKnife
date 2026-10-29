@@ -1,3 +1,4 @@
+import { TranslatePipe } from '../../../core/i18n';
 import {
   ChangeDetectionStrategy,
   Component,
@@ -36,21 +37,19 @@ import {
   selector: 'app-barcode-labels',
   standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [Badge, Button, Card, Dropzone, FormsModule],
+  imports: [Badge, Button, Card, Dropzone, FormsModule, TranslatePipe],
   template: `
     <div class="l-columns l-columns--1 g--margin-x-auto" style="max-width: 1400px; padding: 0 16px;">
       <!-- Tool Header -->
       <div class="l-columns__area g--margin-bottom-4 g--text-center">
         <div class="g--flex-center g--margin-bottom-2">
           <app-badge variant="privacy">
-            🛡️ 100% In-Browser &bull; Never Leaves Your Device
+            {{ 'common.privacyBadge' | translate }}
           </app-badge>
         </div>
-        <h1 style="font-size: 2rem; font-weight: 700; margin-bottom: 8px;">
-          Avery® Barcode &amp; Label Sheet Generator
-        </h1>
+        <h1 style="font-size: 2rem; font-weight: 700; margin-bottom: 8px;">{{ 'tools.barcodeLabels.name' | translate }}</h1>
         <p style="color: var(--color-text-muted); font-size: 1.0625rem; max-width: 800px; margin: 0 auto;">
-          Generate high-precision, grid-aligned sticker sheets for standard Avery® labels with Code128, QR codes, EAN-13, and custom inventory sequences.
+          {{ 'tools.barcodeLabels.description' | translate }}
         </p>
       </div>
 

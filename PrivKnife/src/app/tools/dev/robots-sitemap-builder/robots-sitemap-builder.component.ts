@@ -1,3 +1,4 @@
+import { TranslatePipe } from '../../../core/i18n';
 import {
   ChangeDetectionStrategy,
   Component,
@@ -35,7 +36,7 @@ import {
   selector: 'app-robots-sitemap-builder',
   standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [Badge, Button, Card, FormsModule],
+  imports: [Badge, Button, Card, FormsModule, TranslatePipe],
   template: `
     <div
       class="l-columns l-columns--1 g--margin-x-auto"
@@ -44,15 +45,12 @@ import {
       <div class="l-columns__area g--margin-bottom-4 g--text-center">
         <div class="g--flex-center g--margin-bottom-2">
           <app-badge variant="privacy">
-            🛡️ 100% In-Browser &bull; Never Leaves Your Device
+            {{ 'common.privacyBadge' | translate }}
           </app-badge>
         </div>
-        <h1 style="font-size: 2.25rem; font-weight: 800; margin-bottom: 8px; letter-spacing: -0.025em;">
-          Robots.txt &amp; XML Sitemap Builder
-        </h1>
+        <h1 style="font-size: 2.25rem; font-weight: 800; margin-bottom: 8px; letter-spacing: -0.025em;">{{ 'tools.robotsSitemap.name' | translate }}</h1>
         <p style="color: var(--color-text-muted); font-size: 1.0625rem; max-width: 820px; margin: 0 auto; line-height: 1.6;">
-          Configure standard search crawler directives (robots.txt) and generate valid XML sitemaps client-side.
-          Block AI scrapers, import bulk URLs, and export production-ready root files offline.
+          {{ 'tools.robotsSitemap.description' | translate }}
         </p>
       </div>
 

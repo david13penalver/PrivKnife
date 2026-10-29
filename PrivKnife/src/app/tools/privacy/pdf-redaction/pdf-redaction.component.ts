@@ -1,3 +1,4 @@
+import { TranslatePipe } from '../../../core/i18n';
 import {
   ChangeDetectionStrategy,
   Component,
@@ -29,19 +30,19 @@ import {
   selector: 'app-pdf-redaction',
   standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [Badge, Button, Card, Dropzone],
+  imports: [Badge, Button, Card, Dropzone, TranslatePipe],
   template: `
     <div class="l-columns l-columns--1 g--margin-x-auto" style="max-width: 1050px;">
       <!-- Tool Header -->
       <div class="l-columns__area g--margin-bottom-6 g--text-center">
         <div class="g--flex-center g--margin-bottom-3">
           <app-badge variant="privacy">
-            🛡️ 100% In-Browser &bull; Never Leaves Your Device
+            {{ 'common.privacyBadge' | translate }}
           </app-badge>
         </div>
-        <h1>PDF Redaction &amp; Anonymizer</h1>
+        <h1>{{ 'tools.pdfRedaction.name' | translate }}</h1>
         <p class="g--margin-top-2" style="color: var(--color-text-muted); font-size: 1.125rem;">
-          Permanently blackout or whiteout sensitive data, names, SSNs, and numbers while stripping confidential metadata.
+          {{ 'tools.pdfRedaction.description' | translate }}
         </p>
       </div>
 

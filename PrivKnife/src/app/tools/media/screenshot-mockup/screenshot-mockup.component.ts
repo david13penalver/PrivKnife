@@ -1,3 +1,4 @@
+import { TranslatePipe } from '../../../core/i18n';
 import {
   AfterViewInit,
   ChangeDetectionStrategy,
@@ -41,22 +42,19 @@ import {
   selector: 'app-screenshot-mockup',
   standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [FormsModule, Badge, Dropzone, Card],
+  imports: [FormsModule, Badge, Dropzone, Card, TranslatePipe],
   template: `
     <div class="l-columns l-columns--1 g--margin-x-auto" style="max-width: 1200px;">
       <!-- Tool Header & Privacy Badge -->
       <div class="l-columns__area g--text-center g--margin-bottom-6">
         <div class="g--flex-center g--margin-bottom-3">
           <app-badge variant="privacy" [dot]="true">
-            🛡️ 100% In-Browser 3D Device Rendering &bull; Zero Server Ingestion &bull; Zero Telemetry
+            {{ 'common.privacyBadge' | translate }}
           </app-badge>
         </div>
-        <h1 style="font-size: clamp(1.8rem, 4vw, 2.75rem); font-weight: 800; line-height: 1.2; letter-spacing: -0.02em;">
-          App Screenshot Mockup Studio
-        </h1>
+        <h1 style="font-size: clamp(1.8rem, 4vw, 2.75rem); font-weight: 800; line-height: 1.2; letter-spacing: -0.02em;">{{ 'tools.screenshotMockup.name' | translate }}</h1>
         <p class="g--margin-top-2 g--margin-x-auto" style="max-width: 760px; color: var(--color-text-secondary); font-size: 1.1rem;">
-          Transform flat mobile and web app screenshots into realistic 3D angled device frames with customizable drop shadows,
-          glass reflections, metallic finishes, and high-DPI transparent or gradient exports.
+          {{ 'tools.screenshotMockup.description' | translate }}
         </p>
       </div>
 

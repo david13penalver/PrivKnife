@@ -3,7 +3,7 @@ import { ToolDefinition } from '../../../core/models/tool.model';
 export const localOcrTextExtractorTool: ToolDefinition = {
   id: 'local-ocr-text-extractor',
   name: 'Local OCR Image & Scanned PDF to Text & Word',
-  i18nKey: 'localOcr',
+  i18nKey: 'localOcrTextExtractor',
   category: 'documents',
   description:
     'Extract editable text, tables, and paragraphs from photos, invoices, and scanned multi-page PDFs locally in your browser with zero server uploads.',

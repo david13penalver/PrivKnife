@@ -1,3 +1,4 @@
+import { TranslatePipe } from '../../../core/i18n';
 import {
   Component,
   ElementRef,
@@ -38,19 +39,19 @@ import {
 @Component({
   selector: 'app-braille-ada-sign-generator',
   standalone: true,
-  imports: [CommonModule, FormsModule, Card],
+  imports: [CommonModule, FormsModule, Card, TranslatePipe],
   template: `
     <div class="l-page">
       <!-- Header -->
       <div class="l-page__header c-header">
         <div class="c-header__title-group">
-          <h1 class="c-header__title">Braille & ADA Tactile Door Sign Generator</h1>
+          <h1 class="c-header__title">{{ 'tools.brailleAdaSignGenerator.name' | translate }}</h1>
           <p class="c-header__subtitle">
-            Generate 100% ADA-compliant room signage featuring 1/32" raised tactile lettering, Grade 2 contracted Braille domes, standard pictograms, and multi-color 3MF slicer layers.
+            {{ 'tools.brailleAdaSignGenerator.description' | translate }}
           </p>
         </div>
         <div class="c-badge c-badge--privacy">
-          🛡️ 100% In-Browser • Never Leaves Your Device
+          {{ 'common.privacyBadge' | translate }}
         </div>
       </div>
 

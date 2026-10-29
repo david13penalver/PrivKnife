@@ -1,3 +1,4 @@
+import { TranslatePipe } from '../../../core/i18n';
 import {
   ChangeDetectionStrategy,
   Component,
@@ -31,22 +32,19 @@ import {
   selector: 'app-video-gif-trimmer',
   standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [FormsModule, Badge, Dropzone, Card],
+  imports: [FormsModule, Badge, Dropzone, Card, TranslatePipe],
   template: `
     <div class="l-columns l-columns--1 g--margin-x-auto" style="max-width: 1140px;">
       <!-- Tool Header & Privacy Badge -->
       <div class="l-columns__area g--text-center g--margin-bottom-6">
         <div class="g--flex-center g--margin-bottom-3">
           <app-badge variant="privacy" [dot]="true">
-            🛡️ 100% In-Browser Video Processing &bull; Zero Server Ingestion &bull; Zero Telemetry
+            {{ 'common.privacyBadge' | translate }}
           </app-badge>
         </div>
-        <h1 style="font-size: clamp(1.8rem, 4vw, 2.75rem); font-weight: 800; line-height: 1.2; letter-spacing: -0.02em;">
-          Video to GIF &amp; Clip Trimmer
-        </h1>
+        <h1 style="font-size: clamp(1.8rem, 4vw, 2.75rem); font-weight: 800; line-height: 1.2; letter-spacing: -0.02em;">{{ 'tools.videoGifTrimmer.name' | translate }}</h1>
         <p class="g--margin-top-2 g--margin-x-auto" style="max-width: 720px; color: var(--color-text-secondary); font-size: 1.1rem;">
-          Trim video clips and convert them into lightweight animated GIFs or trimmed video clips.
-          Everything runs entirely inside your browser with zero uploads, zero wait queues, and zero file size caps.
+          {{ 'tools.videoGifTrimmer.description' | translate }}
         </p>
       </div>
 

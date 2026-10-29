@@ -1,3 +1,4 @@
+import { TranslatePipe } from '../../../core/i18n';
 import {
   Component,
   OnDestroy,
@@ -32,7 +33,7 @@ import {
 @Component({
   selector: 'app-heic-avif-converter',
   standalone: true,
-  imports: [CommonModule, FormsModule, Card, Dropzone, ProgressBar],
+  imports: [CommonModule, FormsModule, Card, Dropzone, ProgressBar, TranslatePipe],
   templateUrl: './heic-avif-converter.component.html',
   styleUrl: './heic-avif-converter.component.scss',
 })

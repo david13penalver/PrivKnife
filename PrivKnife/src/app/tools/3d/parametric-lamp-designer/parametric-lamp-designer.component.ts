@@ -14,6 +14,7 @@ import * as THREE from 'three';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
 import { Badge } from '../../../components/badge/badge';
 import { Card } from '../../../components/card/card';
+import { TranslatePipe } from '../../../core/i18n';
 import {
   calculateLampMetrics,
   computeLampMetrics,
@@ -45,7 +46,7 @@ import {
   selector: 'app-parametric-lamp-designer',
   standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [FormsModule, DecimalPipe, Badge, Card],
+  imports: [FormsModule, DecimalPipe, Badge, Card, TranslatePipe],
   styleUrl: './parametric-lamp-designer.component.scss',
   template: `
     <div class="c-lamp-designer">
@@ -53,15 +54,14 @@ import {
       <div class="g--text-center g--margin-bottom-6">
         <div class="g--flex-center g--margin-bottom-3">
           <app-badge variant="privacy" [dot]="true">
-            🛡️ 100% In-Browser 3D Fabrication &bull; Zero Server Ingestion &bull; Zero Telemetry
+            {{ 'common.privacyBadge' | translate }}
           </app-badge>
         </div>
         <h1 style="font-size: clamp(1.8rem, 4vw, 2.75rem); font-weight: 800; line-height: 1.2; letter-spacing: -0.02em;">
-          3D Parametric Lamp &amp; Lampshade Designer
+          {{ 'tools.parametricLampDesigner.name' | translate }}
         </h1>
         <p class="g--margin-top-2 g--margin-x-auto" style="max-width: 820px; color: var(--color-text-secondary); font-size: 1.05rem;">
-          Generate bespoke, spiral, fluted, ribbed, and organic lampshades with standard E27, E14, or IKEA socket adapters.
-          Supports watertight double-wall shells and single-wall <strong>Spiralize Vase Mode</strong> printing with instant <strong>.STL</strong> &amp; <strong>.3MF</strong> downloads.
+          {{ 'tools.parametricLampDesigner.description' | translate }}
         </p>
       </div>
 

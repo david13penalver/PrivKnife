@@ -1,3 +1,4 @@
+import { TranslatePipe } from '../../../core/i18n';
 import {
   AfterViewInit,
   ChangeDetectionStrategy,
@@ -32,22 +33,19 @@ import {
   selector: 'app-background-remover',
   standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [FormsModule, Badge, Card, Dropzone],
+  imports: [FormsModule, Badge, Card, Dropzone, TranslatePipe],
   template: `
     <div class="l-columns l-columns--1 g--margin-x-auto" style="max-width: 1280px; padding: 0 16px;">
       <!-- Header & Privacy Indicator -->
       <div class="l-columns__area g--text-center g--margin-bottom-6">
         <div class="g--flex-center g--margin-bottom-3">
           <app-badge variant="privacy" [dot]="true">
-            🛡️ 100% In-Browser Machine Processing &bull; Zero Server Ingestion &bull; Zero Telemetry
+            {{ 'common.privacyBadge' | translate }}
           </app-badge>
         </div>
-        <h1 style="font-size: clamp(1.8rem, 4vw, 2.75rem); font-weight: 800; line-height: 1.2; letter-spacing: -0.02em;">
-          Automated Background Removal (High Quality)
-        </h1>
+        <h1 style="font-size: clamp(1.8rem, 4vw, 2.75rem); font-weight: 800; line-height: 1.2; letter-spacing: -0.02em;">{{ 'tools.backgroundRemover.name' | translate }}</h1>
         <p class="g--margin-top-2 g--margin-x-auto" style="max-width: 780px; color: var(--color-text-secondary); font-size: 1.1rem;">
-          Instant, client-side background removal producing clean transparent <strong>.png</strong> cutouts.
-          100% private in-browser execution with edge anti-aliasing, color de-contamination, and zero server uploads.
+          {{ 'tools.backgroundRemover.description' | translate }}
         </p>
       </div>
 

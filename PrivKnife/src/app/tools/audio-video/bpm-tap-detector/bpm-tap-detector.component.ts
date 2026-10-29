@@ -1,3 +1,4 @@
+import { TranslatePipe } from '../../../core/i18n';
 import {
   ChangeDetectionStrategy,
   Component,
@@ -35,22 +36,19 @@ import {
   selector: 'app-bpm-tap-detector',
   standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [FormsModule, Badge, Dropzone, Card],
+  imports: [FormsModule, Badge, Dropzone, Card, TranslatePipe],
   template: `
     <div class="l-columns l-columns--1 g--margin-x-auto" style="max-width: 1080px;">
       <!-- Tool Header & Privacy Badge -->
       <div class="l-columns__area g--text-center g--margin-bottom-6">
         <div class="g--flex-center g--margin-bottom-3">
           <app-badge variant="privacy" [dot]="true">
-            🛡️ 100% In-Browser Audio Processing &bull; Zero Server Ingestion &bull; Zero Telemetry
+            {{ 'common.privacyBadge' | translate }}
           </app-badge>
         </div>
-        <h1 style="font-size: clamp(1.8rem, 4vw, 2.75rem); font-weight: 800; line-height: 1.2; letter-spacing: -0.02em;">
-          Audio BPM, Pitch &amp; Key Tap Detector
-        </h1>
+        <h1 style="font-size: clamp(1.8rem, 4vw, 2.75rem); font-weight: 800; line-height: 1.2; letter-spacing: -0.02em;">{{ 'tools.bpmTapDetector.name' | translate }}</h1>
         <p class="g--margin-top-2 g--margin-x-auto" style="max-width: 700px; color: var(--color-text-secondary); font-size: 1.1rem;">
-          Detect tempo, musical key, and pitch in real time. Drop any audio file for instant client-side analysis,
-          or tap along to find the tempo with an audible metronome click track.
+          {{ 'tools.bpmTapDetector.description' | translate }}
         </p>
       </div>
 

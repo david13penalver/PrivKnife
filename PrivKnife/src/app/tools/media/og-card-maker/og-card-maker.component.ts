@@ -1,3 +1,4 @@
+import { TranslatePipe } from '../../../core/i18n';
 import {
   AfterViewInit,
   ChangeDetectionStrategy,
@@ -32,7 +33,7 @@ export type MockupTab = 'studio' | 'twitter' | 'linkedin' | 'meta';
   selector: 'app-og-card-maker',
   standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [Badge, Button, Card, Dropzone, FormsModule],
+  imports: [Badge, Button, Card, Dropzone, FormsModule, TranslatePipe],
   template: `
     <div
       class="l-columns l-columns--1 g--margin-x-auto"
@@ -41,15 +42,12 @@ export type MockupTab = 'studio' | 'twitter' | 'linkedin' | 'meta';
       <div class="l-columns__area g--margin-bottom-4 g--text-center">
         <div class="g--flex-center g--margin-bottom-2">
           <app-badge variant="privacy">
-            🛡️ 100% In-Browser &bull; Never Leaves Your Device
+            {{ 'common.privacyBadge' | translate }}
           </app-badge>
         </div>
-        <h1 style="font-size: 2.25rem; font-weight: 800; margin-bottom: 8px; letter-spacing: -0.025em;">
-          Social Share (Open Graph) Card Maker
-        </h1>
+        <h1 style="font-size: 2.25rem; font-weight: 800; margin-bottom: 8px; letter-spacing: -0.025em;">{{ 'tools.ogCardMaker.name' | translate }}</h1>
         <p style="color: var(--color-text-muted); font-size: 1.0625rem; max-width: 800px; margin: 0 auto; line-height: 1.6;">
-          Design pixel-perfect 1200&times;630 social preview cards for Twitter, LinkedIn, and Facebook in seconds.
-          High-DPI PNG and WebP compilation executed completely in your browser.
+          {{ 'tools.ogCardMaker.description' | translate }}
         </p>
       </div>
 

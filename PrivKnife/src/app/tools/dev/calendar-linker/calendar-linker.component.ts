@@ -1,3 +1,4 @@
+import { TranslatePipe } from '../../../core/i18n';
 import {
   ChangeDetectionStrategy,
   Component,
@@ -23,7 +24,7 @@ import { CalendarEvent, EmbedSnippetType, RecurrenceFreq } from './types';
   selector: 'app-calendar-linker',
   standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [Badge, Button, Card, FormsModule],
+  imports: [Badge, Button, Card, FormsModule, TranslatePipe],
   template: `
     <div
       class="l-columns l-columns--1 g--margin-x-auto"
@@ -32,15 +33,12 @@ import { CalendarEvent, EmbedSnippetType, RecurrenceFreq } from './types';
       <div class="l-columns__area g--margin-bottom-4 g--text-center">
         <div class="g--flex-center g--margin-bottom-2">
           <app-badge variant="privacy">
-            🛡️ 100% In-Browser &bull; Never Leaves Your Device
+            {{ 'common.privacyBadge' | translate }}
           </app-badge>
         </div>
-        <h1 style="font-size: 2.25rem; font-weight: 800; margin-bottom: 8px; letter-spacing: -0.025em;">
-          Universal Event &amp; .ics Calendar Linker
-        </h1>
+        <h1 style="font-size: 2.25rem; font-weight: 800; margin-bottom: 8px; letter-spacing: -0.025em;">{{ 'tools.calendarLinker.name' | translate }}</h1>
         <p style="color: var(--color-text-muted); font-size: 1.0625rem; max-width: 820px; margin: 0 auto; line-height: 1.6;">
-          Generate universal "Add to Calendar" links for Google, Outlook, Office 365, and Yahoo.
-          Export standard RFC 5545 .ics files and email newsletter embed snippets offline with zero tracking.
+          {{ 'tools.calendarLinker.description' | translate }}
         </p>
       </div>
 

@@ -1,3 +1,4 @@
+import { TranslatePipe } from '../../../core/i18n';
 import {
   Component,
   ElementRef,
@@ -21,7 +22,7 @@ import { createSyntheticSurface } from './test-fixtures';
 @Component({
   selector: 'app-seamless-texture-generator',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, TranslatePipe],
   templateUrl: './seamless-texture-generator.component.html',
   styleUrl: './seamless-texture-generator.component.scss',
 })

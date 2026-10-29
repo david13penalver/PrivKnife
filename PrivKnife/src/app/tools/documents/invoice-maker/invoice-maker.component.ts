@@ -1,3 +1,4 @@
+import { TranslatePipe } from '../../../core/i18n';
 import {
   ChangeDetectionStrategy,
   Component,
@@ -39,19 +40,19 @@ const DRAFT_STORAGE_KEY = 'privknife_invoice_draft';
   selector: 'app-invoice-maker',
   standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [Badge, Card, FormsModule],
+  imports: [Badge, Card, FormsModule, TranslatePipe],
   template: `
     <div class="l-columns l-columns--1 g--margin-x-auto" style="max-width: 1280px;">
       <!-- Tool Header -->
       <div class="l-columns__area g--margin-bottom-4 g--text-center">
         <div class="g--flex-center g--margin-bottom-2">
           <app-badge variant="privacy">
-            🛡️ 100% In-Browser &bull; Never Leaves Your Device
+            {{ 'common.privacyBadge' | translate }}
           </app-badge>
         </div>
-        <h1>Instant Client-Side Invoice &amp; Receipt Maker</h1>
+        <h1>{{ 'tools.invoiceMaker.name' | translate }}</h1>
         <p class="g--margin-top-1" style="color: var(--color-text-muted); font-size: 1.0625rem;">
-          Draft clean vector PDF invoices and printable receipts offline. Zero server retention &bull; Zero telemetry.
+          {{ 'tools.invoiceMaker.description' | translate }}
         </p>
       </div>
 
@@ -724,8 +725,8 @@ const DRAFT_STORAGE_KEY = 'privknife_invoice_draft';
 
               <div class="g--flex-center g--margin-bottom-4">
                 <app-badge variant="privacy">
-                  🛡️ Zero Telemetry &bull; 0 Bytes Transmitted
-                </app-badge>
+            {{ 'common.privacyBadge' | translate }}
+          </app-badge>
               </div>
 
               <!-- Post-Download Modal Ad Unit -->

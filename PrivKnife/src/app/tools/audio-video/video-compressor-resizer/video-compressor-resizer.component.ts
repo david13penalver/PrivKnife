@@ -1,3 +1,4 @@
+import { TranslatePipe } from '../../../core/i18n';
 import {
   Component,
   OnDestroy,
@@ -27,7 +28,7 @@ import { SYNTHETIC_VIDEO_BLOB } from './test-fixtures';
 @Component({
   selector: 'app-video-compressor-resizer',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, TranslatePipe],
   templateUrl: './video-compressor-resizer.component.html',
   styleUrl: './video-compressor-resizer.component.scss',
 })

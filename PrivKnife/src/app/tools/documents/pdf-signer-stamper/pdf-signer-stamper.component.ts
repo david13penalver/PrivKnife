@@ -1,3 +1,4 @@
+import { TranslatePipe } from '../../../core/i18n';
 import {
   Component,
   ElementRef,
@@ -37,7 +38,7 @@ import {
 @Component({
   selector: 'app-pdf-signer-stamper',
   standalone: true,
-  imports: [CommonModule, FormsModule, Card, Dropzone],
+  imports: [CommonModule, FormsModule, Card, Dropzone, TranslatePipe],
   templateUrl: './pdf-signer-stamper.component.html',
   styleUrl: './pdf-signer-stamper.component.scss',
 })

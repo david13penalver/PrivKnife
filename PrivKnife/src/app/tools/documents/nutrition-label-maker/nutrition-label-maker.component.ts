@@ -1,3 +1,4 @@
+import { TranslatePipe } from '../../../core/i18n';
 import {
   Component,
   OnDestroy,
@@ -23,7 +24,7 @@ import { DEFAULT_FDA_OPTIONS } from './test-fixtures';
 @Component({
   selector: 'app-nutrition-label-maker',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, TranslatePipe],
   templateUrl: './nutrition-label-maker.component.html',
   styleUrl: './nutrition-label-maker.component.scss',
 })

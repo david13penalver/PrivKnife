@@ -1,3 +1,4 @@
+import { TranslatePipe } from '../../../core/i18n';
 import {
   Component,
   ElementRef,
@@ -41,19 +42,20 @@ import {
     DecimalPipe,
     Badge,
     Card,
+    TranslatePipe,
   ],
   template: `
     <div class="l-page">
       <!-- Header -->
       <div class="l-page__header c-header">
         <div class="c-header__title-group">
-          <h1 class="c-header__title">Parametric Electronics Box & Snap-Fit Enclosure</h1>
+          <h1 class="c-header__title">{{ 'tools.electronicsBoxEnclosure.name' | translate }}</h1>
           <p class="c-header__subtitle">
-            Generate custom two-part 3D printable enclosures for DIY electronics, microcontrollers (Arduino, ESP32, Raspberry Pi Pico), and custom PCBs with snap-fit or screw joints.
+            {{ 'tools.electronicsBoxEnclosure.description' | translate }}
           </p>
         </div>
         <app-badge variant="privacy">
-          🛡️ 100% In-Browser • Never Leaves Your Device
+          {{ 'common.privacyBadge' | translate }}
         </app-badge>
       </div>
 

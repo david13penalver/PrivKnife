@@ -1,3 +1,4 @@
+import { TranslatePipe } from '../../../core/i18n';
 import {
   ChangeDetectionStrategy,
   Component,
@@ -33,19 +34,19 @@ const STORAGE_KEY = 'privknife_grid_paper_settings';
   selector: 'app-grid-paper',
   standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [Badge, Card, FormsModule],
+  imports: [Badge, Card, FormsModule, TranslatePipe],
   template: `
     <div class="l-columns l-columns--1 g--margin-x-auto" style="max-width: 1280px;">
       <!-- Tool Header -->
       <div class="l-columns__area g--margin-bottom-4 g--text-center">
         <div class="g--flex-center g--margin-bottom-2">
           <app-badge variant="privacy">
-            🛡️ 100% In-Browser &bull; Never Leaves Your Device
+            {{ 'common.privacyBadge' | translate }}
           </app-badge>
         </div>
-        <h1>Custom Printable Graph &amp; Dot Grid Paper</h1>
+        <h1>{{ 'tools.gridPaper.name' | translate }}</h1>
         <p class="g--margin-top-1" style="color: var(--color-text-muted); font-size: 1.0625rem;">
-          Generate high-precision vector grid, dot, isometric, hexagonal, and ruled paper for notes, bullet journaling, and drafting.
+          {{ 'tools.gridPaper.description' | translate }}
         </p>
       </div>
 
@@ -572,8 +573,8 @@ const STORAGE_KEY = 'privknife_grid_paper_settings';
 
               <div class="g--flex-center g--margin-bottom-4">
                 <app-badge variant="privacy">
-                  🛡️ 100% Client-Side Vector Precision &bull; 0 Bytes Transmitted
-                </app-badge>
+            {{ 'common.privacyBadge' | translate }}
+          </app-badge>
               </div>
 
               <!-- Post-Download Modal Ad Unit -->

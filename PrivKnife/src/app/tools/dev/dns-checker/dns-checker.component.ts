@@ -1,3 +1,4 @@
+import { TranslatePipe } from '../../../core/i18n';
 import {
   ChangeDetectionStrategy,
   Component,
@@ -35,22 +36,19 @@ import {
   selector: 'app-dns-checker',
   standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [FormsModule, Badge, Card],
+  imports: [FormsModule, Badge, Card, TranslatePipe],
   template: `
     <div class="l-columns l-columns--1 g--margin-x-auto" style="max-width: 1280px; padding: 0 16px;">
       <!-- Header & Privacy Indicator -->
       <div class="l-columns__area g--text-center g--margin-bottom-6">
         <div class="g--flex-center g--margin-bottom-3">
           <app-badge variant="privacy" [dot]="true">
-            🛡️ Direct Browser-to-Resolver DoH &bull; Zero Server Middleware &bull; Zero Telemetry
+            {{ 'common.privacyBadge' | translate }}
           </app-badge>
         </div>
-        <h1 style="font-size: clamp(1.8rem, 4vw, 2.75rem); font-weight: 800; line-height: 1.2; letter-spacing: -0.02em;">
-          Global DNS Propagation &amp; WHOIS Checker
-        </h1>
+        <h1 style="font-size: clamp(1.8rem, 4vw, 2.75rem); font-weight: 800; line-height: 1.2; letter-spacing: -0.02em;">{{ 'tools.dnsChecker.name' | translate }}</h1>
         <p class="g--margin-top-2 g--margin-x-auto" style="max-width: 780px; color: var(--color-text-secondary); font-size: 1.1rem;">
-          Verify DNS record propagation across multiple global Anycast resolvers in real time.
-          Query direct DNS-over-HTTPS (DoH) and inspect RDAP domain registration records with zero intermediary servers.
+          {{ 'tools.dnsChecker.description' | translate }}
         </p>
       </div>
 

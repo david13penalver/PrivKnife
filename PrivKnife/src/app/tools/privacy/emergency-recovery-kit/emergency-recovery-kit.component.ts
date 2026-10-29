@@ -1,3 +1,4 @@
+import { TranslatePipe } from '../../../core/i18n';
 import {
   Component,
   ChangeDetectionStrategy,
@@ -24,7 +25,7 @@ import {
 @Component({
   selector: 'app-emergency-recovery-kit',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, TranslatePipe],
   templateUrl: './emergency-recovery-kit.component.html',
   styleUrls: ['./emergency-recovery-kit.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,

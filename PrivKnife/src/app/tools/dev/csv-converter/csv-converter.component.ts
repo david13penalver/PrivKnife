@@ -1,3 +1,4 @@
+import { TranslatePipe } from '../../../core/i18n';
 import {
   ChangeDetectionStrategy,
   Component,
@@ -31,19 +32,19 @@ import {
   selector: 'app-csv-converter',
   standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [Badge, Button, Card, Dropzone, FormsModule],
+  imports: [Badge, Button, Card, Dropzone, FormsModule, TranslatePipe],
   template: `
     <div class="l-columns l-columns--1 g--margin-x-auto" style="max-width: 1100px;">
       <!-- Tool Header -->
       <div class="l-columns__area g--margin-bottom-6 g--text-center">
         <div class="g--flex-center g--margin-bottom-3">
           <app-badge variant="privacy">
-            🛡️ 100% In-Browser &bull; Never Leaves Your Device
+            {{ 'common.privacyBadge' | translate }}
           </app-badge>
         </div>
-        <h1>CSV / Excel to JSON, SQL &amp; Markdown</h1>
+        <h1>{{ 'tools.csvConverter.name' | translate }}</h1>
         <p class="g--margin-top-2" style="color: var(--color-text-muted); font-size: 1.125rem;">
-          Convert spreadsheet data into clean JSON objects, SQL INSERT statements, and GitHub Markdown tables offline.
+          {{ 'tools.csvConverter.description' | translate }}
         </p>
       </div>
 

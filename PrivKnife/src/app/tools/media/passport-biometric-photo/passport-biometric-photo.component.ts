@@ -1,3 +1,4 @@
+import { TranslatePipe } from '../../../core/i18n';
 import {
   Component,
   ElementRef,
@@ -41,7 +42,7 @@ import {
 @Component({
   selector: 'app-passport-biometric-photo',
   standalone: true,
-  imports: [CommonModule, FormsModule, Card, Dropzone],
+  imports: [CommonModule, FormsModule, Card, Dropzone, TranslatePipe],
   templateUrl: './passport-biometric-photo.component.html',
   styleUrl: './passport-biometric-photo.component.scss',
 })

@@ -1,3 +1,4 @@
+import { TranslatePipe } from '../../../core/i18n';
 import {
   AfterViewInit,
   ChangeDetectionStrategy,
@@ -38,22 +39,19 @@ import {
   selector: 'app-desk-wedge-nameplate',
   standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [FormsModule, Badge, Card],
+  imports: [FormsModule, Badge, Card, TranslatePipe],
   template: `
     <div class="l-columns l-columns--1 g--margin-x-auto" style="max-width: 1280px; padding: 0 16px;">
       <!-- Header & Privacy Indicator -->
       <div class="l-columns__area g--text-center g--margin-bottom-6">
         <div class="g--flex-center g--margin-bottom-3">
           <app-badge variant="privacy" [dot]="true">
-            🛡️ 100% In-Browser 3D Fabrication &bull; Zero Server Ingestion &bull; Zero Telemetry
+            {{ 'common.privacyBadge' | translate }}
           </app-badge>
         </div>
-        <h1 style="font-size: clamp(1.8rem, 4vw, 2.75rem); font-weight: 800; line-height: 1.2; letter-spacing: -0.02em;">
-          Parametric Desk Wedge &amp; Nameplate Maker
-        </h1>
+        <h1 style="font-size: clamp(1.8rem, 4vw, 2.75rem); font-weight: 800; line-height: 1.2; letter-spacing: -0.02em;">{{ 'tools.deskWedge.name' | translate }}</h1>
         <p class="g--margin-top-2 g--margin-x-auto" style="max-width: 780px; color: var(--color-text-secondary); font-size: 1.1rem;">
-          Design bespoke executive, technical, and medical desk signs with crisp parametric bevels and dual-color typography.
-          Exports dual-material <strong>.3mf</strong> archives for Bambu AMS / Prusa MMU3 and single-extruder <strong>.stl</strong> files.
+          {{ 'tools.deskWedge.description' | translate }}
         </p>
       </div>
 

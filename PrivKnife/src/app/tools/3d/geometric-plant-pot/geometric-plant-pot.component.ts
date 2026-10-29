@@ -1,3 +1,4 @@
+import { TranslatePipe } from '../../../core/i18n';
 import {
   Component,
   ElementRef,
@@ -38,19 +39,20 @@ import {
     CommonModule,
     FormsModule,
     Card,
+    TranslatePipe,
   ],
   template: `
     <div class="l-page">
       <!-- Header -->
       <div class="l-page__header c-header">
         <div class="c-header__title-group">
-          <h1 class="c-header__title">Geometric Plant Pot & Self-Watering Planter</h1>
+          <h1 class="c-header__title">{{ 'tools.geometricPlantPot.name' | translate }}</h1>
           <p class="c-header__subtitle">
-            Generate modern faceted, twisted, or ribbed 3D printable planters with sub-irrigation reservoir inserts, drainage wicks, and matching saucers.
+            {{ 'tools.geometricPlantPot.description' | translate }}
           </p>
         </div>
         <div class="c-badge c-badge--privacy">
-          🛡️ 100% In-Browser • Never Leaves Your Device
+          {{ 'common.privacyBadge' | translate }}
         </div>
       </div>
 

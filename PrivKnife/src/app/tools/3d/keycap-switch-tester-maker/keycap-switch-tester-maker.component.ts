@@ -1,3 +1,4 @@
+import { TranslatePipe } from '../../../core/i18n';
 import {
   Component,
   ElementRef,
@@ -38,19 +39,19 @@ import {
 @Component({
   selector: 'app-keycap-switch-tester-maker',
   standalone: true,
-  imports: [CommonModule, FormsModule, Card],
+  imports: [CommonModule, FormsModule, Card, TranslatePipe],
   template: `
     <div class="l-page">
       <!-- Header -->
       <div class="l-page__header c-header">
         <div class="c-header__title-group">
-          <h1 class="c-header__title">Custom Mechanical Keycap & Switch Tester Maker</h1>
+          <h1 class="c-header__title">{{ 'tools.keycapSwitchTesterMaker.name' | translate }}</h1>
           <p class="c-header__subtitle">
-            Parametrically generate Cherry, OEM, DSA, and SA mechanical keycaps with custom legends and calibrated MX stems, or modular snap-in switch tester desk trays.
+            {{ 'tools.keycapSwitchTesterMaker.description' | translate }}
           </p>
         </div>
         <div class="c-badge c-badge--privacy">
-          🛡️ 100% In-Browser • Never Leaves Your Device
+          {{ 'common.privacyBadge' | translate }}
         </div>
       </div>
 

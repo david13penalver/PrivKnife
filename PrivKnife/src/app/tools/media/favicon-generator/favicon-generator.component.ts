@@ -1,3 +1,4 @@
+import { TranslatePipe } from '../../../core/i18n';
 import {
   ChangeDetectionStrategy,
   Component,
@@ -25,7 +26,7 @@ export type PreviewTab = 'all' | 'chrome' | 'iphone' | 'android' | 'google';
   selector: 'app-favicon-generator',
   standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [Badge, Button, Card, Dropzone, FormsModule],
+  imports: [Badge, Button, Card, Dropzone, FormsModule, TranslatePipe],
   template: `
     <div
       class="l-columns l-columns--1 g--margin-x-auto"
@@ -34,16 +35,12 @@ export type PreviewTab = 'all' | 'chrome' | 'iphone' | 'android' | 'google';
       <div class="l-columns__area g--margin-bottom-4 g--text-center">
         <div class="g--flex-center g--margin-bottom-2">
           <app-badge variant="privacy">
-            🛡️ 100% In-Browser &bull; Never Leaves Your Device
+            {{ 'common.privacyBadge' | translate }}
           </app-badge>
         </div>
-        <h1 style="font-size: 2.25rem; font-weight: 800; margin-bottom: 8px; letter-spacing: -0.025em;">
-          App Icon &amp; Favicon Suite Generator
-        </h1>
+        <h1 style="font-size: 2.25rem; font-weight: 800; margin-bottom: 8px; letter-spacing: -0.025em;">{{ 'tools.faviconGenerator.name' | translate }}</h1>
         <p style="color: var(--color-text-muted); font-size: 1.0625rem; max-width: 780px; margin: 0 auto; line-height: 1.6;">
-          Transform any logo or image into standard multi-resolution
-          <code>favicon.ico</code>, Apple Touch Icon, Android Chrome PWAs,
-          and webmanifest. Pure client-side processing with zero server uploads.
+          {{ 'tools.faviconGenerator.description' | translate }}
         </p>
       </div>
 

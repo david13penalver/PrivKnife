@@ -1,3 +1,4 @@
+import { TranslatePipe } from '../../../core/i18n';
 import {
   Component,
   ElementRef,
@@ -36,19 +37,19 @@ import {
 @Component({
   selector: 'app-hsw-insert-adapter',
   standalone: true,
-  imports: [CommonModule, FormsModule, Card],
+  imports: [CommonModule, FormsModule, Card, TranslatePipe],
   template: `
     <div class="l-page">
       <!-- Header -->
       <div class="l-page__header c-header">
         <div class="c-header__title-group">
-          <h1 class="c-header__title">Honeycomb Storage Wall (HSW) Insert & Adapter</h1>
+          <h1 class="c-header__title">{{ 'tools.hswInsertAdapter.name' | translate }}</h1>
           <p class="c-header__subtitle">
-            Generate dimensionally accurate snap-fit inserts, captive nut pockets (M3/M4/M5), neodymium magnet holders, utility hooks, and can loops for the open-source Honeycomb Storage Wall standard.
+            {{ 'tools.hswInsertAdapter.description' | translate }}
           </p>
         </div>
         <div class="c-badge c-badge--privacy">
-          🛡️ 100% In-Browser • Never Leaves Your Device
+          {{ 'common.privacyBadge' | translate }}
         </div>
       </div>
 

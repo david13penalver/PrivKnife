@@ -1,3 +1,4 @@
+import { TranslatePipe } from '../../../core/i18n';
 import {
   ChangeDetectionStrategy,
   Component,
@@ -30,21 +31,19 @@ import {
   selector: 'app-batch-compressor',
   standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [Badge, Button, Card, Dropzone, FormsModule, SplitPreview],
+  imports: [Badge, Button, Card, Dropzone, FormsModule, SplitPreview, TranslatePipe],
   template: `
     <div class="l-columns l-columns--1 g--margin-x-auto" style="max-width: 1300px; padding: 0 16px;">
       <!-- Tool Header -->
       <div class="l-columns__area g--margin-bottom-4 g--text-center">
         <div class="g--flex-center g--margin-bottom-2">
           <app-badge variant="privacy">
-            🛡️ 100% In-Browser &bull; Never Leaves Your Device
+            {{ 'common.privacyBadge' | translate }}
           </app-badge>
         </div>
-        <h1 style="font-size: 2rem; font-weight: 700; margin-bottom: 8px;">
-          Batch Image Compressor &amp; WebP Converter
-        </h1>
+        <h1 style="font-size: 2rem; font-weight: 700; margin-bottom: 8px;">{{ 'tools.batchCompressor.name' | translate }}</h1>
         <p style="color: var(--color-text-muted); font-size: 1.0625rem; max-width: 800px; margin: 0 auto;">
-          Losslessly compress hundreds of photos and convert PNG, JPG, and AVIF to modern WebP. Zero server uploads, zero file limits, and instant ZIP downloads.
+          {{ 'tools.batchCompressor.description' | translate }}
         </p>
       </div>
 

@@ -1,3 +1,4 @@
+import { TranslatePipe } from '../../../core/i18n';
 import {
   Component,
   ElementRef,
@@ -39,19 +40,20 @@ import {
     FormsModule,
     DecimalPipe,
     Card,
+    TranslatePipe,
   ],
   template: `
     <div class="l-page">
       <!-- Header -->
       <div class="l-page__header c-header">
         <div class="c-header__title-group">
-          <h1 class="c-header__title">Under-Desk Clamp & Cable Management Generator</h1>
+          <h1 class="c-header__title">{{ 'tools.underDeskClampGenerator.name' | translate }}</h1>
           <p class="c-header__subtitle">
-            Generate heavy-duty parametric C-clamps with 3D-printable trapezoidal screw threads, clamping bolt knobs, and customizable attachments for headphones, cable raceways, power strips, and beverages.
+            {{ 'tools.underDeskClampGenerator.description' | translate }}
           </p>
         </div>
         <div class="c-badge c-badge--privacy">
-          🛡️ 100% In-Browser • Never Leaves Your Device
+          {{ 'common.privacyBadge' | translate }}
         </div>
       </div>
 

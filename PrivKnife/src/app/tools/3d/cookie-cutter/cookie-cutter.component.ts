@@ -1,3 +1,4 @@
+import { TranslatePipe } from '../../../core/i18n';
 import {
   AfterViewInit,
   ChangeDetectionStrategy,
@@ -36,22 +37,19 @@ import {
   selector: 'app-cookie-cutter',
   standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [FormsModule, Badge, Card, Dropzone],
+  imports: [FormsModule, Badge, Card, Dropzone, TranslatePipe],
   template: `
     <div class="l-columns l-columns--1 g--margin-x-auto" style="max-width: 1280px; padding: 0 16px;">
       <!-- Tool Header & Privacy Indicator -->
       <div class="l-columns__area g--text-center g--margin-bottom-6">
         <div class="g--flex-center g--margin-bottom-3">
           <app-badge variant="privacy" [dot]="true">
-            🛡️ 100% In-Browser 3D Fabrication &bull; Zero Server Ingestion &bull; Zero Telemetry
+            {{ 'common.privacyBadge' | translate }}
           </app-badge>
         </div>
-        <h1 style="font-size: clamp(1.8rem, 4vw, 2.75rem); font-weight: 800; line-height: 1.2; letter-spacing: -0.02em;">
-          Custom Cookie Cutter &amp; Stamp 3D Maker
-        </h1>
+        <h1 style="font-size: clamp(1.8rem, 4vw, 2.75rem); font-weight: 800; line-height: 1.2; letter-spacing: -0.02em;">{{ 'tools.cookieCutter.name' | translate }}</h1>
         <p class="g--margin-top-2 g--margin-x-auto" style="max-width: 760px; color: var(--color-text-secondary); font-size: 1.1rem;">
-          Transform black-and-white silhouettes, custom logos, or artwork into dual-part 3D-printable cookie cutters
-          and matching impression stamps. 100% in-browser with slice-ready <strong>.3mf</strong> and <strong>.stl</strong> exports.
+          {{ 'tools.cookieCutter.description' | translate }}
         </p>
       </div>
 

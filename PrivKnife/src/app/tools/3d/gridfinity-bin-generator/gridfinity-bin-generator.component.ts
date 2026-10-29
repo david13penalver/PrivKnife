@@ -1,3 +1,4 @@
+import { TranslatePipe } from '../../../core/i18n';
 import {
   Component,
   ElementRef,
@@ -40,19 +41,20 @@ import {
     DecimalPipe,
     Badge,
     Card,
+    TranslatePipe,
   ],
   template: `
     <div class="l-page">
       <!-- Header -->
       <div class="l-page__header c-header">
         <div class="c-header__title-group">
-          <h1 class="c-header__title">Gridfinity & Modular Drawer Bin Generator</h1>
+          <h1 class="c-header__title">{{ 'tools.gridfinityBinGenerator.name' | translate }}</h1>
           <p class="c-header__subtitle">
-            Parametric 3D printable bins conforming strictly to Zack Freedman's open-source Gridfinity storage standard. Custom unit sizes, internal dividers, scoops, and label tabs.
+            {{ 'tools.gridfinityBinGenerator.description' | translate }}
           </p>
         </div>
         <app-badge variant="privacy">
-          🛡️ 100% In-Browser • Never Leaves Your Device
+          {{ 'common.privacyBadge' | translate }}
         </app-badge>
       </div>
 

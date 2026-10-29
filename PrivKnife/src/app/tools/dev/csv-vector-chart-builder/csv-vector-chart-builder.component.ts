@@ -1,3 +1,4 @@
+import { TranslatePipe } from '../../../core/i18n';
 import {
   Component,
   ChangeDetectionStrategy,
@@ -33,7 +34,7 @@ import {
 @Component({
   selector: 'app-csv-vector-chart-builder',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, TranslatePipe],
   templateUrl: './csv-vector-chart-builder.component.html',
   styleUrls: ['./csv-vector-chart-builder.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,

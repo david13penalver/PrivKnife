@@ -1,3 +1,4 @@
+import { TranslatePipe } from '../../../core/i18n';
 import {
   ChangeDetectionStrategy,
   Component,
@@ -31,22 +32,19 @@ import {
   selector: 'app-web-vitals',
   standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [FormsModule, Badge, Card],
+  imports: [FormsModule, Badge, Card, TranslatePipe],
   template: `
     <div class="l-columns l-columns--1 g--margin-x-auto" style="max-width: 1280px; padding: 0 16px;">
       <!-- Header & Privacy Indicator -->
       <div class="l-columns__area g--text-center g--margin-bottom-6">
         <div class="g--flex-center g--margin-bottom-3">
           <app-badge variant="privacy" [dot]="true">
-            🛡️ Direct Client-Side Audit &bull; Zero Server Middleware &bull; Zero Telemetry
+            {{ 'common.privacyBadge' | translate }}
           </app-badge>
         </div>
-        <h1 style="font-size: clamp(1.8rem, 4vw, 2.75rem); font-weight: 800; line-height: 1.2; letter-spacing: -0.02em;">
-          Website Performance &amp; Core Web Vitals Checker
-        </h1>
+        <h1 style="font-size: clamp(1.8rem, 4vw, 2.75rem); font-weight: 800; line-height: 1.2; letter-spacing: -0.02em;">{{ 'tools.webVitals.name' | translate }}</h1>
         <p class="g--margin-top-2 g--margin-x-auto" style="max-width: 780px; color: var(--color-text-secondary); font-size: 1.1rem;">
-          Audit page loading speed, inspect official Google Core Web Vitals (LCP, INP, CLS, FCP, TTFB),
-          and receive actionable developer diagnostics directly from your browser.
+          {{ 'tools.webVitals.description' | translate }}
         </p>
       </div>
 

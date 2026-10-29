@@ -1,3 +1,4 @@
+import { TranslatePipe } from '../../../core/i18n';
 import {
   Component,
   ElementRef,
@@ -47,19 +48,20 @@ import {
     Card,
     Dropzone,
     ProgressBar,
+    TranslatePipe,
   ],
   template: `
     <div class="l-page">
       <!-- Header -->
       <div class="l-page__header c-header">
         <div class="c-header__title-group">
-          <h1 class="c-header__title">Curved & Flat 3D Lithophane Maker</h1>
+          <h1 class="c-header__title">{{ 'tools.lithophaneMaker.name' | translate }}</h1>
           <p class="c-header__subtitle">
-            Transform digital photos into high-detail, 3D printable lithophanes (flat, curved arcs, cylinders, and nightlights) with an interactive backlight simulator.
+            {{ 'tools.lithophaneMaker.description' | translate }}
           </p>
         </div>
         <app-badge variant="privacy">
-          🛡️ 100% In-Browser • Never Leaves Your Device
+          {{ 'common.privacyBadge' | translate }}
         </app-badge>
       </div>
 

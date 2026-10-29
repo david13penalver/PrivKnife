@@ -1,3 +1,4 @@
+import { TranslatePipe } from '../../../core/i18n';
 import { Component, OnDestroy, computed, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
@@ -18,7 +19,7 @@ import { SYNTHETIC_AUDIO_BUFFER } from './test-fixtures';
 @Component({
   selector: 'app-audio-trimmer-booster',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, TranslatePipe],
   templateUrl: './audio-trimmer-booster.component.html',
   styleUrl: './audio-trimmer-booster.component.scss',
 })

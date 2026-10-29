@@ -1,3 +1,4 @@
+import { TranslatePipe } from '../../../core/i18n';
 import {
   ChangeDetectionStrategy,
   Component,
@@ -24,19 +25,19 @@ import { DocumentPage, LoadedPdfDocument } from './types';
   selector: 'app-pdf-merger',
   standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [Badge, Button, Card, Dropzone],
+  imports: [Badge, Button, Card, Dropzone, TranslatePipe],
   template: `
     <div class="l-columns l-columns--1 g--margin-x-auto" style="max-width: 1100px;">
       <!-- Tool Header -->
       <div class="l-columns__area g--margin-bottom-6 g--text-center">
         <div class="g--flex-center g--margin-bottom-3">
           <app-badge variant="privacy">
-            🛡️ 100% In-Browser &bull; Never Leaves Your Device
+            {{ 'common.privacyBadge' | translate }}
           </app-badge>
         </div>
-        <h1>PDF Merger, Splitter &amp; Page Organizer</h1>
+        <h1>{{ 'tools.pdfMerger.name' | translate }}</h1>
         <p class="g--margin-top-2" style="color: var(--color-text-muted); font-size: 1.125rem;">
-          Combine multiple PDFs, reorganize, rotate, or split documents directly in your browser with zero upload limits.
+          {{ 'tools.pdfMerger.description' | translate }}
         </p>
       </div>
 

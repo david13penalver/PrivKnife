@@ -1,3 +1,4 @@
+import { TranslatePipe } from '../../../core/i18n';
 import {
   AfterViewInit,
   ChangeDetectionStrategy,
@@ -37,22 +38,19 @@ import {
   selector: 'app-qr-stand-keychain',
   standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [FormsModule, Badge, Card],
+  imports: [FormsModule, Badge, Card, TranslatePipe],
   template: `
     <div class="l-columns l-columns--1 g--margin-x-auto" style="max-width: 1280px; padding: 0 16px;">
       <!-- Tool Header & Privacy Assurance -->
       <div class="l-columns__area g--text-center g--margin-bottom-6">
         <div class="g--flex-center g--margin-bottom-3">
           <app-badge variant="privacy" [dot]="true">
-            🛡️ 100% In-Browser 3D CAD &bull; Zero Server Ingestion &bull; Zero Telemetry
+            {{ 'common.privacyBadge' | translate }}
           </app-badge>
         </div>
-        <h1 style="font-size: clamp(1.8rem, 4vw, 2.75rem); font-weight: 800; line-height: 1.2; letter-spacing: -0.02em;">
-          3D QR Stand &amp; Keychain Generator
-        </h1>
+        <h1 style="font-size: clamp(1.8rem, 4vw, 2.75rem); font-weight: 800; line-height: 1.2; letter-spacing: -0.02em;">{{ 'tools.qrStandKeychain.name' | translate }}</h1>
         <p class="g--margin-top-2 g--margin-x-auto" style="max-width: 760px; color: var(--color-text-secondary); font-size: 1.1rem;">
-          Generate slice-ready dual-color <strong>.3mf</strong> and <strong>.stl</strong> models of functional tabletop QR code stands,
-          keychain loops, and plaques for 3D printing. Compatible with Bambu Studio, OrcaSlicer, PrusaSlicer, and manual color swaps.
+          {{ 'tools.qrStandKeychain.description' | translate }}
         </p>
       </div>
 

@@ -1,3 +1,4 @@
+import { TranslatePipe } from '../../../core/i18n';
 import {
   Component,
   ElementRef,
@@ -28,7 +29,7 @@ import {
 @Component({
   selector: 'app-diff-checker',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, TranslatePipe],
   templateUrl: './diff-checker.component.html',
   styleUrls: ['./diff-checker.component.scss'],
 })
