@@ -38,7 +38,7 @@
     <!-- Controls & Stamping Tools Column -->
     <div class="l-columns__area">
       <!-- Document Upload Card -->
-      <app-card title="1. Select or Drop PDF" class="g--margin-bottom-4">
+      <app-card [title]="'tools.pdfSignerStamper.openTitle' | translate" class="g--margin-bottom-4">
         <app-dropzone
           title="Drop your PDF document here"
           subtitle="or click to browse from your device (zero server upload)"
@@ -58,7 +58,7 @@
       </app-card>
 
       <!-- Signature Pad Card -->
-      <app-card title="2. Draw or Type Signature" class="g--margin-bottom-4">
+      <app-card [title]="'tools.pdfSignerStamper.signatureTitle' | translate" class="g--margin-bottom-4">
         <!-- Mode Toggle Pills -->
         <div class="c-pdf-signer__mode-pills g--margin-bottom-3">
           <button
@@ -68,7 +68,7 @@
             [class.c-button--outline]="signatureMode() !== 'draw'"
             (click)="setSignatureMode('draw')"
           >
-            ✏️ Draw Signature
+            ✏️ {{ 'tools.pdfSignerStamper.drawSig' | translate }}
           </button>
           <button
             type="button"
@@ -223,7 +223,7 @@
       </app-card>
 
       <!-- Date Stamper & Initials Card -->
-      <app-card title="3. Date Stamps & Initials" class="g--margin-bottom-4">
+      <app-card [title]="'tools.pdfSignerStamper.auditTitle' | translate" class="g--margin-bottom-4">
         <!-- Date Stamper -->
         <div class="c-input g--margin-bottom-3">
           <label class="c-input__label g--margin-bottom-1">Date Format</label>
@@ -315,7 +315,7 @@
     <!-- Preview & Placed Annotations Column -->
     <div class="l-columns__area">
       <!-- Document Stamps List & Action Card -->
-      <app-card title="Placed Stamps & Live Document Viewport" class="g--margin-bottom-4">
+      <app-card [title]="'tools.pdfSignerStamper.viewerTitle' | translate" class="g--margin-bottom-4">
         <!-- Page Selector if multi-page -->
         @if (pageCount() > 1) {
           <div class="c-pdf-signer__page-selector-bar g--margin-bottom-3 l-extremo g--align-center">
@@ -516,7 +516,7 @@
             @if (isProcessing()) {
               <span>Embedding & Flattening PDF...</span>
             } @else {
-              <span>Download Signed PDF ({{ placedStamps().length }} Stamps)</span>
+              <span>{{ 'tools.pdfSignerStamper.savePdf' | translate }} ({{ placedStamps().length }} Stamps)</span>
             }
           </button>
         </div>

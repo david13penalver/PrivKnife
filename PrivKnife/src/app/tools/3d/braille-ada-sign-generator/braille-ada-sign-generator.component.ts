@@ -79,7 +79,7 @@ import {
         <div class="l-columns__area">
           <app-card>
             <div class="c-card__header">
-              <h2 class="c-card__title">1. Sign Content & Tactile Typography</h2>
+              <h2 class="c-card__title">{{ 'tools.brailleAdaSignGenerator.textTitle' | translate }}</h2>
             </div>
             <div class="c-card__body">
               <!-- Room Title -->
@@ -215,7 +215,7 @@ import {
           <!-- Plaque Physical Dimensions -->
           <app-card class="g--margin-top-4">
             <div class="c-card__header">
-              <h2 class="c-card__title">2. Plaque Dimensions & Mounting</h2>
+              <h2 class="c-card__title">{{ 'tools.brailleAdaSignGenerator.reliefTitle' | translate }}</h2>
             </div>
             <div class="c-card__body">
               <div class="grid-2-col">
@@ -327,7 +327,7 @@ import {
                   class="c-button c-button--outline c-button--small"
                   (click)="resetToDefaults()"
                 >
-                  🔄 Reset Defaults
+                  🔄 {{ 'common.resetDefaults' | translate }}
                 </button>
               </div>
             </div>
@@ -339,7 +339,7 @@ import {
           <app-card>
             <div class="c-card__header l-extremo">
               <div class="l-extremo__area-izquierda">
-                <h2 class="c-card__title">Interactive 3D Sign Viewport</h2>
+                <h2 class="c-card__title">{{ 'common.interactivePreview' | translate }}</h2>
               </div>
               <div class="l-extremo__area-derecha">
                 <span class="badge-dim">

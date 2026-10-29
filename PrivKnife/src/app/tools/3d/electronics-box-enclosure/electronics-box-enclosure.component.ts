@@ -66,7 +66,7 @@ import {
           <!-- Curated Presets -->
           <app-card>
             <div class="c-card__header">
-              <h2 class="c-card__title">1. Common Microcontroller & Device Presets</h2>
+              <h2 class="c-card__title">{{ 'tools.electronicsBoxEnclosure.presetsTitle' | translate }}</h2>
             </div>
             <div class="c-card__body">
               <div class="enclosure-presets">
@@ -88,13 +88,13 @@ import {
           <!-- Dimensions & Shell Parameters -->
           <app-card class="g--margin-top-4">
             <div class="c-card__header">
-              <h2 class="c-card__title">2. Internal Dimensions & Wall Thickness</h2>
+              <h2 class="c-card__title">{{ 'tools.electronicsBoxEnclosure.dimensionsTitle' | translate }}</h2>
             </div>
             <div class="c-card__body">
               <!-- Internal Dimensions -->
               <div class="param-grid">
                 <div class="control-group">
-                  <label class="c-input__label">Inner Length: <strong>{{ innerLengthMm() }} mm</strong></label>
+                  <label class="c-input__label">{{ 'tools.electronicsBoxEnclosure.innerLength' | translate }} <strong>{{ innerLengthMm() }} mm</strong></label>
                   <input
                     type="range"
                     class="c-input c-input__slider"
@@ -107,7 +107,7 @@ import {
                 </div>
 
                 <div class="control-group">
-                  <label class="c-input__label">Inner Width: <strong>{{ innerWidthMm() }} mm</strong></label>
+                  <label class="c-input__label">{{ 'tools.electronicsBoxEnclosure.innerWidth' | translate }} <strong>{{ innerWidthMm() }} mm</strong></label>
                   <input
                     type="range"
                     class="c-input c-input__slider"
@@ -122,7 +122,7 @@ import {
 
               <div class="param-grid g--margin-top-3">
                 <div class="control-group">
-                  <label class="c-input__label">Inner Height: <strong>{{ innerHeightMm() }} mm</strong></label>
+                  <label class="c-input__label">{{ 'tools.electronicsBoxEnclosure.innerHeight' | translate }} <strong>{{ innerHeightMm() }} mm</strong></label>
                   <input
                     type="range"
                     class="c-input c-input__slider"
@@ -135,7 +135,7 @@ import {
                 </div>
 
                 <div class="control-group">
-                  <label class="c-input__label">Wall Thickness: <strong>{{ wallThicknessMm() | number:'1.1-1' }} mm</strong></label>
+                  <label class="c-input__label">{{ 'tools.electronicsBoxEnclosure.wallThickness' | translate }} <strong>{{ wallThicknessMm() | number:'1.1-1' }} mm</strong></label>
                   <input
                     type="range"
                     class="c-input c-input__slider"
@@ -279,7 +279,7 @@ import {
                   class="c-button c-button--outline"
                   (click)="resetToDefaults()"
                 >
-                  Reset Defaults
+                  {{ 'common.resetDefaults' | translate }}
                 </button>
               </div>
             </div>
@@ -356,7 +356,7 @@ import {
             <!-- Export Buttons -->
             <div class="c-card__footer l-extremo">
               <div class="l-extremo__area-izquierda">
-                <span class="g--text-muted">Export formats:</span>
+                <span class="g--text-muted">{{ 'common.exportFormats' | translate }}</span>
               </div>
               <div class="l-extremo__area-derecha export-actions">
                 <button

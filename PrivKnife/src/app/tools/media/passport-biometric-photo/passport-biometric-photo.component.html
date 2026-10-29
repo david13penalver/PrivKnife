@@ -14,7 +14,7 @@
 
   <!-- Quick Country Presets Bar -->
   <div class="c-passport__preset-strip g--margin-bottom-4">
-    <span class="c-passport__preset-label">Standard Presets:</span>
+    <span class="c-passport__preset-label">{{ 'common.curatedPresets' | translate }}</span>
     <div class="c-passport__button-group">
       @for (presetKey of presetKeys; track presetKey) {
         <button
@@ -35,7 +35,7 @@
     <!-- Controls Column -->
     <div class="l-columns__area">
       <!-- Portrait Input Card -->
-      <app-card title="1. Select or Upload Portrait" class="g--margin-bottom-4">
+      <app-card [title]="'tools.passportBiometricPhoto.uploadTitle' | translate" class="g--margin-bottom-4">
         <!-- Sample Selector -->
         <div class="c-passport__sample-selector g--margin-bottom-3">
           <label class="c-input__label g--margin-bottom-1">Try Sample Portrait:</label>
@@ -68,12 +68,12 @@
       </app-card>
 
       <!-- Framing & Biometric Adjustments Card -->
-      <app-card title="2. Framing & Adjustments" class="g--margin-bottom-4">
+      <app-card [title]="'tools.passportBiometricPhoto.adjustmentsTitle' | translate" class="g--margin-bottom-4">
         <!-- Zoom Slider -->
         <div class="c-input g--margin-bottom-3">
           <div class="l-extremo">
             <div class="l-extremo__area-izquierda">
-              <label class="c-input__label" for="zoomRange">Scale / Zoom Level</label>
+              <label class="c-input__label" for="zoomRange">{{ 'tools.passportBiometricPhoto.scaleZoom' | translate }}</label>
             </div>
             <div class="l-extremo__area-derecha">
               <span class="c-input__value">{{ zoomLevel().toFixed(2) }}x</span>
@@ -95,7 +95,7 @@
         <div class="c-input g--margin-bottom-3">
           <div class="l-extremo">
             <div class="l-extremo__area-izquierda">
-              <label class="c-input__label" for="tiltRange">Head Tilt Correction</label>
+              <label class="c-input__label" for="tiltRange">{{ 'tools.passportBiometricPhoto.headTilt' | translate }}</label>
             </div>
             <div class="l-extremo__area-derecha">
               <span class="c-input__value">{{ tiltAngleDeg().toFixed(1) }}°</span>

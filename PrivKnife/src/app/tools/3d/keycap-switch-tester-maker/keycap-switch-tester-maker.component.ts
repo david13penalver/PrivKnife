@@ -101,7 +101,7 @@ import {
             <!-- Keycap Configuration -->
             <app-card>
               <div class="c-card__header">
-                <h2 class="c-card__title">1. Keycap Profile & Dimensions</h2>
+                <h2 class="c-card__title">{{ 'tools.keycapSwitchTesterMaker.stemTitle' | translate }}</h2>
               </div>
               <div class="c-card__body">
                 <!-- Profile -->
@@ -290,7 +290,7 @@ import {
             <!-- Switch Tester Tray Configuration -->
             <app-card>
               <div class="c-card__header">
-                <h2 class="c-card__title">1. Switch Tester Tray Grid</h2>
+                <h2 class="c-card__title">{{ 'tools.keycapSwitchTesterMaker.matrixTitle' | translate }}</h2>
               </div>
               <div class="c-card__body">
                 <div class="grid-2-col">
@@ -348,7 +348,7 @@ import {
               class="c-button c-button--outline c-button--small"
               (click)="resetToDefaults()"
             >
-              🔄 Reset Defaults
+              🔄 {{ 'common.resetDefaults' | translate }}
             </button>
           </div>
         </div>
@@ -358,7 +358,7 @@ import {
           <app-card>
             <div class="c-card__header l-extremo">
               <div class="l-extremo__area-izquierda">
-                <h2 class="c-card__title">Interactive 3D Viewport</h2>
+                <h2 class="c-card__title">{{ 'common.interactiveViewport' | translate }}</h2>
               </div>
               <div class="l-extremo__area-derecha">
                 @if (currentMetrics(); as metrics) {

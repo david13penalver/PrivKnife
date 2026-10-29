@@ -25,7 +25,7 @@
     <section class="l-columns__area c-card">
       <div class="c-card__header l-extremo">
         <div class="l-extremo__area-izquierda">
-          <h2 class="c-card__title">Scrubber Configuration &amp; Input</h2>
+          <h2 class="c-card__title">{{ 'tools.piiScrubberAnonymizer.rulesTitle' | translate }}</h2>
         </div>
         <div class="l-extremo__area-derecha">
           <button
@@ -268,7 +268,7 @@
     <section class="l-columns__area c-card">
       <div class="c-card__header l-extremo">
         <div class="l-extremo__area-izquierda">
-          <h2 class="c-card__title">Anonymized Output &amp; Audit</h2>
+          <h2 class="c-card__title">{{ 'tools.piiScrubberAnonymizer.previewTitle' | translate }}</h2>
         </div>
         <div class="l-extremo__area-derecha">
           @if (lastResult()) {
@@ -277,7 +277,11 @@
               class="c-button c-button--outline c-button--small"
               (click)="copyToClipboard()"
             >
-              {{ copySuccess() ? '✓ Copied!' : 'Copy Sanitized' }}
+              @if (copySuccess()) {
+                ✓ Copied!
+              } @else {
+                {{ 'tools.piiScrubberAnonymizer.copyClean' | translate }}
+              }
             </button>
           }
         </div>

@@ -151,7 +151,7 @@
     <!-- Original Input -->
     <section class="l-columns__area c-card">
       <div class="c-card__header l-extremo">
-        <h2 class="c-card__title l-extremo__area-izquierda">Original (Before)</h2>
+        <h2 class="c-card__title l-extremo__area-izquierda">{{ 'tools.diffChecker.originalTitle' | translate }}</h2>
         <div class="l-extremo__area-derecha">
           <input
             #origFileInput
@@ -184,7 +184,7 @@
     <!-- Modified Input -->
     <section class="l-columns__area c-card">
       <div class="c-card__header l-extremo">
-        <h2 class="c-card__title l-extremo__area-izquierda">Modified (After)</h2>
+        <h2 class="c-card__title l-extremo__area-izquierda">{{ 'tools.diffChecker.modifiedTitle' | translate }}</h2>
         <div class="l-extremo__area-derecha">
           <input
             #modFileInput
@@ -403,7 +403,7 @@
           class="c-button c-button--outline"
           (click)="reset()"
         >
-          Reset / Clear
+          {{ 'common.resetDefaults' | translate }}
         </button>
       </div>
       <div class="l-extremo__area-derecha c-diff-checker__export-actions">
@@ -413,7 +413,7 @@
           [disabled]="result().lines.length === 0"
           (click)="downloadExport('patch')"
         >
-          Download .patch
+          {{ 'tools.diffChecker.exportPatch' | translate }}
         </button>
         <button
           type="button"

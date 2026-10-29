@@ -17,7 +17,7 @@
     <!-- Configuration & Upload Area -->
     <section class="l-columns__area c-card">
       <div class="c-card__header l-extremo c-texture-gen__card-header">
-        <h2 class="c-card__title l-extremo__area-izquierda">Texture Settings</h2>
+        <h2 class="c-card__title l-extremo__area-izquierda">{{ 'tools.seamlessTextureGenerator.synthesisTitle' | translate }}</h2>
         <div class="l-extremo__area-derecha">
           <button
             type="button"
@@ -241,7 +241,7 @@
     <!-- Preview & Deliverable Area -->
     <section class="l-columns__area c-card">
       <div class="c-card__header l-extremo c-texture-gen__card-header">
-        <h2 class="c-card__title l-extremo__area-izquierda">Texture Viewport</h2>
+        <h2 class="c-card__title l-extremo__area-izquierda">{{ 'tools.seamlessTextureGenerator.tiledTitle' | translate }}</h2>
         <div class="l-extremo__area-derecha c-texture-gen__tab-group">
           <button
             type="button"
@@ -323,7 +323,7 @@
             [disabled]="!result() || !result()?.success"
             (click)="downloadDiffuse()"
           >
-            Download Diffuse PNG
+            {{ 'tools.seamlessTextureGenerator.downloadTile' | translate }}
           </button>
         </div>
         <div class="l-extremo__area-derecha">
@@ -333,7 +333,7 @@
             [disabled]="!result() || !result()?.success || !result()?.normalMapBlob"
             (click)="downloadNormal()"
           >
-            Download Normal PNG
+            {{ 'tools.seamlessTextureGenerator.downloadNormal' | translate }}
           </button>
         </div>
       </div>

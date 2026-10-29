@@ -17,7 +17,7 @@
     <!-- Controls Column -->
     <div class="l-columns__area">
       <!-- File Dropzone Card -->
-      <app-card title="1. Select or Drop Images" class="g--margin-bottom-4">
+      <app-card [title]="'tools.heicAvifConverter.dropTitle' | translate" class="g--margin-bottom-4">
         <!-- Sample Batch Loader Button -->
         <div class="c-heic-converter__sample-action g--margin-bottom-3">
           <button
@@ -46,7 +46,7 @@
       </app-card>
 
       <!-- Conversion Parameters Card -->
-      <app-card title="2. Output Settings" class="g--margin-bottom-4">
+      <app-card [title]="'tools.heicAvifConverter.settingsTitle' | translate" class="g--margin-bottom-4">
         <!-- Format Selector -->
         <div class="c-input g--margin-bottom-3">
           <label class="c-input__label g--margin-bottom-1">Target Format</label>
@@ -189,7 +189,7 @@
               class="c-button c-button--small c-button--outline"
               (click)="resetToDefaults()"
             >
-              Reset Defaults
+              {{ 'common.resetDefaults' | translate }}
             </button>
           </div>
         </div>
@@ -199,7 +199,7 @@
     <!-- Queue & Deliverables Column -->
     <div class="l-columns__area">
       <!-- Queue Summary Card -->
-      <app-card title="Batch Queue & Statistics" class="g--margin-bottom-4">
+      <app-card [title]="'tools.heicAvifConverter.resultsTitle' | translate" class="g--margin-bottom-4">
         <div class="c-heic-converter__stats-grid g--margin-bottom-3">
           <div class="c-heic-converter__stat-card">
             <span class="c-heic-converter__stat-label">Files Queued</span>
@@ -240,7 +240,7 @@
               [disabled]="imageQueue().length === 0 || isConverting()"
               (click)="startBatchConversion()"
             >
-              Convert All ({{ imageQueue().length }})
+              {{ 'tools.heicAvifConverter.convertAll' | translate }} ({{ imageQueue().length }})
             </button>
           </div>
 
@@ -262,7 +262,7 @@
               [disabled]="imageQueue().length === 0 || isConverting()"
               (click)="clearQueue()"
             >
-              Clear Queue
+              {{ 'tools.heicAvifConverter.clearList' | translate }}
             </button>
           </div>
         </div>

@@ -81,7 +81,7 @@ import {
         <div class="l-columns__area">
           <app-card>
             <div class="c-card__header">
-              <h2 class="c-card__title">1. Pegboard System & Style</h2>
+              <h2 class="c-card__title">{{ 'tools.skadisPegboardMaker.mountTitle' | translate }}</h2>
             </div>
             <div class="c-card__body">
               <!-- System Selection -->
@@ -175,7 +175,7 @@ import {
           <!-- Parametric Dimensions -->
           <app-card class="g--margin-top-4">
             <div class="c-card__header">
-              <h2 class="c-card__title">2. Dimensions & Fit</h2>
+              <h2 class="c-card__title">{{ 'tools.skadisPegboardMaker.retentionTitle' | translate }}</h2>
             </div>
             <div class="c-card__body">
               <!-- Hook Length -->
@@ -310,7 +310,7 @@ import {
           <app-card>
             <div class="c-card__header l-extremo">
               <div class="l-extremo__area-izquierda">
-                <h2 class="c-card__title">3D Preview & Mounting Simulation</h2>
+                <h2 class="c-card__title">{{ 'common.interactivePreview' | translate }}</h2>
               </div>
             </div>
 
@@ -347,11 +347,11 @@ import {
                   <span class="metric-value">{{ metrics().prongCount }} Lugs</span>
                 </div>
                 <div class="metric-card">
-                  <span class="metric-label">Est. Weight</span>
+                  <span class="metric-label">{{ 'common.estWeight' | translate }}</span>
                   <span class="metric-value">{{ metrics().estimatedGrams }} g (PLA/PETG)</span>
                 </div>
                 <div class="metric-card">
-                  <span class="metric-label">Est. Print Time</span>
+                  <span class="metric-label">{{ 'common.estPrintTime' | translate }}</span>
                   <span class="metric-value">~{{ metrics().estimatedPrintTimeHours }} hrs</span>
                 </div>
               </div>

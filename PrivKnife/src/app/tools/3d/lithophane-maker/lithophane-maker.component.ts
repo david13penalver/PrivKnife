@@ -72,7 +72,7 @@ import {
           <!-- Preset Templates -->
           <app-card>
             <div class="c-card__header">
-              <h2 class="c-card__title">1. Choose a Starting Template</h2>
+              <h2 class="c-card__title">{{ 'tools.lithophaneMaker.templatesTitle' | translate }}</h2>
             </div>
             <div class="c-card__body">
               <div class="litho-presets">
@@ -94,7 +94,7 @@ import {
           <!-- Image Selection & Tuning -->
           <app-card class="g--margin-top-4">
             <div class="c-card__header">
-              <h2 class="c-card__title">2. Image Source & Contrast</h2>
+              <h2 class="c-card__title">{{ 'tools.lithophaneMaker.imageTitle' | translate }}</h2>
             </div>
             <div class="c-card__body">
               <app-dropzone
@@ -121,7 +121,7 @@ import {
               <!-- Contrast and Invert Controls -->
               <div class="control-row g--margin-top-4">
                 <label class="c-input__label">
-                  Contrast Boost: <strong>{{ contrastFactor() | number:'1.2-2' }}x</strong>
+                  {{ 'tools.lithophaneMaker.contrastBoost' | translate }} <strong>{{ contrastFactor() | number:'1.2-2' }}x</strong>
                 </label>
                 <input
                   type="range"
@@ -141,7 +141,7 @@ import {
                     [checked]="invertLuminance()"
                     (change)="toggleInvert()"
                   />
-                  <span>Invert Optical Relief (Negative Mode)</span>
+                  <span>{{ 'tools.lithophaneMaker.invertRelief' | translate }}</span>
                 </label>
               </div>
             </div>
@@ -150,12 +150,12 @@ import {
           <!-- Geometry & Sizing Parameters -->
           <app-card class="g--margin-top-4">
             <div class="c-card__header">
-              <h2 class="c-card__title">3. 3D Geometry & Wall Dimensions</h2>
+              <h2 class="c-card__title">{{ 'tools.lithophaneMaker.geometryTitle' | translate }}</h2>
             </div>
             <div class="c-card__body">
               <!-- Geometry Type Selector -->
               <div class="control-group">
-                <label class="c-input__label">Geometry Style</label>
+                <label class="c-input__label">{{ 'tools.lithophaneMaker.geometryStyle' | translate }}</label>
                 <div class="geom-button-row">
                   <button
                     type="button"
@@ -200,7 +200,7 @@ import {
               @if (geometryType() === 'curve_arc') {
                 <div class="control-row g--margin-top-3">
                   <label class="c-input__label">
-                    Arc Angle: <strong>{{ arcDegrees() }}°</strong>
+                    {{ 'tools.lithophaneMaker.arcAngle' | translate }} <strong>{{ arcDegrees() }}°</strong>
                   </label>
                   <input
                     type="range"
@@ -217,7 +217,7 @@ import {
               <!-- Width & Height -->
               <div class="param-grid g--margin-top-3">
                 <div class="control-group">
-                  <label class="c-input__label">Width: <strong>{{ widthMm() }} mm</strong></label>
+                  <label class="c-input__label">{{ 'tools.lithophaneMaker.width' | translate }} <strong>{{ widthMm() }} mm</strong></label>
                   <input
                     type="range"
                     class="c-input c-input__slider"
@@ -230,7 +230,7 @@ import {
                 </div>
 
                 <div class="control-group">
-                  <label class="c-input__label">Height: <strong>{{ heightMm() }} mm</strong></label>
+                  <label class="c-input__label">{{ 'tools.lithophaneMaker.height' | translate }} <strong>{{ heightMm() }} mm</strong></label>
                   <input
                     type="range"
                     class="c-input c-input__slider"
@@ -247,7 +247,7 @@ import {
               <div class="param-grid g--margin-top-3">
                 <div class="control-group">
                   <label class="c-input__label">
-                    Min Thickness (Highlights): <strong>{{ minThicknessMm() | number:'1.2-2' }} mm</strong>
+                    {{ 'tools.lithophaneMaker.minThickness' | translate }} <strong>{{ minThicknessMm() | number:'1.2-2' }} mm</strong>
                   </label>
                   <input
                     type="range"
@@ -262,7 +262,7 @@ import {
 
                 <div class="control-group">
                   <label class="c-input__label">
-                    Max Thickness (Shadows): <strong>{{ maxThicknessMm() | number:'1.2-2' }} mm</strong>
+                    {{ 'tools.lithophaneMaker.maxThickness' | translate }} <strong>{{ maxThicknessMm() | number:'1.2-2' }} mm</strong>
                   </label>
                   <input
                     type="range"
@@ -279,7 +279,7 @@ import {
               <!-- Solid Border Frame -->
               <div class="param-grid g--margin-top-3">
                 <div class="control-group">
-                  <label class="c-input__label">Border Width: <strong>{{ frameBorderWidthMm() }} mm</strong></label>
+                  <label class="c-input__label">Border {{ 'tools.lithophaneMaker.width' | translate }} <strong>{{ frameBorderWidthMm() }} mm</strong></label>
                   <input
                     type="range"
                     class="c-input c-input__slider"
@@ -292,7 +292,7 @@ import {
                 </div>
 
                 <div class="control-group">
-                  <label class="c-input__label">Border Depth: <strong>{{ frameBorderDepthMm() | number:'1.1-1' }} mm</strong></label>
+                  <label class="c-input__label">{{ 'tools.lithophaneMaker.borderDepth' | translate }} <strong>{{ frameBorderDepthMm() | number:'1.1-1' }} mm</strong></label>
                   <input
                     type="range"
                     class="c-input c-input__slider"
@@ -313,7 +313,7 @@ import {
                     [checked]="baseStandSlot()"
                     (change)="toggleBaseStand()"
                   />
-                  <span>Add Integrated Stabilizing Foot / Standing Lip</span>
+                  <span>{{ 'tools.lithophaneMaker.stabilizingFoot' | translate }}</span>
                 </label>
               </div>
             </div>
@@ -325,7 +325,7 @@ import {
                   class="c-button c-button--outline"
                   (click)="resetToDefaults()"
                 >
-                  Reset Defaults
+                  {{ 'common.resetDefaults' | translate }}
                 </button>
               </div>
             </div>
@@ -337,7 +337,7 @@ import {
           <app-card>
             <div class="c-card__header l-extremo">
               <div class="l-extremo__area-izquierda">
-                <h2 class="c-card__title">Interactive 3D Viewport</h2>
+                <h2 class="c-card__title">{{ 'tools.lithophaneMaker.viewportTitle' | translate }}</h2>
               </div>
               <!-- Backlight Simulator Toggle -->
               <div class="l-extremo__area-derecha backlight-toolbar">
@@ -349,7 +349,7 @@ import {
                   (click)="toggleBacklight()"
                   title="Toggle real-time backlight transmission simulation"
                 >
-                  💡 Backlight: {{ backlightOn() ? 'ON' : 'OFF' }}
+                  💡 {{ 'tools.lithophaneMaker.backlight' | translate }} {{ backlightOn() ? 'ON' : 'OFF' }}
                 </button>
               </div>
             </div>
@@ -384,7 +384,7 @@ import {
               @if (currentMetrics(); as metrics) {
                 <div class="metrics-grid g--margin-top-4">
                   <div class="metric-card">
-                    <span class="metric-label">Dimensions</span>
+                    <span class="metric-label">{{ 'common.dimensions' | translate }}</span>
                     <strong class="metric-value">{{ metrics.widthMm }} × {{ metrics.heightMm }} × {{ metrics.depthMm }} mm</strong>
                   </div>
                   <div class="metric-card">
@@ -392,11 +392,11 @@ import {
                     <strong class="metric-value">{{ metrics.triangleCount | number }} tris</strong>
                   </div>
                   <div class="metric-card">
-                    <span class="metric-label">Est. Weight</span>
+                    <span class="metric-label">{{ 'common.estWeight' | translate }}</span>
                     <strong class="metric-value">{{ metrics.estimatedGrams }} g (PLA)</strong>
                   </div>
                   <div class="metric-card">
-                    <span class="metric-label">Est. Print Time</span>
+                    <span class="metric-label">{{ 'common.estPrintTime' | translate }}</span>
                     <strong class="metric-value">~{{ metrics.estimatedPrintTimeHours }} hrs</strong>
                   </div>
                 </div>
@@ -416,7 +416,7 @@ import {
             <!-- Export Buttons -->
             <div class="c-card__footer l-extremo">
               <div class="l-extremo__area-izquierda">
-                <span class="g--text-muted">Export formats:</span>
+                <span class="g--text-muted">{{ 'common.exportFormats' | translate }}</span>
               </div>
               <div class="l-extremo__area-derecha export-actions">
                 <button
@@ -424,21 +424,21 @@ import {
                   class="c-button c-button--outline"
                   (click)="downloadPngSnapshot()"
                 >
-                  Snapshot .PNG
+                  {{ 'common.exportPng' | translate }}
                 </button>
                 <button
                   type="button"
                   class="c-button c-button--outline"
                   (click)="downloadFormat('3mf')"
                 >
-                  Download .3MF (Bambu / Prusa)
+                  {{ 'common.export3mf' | translate }}
                 </button>
                 <button
                   type="button"
                   class="c-button c-button--primary"
                   (click)="downloadFormat('stl')"
                 >
-                  Download .STL (Binary Mesh)
+                  {{ 'common.exportStl' | translate }}
                 </button>
               </div>
             </div>

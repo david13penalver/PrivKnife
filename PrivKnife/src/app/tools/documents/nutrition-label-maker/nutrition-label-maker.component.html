@@ -49,7 +49,7 @@
 
         <div class="l-columns l-columns--2 g--margin-bottom-4">
           <div class="l-columns__area">
-            <label class="c-input__label" for="servingSizeInput">Serving Size</label>
+            <label class="c-input__label" for="servingSizeInput">{{ 'tools.nutritionLabelMaker.servingSize' | translate }}</label>
             <input
               id="servingSizeInput"
               type="text"
@@ -60,7 +60,7 @@
             />
           </div>
           <div class="l-columns__area">
-            <label class="c-input__label" for="servingsContainerInput">Servings Per Container</label>
+            <label class="c-input__label" for="servingsContainerInput">{{ 'tools.nutritionLabelMaker.servingsPerContainer' | translate }}</label>
             <input
               id="servingsContainerInput"
               type="text"
@@ -72,9 +72,9 @@
           </div>
         </div>
 
-        <!-- Calories -->
+        <!-- {{ 'tools.nutritionLabelMaker.calories' | translate }} -->
         <div class="g--margin-bottom-4">
-          <label class="c-input__label" for="caloriesInput">Calories per Serving</label>
+          <label class="c-input__label" for="caloriesInput">{{ 'tools.nutritionLabelMaker.calories' | translate }} per Serving</label>
           <input
             id="caloriesInput"
             type="number"

@@ -15,7 +15,7 @@
     <!-- Controls Column -->
     <div class="l-columns__area c-card">
       <div class="c-card__header">
-        <h2 class="c-card__title">Compression & Resize Parameters</h2>
+        <h2 class="c-card__title">{{ 'tools.videoCompressorResizer.controlsTitle' | translate }}</h2>
       </div>
       <div class="c-card__body">
         <!-- Dropzone -->
@@ -163,7 +163,11 @@
             (click)="compressVideo()"
             [disabled]="isProcessing() || !hasVideoData()"
           >
-            {{ isProcessing() ? 'Compressing Video...' : 'Compress & Resize Video' }}
+            @if (isProcessing()) {
+              Compressing Video...
+            } @else {
+              {{ 'tools.videoCompressorResizer.compressAction' | translate }}
+            }
           </button>
         </div>
       </div>
@@ -172,7 +176,7 @@
     <!-- Preview & Output Column -->
     <div class="l-columns__area c-card">
       <div class="c-card__header">
-        <h2 class="c-card__title">Bitrate Budget & Preview</h2>
+        <h2 class="c-card__title">{{ 'tools.videoCompressorResizer.previewTitle' | translate }}</h2>
       </div>
 
       <div class="c-card__body">

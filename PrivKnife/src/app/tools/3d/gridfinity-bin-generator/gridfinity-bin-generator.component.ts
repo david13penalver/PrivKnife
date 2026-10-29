@@ -65,7 +65,7 @@ import {
           <!-- Preset Templates -->
           <app-card>
             <div class="c-card__header">
-              <h2 class="c-card__title">1. Curated Presets</h2>
+              <h2 class="c-card__title">{{ 'tools.gridfinityBinGenerator.presetsTitle' | translate }}</h2>
             </div>
             <div class="c-card__body">
               <div class="presets-grid">
@@ -87,14 +87,14 @@ import {
           <!-- Grid Dimensions & Height -->
           <app-card class="g--margin-top-4">
             <div class="c-card__header">
-              <h2 class="c-card__title">2. Grid Units & Bin Height</h2>
+              <h2 class="c-card__title">{{ 'tools.gridfinityBinGenerator.unitsTitle' | translate }}</h2>
             </div>
             <div class="c-card__body">
               <!-- Grid X & Y Selectors -->
               <div class="param-grid">
                 <div class="control-group">
                   <label class="c-input__label">
-                    Grid Width (X): <strong>{{ gridX() }} units</strong> ({{ gridX() * 42 - 0.5 }} mm)
+                    {{ 'tools.gridfinityBinGenerator.gridWidth' | translate }} <strong>{{ gridX() }} units</strong> ({{ gridX() * 42 - 0.5 }} mm)
                   </label>
                   <div class="unit-btn-row">
                     @for (val of [1, 2, 3, 4, 5, 6]; track val) {
@@ -113,7 +113,7 @@ import {
 
                 <div class="control-group">
                   <label class="c-input__label">
-                    Grid Depth (Y): <strong>{{ gridY() }} units</strong> ({{ gridY() * 42 - 0.5 }} mm)
+                    {{ 'tools.gridfinityBinGenerator.gridDepth' | translate }} <strong>{{ gridY() }} units</strong> ({{ gridY() * 42 - 0.5 }} mm)
                   </label>
                   <div class="unit-btn-row">
                     @for (val of [1, 2, 3, 4, 5, 6]; track val) {
@@ -134,7 +134,7 @@ import {
               <!-- Height in 7mm Units -->
               <div class="control-row g--margin-top-4">
                 <label class="c-input__label">
-                  Bin Height: <strong>{{ heightUnits() }}U</strong> ({{ heightUnits() * 7 }} mm / {{ (heightUnits() * 7 / 25.4) | number:'1.1-1' }} in)
+                  {{ 'tools.gridfinityBinGenerator.binHeight' | translate }} <strong>{{ heightUnits() }}U</strong> ({{ heightUnits() * 7 }} mm / {{ (heightUnits() * 7 / 25.4) | number:'1.1-1' }} in)
                 </label>
                 <input
                   type="range"
@@ -149,7 +149,7 @@ import {
 
               <!-- Stacking Lip Style -->
               <div class="control-group g--margin-top-4">
-                <label class="c-input__label">Top Stacking Lip Style</label>
+                <label class="c-input__label">{{ 'tools.gridfinityBinGenerator.lipStyle' | translate }}</label>
                 <div class="lip-button-row">
                   <button
                     type="button"
@@ -186,13 +186,13 @@ import {
           <!-- Dividers & Ergonomics -->
           <app-card class="g--margin-top-4">
             <div class="c-card__header">
-              <h2 class="c-card__title">3. Dividers, Scoops & Tabs</h2>
+              <h2 class="c-card__title">{{ 'tools.gridfinityBinGenerator.dividersTitle' | translate }}</h2>
             </div>
             <div class="c-card__body">
               <!-- Internal Subdivisions -->
               <div class="param-grid">
                 <div class="control-group">
-                  <label class="c-input__label">X Compartments: <strong>{{ subdivisionsX() }}</strong></label>
+                  <label class="c-input__label">{{ 'tools.gridfinityBinGenerator.xCompartments' | translate }} <strong>{{ subdivisionsX() }}</strong></label>
                   <input
                     type="range"
                     class="c-input c-input__slider"
@@ -205,7 +205,7 @@ import {
                 </div>
 
                 <div class="control-group">
-                  <label class="c-input__label">Y Compartments: <strong>{{ subdivisionsY() }}</strong></label>
+                  <label class="c-input__label">{{ 'tools.gridfinityBinGenerator.yCompartments' | translate }} <strong>{{ subdivisionsY() }}</strong></label>
                   <input
                     type="range"
                     class="c-input c-input__slider"
@@ -227,7 +227,7 @@ import {
                     [checked]="fingerScoop()"
                     (change)="toggleFingerScoop()"
                   />
-                  <span>Curved Finger Scoop (Smooth bottom fillet for sliding small parts out)</span>
+                  <span>{{ 'tools.gridfinityBinGenerator.fingerScoop' | translate }}</span>
                 </label>
               </div>
 
@@ -256,7 +256,7 @@ import {
                     [checked]="labelTab()"
                     (change)="toggleLabelTab()"
                   />
-                  <span>Angled 45° Label Tab (Compatible with 9mm / 12mm label makers)</span>
+                  <span>{{ 'tools.gridfinityBinGenerator.labelTab' | translate }}</span>
                 </label>
               </div>
 
@@ -300,7 +300,7 @@ import {
                     [checked]="baseMagnetHoles()"
                     (change)="toggleMagnetHoles()"
                   />
-                  <span>Base Magnet Pockets (6×2mm neodymium press-fit pockets)</span>
+                  <span>{{ 'tools.gridfinityBinGenerator.magnetPockets' | translate }}</span>
                 </label>
               </div>
 
@@ -312,7 +312,7 @@ import {
                     [checked]="baseScrewHoles()"
                     (change)="toggleScrewHoles()"
                   />
-                  <span>M3 Counterbore Screw Holes (Bolt directly to baseplates)</span>
+                  <span>{{ 'tools.gridfinityBinGenerator.screwHoles' | translate }}</span>
                 </label>
               </div>
             </div>
@@ -324,7 +324,7 @@ import {
                   class="c-button c-button--outline"
                   (click)="resetToDefaults()"
                 >
-                  Reset Defaults
+                  {{ 'common.resetDefaults' | translate }}
                 </button>
               </div>
             </div>
@@ -336,7 +336,7 @@ import {
           <app-card>
             <div class="c-card__header l-extremo">
               <div class="l-extremo__area-izquierda">
-                <h2 class="c-card__title">Interactive 3D Preview</h2>
+                <h2 class="c-card__title">{{ 'tools.gridfinityBinGenerator.viewportTitle' | translate }}</h2>
               </div>
               <div class="l-extremo__area-derecha">
                 <span class="badge-dim">Grid: {{ gridX() }}×{{ gridY() }} ({{ heightUnits() }}U)</span>
@@ -369,7 +369,7 @@ import {
               @if (currentMetrics(); as metrics) {
                 <div class="metrics-grid g--margin-top-4">
                   <div class="metric-card">
-                    <span class="metric-label">Dimensions</span>
+                    <span class="metric-label">{{ 'common.dimensions' | translate }}</span>
                     <strong class="metric-value">{{ metrics.totalWidthMm }} × {{ metrics.totalLengthMm }} × {{ metrics.totalHeightMm }} mm</strong>
                   </div>
                   <div class="metric-card">
@@ -377,11 +377,11 @@ import {
                     <strong class="metric-value">{{ metrics.internalCompartments }} {{ metrics.internalCompartments === 1 ? 'pocket' : 'pockets' }}</strong>
                   </div>
                   <div class="metric-card">
-                    <span class="metric-label">Est. Weight</span>
+                    <span class="metric-label">{{ 'common.estWeight' | translate }}</span>
                     <strong class="metric-value">{{ metrics.estimatedGrams }} g (PLA)</strong>
                   </div>
                   <div class="metric-card">
-                    <span class="metric-label">Est. Print Time</span>
+                    <span class="metric-label">{{ 'common.estPrintTime' | translate }}</span>
                     <strong class="metric-value">~{{ metrics.estimatedPrintTimeHours }} hrs</strong>
                   </div>
                 </div>
@@ -401,7 +401,7 @@ import {
             <!-- Export Buttons -->
             <div class="c-card__footer l-extremo">
               <div class="l-extremo__area-izquierda">
-                <span class="g--text-muted">Export formats:</span>
+                <span class="g--text-muted">{{ 'common.exportFormats' | translate }}</span>
               </div>
               <div class="l-extremo__area-derecha export-actions">
                 <button
@@ -409,14 +409,14 @@ import {
                   class="c-button c-button--outline"
                   (click)="downloadFormat('3mf')"
                 >
-                  Download .3MF (Bambu / Prusa)
+                  {{ 'common.export3mf' | translate }}
                 </button>
                 <button
                   type="button"
                   class="c-button c-button--primary"
                   (click)="downloadFormat('stl')"
                 >
-                  Download .STL (Binary Mesh)
+                  {{ 'common.exportStl' | translate }}
                 </button>
               </div>
             </div>

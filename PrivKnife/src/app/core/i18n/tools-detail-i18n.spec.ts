@@ -2,6 +2,8 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 import { I18nService } from './i18n.service';
 import { ParametricLampDesignerComponent } from '../../tools/3d/parametric-lamp-designer/parametric-lamp-designer.component';
+import { LithophaneMakerComponent } from '../../tools/3d/lithophane-maker/lithophane-maker.component';
+import { GridfinityBinGeneratorComponent } from '../../tools/3d/gridfinity-bin-generator/gridfinity-bin-generator.component';
 import { PassportBiometricPhotoComponent } from '../../tools/media/passport-biometric-photo/passport-biometric-photo.component';
 import { FileEncryptorVaultComponent } from '../../tools/privacy/file-encryptor-vault/file-encryptor-vault.component';
 import { CsvVectorChartBuilderComponent } from '../../tools/dev/csv-vector-chart-builder/csv-vector-chart-builder.component';
@@ -80,6 +82,59 @@ describe('Tools Detail Pages Localization (Batch 2: Tools 31–60)', () => {
     expect(frText).toContain('↺ Réinitialiser');
     expect(frText).toContain('Hauteur Totale :');
     expect(frText).toContain('💡 Ampoule ALLUMÉE');
+
+    fixture.destroy();
+  });
+
+  it('should render Lithophane Maker detail page in Spanish with localized controls and titles', async () => {
+    await TestBed.configureTestingModule({
+      imports: [LithophaneMakerComponent],
+      providers: [I18nService],
+    }).compileComponents();
+
+    i18nService = TestBed.inject(I18nService);
+    await i18nService.setLanguage('es');
+
+    const fixture = TestBed.createComponent(LithophaneMakerComponent);
+    fixture.detectChanges();
+
+    const esText = fixture.nativeElement.textContent;
+    expect(esText).toContain('Creador de Litofanías 3D Curvas y Planas');
+    expect(esText).toContain('1. Elegir una Plantilla Inicial');
+    expect(esText).toContain('2. Fuente de Imagen y Contraste');
+    expect(esText).toContain('3. Geometría 3D y Dimensiones de Pared');
+    expect(esText).toContain('Visor 3D Interactivo');
+    expect(esText).toContain('Realce de Contraste:');
+    expect(esText).toContain('Estilo de Geometría');
+    expect(esText).toContain('Descargar Archivo .3MF');
+    expect(esText).toContain('Descargar .STL Listo para Imprimir');
+
+    fixture.destroy();
+  });
+
+  it('should render Gridfinity Bin Generator detail page in Spanish with localized controls and titles', async () => {
+    await TestBed.configureTestingModule({
+      imports: [GridfinityBinGeneratorComponent],
+      providers: [I18nService],
+    }).compileComponents();
+
+    i18nService = TestBed.inject(I18nService);
+    await i18nService.setLanguage('es');
+
+    const fixture = TestBed.createComponent(GridfinityBinGeneratorComponent);
+    fixture.detectChanges();
+
+    const esText = fixture.nativeElement.textContent;
+    expect(esText).toContain('Generador de Cajas Modulares Gridfinity para Cajones');
+    expect(esText).toContain('1. Preajustes Seleccionados');
+    expect(esText).toContain('2. Unidades de Rejilla y Altura');
+    expect(esText).toContain('3. Divisores, Curvas y Pestañas');
+    expect(esText).toContain('Vista Previa 3D Interactiva');
+    expect(esText).toContain('Anchura de Rejilla (X):');
+    expect(esText).toContain('Profundidad de Rejilla (Y):');
+    expect(esText).toContain('Altura de Caja:');
+    expect(esText).toContain('Curva Ergonómica para Dedos');
+    expect(esText).toContain('Descargar Archivo .3MF');
 
     fixture.destroy();
   });
@@ -273,7 +328,7 @@ describe('Tools Detail Pages Localization (Batch 2: Tools 31–60)', () => {
     fixture.destroy();
   });
 
-  it('should ensure all 30 Batch 2 tools use TranslatePipe and localization keys in their templates', () => {
+  it('should ensure all 30 Batch 2 tools use TranslatePipe and localization keys in their templates', async () => {
     const BATCH_2_TOOL_KEYS = [
       'parametricLampDesigner',
       'lithophaneMaker',
@@ -307,10 +362,19 @@ describe('Tools Detail Pages Localization (Batch 2: Tools 31–60)', () => {
       'csvVectorChartBuilder',
     ];
 
+    const SUPPORTED_LANG_CODES = ['en', 'es', 'fr', 'de', 'it', 'zh', 'ja', 'ar'] as const;
+
     // Assert that each tool's name and description resolve to non-empty translations in all 8 languages
-    for (const key of BATCH_2_TOOL_KEYS) {
-      expect(i18nService.t(`tools.${key}.name`)).not.toBe(`tools.${key}.name`);
-      expect(i18nService.t(`tools.${key}.description`)).not.toBe(`tools.${key}.description`);
+    for (const lang of SUPPORTED_LANG_CODES) {
+      await i18nService.setLanguage(lang);
+      for (const key of BATCH_2_TOOL_KEYS) {
+        const name = i18nService.t(`tools.${key}.name`);
+        const desc = i18nService.t(`tools.${key}.description`);
+        expect(name).not.toBe(`tools.${key}.name`);
+        expect(desc).not.toBe(`tools.${key}.description`);
+        expect(name.length).toBeGreaterThan(3);
+        expect(desc.length).toBeGreaterThan(10);
+      }
     }
   });
 });

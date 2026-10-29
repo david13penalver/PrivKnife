@@ -77,7 +77,7 @@ import {
         <div class="l-columns__area">
           <app-card>
             <div class="c-card__header">
-              <h2 class="c-card__title">1. HSW Cell Plug & Fit Calibration</h2>
+              <h2 class="c-card__title">{{ 'tools.hswInsertAdapter.depthTitle' | translate }}</h2>
             </div>
             <div class="c-card__body">
               <div class="control-group">
@@ -178,7 +178,7 @@ import {
           <!-- Attachment Selection -->
           <app-card class="g--margin-top-4">
             <div class="c-card__header">
-              <h2 class="c-card__title">2. Functional Attachment Type</h2>
+              <h2 class="c-card__title">{{ 'tools.hswInsertAdapter.mountTitle' | translate }}</h2>
             </div>
             <div class="c-card__body">
               <div class="btn-grid-3">
@@ -363,7 +363,7 @@ import {
               class="c-button c-button--outline c-button--small"
               (click)="resetToDefaults()"
             >
-              🔄 Reset Defaults
+              🔄 {{ 'common.resetDefaults' | translate }}
             </button>
           </div>
         </div>
@@ -373,7 +373,7 @@ import {
           <app-card>
             <div class="c-card__header l-extremo">
               <div class="l-extremo__area-izquierda">
-                <h2 class="c-card__title">Interactive 3D Viewport</h2>
+                <h2 class="c-card__title">{{ 'common.interactiveViewport' | translate }}</h2>
               </div>
               <div class="l-extremo__area-derecha">
                 @if (currentMetrics(); as metrics) {
@@ -417,7 +417,7 @@ import {
                     <span class="metric-value">{{ metrics.totalLengthMm }} mm</span>
                   </div>
                   <div class="metric-item">
-                    <span class="metric-label">Est. Weight</span>
+                    <span class="metric-label">{{ 'common.estWeight' | translate }}</span>
                     <span class="metric-value">~{{ metrics.estimatedGrams.toFixed(1) }} g</span>
                   </div>
                   <div class="metric-item">

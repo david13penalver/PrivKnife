@@ -18,7 +18,7 @@
     <div class="l-columns__area c-card c-chart-builder__controls-card">
       <div class="c-card__header l-extremo">
         <div class="l-extremo__area-izquierda">
-          <h2 class="c-card__title">Data Input &amp; Chart Configuration</h2>
+          <h2 class="c-card__title">{{ 'tools.csvVectorChartBuilder.sourceTitle' | translate }}</h2>
         </div>
       </div>
 
@@ -225,7 +225,11 @@
             class="c-button c-button--outline c-chart-builder__action-btn"
             (click)="copySvgCode()"
           >
-            {{ copiedFeedback() ? '✓ SVG Copied!' : 'Copy SVG Code' }}
+            @if (copiedFeedback()) {
+              ✓ SVG Copied!
+            } @else {
+              {{ 'tools.csvVectorChartBuilder.copySvg' | translate }}
+            }
           </button>
         </div>
       </div>
@@ -235,7 +239,7 @@
     <div class="l-columns__area c-card c-chart-builder__preview-card">
       <div class="c-card__header l-extremo">
         <div class="l-extremo__area-izquierda">
-          <h2 class="c-card__title">Real-Time Vector Preview</h2>
+          <h2 class="c-card__title">{{ 'tools.csvVectorChartBuilder.previewTitle' | translate }}</h2>
         </div>
         <div class="l-extremo__area-derecha">
           <div class="c-chart-builder__meta">

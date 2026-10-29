@@ -97,7 +97,7 @@ import {
         <div class="l-columns__area">
           <app-card>
             <div class="c-card__header">
-              <h2 class="c-card__title">1. Tag Geometry & Dimensions</h2>
+              <h2 class="c-card__title">{{ 'tools.petIdTagGenerator.infoTitle' | translate }}</h2>
             </div>
             <div class="c-card__body">
               @if (tagFormat() === 'hanging_charm') {
@@ -328,7 +328,7 @@ import {
           <!-- Identification & Text -->
           <app-card class="g--margin-top-4">
             <div class="c-card__header">
-              <h2 class="c-card__title">2. Identification & Emergency Text</h2>
+              <h2 class="c-card__title">{{ 'tools.petIdTagGenerator.mountTitle' | translate }}</h2>
             </div>
             <div class="c-card__body">
               <div class="control-group">
@@ -452,7 +452,7 @@ import {
               class="c-button c-button--outline c-button--small"
               (click)="resetToDefaults()"
             >
-              🔄 Reset Defaults
+              🔄 {{ 'common.resetDefaults' | translate }}
             </button>
           </div>
         </div>
@@ -462,7 +462,7 @@ import {
           <app-card>
             <div class="c-card__header l-extremo">
               <div class="l-extremo__area-izquierda">
-                <h2 class="c-card__title">Interactive 3D Viewport</h2>
+                <h2 class="c-card__title">{{ 'common.interactiveViewport' | translate }}</h2>
               </div>
               <div class="l-extremo__area-derecha">
                 @if (currentMetrics(); as metrics) {
@@ -498,7 +498,7 @@ import {
               <div class="c-card__body">
                 <div class="metrics-panel">
                   <div class="metric-item">
-                    <span class="metric-label">Dimensions</span>
+                    <span class="metric-label">{{ 'common.dimensions' | translate }}</span>
                     <span class="metric-value">{{ metrics.widthMm }}×{{ metrics.heightMm }} mm</span>
                   </div>
                   <div class="metric-item">
@@ -506,7 +506,7 @@ import {
                     <span class="metric-value">{{ metrics.thicknessMm }} mm</span>
                   </div>
                   <div class="metric-item">
-                    <span class="metric-label">Est. Weight</span>
+                    <span class="metric-label">{{ 'common.estWeight' | translate }}</span>
                     <span class="metric-value">~{{ metrics.estimatedGrams.toFixed(1) }} g</span>
                   </div>
                   <div class="metric-item">

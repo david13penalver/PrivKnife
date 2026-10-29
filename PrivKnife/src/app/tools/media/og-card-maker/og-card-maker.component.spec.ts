@@ -63,8 +63,10 @@ describe('OgCardMakerComponent (Seam 2: Studio UI, Previews, Exports & Privacy G
 
   it('should copy HTML meta tags to clipboard with feedback state', async () => {
     const writeTextSpy = vi.fn().mockResolvedValue(undefined);
-    Object.assign(navigator, {
-      clipboard: { writeText: writeTextSpy },
+    Object.defineProperty(navigator, 'clipboard', {
+      value: { writeText: writeTextSpy },
+      configurable: true,
+      writable: true,
     });
 
     await component.copyMetaSnippet();

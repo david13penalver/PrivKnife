@@ -17,7 +17,7 @@
     <!-- Controls Column -->
     <section class="l-columns__area c-card">
       <div class="c-card__header c-floor-plan__card-header">
-        <h2 class="c-card__title">Layout &amp; Architectural Configuration</h2>
+        <h2 class="c-card__title">{{ 'tools.floorPlanFurnitureScaler.calibrationTitle' | translate }}</h2>
       </div>
 
       <div class="c-card__body">
@@ -198,7 +198,7 @@
           </div>
         </div>
 
-        <!-- Add Furniture Section -->
+        <!-- {{ 'tools.floorPlanFurnitureScaler.addFurniture' | translate }} Section -->
         <div class="g--margin-bottom-4">
           <label class="c-input__label">Add Scaled Furniture</label>
           <div class="c-floor-plan__catalog-grid g--margin-top-1">
@@ -336,7 +336,7 @@
     <!-- Preview Column -->
     <section class="l-columns__area c-card">
       <div class="c-card__header l-extremo c-floor-plan__card-header">
-        <h2 class="c-card__title l-extremo__area-izquierda">Real-Time Scaled Blueprint</h2>
+        <h2 class="c-card__title l-extremo__area-izquierda">{{ 'tools.floorPlanFurnitureScaler.layoutTitle' | translate }}</h2>
         <div class="l-extremo__area-derecha c-floor-plan__stats">
           Walls: {{ project().walls.length }} • Furniture: {{ project().furniture.length }}
         </div>
@@ -390,7 +390,7 @@
             class="c-button c-button--primary c-floor-plan__action-btn"
             (click)="downloadPdf()"
           >
-            Download Blueprint PDF (A4)
+            {{ 'tools.floorPlanFurnitureScaler.exportBlueprint' | translate }}
           </button>
         </div>
       </div>

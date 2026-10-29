@@ -85,7 +85,7 @@ import {
         <div class="l-columns__area">
           <app-card>
             <div class="c-card__header">
-              <h2 class="c-card__title">1. Desk & Clamp Dimensions</h2>
+              <h2 class="c-card__title">{{ 'tools.underDeskClampGenerator.thicknessTitle' | translate }}</h2>
             </div>
             <div class="c-card__body">
               <!-- Desk Thickness -->
@@ -177,7 +177,7 @@ import {
           <!-- Accessory & Attachment Type -->
           <app-card class="g--margin-top-4">
             <div class="c-card__header">
-              <h2 class="c-card__title">2. Under-Desk Attachment</h2>
+              <h2 class="c-card__title">{{ 'tools.underDeskClampGenerator.accessoryTitle' | translate }}</h2>
             </div>
             <div class="c-card__body">
               <div class="accessory-btn-grid">
@@ -253,7 +253,7 @@ import {
           <!-- Clamping Screw & Knob -->
           <app-card class="g--margin-top-4">
             <div class="c-card__header">
-              <h2 class="c-card__title">3. Screw Bolt & Swivel Foot Pad</h2>
+              <h2 class="c-card__title">{{ 'tools.underDeskClampGenerator.screwTitle' | translate }}</h2>
             </div>
             <div class="c-card__body">
               <div class="control-row-2">
@@ -321,7 +321,7 @@ import {
           <app-card>
             <div class="c-card__header l-extremo">
               <div class="l-extremo__area-izquierda">
-                <h2 class="c-card__title">Live 3D Viewport</h2>
+                <h2 class="c-card__title">{{ 'tools.underDeskClampGenerator.viewportTitle' | translate }}</h2>
               </div>
               <div class="l-extremo__area-derecha">
                 <button
@@ -369,7 +369,7 @@ import {
                   <span class="metric-value">{{ metrics().estimatedGrams }} g (PETG/PLA)</span>
                 </div>
                 <div class="metric-card">
-                  <span class="metric-label">Est. Print Time</span>
+                  <span class="metric-label">{{ 'common.estPrintTime' | translate }}</span>
                   <span class="metric-value">~{{ metrics().estimatedPrintTimeHours }} hrs</span>
                 </div>
                 <div class="metric-card">

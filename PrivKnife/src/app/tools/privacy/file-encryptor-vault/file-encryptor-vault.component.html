@@ -17,7 +17,7 @@
     <!-- Configuration & Form Area -->
     <section class="l-columns__area c-card">
       <div class="c-card__header">
-        <h2 class="c-card__title">Vault Security Controls</h2>
+        <h2 class="c-card__title">{{ 'tools.fileEncryptorVault.securityTitle' | translate }}</h2>
       </div>
 
       <div class="c-card__body">
@@ -32,7 +32,7 @@
               [class.c-button--outline]="operationMode() !== 'encrypt'"
               (click)="setOperationMode('encrypt')"
             >
-              🔒 Encrypt File
+              {{ 'tools.fileEncryptorVault.encryptMode' | translate }}
             </button>
             <button
               type="button"
@@ -41,7 +41,7 @@
               [class.c-button--outline]="operationMode() !== 'decrypt'"
               (click)="setOperationMode('decrypt')"
             >
-              🔓 Decrypt Vault
+              {{ 'tools.fileEncryptorVault.decryptMode' | translate }}
             </button>
           </div>
         </div>
@@ -87,7 +87,7 @@
 
         <!-- Master Password Input -->
         <div class="c-input g--margin-bottom-4">
-          <label class="c-input__label" for="masterPasswordInput">Vault Master Password</label>
+          <label class="c-input__label" for="masterPasswordInput">{{ 'tools.fileEncryptorVault.masterPassword' | translate }}</label>
           <div class="c-password-field">
             <input
               id="masterPasswordInput"
@@ -107,10 +107,10 @@
           </div>
         </div>
 
-        <!-- Confirm Master Password (in Encrypt Mode) -->
+        <!-- {{ 'tools.fileEncryptorVault.confirmPassword' | translate }} (in Encrypt Mode) -->
         @if (operationMode() === 'encrypt') {
           <div class="c-input g--margin-bottom-4">
-            <label class="c-input__label" for="confirmPasswordInput">Confirm Master Password</label>
+            <label class="c-input__label" for="confirmPasswordInput">{{ 'tools.fileEncryptorVault.confirmPassword' | translate }}</label>
             <div class="c-password-field">
               <input
                 id="confirmPasswordInput"

@@ -80,7 +80,7 @@ import {
         <div class="l-columns__area">
           <app-card>
             <div class="c-card__header">
-              <h2 class="c-card__title">1. Style & Planter Function</h2>
+              <h2 class="c-card__title">{{ 'tools.geometricPlantPot.dimensionsTitle' | translate }}</h2>
             </div>
             <div class="c-card__body">
               <!-- Aesthetic Style -->
@@ -165,7 +165,7 @@ import {
           <!-- Parametric Geometry -->
           <app-card class="g--margin-top-4">
             <div class="c-card__header">
-              <h2 class="c-card__title">2. Parametric Pot Geometry</h2>
+              <h2 class="c-card__title">{{ 'tools.geometricPlantPot.drainageTitle' | translate }}</h2>
             </div>
             <div class="c-card__body">
               <!-- Diameters -->
@@ -318,7 +318,7 @@ import {
           <app-card>
             <div class="c-card__header l-extremo">
               <div class="l-extremo__area-izquierda">
-                <h2 class="c-card__title">3D Viewport</h2>
+                <h2 class="c-card__title">{{ 'common.interactivePreview' | translate }}</h2>
               </div>
               <div class="l-extremo__area-derecha">
                 @if (planterType() !== 'decorative_cover') {
@@ -374,7 +374,7 @@ import {
                   <span class="metric-value">{{ metrics().estimatedGrams }} g (PETG/PLA)</span>
                 </div>
                 <div class="metric-card">
-                  <span class="metric-label">Est. Print Time</span>
+                  <span class="metric-label">{{ 'common.estPrintTime' | translate }}</span>
                   <span class="metric-value">~{{ metrics().estimatedPrintTimeHours }} hrs</span>
                 </div>
               </div>
