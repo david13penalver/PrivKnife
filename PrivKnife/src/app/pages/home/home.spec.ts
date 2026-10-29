@@ -128,5 +128,44 @@ describe('Home Component (Presentation & Tool Catalog)', () => {
     fixture.detectChanges();
     expect(component.filteredTools().some((t) => t.id === 'exif-stripper')).toBe(true);
   });
+
+  it('should have an i18nKey defined for every single tool in the catalog (Spec 91)', () => {
+    const tools = component.allTools();
+    expect(tools.length).toBeGreaterThanOrEqual(59);
+
+    for (const tool of tools) {
+      expect(tool.i18nKey).toBeDefined();
+      expect(typeof tool.i18nKey).toBe('string');
+      expect((tool.i18nKey as string).length).toBeGreaterThan(0);
+    }
+  });
+
+  it('should dynamically update Batch 2 tool card titles and descriptions when switching to Spanish (Spec 91)', async () => {
+    const i18n = TestBed.inject(I18nService);
+    await i18n.setLanguage('es');
+    fixture.detectChanges();
+
+    const compiled = fixture.nativeElement as HTMLElement;
+
+    // Batch 2 tool card titles in Spanish
+    expect(compiled.textContent).toContain('Diseñador Paramétrico 3D de Lámparas y Pantallas');
+    expect(compiled.textContent).toContain('Creador de Litofanías 3D Curvas y Planas');
+    expect(compiled.textContent).toContain('Generador de Cajas Modulares Gridfinity para Cajones');
+    expect(compiled.textContent).toContain('Kit de Emergencia Imprimible de Claves y Recuperación');
+    expect(compiled.textContent).toContain('Generador de Gráficos Vectoriales e Infografías desde CSV');
+
+    // Spanish search queries for Batch 2 tools
+    component.searchQuery.set('lámpara');
+    fixture.detectChanges();
+    expect(component.filteredTools().some((t) => t.id === 'parametric-lamp-designer')).toBe(true);
+
+    component.searchQuery.set('litofanía');
+    fixture.detectChanges();
+    expect(component.filteredTools().some((t) => t.id === 'lithophane-maker')).toBe(true);
+
+    component.searchQuery.set('gridfinity');
+    fixture.detectChanges();
+    expect(component.filteredTools().some((t) => t.id === 'gridfinity-bin-generator')).toBe(true);
+  });
 });
 

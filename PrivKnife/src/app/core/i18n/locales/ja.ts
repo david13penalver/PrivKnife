@@ -51,11 +51,11 @@ export const ja: TranslationSchema = {
     heroHeadingHighlight: '十徳ナイフ',
     heroDescription:
       'ブラウザ内だけで完全に動作する高速な日常ツールスイート。クラウドアップロードなし、テレメトリなし、クッキーなし。',
-    ribbonTools: '🇨🇭 29+ 種類の便利ツール',
+    ribbonTools: '🇨🇭 59+ の日常便利ツール',
     ribbonZeroBytes: '🔒 端末外への送信 0 バイト',
     ribbonWasm: '⚡ クライアント側 WebAssembly',
     ribbonOpenSource: '📜 MIT オープンソース',
-    searchPlaceholder: '29以上の安全なツールを検索（PDF、画像、3D、暗号、開発者向け）...',
+    searchPlaceholder: '59+ の完全ローカルツールを検索 (PDF, 画像, 3D, 暗号, 開発)...',
     allTools: 'すべてのツール',
     toolsCount: '{count} 個のツールが利用可能',
     noResultsTitle: '一致するツールが見つかりません',
@@ -218,6 +218,126 @@ export const ja: TranslationSchema = {
     webVitals: {
       name: 'ウェブサイト パフォーマンス & Core Web Vitals 診断',
       description: '表示速度、アクセシビリティ、Core Web Vitals (LCP, INP, CLS) を診断し、実践的な改善アドバイスを提供。',
+    },
+    parametricLampDesigner: {
+      name: '3Dパラメトリック ランプ＆シェード デザイナー',
+      description: '標準E27、E14、IKEAソケットに対応したスパイラル、リブ、フルート、ボロノイ模様のランプシェードを作成できます。',
+    },
+    lithophaneMaker: {
+      name: '曲面＆平面 3Dリソフェン（透光浮彫）メーカー',
+      description: '写真を高解像度の曲面、平面、円筒、ナイトライト型3Dプリント透光レリーフに変換し、バックライトをシミュレートします。',
+    },
+    gridfinityBinGenerator: {
+      name: 'Gridfinity規格 引き出しモジュール収納ボックス生成器',
+      description: 'カスタム仕切り、リップ形状、マグネット穴を備えたGridfinity準拠のオーガナイザーケースを生成します。',
+    },
+    electronicsBoxEnclosure: {
+      name: 'パラメトリック電子工作ケース＆スナップフィット蓋生成器',
+      description: 'Arduino、ESP32、Raspberry Pi、自作基板向けのスナップ留めまたはネジ止め用エンクロージャーを設計します。',
+    },
+    underDeskClampGenerator: {
+      name: 'デスク下クランプ＆ケーブルホルダー 3Dジェネレーター',
+      description: 'ACME台形ネジを採用した頑丈なクランプ、ヘッドホンフック、配線ダクトを3Dプリント用に作成します。',
+    },
+    skadisPegboardMaker: {
+      name: 'IKEA スコーディス (Skådis) 有孔ボード用フック＆ホルダー作成器',
+      description: 'IKEAスコーディス有孔ボードにぴったり嵌まるツールホルダー、汎用フック、棚受けを生成します。',
+    },
+    geometricPlantPot: {
+      name: '幾何学デザイン植木鉢＆給水機能付きプランター',
+      description: '底面給水タンクと排水グリッドを備えた多面体・ボロノイ・スパイラル形状の多肉植物用ポットを設計します。',
+    },
+    brailleAdaSignGenerator: {
+      name: '点字＆ADA規格対応 触知式ドアサイン生成器',
+      description: 'カリフォルニア規格グレード2点字ドットと立体凸文字を備えたバリアフリー対応の部屋・ドア銘板を作成します。',
+    },
+    keycapSwitchTesterMaker: {
+      name: 'メカニカルキーボード用キーキャップ＆スイッチテスター作成器',
+      description: 'Cherry MX軸対応のカスタムキーキャップや複数キースイッチ打鍵音確認用テストプレートを設計します。',
+    },
+    cappuccinoStencilMaker: {
+      name: 'カプチーノステンシル＆エアブラシ用型紙作成器',
+      description: 'SVGロゴやシルエット画像を自動ブリッジ処理により食品対応のラテアート用ステンシルに変換します。',
+    },
+    petIdTagGenerator: {
+      name: '迷子防止ペット用ネームタグ＆首輪通し型プレート作成器',
+      description: '犬や猫向けに名前、電話番号、マイクロチップ番号を立体刻印した首輪スライド型静音ネームタグを生成します。',
+    },
+    hswInsertAdapter: {
+      name: 'Honeycomb Storage Wall (HSW) インサート＆アダプター作成器',
+      description: 'ハニカム収納壁向けの六角スナップインサート、M3/M4/M5ナット保持具、工具ホルダーを生成します。',
+    },
+    passportBiometricPhoto: {
+      name: 'パスポート・ビザ・身分証用 生体認証証明写真作成器',
+      description: '国際規格（2×2インチ、35×45mm）に準拠して顔写真をトリミングし、L判・A4印刷シートに自動面付けします。',
+    },
+    heicAvifConverter: {
+      name: 'HEIC＆AVIF一括 JPG / PNG 変換ツール',
+      description: 'iPhoneのHEIC写真や次世代AVIF画像をブラウザ内だけで高品質JPG/PNGにまとめて一括変換します。',
+    },
+    pdfSignerStamper: {
+      name: '完全ローカル PDF電子署名・日付スタンプ・イニシャル記入ツール',
+      description: '契約書PDFに署名描画、日付印、イニシャルを書き込みます。機密文書は一切クラウドに送信されません。',
+    },
+    facePlateBlur: {
+      name: '写真の顔＆ナンバープレート自動ぼかし・モザイク保護ツール',
+      description: 'ブラウザ内AIが写真内の顔や車のナンバープレートを自動認識し、ガウスぼかしや黒帯で不可逆マスキングします。',
+    },
+    localOcrTextExtractor: {
+      name: 'ローカルOCR 画像・スキャンPDF テキスト抽出ツール',
+      description: 'レシート、スクリーンショット、PDF文書から端末内機械学習により編集可能なテキストを高速抽出します。',
+    },
+    fileEncryptorVault: {
+      name: 'ゼロナレッジ型 ファイル暗号化保管庫',
+      description: '軍用規格AES-256-GCMとArgon2id/PBKDF2暗号化を用い、重要ファイルを自己復号可能な安全パッケージに変換します。',
+    },
+    piiScrubberAnonymizer: {
+      name: 'ログ＆CSV 個人情報 (PII) 自動匿名化スクラバー',
+      description: 'ログやCSVからマイナンバー、メールアドレス、クレジットカード番号、IP、電話番号を検出して安全にマスキングします。',
+    },
+    bankStatementConverter: {
+      name: '銀行取引明細 CSV / OFX の Excel＆QIF 変換ツール',
+      description: '乱雑なオンラインバンキング明細やOFXデータを整理し、標準取引形式の綺麗なExcel表に変換します。',
+    },
+    audioTrimmerBooster: {
+      name: '音声トリミング・音量ブースター＆着信音作成器',
+      description: 'MP3、WAV、AAC音声を波形を見ながらカットし、フェードイン・アウト処理や音量増幅をオフラインで実行します。',
+    },
+    videoCompressorResizer: {
+      name: 'ブラウザ内動画圧縮＆SNS向けサイズ調整ツール',
+      description: 'MP4やWebM動画をDiscordの10MB/25MB上限以下に軽量化し、TikTokやReels、Shorts向けに画角をクロップします。',
+    },
+    nutritionLabelMaker: {
+      name: 'FDA＆EU食品基準 栄養成分表示ラベル作成器',
+      description: '米国FDA規則や欧州連合基準に準拠した商品パッケージ用ベクター栄養成分表を正確に作成します。',
+    },
+    svgOptimizerCleaner: {
+      name: 'SVG軽量化オプティマイザー＆React / Vueコード出力ツール',
+      description: 'SVGベクターから無駄なメタデータを除去してパスを単純化し、ReactやVueコンポーネントとしてコピーできます。',
+    },
+    diffChecker: {
+      name: '2画面並行 ソースコード＆契約書 差分比較ツール (Diff)',
+      description: 'プログラムコードや契約書文書の相違点を文字単位で並べて比較し、変更ハイライトやパッチを出力します。',
+    },
+    fontSubsetterConverter: {
+      name: 'Webフォント軽量化サブセッター＆WOFF2変換器',
+      description: '使わない文字グリフを削除してフォント容量を最大90%削減し、高圧縮なWOFF2形式に変換します。',
+    },
+    seamlessTextureGenerator: {
+      name: 'シームレス タイル状テクスチャ＆パターン画像生成器',
+      description: '写真を継ぎ目なくリピートできるテクスチャ素材に変換し、ノーマルマップも同時に生成します。',
+    },
+    floorPlanFurnitureScaler: {
+      name: '2D間取り図スケール計測＆家具レイアウトシミュレーター',
+      description: '間取り図面から縮尺比率をキャリブレーションし、実寸家具を配置して部屋の動線や隙間寸法を検証します。',
+    },
+    emergencyRecoveryKit: {
+      name: '緊急時用オフラインパスワード＆暗号資産復旧シート作成器',
+      description: 'マスターパスワード、2段階認証予備コード、秘密鍵シードフレーズを保管するための安全な印刷用紙を作成します。',
+    },
+    csvVectorChartBuilder: {
+      name: 'CSV表データからベクターグラフ＆インフォグラフィック作成器',
+      description: '貼り付けた表データを印刷品質のSVG棒グラフ、折れ線グラフ、インフォグラフィックに即座に可視化します。',
     },
   },
 };

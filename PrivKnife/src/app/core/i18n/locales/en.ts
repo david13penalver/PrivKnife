@@ -49,11 +49,11 @@ export const en = {
     heroHeadingHighlight: 'Swiss Army Knife',
     heroDescription:
       'A consolidated suite of fast, everyday web tools running entirely inside your browser. No cloud uploads. No telemetry. No cookies.',
-    ribbonTools: '🇨🇭 29+ Everyday Tools',
+    ribbonTools: '🇨🇭 59+ Everyday Tools',
     ribbonZeroBytes: '🔒 0 Bytes Leaves Device',
     ribbonWasm: '⚡ Client-Side WebAssembly',
     ribbonOpenSource: '📜 MIT Open Source',
-    searchPlaceholder: 'Search 29+ private tools (PDF, images, 3D, crypto, dev)...',
+    searchPlaceholder: 'Search 59+ private tools (PDF, images, 3D, crypto, dev)...',
     allTools: 'All Tools',
     toolsCount: '{count} tools available',
     noResultsTitle: 'No matching tools found',
@@ -216,6 +216,126 @@ export const en = {
     webVitals: {
       name: 'Website Performance & Core Web Vitals Checker',
       description: 'Audit performance, accessibility, and Core Web Vitals (LCP, INP, CLS) with actionable diagnostic tips.',
+    },
+    parametricLampDesigner: {
+      name: '3D Parametric Lamp & Lampshade Designer',
+      description: 'Design bespoke spiral, ribbed, fluted, and Voronoi lampshades with standard E27, E14, or IKEA socket adapters and vase mode support.',
+    },
+    lithophaneMaker: {
+      name: 'Curved & Flat 3D Lithophane Maker',
+      description: 'Turn photographs into high-resolution curved, flat, cylindrical, or nightlight 3D-printable lithophanes with real-time backlight simulation.',
+    },
+    gridfinityBinGenerator: {
+      name: 'Gridfinity & Modular Drawer Bin Generator',
+      description: 'Generate parametric Gridfinity organizer bins with custom compartments, lip types, and magnet base holes.',
+    },
+    electronicsBoxEnclosure: {
+      name: 'Parametric Electronics Box & Snap-Fit Enclosure',
+      description: 'Create snap-fit or screwed enclosures for Arduino, ESP32, Raspberry Pi, and custom PCBs with cable cutouts.',
+    },
+    underDeskClampGenerator: {
+      name: 'Under-Desk Clamp & Cable Management Generator',
+      description: 'Design custom screw clamps, headphone hooks, and cable channels with ACME lead-screw threads.',
+    },
+    skadisPegboardMaker: {
+      name: 'IKEA Skådis & Pegboard Hook / Holder Maker',
+      description: 'Generate custom tool holders, universal hooks, and shelves specifically engineered for IKEA Skådis pegboards.',
+    },
+    geometricPlantPot: {
+      name: 'Geometric Plant Pot & Self-Watering Planter',
+      description: 'Create faceted, Voronoi, and spiral succulent planters with sub-irrigation reservoirs and drainage grids.',
+    },
+    brailleAdaSignGenerator: {
+      name: 'Braille & ADA Tactile Door Sign Generator',
+      description: 'Generate compliant ADA room and door signs with California Grade 2 Braille dots and raised tactile lettering.',
+    },
+    keycapSwitchTesterMaker: {
+      name: 'Custom Mechanical Keycap & Switch Tester Maker',
+      description: 'Design custom Cherry MX stem keycaps and multi-switch sound test plates with customizable layout grids.',
+    },
+    cappuccinoStencilMaker: {
+      name: 'Cappuccino Stencil & Airbrush Template Maker',
+      description: 'Turn SVG logos and silhouettes into food-safe coffee art stencils with automated island bridge connections.',
+    },
+    petIdTagGenerator: {
+      name: 'Pet ID Tag & Collar Slide-On Generator',
+      description: 'Design silent slide-on or hanging dog and cat ID tags with embossed names, phone numbers, and emergency microchip info.',
+    },
+    hswInsertAdapter: {
+      name: 'Honeycomb Storage Wall (HSW) Insert & Adapter',
+      description: 'Create snap-in hexagonal inserts, M3/M4/M5 nut holders, and custom tool adapters for Honeycomb Storage Walls.',
+    },
+    passportBiometricPhoto: {
+      name: 'Passport, Visa & ID Biometric Photo Maker',
+      description: 'Crop and scale portrait photos to strict 2×2 inch, 35×45 mm, and international biometric visa specs on printable 4×6 / A4 sheets.',
+    },
+    heicAvifConverter: {
+      name: 'HEIC & AVIF to JPG / PNG Batch Converter',
+      description: 'Batch convert Apple iPhone HEIC/HEIF photos and next-gen AVIF images to standard high-quality JPG or PNG files in-browser.',
+    },
+    pdfSignerStamper: {
+      name: 'Client-Side PDF Signer, Date Stamper & Initials',
+      description: 'Draw or upload signatures, add audit date stamps and initials onto PDF contracts without uploading confidential legal files to cloud servers.',
+    },
+    facePlateBlur: {
+      name: 'Face & License Plate Privacy Blur Tool',
+      description: 'Automatically detect and censor faces and vehicle license plates with Gaussian blur, pixelation, or black privacy bars.',
+    },
+    localOcrTextExtractor: {
+      name: 'Local OCR Image & Scanned PDF to Text / Word',
+      description: 'Extract editable text from scanned receipts, screenshots, and multi-page PDFs using local machine learning without server ingestion.',
+    },
+    fileEncryptorVault: {
+      name: 'Zero-Knowledge File Encryptor & Vault',
+      description: 'Encrypt any file or folder with military-grade AES-256-GCM and Argon2id / PBKDF2 key derivation into self-decrypting packages.',
+    },
+    piiScrubberAnonymizer: {
+      name: 'PII Log & CSV Scrubber / Data Anonymizer',
+      description: 'Detect and redact SSNs, emails, credit cards, IP addresses, and phone numbers from logs, CSVs, and customer data before sharing.',
+    },
+    bankStatementConverter: {
+      name: 'Bank Statement CSV / OFX to Excel & QIF Converter',
+      description: 'Clean up ugly bank exports, normalize transaction columns, and convert messy OFX/QFX/CSV files into clean Excel spreadsheets.',
+    },
+    audioTrimmerBooster: {
+      name: 'Audio Trimmer, Volume Booster & Ringtone Maker',
+      description: 'Trim MP3, WAV, and AAC audio tracks, apply gentle fade-in/fade-out envelopes, and safely boost quiet recordings offline.',
+    },
+    videoCompressorResizer: {
+      name: 'Client-Side Video Compressor & Social Resizer',
+      description: 'Compress large MP4 and WebM videos below Discord 10MB / 25MB limits and crop for TikTok, Instagram Reels, and YouTube Shorts.',
+    },
+    nutritionLabelMaker: {
+      name: 'FDA & EU Nutrition Facts & Supplement Label Maker',
+      description: 'Generate vector FDA Nutrition Facts panels, EU Food Regulation tables, and Supplement Facts labels ready for commercial packaging.',
+    },
+    svgOptimizerCleaner: {
+      name: 'SVG Optimizer, Path Cleaner & React / Vue Exporter',
+      description: 'Strip bloated metadata from vector SVGs, simplify bezier curves, and export optimized JSX, React, and Vue icon components.',
+    },
+    diffChecker: {
+      name: 'Side-by-Side Code & Contract Diff Checker',
+      description: 'Compare code files, legal contracts, or markdown texts side-by-side with character-level inline highlighting and unified patch export.',
+    },
+    fontSubsetterConverter: {
+      name: 'Web Font Subsetter & TTF / OTF to WOFF2 Converter',
+      description: 'Reduce font file sizes by 90% by stripping unused glyphs and converting heavy TTF/OTF fonts into high-compression WOFF2 web fonts.',
+    },
+    seamlessTextureGenerator: {
+      name: 'Seamless Tileable Texture & Pattern Generator',
+      description: 'Convert photos and game textures into seamless repeating tiles with Poisson blending, mirrored seams, and normal map generation.',
+    },
+    floorPlanFurnitureScaler: {
+      name: 'Interactive 2D Floor Plan & Room Furniture Scaler',
+      description: 'Calibrate scale from architectural blueprint images and drag standard furniture items to verify room clearances offline.',
+    },
+    emergencyRecoveryKit: {
+      name: 'Printable Emergency Recovery & Password Kit Sheet',
+      description: 'Generate high-security offline paper recovery sheets for password managers, 2FA backup codes, and crypto seed phrases.',
+    },
+    csvVectorChartBuilder: {
+      name: 'CSV / Paste to Vector Chart & Infographic Builder',
+      description: 'Transform spreadsheet data into publication-ready SVG bar charts, line plots, and infographics with instant SVG and PNG export.',
     },
   },
 };

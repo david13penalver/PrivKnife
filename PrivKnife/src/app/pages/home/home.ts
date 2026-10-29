@@ -401,6 +401,7 @@ const CATALOG_TOOLS: CatalogTool[] = [
   },
   {
     id: 'parametric-lamp-designer',
+    i18nKey: 'parametricLampDesigner',
     name: '3D Parametric Lamp & Lampshade Designer',
     category: '3d',
     categoryLabel: '3D Fabrication',
@@ -413,6 +414,7 @@ const CATALOG_TOOLS: CatalogTool[] = [
   },
   {
     id: 'lithophane-maker',
+    i18nKey: 'lithophaneMaker',
     name: 'Curved & Flat 3D Lithophane Maker',
     category: '3d',
     categoryLabel: '3D Fabrication',
@@ -425,6 +427,7 @@ const CATALOG_TOOLS: CatalogTool[] = [
   },
   {
     id: 'gridfinity-bin-generator',
+    i18nKey: 'gridfinityBinGenerator',
     name: 'Gridfinity & Modular Drawer Bin Generator',
     category: '3d',
     categoryLabel: '3D Fabrication',
@@ -437,6 +440,7 @@ const CATALOG_TOOLS: CatalogTool[] = [
   },
   {
     id: 'electronics-box-enclosure',
+    i18nKey: 'electronicsBoxEnclosure',
     name: 'Parametric Electronics Box & Snap-Fit Enclosure',
     category: '3d',
     categoryLabel: '3D Fabrication',
@@ -449,6 +453,7 @@ const CATALOG_TOOLS: CatalogTool[] = [
   },
   {
     id: 'under-desk-clamp-generator',
+    i18nKey: 'underDeskClampGenerator',
     name: 'Under-Desk Clamp & Cable Management Generator',
     category: '3d',
     categoryLabel: '3D Fabrication',
@@ -461,6 +466,7 @@ const CATALOG_TOOLS: CatalogTool[] = [
   },
   {
     id: 'skadis-pegboard-maker',
+    i18nKey: 'skadisPegboardMaker',
     name: 'IKEA Skådis & Pegboard Hook / Holder Maker',
     category: '3d',
     categoryLabel: '3D Fabrication',
@@ -473,6 +479,7 @@ const CATALOG_TOOLS: CatalogTool[] = [
   },
   {
     id: 'geometric-plant-pot',
+    i18nKey: 'geometricPlantPot',
     name: 'Geometric Plant Pot & Self-Watering Planter',
     category: '3d',
     categoryLabel: '3D Fabrication',
@@ -485,6 +492,7 @@ const CATALOG_TOOLS: CatalogTool[] = [
   },
   {
     id: 'braille-ada-sign-generator',
+    i18nKey: 'brailleAdaSignGenerator',
     name: 'Braille & ADA Tactile Door Sign Generator',
     category: '3d',
     categoryLabel: '3D Fabrication',
@@ -497,6 +505,7 @@ const CATALOG_TOOLS: CatalogTool[] = [
   },
   {
     id: 'keycap-switch-tester-maker',
+    i18nKey: 'keycapSwitchTesterMaker',
     name: 'Custom Mechanical Keycap & Switch Tester Maker',
     category: '3d',
     categoryLabel: '3D Fabrication',
@@ -509,6 +518,7 @@ const CATALOG_TOOLS: CatalogTool[] = [
   },
   {
     id: 'cappuccino-stencil-maker',
+    i18nKey: 'cappuccinoStencilMaker',
     name: 'Cappuccino Stencil & Airbrush Template Maker',
     category: '3d',
     categoryLabel: '3D Fabrication',
@@ -521,6 +531,7 @@ const CATALOG_TOOLS: CatalogTool[] = [
   },
   {
     id: 'pet-id-tag-generator',
+    i18nKey: 'petIdTagGenerator',
     name: 'Pet ID Tag & Collar Slide-On Generator',
     category: '3d',
     categoryLabel: '3D Fabrication',
@@ -533,6 +544,7 @@ const CATALOG_TOOLS: CatalogTool[] = [
   },
   {
     id: 'hsw-insert-adapter',
+    i18nKey: 'hswInsertAdapter',
     name: 'Honeycomb Storage Wall (HSW) Insert & Adapter',
     category: '3d',
     categoryLabel: '3D Fabrication',
@@ -545,6 +557,7 @@ const CATALOG_TOOLS: CatalogTool[] = [
   },
   {
     id: 'passport-biometric-photo',
+    i18nKey: 'passportBiometricPhoto',
     name: 'Passport, Visa & ID Biometric Photo Maker',
     category: 'media',
     categoryLabel: 'Media',
@@ -557,6 +570,7 @@ const CATALOG_TOOLS: CatalogTool[] = [
   },
   {
     id: 'heic-avif-converter',
+    i18nKey: 'heicAvifConverter',
     name: 'HEIC & AVIF to JPG / PNG Batch Converter',
     category: 'media',
     categoryLabel: 'Media',
@@ -569,6 +583,7 @@ const CATALOG_TOOLS: CatalogTool[] = [
   },
   {
     id: 'pdf-signer-stamper',
+    i18nKey: 'pdfSignerStamper',
     name: 'Client-Side PDF Signer, Date Stamper & Initials',
     category: 'documents',
     categoryLabel: 'Documents',
@@ -581,6 +596,7 @@ const CATALOG_TOOLS: CatalogTool[] = [
   },
   {
     id: 'face-plate-blur',
+    i18nKey: 'facePlateBlur',
     name: 'Face & License Plate Privacy Blur Tool',
     category: 'privacy',
     categoryLabel: 'Privacy',
@@ -593,6 +609,7 @@ const CATALOG_TOOLS: CatalogTool[] = [
   },
   {
     id: 'local-ocr-text-extractor',
+    i18nKey: 'localOcrTextExtractor',
     name: 'Local OCR Image & Scanned PDF to Text / Word',
     category: 'documents',
     categoryLabel: 'Documents',
@@ -605,6 +622,7 @@ const CATALOG_TOOLS: CatalogTool[] = [
   },
   {
     id: 'file-encryptor-vault',
+    i18nKey: 'fileEncryptorVault',
     name: 'Zero-Knowledge File Encryptor & Vault',
     category: 'privacy',
     categoryLabel: 'Privacy',
@@ -617,6 +635,7 @@ const CATALOG_TOOLS: CatalogTool[] = [
   },
   {
     id: 'pii-scrubber-anonymizer',
+    i18nKey: 'piiScrubberAnonymizer',
     name: 'PII Log & CSV Scrubber / Data Anonymizer',
     category: 'privacy',
     categoryLabel: 'Privacy / Dev',
@@ -629,6 +648,7 @@ const CATALOG_TOOLS: CatalogTool[] = [
   },
   {
     id: 'bank-statement-converter',
+    i18nKey: 'bankStatementConverter',
     name: 'Bank Statement CSV / OFX to Excel & QIF Converter',
     category: 'dev',
     categoryLabel: 'Dev / Data',
@@ -641,6 +661,7 @@ const CATALOG_TOOLS: CatalogTool[] = [
   },
   {
     id: 'audio-trimmer-booster',
+    i18nKey: 'audioTrimmerBooster',
     name: 'Audio Trimmer, Volume Booster & Ringtone Maker',
     category: 'audio-video',
     categoryLabel: 'Audio / Video',
@@ -653,6 +674,7 @@ const CATALOG_TOOLS: CatalogTool[] = [
   },
   {
     id: 'video-compressor-resizer',
+    i18nKey: 'videoCompressorResizer',
     name: 'Client-Side Video Compressor & Social Resizer',
     category: 'audio-video',
     categoryLabel: 'Audio / Video',
@@ -665,6 +687,7 @@ const CATALOG_TOOLS: CatalogTool[] = [
   },
   {
     id: 'nutrition-label-maker',
+    i18nKey: 'nutritionLabelMaker',
     name: 'FDA & EU Nutrition Facts & Supplement Label Maker',
     category: 'documents',
     categoryLabel: 'Documents',
@@ -677,6 +700,7 @@ const CATALOG_TOOLS: CatalogTool[] = [
   },
   {
     id: 'svg-optimizer-cleaner',
+    i18nKey: 'svgOptimizerCleaner',
     name: 'SVG Optimizer, Path Cleaner & React / Vue Exporter',
     category: 'dev',
     categoryLabel: 'Dev / Design',
@@ -689,6 +713,7 @@ const CATALOG_TOOLS: CatalogTool[] = [
   },
   {
     id: 'diff-checker',
+    i18nKey: 'diffChecker',
     name: 'Side-by-Side Code & Contract Diff Checker',
     category: 'dev',
     categoryLabel: 'Dev / Docs',
@@ -701,6 +726,7 @@ const CATALOG_TOOLS: CatalogTool[] = [
   },
   {
     id: 'font-subsetter-converter',
+    i18nKey: 'fontSubsetterConverter',
     name: 'Web Font Subsetter & TTF / OTF to WOFF2 Converter',
     category: 'dev',
     categoryLabel: 'Dev / Design',
@@ -713,6 +739,7 @@ const CATALOG_TOOLS: CatalogTool[] = [
   },
   {
     id: 'seamless-texture-generator',
+    i18nKey: 'seamlessTextureGenerator',
     name: 'Seamless Tileable Texture & Pattern Generator',
     category: 'media',
     categoryLabel: 'Media / 3D',
@@ -725,6 +752,7 @@ const CATALOG_TOOLS: CatalogTool[] = [
   },
   {
     id: 'floor-plan-furniture-scaler',
+    i18nKey: 'floorPlanFurnitureScaler',
     name: 'Interactive 2D Floor Plan & Room Furniture Scaler',
     category: 'documents',
     categoryLabel: 'Documents / Design',
@@ -737,6 +765,7 @@ const CATALOG_TOOLS: CatalogTool[] = [
   },
   {
     id: 'emergency-recovery-kit',
+    i18nKey: 'emergencyRecoveryKit',
     name: 'Printable Emergency Recovery & Password Kit Sheet',
     category: 'privacy',
     categoryLabel: 'Privacy',
@@ -749,6 +778,7 @@ const CATALOG_TOOLS: CatalogTool[] = [
   },
   {
     id: 'csv-vector-chart-builder',
+    i18nKey: 'csvVectorChartBuilder',
     name: 'CSV / Paste to Vector Chart & Infographic Builder',
     category: 'dev',
     categoryLabel: 'Dev / Data',

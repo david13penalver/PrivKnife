@@ -209,4 +209,89 @@ describe('I18nService', () => {
 
     fetchSpy.mockRestore();
   });
+
+  const BATCH_2_TOOL_KEYS = [
+    'parametricLampDesigner',
+    'lithophaneMaker',
+    'gridfinityBinGenerator',
+    'electronicsBoxEnclosure',
+    'underDeskClampGenerator',
+    'skadisPegboardMaker',
+    'geometricPlantPot',
+    'brailleAdaSignGenerator',
+    'keycapSwitchTesterMaker',
+    'cappuccinoStencilMaker',
+    'petIdTagGenerator',
+    'hswInsertAdapter',
+    'passportBiometricPhoto',
+    'heicAvifConverter',
+    'pdfSignerStamper',
+    'facePlateBlur',
+    'localOcrTextExtractor',
+    'fileEncryptorVault',
+    'piiScrubberAnonymizer',
+    'bankStatementConverter',
+    'audioTrimmerBooster',
+    'videoCompressorResizer',
+    'nutritionLabelMaker',
+    'svgOptimizerCleaner',
+    'diffChecker',
+    'fontSubsetterConverter',
+    'seamlessTextureGenerator',
+    'floorPlanFurnitureScaler',
+    'emergencyRecoveryKit',
+    'csvVectorChartBuilder',
+  ];
+
+  it('should resolve all 30 Batch 2 tool translations in English and Spanish (Spec 91)', async () => {
+    // English assertions
+    await service.setLanguage('en');
+    expect(service.t('home.ribbonTools')).toContain('59+');
+    expect(service.t('home.searchPlaceholder')).toContain('59+');
+
+    for (const key of BATCH_2_TOOL_KEYS) {
+      const name = service.t(`tools.${key}.name`);
+      const desc = service.t(`tools.${key}.description`);
+
+      expect(name).not.toBe(`tools.${key}.name`);
+      expect(name.length).toBeGreaterThan(0);
+      expect(desc).not.toBe(`tools.${key}.description`);
+      expect(desc.length).toBeGreaterThan(0);
+    }
+
+    // Spanish assertions
+    await service.setLanguage('es');
+    expect(service.t('home.ribbonTools')).toContain('59+');
+    expect(service.t('home.searchPlaceholder')).toContain('59+');
+
+    for (const key of BATCH_2_TOOL_KEYS) {
+      const name = service.t(`tools.${key}.name`);
+      const desc = service.t(`tools.${key}.description`);
+
+      expect(name).not.toBe(`tools.${key}.name`);
+      expect(name.length).toBeGreaterThan(0);
+      expect(desc).not.toBe(`tools.${key}.description`);
+      expect(desc.length).toBeGreaterThan(0);
+    }
+  });
+
+  it('should resolve all 30 Batch 2 tool translations in all other 6 supported languages (Spec 91)', async () => {
+    const otherLocales = ['fr', 'it', 'de', 'zh', 'ja', 'ar'] as const;
+
+    for (const lang of otherLocales) {
+      await service.setLanguage(lang);
+      expect(service.t('home.ribbonTools')).toMatch(/59\+/);
+      expect(service.t('home.searchPlaceholder')).toMatch(/59\+/);
+
+      for (const key of BATCH_2_TOOL_KEYS) {
+        const name = service.t(`tools.${key}.name`);
+        const desc = service.t(`tools.${key}.description`);
+
+        expect(name).not.toBe(`tools.${key}.name`);
+        expect(name.length).toBeGreaterThan(0);
+        expect(desc).not.toBe(`tools.${key}.description`);
+        expect(desc.length).toBeGreaterThan(0);
+      }
+    }
+  });
 });

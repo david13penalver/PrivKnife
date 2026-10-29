@@ -51,11 +51,11 @@ export const zh: TranslationSchema = {
     heroHeadingHighlight: '瑞士军刀',
     heroDescription:
       '完全在您的浏览器内部运行的高速日常网络工具套件。无需云端上传，无遥测，无 Cookie。',
-    ribbonTools: '🇨🇭 29+ 款日常工具',
+    ribbonTools: '🇨🇭 59+ 款日常实用工具',
     ribbonZeroBytes: '🔒 0 字节离开设备',
     ribbonWasm: '⚡ 客户端 WebAssembly',
     ribbonOpenSource: '📜 MIT 开源协议',
-    searchPlaceholder: '搜索 29+ 款隐私工具（PDF、图像、3D、加密、开发者）...',
+    searchPlaceholder: '搜索 59+ 款本地隐私工具 (PDF, 图片, 3D打印, 加密, 开发者)...',
     allTools: '全部工具',
     toolsCount: '共 {count} 款可用工具',
     noResultsTitle: '未找到匹配的工具',
@@ -218,6 +218,126 @@ export const zh: TranslationSchema = {
     webVitals: {
       name: '网页性能与 Core Web Vitals 检测诊断',
       description: '评估页面性能、无障碍性及核心性能指标 (LCP, INP, CLS)，并提供实用的优化建议。',
+    },
+    parametricLampDesigner: {
+      name: '3D 参数化台灯与灯罩设计器',
+      description: '设计独特的螺旋、凹槽、波纹及 Voronoi 蜂窝多孔灯罩，支持标准 E27、E14 或宜家灯座适配器及花瓶模式。',
+    },
+    lithophaneMaker: {
+      name: '弧面与平面 3D 照片透光浮雕制作器',
+      description: '将数码照片转换为高精度弧面、平面、圆柱或小夜灯 3D 打印浮雕，配备实时背光穿透模拟。',
+    },
+    gridfinityBinGenerator: {
+      name: 'Gridfinity 抽屉收纳盒与模块化零件箱生成器',
+      description: '参数化生成符合 Gridfinity 规范的收纳盒，可定制分隔槽、堆叠边缘及底部磁铁孔位。',
+    },
+    electronicsBoxEnclosure: {
+      name: '参数化电子外壳与卡扣盒生成器',
+      description: '为 Arduino、ESP32、树莓派及定制 PCB 快速设计卡扣式或螺丝固定式外壳与线缆开孔。',
+    },
+    underDeskClampGenerator: {
+      name: '桌下夹具与耳机理线架 3D 生成器',
+      description: '设计定制螺纹桌夹、耳机挂钩与走线槽，内置高强度 ACME 梯形螺纹旋钮结构。',
+    },
+    skadisPegboardMaker: {
+      name: '宜家斯考迪斯 (Skådis) 洞洞板挂钩与支架制作器',
+      description: '为宜家 Skådis 洞洞板量身定制工具架、通用挂钩、置物架及分类收纳插槽。',
+    },
+    geometricPlantPot: {
+      name: '多面体几何花盆与自动吸水绿植盆制作器',
+      description: '设计多面体折纸风、Voronoi 多孔及螺旋多肉花盆，支持底部储水自吸灌溉与防烂根滤网。',
+    },
+    brailleAdaSignGenerator: {
+      name: '盲文与 ADA 无障碍触感门牌标识生成器',
+      description: '生成符合无障碍规范的房间门牌与提示牌，带有加州二级盲文凸点与触感浮雕英文字母。',
+    },
+    keycapSwitchTesterMaker: {
+      name: '客制化机械键盘键帽与轴体试轴器制作器',
+      description: '设计定制 Cherry MX 轴心键帽，以及多孔位机械轴试音底座与个性化配列试轴板。',
+    },
+    cappuccinoStencilMaker: {
+      name: '卡布奇诺咖啡拉花模版与喷绘遮板制作器',
+      description: '将矢量 SVG 标志与剪影转换为食品级 3D 咖啡拉花模版，自动连接孤岛断连连桥。',
+    },
+    petIdTagGenerator: {
+      name: '宠物防走丢身份牌与项圈穿入式铭牌制作器',
+      description: '设计静音穿入式或悬挂式猫狗身份吊牌，带有浮雕姓名、紧急电话与芯片信息。',
+    },
+    hswInsertAdapter: {
+      name: '蜂窝储物墙 (HSW) 卡扣插件与工具转接件生成器',
+      description: '生成适用于 Honeycomb Storage Wall 的六角卡扣件、M3/M4/M5 螺母固定件及工具适配件。',
+    },
+    passportBiometricPhoto: {
+      name: '证件照、护照与签证生物识别照制作器',
+      description: '严格按 2×2 英寸、35×45 毫米及国际签证标准裁切人像，生成 4×6 / A4 打印排版纸。',
+    },
+    heicAvifConverter: {
+      name: '苹果 HEIC 与 AVIF 批量转换为 JPG / PNG 工具',
+      description: '在浏览器本地批量将苹果手机 HEIC 照片及新一代 AVIF 格式秒转为高清 JPG 或 PNG。',
+    },
+    pdfSignerStamper: {
+      name: '客户端本地 PDF 签名、日期图章与合同批注工具',
+      description: '手绘或上传签名，添加防篡改日期印章与姓名缩写，绝不将涉密法律合同上传至云端。',
+    },
+    facePlateBlur: {
+      name: '照片人脸与车牌隐私智能打码遮挡工具',
+      description: '本地 AI 自动检测人脸与车辆号牌，应用高斯模糊、马赛克像素化或黑色隐私遮挡条。',
+    },
+    localOcrTextExtractor: {
+      name: '本地离线图片与扫描件 PDF 文字识别 (OCR) 工具',
+      description: '利用本地机器学习从发票小票、截图与多页 PDF 中提取可编辑文本，无服务器数据泄露。',
+    },
+    fileEncryptorVault: {
+      name: '零知识客户端文件加密器与隐私保险库',
+      description: '使用军工级 AES-256-GCM 与 Argon2id / PBKDF2 算法对任何文件加密打包为自解密包。',
+    },
+    piiScrubberAnonymizer: {
+      name: '日志与 CSV 个人隐私信息 (PII) 自动脱敏清洗器',
+      description: '在共享前自动检测并脱敏日志和表格中的身份证号、邮箱、银行卡号、IP 与手机号。',
+    },
+    bankStatementConverter: {
+      name: '银行流水账单 CSV / OFX 转换为 Excel 与 QIF 工具',
+      description: '规范整理杂乱的银行导出流水，匹配标准交易列并转为清晰规范的 Excel 财务表格。',
+    },
+    audioTrimmerBooster: {
+      name: '本地音频剪辑器、音量放大器与手机铃声制作器',
+      description: '精准剪裁 MP3、WAV、AAC 音频片段，设置淡入淡出曲线并无失真放大微弱录音。',
+    },
+    videoCompressorResizer: {
+      name: '浏览器本地视频压缩器与社交媒体画幅裁剪工具',
+      description: '将超大 MP4 和 WebM 视频压缩到 Discord 10MB/25MB 限制内，并自由裁剪适配竖屏短视频。',
+    },
+    nutritionLabelMaker: {
+      name: '美国 FDA 与欧盟规范食品营养成分标签制作器',
+      description: '生成符合美国 FDA CFR 101.9 及欧盟法规的矢量营养成分表，直接用于商品包装印刷。',
+    },
+    svgOptimizerCleaner: {
+      name: 'SVG 矢量代码精简优化器与 React / Vue 组件导出工具',
+      description: '剔除矢量图中的冗余元数据，简化贝塞尔曲线，一键导出干净的 JSX 和 Vue 图标组件。',
+    },
+    diffChecker: {
+      name: '双栏代码与法律合同文本差异对比器 (Diff)',
+      description: '双栏并排对比源代码、法律合同或 Markdown，提供字符级精确高亮及统一补丁导出。',
+    },
+    fontSubsetterConverter: {
+      name: '网页字体精简抽离 (Subsetter) 与 WOFF2 格式转换器',
+      description: '通过剥离生僻字将字体文件体积缩减 90%，并快速转换为高压缩比 WOFF2 网页字体。',
+    },
+    seamlessTextureGenerator: {
+      name: '无缝连续贴图与无接缝图案纹理生成器',
+      description: '将普通照片与贴图转换为无缝平铺的四方连续贴图，支持泊松融合与法线贴图生成。',
+    },
+    floorPlanFurnitureScaler: {
+      name: '交互式 2D 户型图测量与家具摆放排布比例尺',
+      description: '从建筑蓝图与户型图中校准实际尺寸，自由拖拽标准家具验证离墙空间与动线尺寸。',
+    },
+    emergencyRecoveryKit: {
+      name: '可打印离线紧急恢复备忘单与密保卡片生成器',
+      description: '生成高安全性纸质备份卡，妥善记录主密码、双重验证 (2FA) 备用码及加密助记词。',
+    },
+    csvVectorChartBuilder: {
+      name: 'CSV 与表格数据一键生成矢量图表与信息图',
+      description: '将表格粘贴数据直接转换为出版级 SVG 柱状图、折线图与信息图表，支持矢量 SVG 和 PNG 导出。',
     },
   },
 };

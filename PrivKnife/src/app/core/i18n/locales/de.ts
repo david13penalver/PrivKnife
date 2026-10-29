@@ -51,11 +51,11 @@ export const de: TranslationSchema = {
     heroHeadingHighlight: 'Taschenmesser im Browser',
     heroDescription:
       'Eine konsolidierte Suite schneller alltäglicher Web-Tools, die vollständig in Ihrem Browser laufen. Keine Cloud-Uploads. Keine Telemetrie. Keine Cookies.',
-    ribbonTools: '🇨🇭 Über 29 Alltagswerkzeuge',
+    ribbonTools: '🇨🇭 59+ Werkzeuge für Jeden Tag',
     ribbonZeroBytes: '🔒 0 Bytes Verlassen das Gerät',
     ribbonWasm: '⚡ Client-Seitiges WebAssembly',
     ribbonOpenSource: '📜 Open Source unter MIT-Lizenz',
-    searchPlaceholder: 'Über 29 private Tools durchsuchen (PDF, Bilder, 3D, Krypto, Dev)...',
+    searchPlaceholder: 'Suche in 59+ privaten Werkzeugen (PDF, Bilder, 3D, Krypto, Dev)...',
     allTools: 'Alle Werkzeuge',
     toolsCount: '{count} Werkzeuge verfügbar',
     noResultsTitle: 'Keine passenden Werkzeuge gefunden',
@@ -218,6 +218,126 @@ export const de: TranslationSchema = {
     webVitals: {
       name: 'Website-Geschwindigkeits- & Core-Web-Vitals-Prüfer',
       description: 'Überprüfen Sie Leistung, Barrierefreiheit und Core Web Vitals (LCP, INP, CLS) mit praktischen Optimierungstipps.',
+    },
+    parametricLampDesigner: {
+      name: '3D Parametrischer Lampen- & Lampenschirm-Designer',
+      description: 'Erstellen Sie individuelle spiral-, rippen- und Voronoi-förmige Lampenschirme mit E27-, E14- oder IKEA-Fassungen.',
+    },
+    lithophaneMaker: {
+      name: '3D-Lithophan-Ersteller für Gekrümmte & Flache Reliefs',
+      description: 'Verwandeln Sie Fotos in hochauflösende flache, gebogene oder zylindrische 3D-Lithophane mit Echtzeit-Hintergrundlicht.',
+    },
+    gridfinityBinGenerator: {
+      name: 'Gridfinity & Modulare Schubladen-Einsatzboxen',
+      description: 'Erzeugen Sie parametrische Gridfinity-Ordnungsboxen mit individuellen Fächern, Randprofilen und Magnetlöchern.',
+    },
+    electronicsBoxEnclosure: {
+      name: 'Parametrisches Elektronikgehäuse mit Schnappverschluss',
+      description: 'Entwerfen Sie Schnapp- oder Schraubgehäuse für Arduino, ESP32, Raspberry Pi und Leiterplatten mit Kabeldurchführungen.',
+    },
+    underDeskClampGenerator: {
+      name: 'Untertisch-Klemmen- & Kabelmanagement-Generator',
+      description: 'Konstruieren Sie Schraubzwingen, Kopfhörerhaken und Kabelführungen mit leichtgängigen ACME-Trapezgewinden.',
+    },
+    skadisPegboardMaker: {
+      name: 'IKEA Skådis Lochwand-Haken & Halterungen-Ersteller',
+      description: 'Erstellen Sie passgenaue Werkzeughalter, Universalhaken und Ablagen speziell für IKEA Skådis Lochplatten.',
+    },
+    geometricPlantPot: {
+      name: 'Geometrischer Blumentopf & Selbstbewässernder Übertopf',
+      description: 'Gestalten Sie facettierte, Voronoi- und Spiral-Pflanzkübel für Sukkulenten mit Bewässerungsreservoir und Drainagegitter.',
+    },
+    brailleAdaSignGenerator: {
+      name: 'Braille- & Taktiler ADA-Türschild-Generator',
+      description: 'Erstellen Sie barrierefreie ADA-Schilder mit California Grade 2 Blindenschrift-Punkten und erhabenem Tasttext.',
+    },
+    keycapSwitchTesterMaker: {
+      name: 'Mechanische Tastenkappen & Schalter-Tester-Designer',
+      description: 'Entwerfen Sie Tastenkappen mit Cherry MX-Kreuzaufnahme und Schaltertest-Platten mit anpassbarem Tastenfeld.',
+    },
+    cappuccinoStencilMaker: {
+      name: 'Cappuccino-Schablonen- & Airbrush-Vorlagen-Ersteller',
+      description: 'Konvertieren Sie SVG-Logos in lebensmittelechte Kaffeeschablonen mit automatisch generierten Haltestegen.',
+    },
+    petIdTagGenerator: {
+      name: 'Haustier-Erkennungsmarken & Halsband-Schieber-Generator',
+      description: 'Gestalten Sie geräuschlose Schiebe- oder Hängemarken für Hunde und Katzen mit erhabenem Namen und Notfallkontakt.',
+    },
+    hswInsertAdapter: {
+      name: 'Honeycomb Storage Wall (HSW) Einsätze & Adapter',
+      description: 'Erstellen Sie sechseckige Schnappeinsätze, M3/M4/M5-Mutternhalter und Werkzeughalter für Honeycomb Storage Walls.',
+    },
+    passportBiometricPhoto: {
+      name: 'Biometrischer Passfoto-, Visum- & Ausweis-Generator',
+      description: 'Schneiden Sie Porträts exakt auf 2×2 Zoll, 35×45 mm und internationale biometrische Vorgaben auf 4×6 / A4-Druckbögen zu.',
+    },
+    heicAvifConverter: {
+      name: 'HEIC- & AVIF-Stapelkonverter zu JPG / PNG',
+      description: 'Konvertieren Sie Apple iPhone HEIC-Fotos und moderne AVIF-Bilder direkt im Browser verlustarm in JPG oder PNG.',
+    },
+    pdfSignerStamper: {
+      name: 'Lokaler PDF-Signierer, Datumsstempel & Initialen',
+      description: 'Unterschreiben, stempeln und paraphieren Sie PDF-Verträge lokal im Browser, ohne vertrauliche Dokumente hochzuladen.',
+    },
+    facePlateBlur: {
+      name: 'Gesichter- & Kennzeichen-Verpixelungs-Werkzeug',
+      description: 'Zensieren Sie Gesichter und Autokennzeichen auf Fotos automatisch mit Gaußschem Weichzeichner oder Mosaikpixeln.',
+    },
+    localOcrTextExtractor: {
+      name: 'Lokale OCR-Texterkennung für Bilder & Gescannte PDFs',
+      description: 'Extrahieren Sie editierbaren Text aus Belegen, Screenshots und PDFs mittels lokaler KI ohne Server-Upload.',
+    },
+    fileEncryptorVault: {
+      name: 'Zero-Knowledge-Dateiverschlüsselung & Datensafe',
+      description: 'Verschlüsseln Sie Dateien mit militärischem AES-256-GCM und Argon2id / PBKDF2 in selbstentschlüsselnde Container.',
+    },
+    piiScrubberAnonymizer: {
+      name: 'PII-Datenschutz-Bereiniger für Logdateien & CSV-Dateien',
+      description: 'Entfernen Sie sensible Sozialversicherungsnummern, E-Mails, Kreditkarten, IP-Adressen und Telefonnummern.',
+    },
+    bankStatementConverter: {
+      name: 'Kontoauszug-Konverter von CSV / OFX zu Excel & QIF',
+      description: 'Bereinigen Sie Bankexporte, vereinheitlichen Sie Buchungsspalten und wandeln Sie OFX/QFX-Dateien in sauberes Excel um.',
+    },
+    audioTrimmerBooster: {
+      name: 'Audio-Cutter, Lautstärke-Booster & Klingelton-Ersteller',
+      description: 'Schneiden Sie MP3-, WAV- und AAC-Titel, fügen Sie weiche Blenden ein und heben Sie leise Aufnahmen sicher an.',
+    },
+    videoCompressorResizer: {
+      name: 'Client-Videokompressor & Social-Media-Zuschneider',
+      description: 'Komprimieren Sie MP4- und WebM-Videos unter 10MB / 25MB für Discord und schneiden Sie für TikTok, Reels und Shorts zu.',
+    },
+    nutritionLabelMaker: {
+      name: 'FDA- & EU-Nährwerttabellen-Generator für Verpackungen',
+      description: 'Erstellen Sie druckfertige Vektor-Nährwertangaben nach FDA- und EU-Richtlinien für Lebensmittelverpackungen.',
+    },
+    svgOptimizerCleaner: {
+      name: 'SVG-Optimierer, Pfad-Bereiniger & React / Vue-Exporter',
+      description: 'Entfernen Sie unnötigen Ballast aus SVG-Vektoren, glätten Sie Pfade und exportieren Sie optimierten React- und Vue-Code.',
+    },
+    diffChecker: {
+      name: 'Code- & Vertragsvergleicher Gegenüberstellung (Diff)',
+      description: 'Vergleichen Sie Quellcode, Verträge oder Markdown-Texte zweispaltig mit zeichengenauem Inline-Farbabgleich.',
+    },
+    fontSubsetterConverter: {
+      name: 'Webfont-Verschlanker & TTF / OTF zu WOFF2-Konverter',
+      description: 'Sparen Sie 90% Dateigröße durch Entfernen ungenutzter Glyphen und konvertieren Sie Schriften in kompaktes WOFF2.',
+    },
+    seamlessTextureGenerator: {
+      name: 'Nahtlose Kachelbare Texturen & Muster-Generator',
+      description: 'Wandeln Sie Fotos in nahtlos wiederholbare Texturen mit Poisson-Synthese und automatischer Normal-Map um.',
+    },
+    floorPlanFurnitureScaler: {
+      name: 'Interaktiver 2D-Grundriss- & Möbel-Skalierer',
+      description: 'Kalibrieren Sie Maßstäbe aus Bauplänen und platzieren Sie Standardmöbel zur kollisionsfreien Raumplanung.',
+    },
+    emergencyRecoveryKit: {
+      name: 'Druckbares Notfall-Wiederherstellungs- & Passwortblatt',
+      description: 'Erstellen Sie hochsichere Offline-Papierbögen für Master-Passwörter, 2FA-Backup-Codes und Krypto-Seed-Phrasen.',
+    },
+    csvVectorChartBuilder: {
+      name: 'CSV-Vektordiagramm- & Infografik-Generator',
+      description: 'Verwandeln Sie Tabellenkalkulationsdaten in gestochen scharfe SVG-Balkendiagramme, Liniengrafiken und Infografiken.',
     },
   },
 };

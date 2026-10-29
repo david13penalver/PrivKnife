@@ -51,11 +51,11 @@ export const it: TranslationSchema = {
     heroHeadingHighlight: 'Privato nel Browser',
     heroDescription:
       'Una suite consolidata di strumenti web quotidiani e veloci in esecuzione interamente nel tuo browser. Nessun caricamento su cloud. Nessuna telemetria. Nessun cookie.',
-    ribbonTools: '🇨🇭 Oltre 29 Strumenti Quotidiani',
+    ribbonTools: '🇨🇭 59+ Strumenti per Tutti i Giorni',
     ribbonZeroBytes: '🔒 0 Byte Lasciano il Dispositivo',
     ribbonWasm: '⚡ WebAssembly Lato Client',
     ribbonOpenSource: '📜 Open Source con Licenza MIT',
-    searchPlaceholder: 'Cerca tra oltre 29 strumenti privati (PDF, immagini, 3D, crypto, dev)...',
+    searchPlaceholder: 'Cerca tra 59+ strumenti privati (PDF, immagini, 3D, crypto, dev)...',
     allTools: 'Tutti gli Strumenti',
     toolsCount: '{count} strumenti disponibili',
     noResultsTitle: 'Nessuno strumento corrispondente trovato',
@@ -218,6 +218,126 @@ export const it: TranslationSchema = {
     webVitals: {
       name: 'Verifica Prestazioni del Sito & Core Web Vitals',
       description: 'Analizza velocità, accessibilità e Core Web Vitals (LCP, INP, CLS) con diagnosi pratiche per sviluppatori.',
+    },
+    parametricLampDesigner: {
+      name: 'Designer Parametrico 3D di Lampade e Paralumi',
+      description: 'Progetta paralumi personalizzati a spirale, scanalati e Voronoi con attacchi standard E27, E14 o IKEA e modalità vaso.',
+    },
+    lithophaneMaker: {
+      name: 'Creatore di Litofanie 3D Curvature e Piane',
+      description: 'Trasforma fotografie in litofanie 3D stampabili curve, piatte o cilindriche con simulazione di retroilluminazione.',
+    },
+    gridfinityBinGenerator: {
+      name: 'Generatore di Vaschette Modulari Gridfinity per Cassetti',
+      description: 'Genera contenitori organizer Gridfinity parametrici con scomparti su misura, bordi rinforzati e alloggiamenti per magneti.',
+    },
+    electronicsBoxEnclosure: {
+      name: 'Scatola Elettronica Parametrica e Custodia a Scatto',
+      description: 'Crea custodie a incastro o avvitate per Arduino, ESP32, Raspberry Pi e PCB personalizzati con passacavi dedicati.',
+    },
+    underDeskClampGenerator: {
+      name: 'Morsetto Sottoscrivania e Passacavi Parametrico',
+      description: 'Progetta morsetti a vite, ganci per cuffie e canaline passacavi con filettatura trapezoidale ACME per stampa 3D.',
+    },
+    skadisPegboardMaker: {
+      name: 'Supporti e Ganci per Pannelli Forati IKEA Skådis',
+      description: 'Realizza ganci universali, mensole e alloggiamenti attrezzi progettati specificamente per pannelli forati IKEA Skådis.',
+    },
+    geometricPlantPot: {
+      name: 'Vaso Geometrico e Fioriera ad Auto-Irrigazione',
+      description: 'Crea vasi sfaccettati, Voronoi e a spirale per piante grasse con serbatoio di irrigazione e griglia di drenaggio.',
+    },
+    brailleAdaSignGenerator: {
+      name: 'Generatore di Segnaletica Tattile in Braille e Norma ADA',
+      description: 'Genera targhe per porte conformi alle normative ADA con puntini Braille Grado 2 e scritte in rilievo tattile.',
+    },
+    keycapSwitchTesterMaker: {
+      name: 'Copritasti Meccanici e Piastra Tester per Switch',
+      description: 'Disegna copritasti con stelo Cherry MX e piastre di prova del suono degli switch con griglie personalizzabili.',
+    },
+    cappuccinoStencilMaker: {
+      name: 'Stampino per Cappuccino e Sagoma Aerografo 3D',
+      description: 'Converti loghi e sagome vettoriali SVG in stampini alimentari per caffè con ponti di giunzione automatici.',
+    },
+    petIdTagGenerator: {
+      name: 'Generatore di Medagliette e Passanti per Collari Animali',
+      description: 'Crea medagliette silenziose da infilare o da appendere per cani e gatti con nome, recapito e microchip in rilievo.',
+    },
+    hswInsertAdapter: {
+      name: 'Inserti e Adattatori per Honeycomb Storage Wall (HSW)',
+      description: 'Progetta inserti esagonali a scatto, alloggiamenti per dadi M3/M4/M5 e supporti utensili per pareti HSW.',
+    },
+    passportBiometricPhoto: {
+      name: 'Creatore di Fototessere Biometriche per Passaporto e Visto',
+      description: 'Ritaglia ritratti secondo le misure 2×2 pollici, 35×45 mm e requisiti biometrici su fogli stampabili 4×6 / A4.',
+    },
+    heicAvifConverter: {
+      name: 'Convertitore Batch da HEIC e AVIF a JPG / PNG',
+      description: 'Converti in blocco le foto HEIC/HEIF di iPhone e le immagini AVIF in formato JPG o PNG ad alta qualità nel browser.',
+    },
+    pdfSignerStamper: {
+      name: 'Firma Digitale, Timbro Data e Sigla per Contratti PDF',
+      description: 'Disegna firme, inserisci timbri con data e sigle su contratti PDF senza caricare documenti legali su server esterni.',
+    },
+    facePlateBlur: {
+      name: 'Oscuramento e Sfocatura di Volti e Targhe per la Privacy',
+      description: 'Rileva e censura automaticamente volti e targhe automobilistiche con sfocatura gaussiana, pixelatura o barre nere.',
+    },
+    localOcrTextExtractor: {
+      name: 'Estrattore OCR Locale da Immagini e PDF a Testo / Word',
+      description: 'Estrai testo modificabile da scontrini, schermate e PDF scansionati tramite intelligenza artificiale locale senza server.',
+    },
+    fileEncryptorVault: {
+      name: 'Cifratore di File e Cassaforte Privata Zero-Knowledge',
+      description: 'Cifra qualsiasi file o cartella con algoritmo militare AES-256-GCM e derivazione chiave Argon2id / PBKDF2.',
+    },
+    piiScrubberAnonymizer: {
+      name: 'Anonimizzatore e Bonifica Dati Personali PII per Log e CSV',
+      description: 'Individua e cancella codici fiscali, email, carte di credito, indirizzi IP e numeri di telefono prima della condivisione.',
+    },
+    bankStatementConverter: {
+      name: 'Convertitore di Estratti Conto CSV / OFX in Excel e QIF',
+      description: 'Normalizza le colonne delle transazioni e trasforma file bancari disordinati OFX/QFX/CSV in fogli Excel ordinati.',
+    },
+    audioTrimmerBooster: {
+      name: 'Taglierina Audio, Booster di Volume e Suonerie',
+      description: 'Taglia tracce MP3, WAV e AAC, applica dissolvenze audio e aumenta il volume di registrazioni basse offline.',
+    },
+    videoCompressorResizer: {
+      name: 'Compressore Video e Ridimensionatore per Social Network',
+      description: 'Comprimi video MP4 e WebM entro i limiti di 10MB / 25MB di Discord e ritaglia per TikTok, Reels e Shorts.',
+    },
+    nutritionLabelMaker: {
+      name: 'Etichette con Valori Nutrizionali FDA e UE per Imballaggi',
+      description: 'Genera tabelle nutrizionali vettoriali conformi alle normative FDA ed europee pronte per il packaging commerciale.',
+    },
+    svgOptimizerCleaner: {
+      name: 'Ottimizzatore SVG, Pulizia Tracciati ed Export React / Vue',
+      description: 'Rimuovi metadati superflui da file SVG, semplifica le curve ed esporta componenti puliti per React e Vue.',
+    },
+    diffChecker: {
+      name: 'Confronto File di Codice e Contratti Fianco a Fianco (Diff)',
+      description: 'Confronta versioni di codice o contratti legali con evidenziazione dei caratteri ed esportazione di file di patch.',
+    },
+    fontSubsetterConverter: {
+      name: 'Riduttore di Caratteri Web e Convertitore TTF in WOFF2',
+      description: 'Riduci del 90% il peso dei font eliminando i glifi inutilizzati e converti in formato compresso per il web WOFF2.',
+    },
+    seamlessTextureGenerator: {
+      name: 'Generatore di Texture e Motivi Ripetibili Senza Giunzioni',
+      description: 'Trasforma immagini e trame di gioco in pattern continui con fusione di Poisson e mappa delle normali.',
+    },
+    floorPlanFurnitureScaler: {
+      name: 'Scalatore Interattivo 2D di Planimetrie e Arredamento',
+      description: 'Calibra le scale metriche da planimetrie e posiziona mobili standard per verificare gli spazi liberi offline.',
+    },
+    emergencyRecoveryKit: {
+      name: 'Foglio Stampabile di Emergenza per Password e Chiavi Crypto',
+      description: 'Genera moduli cartacei sicuri per conservare offline master password, codici 2FA e frasi di recupero seed.',
+    },
+    csvVectorChartBuilder: {
+      name: 'Generatore di Grafici Vettoriali e Infografiche da CSV',
+      description: 'Trasforma dati tabulari in diagrammi a barre, grafici a linee e infografiche vettoriali SVG e PNG ad alta risoluzione.',
     },
   },
 };
