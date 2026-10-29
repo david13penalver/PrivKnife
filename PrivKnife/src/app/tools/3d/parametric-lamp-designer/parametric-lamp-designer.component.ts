@@ -70,7 +70,9 @@ import {
         <div class="c-card" style="padding: 12px 16px;">
           <div class="g--flex-center" style="justify-content: space-between; flex-wrap: wrap; gap: 10px;">
             <div class="g--flex-center" style="gap: 8px; flex-wrap: wrap;">
-              <span style="font-size: 0.85rem; font-weight: 600; color: var(--color-text-secondary);">Curated Presets:</span>
+              <span style="font-size: 0.85rem; font-weight: 600; color: var(--color-text-secondary);">
+                {{ 'tools.parametricLampDesigner.curatedPresets' | translate }}
+              </span>
               @for (preset of presets; track preset.id) {
                 <button
                   type="button"
@@ -78,7 +80,7 @@ import {
                   [class.c-button--primary]="selectedPresetId() === preset.id"
                   [class.c-button--outline]="selectedPresetId() !== preset.id"
                   (click)="loadPreset(preset)">
-                  {{ preset.name }}
+                  {{ 'tools.parametricLampDesigner.presets.' + preset.id | translate }}
                 </button>
               }
             </div>
@@ -86,7 +88,7 @@ import {
               type="button"
               class="c-button c-button--small c-button--ghost"
               (click)="resetToDefaults()">
-              ↺ Reset Defaults
+              {{ 'tools.parametricLampDesigner.resetDefaults' | translate }}
             </button>
           </div>
         </div>
@@ -100,29 +102,29 @@ import {
           <div class="l-columns l-columns--1" style="gap: 16px;">
             
             <!-- 1. Silhouette & Dimensions -->
-            <app-card title="1. Silhouette &amp; Proportions">
+            <app-card [title]="'tools.parametricLampDesigner.silhouetteTitle' | translate">
               <div class="l-columns l-columns--1" style="gap: 12px;">
                 <div>
                   <label style="font-size: 0.85rem; font-weight: 600; display: block; margin-bottom: 4px;">
-                    Silhouette Profile:
+                    {{ 'tools.parametricLampDesigner.silhouetteProfile' | translate }}
                   </label>
                   <select
                     class="c-input__control"
                     style="width: 100%;"
                     [ngModel]="config().curveType"
                     (ngModelChange)="updateConfig({ curveType: $event })">
-                    <option value="spline">Spline (Organic Bezier)</option>
-                    <option value="conical">Conical (Two-Stage Flared)</option>
-                    <option value="hourglass">Hourglass (Pinched Waist)</option>
-                    <option value="bulbous">Bulbous (Rounded Lantern)</option>
-                    <option value="scurve">S-Curve (Bell Flare)</option>
+                    <option value="spline">{{ 'tools.parametricLampDesigner.profiles.spline' | translate }}</option>
+                    <option value="conical">{{ 'tools.parametricLampDesigner.profiles.conical' | translate }}</option>
+                    <option value="hourglass">{{ 'tools.parametricLampDesigner.profiles.hourglass' | translate }}</option>
+                    <option value="bulbous">{{ 'tools.parametricLampDesigner.profiles.bulbous' | translate }}</option>
+                    <option value="scurve">{{ 'tools.parametricLampDesigner.profiles.scurve' | translate }}</option>
                   </select>
                 </div>
 
                 <!-- Height -->
                 <div>
                   <div class="g--flex-center" style="justify-content: space-between; font-size: 0.85rem;">
-                    <span style="font-weight: 600;">Total Height:</span>
+                    <span style="font-weight: 600;">{{ 'tools.parametricLampDesigner.totalHeight' | translate }}</span>
                     <span style="font-family: monospace;">{{ config().height }} mm</span>
                   </div>
                   <input
@@ -140,7 +142,7 @@ import {
                 <div class="l-columns l-columns--2" style="gap: 12px;">
                   <div>
                     <div class="g--flex-center" style="justify-content: space-between; font-size: 0.82rem;">
-                      <span style="font-weight: 600;">Top Radius:</span>
+                      <span style="font-weight: 600;">{{ 'tools.parametricLampDesigner.topRadius' | translate }}</span>
                       <span style="font-family: monospace;">{{ config().topRadius }} mm</span>
                     </div>
                     <input
@@ -155,7 +157,7 @@ import {
                   </div>
                   <div>
                     <div class="g--flex-center" style="justify-content: space-between; font-size: 0.82rem;">
-                      <span style="font-weight: 600;">Bottom Radius:</span>
+                      <span style="font-weight: 600;">{{ 'tools.parametricLampDesigner.bottomRadius' | translate }}</span>
                       <span style="font-family: monospace;">{{ config().bottomRadius }} mm</span>
                     </div>
                     <input
@@ -174,7 +176,7 @@ import {
                 <div class="l-columns l-columns--2" style="gap: 12px;">
                   <div>
                     <div class="g--flex-center" style="justify-content: space-between; font-size: 0.82rem;">
-                      <span style="font-weight: 600;">Mid/Waist Radius:</span>
+                      <span style="font-weight: 600;">{{ 'tools.parametricLampDesigner.midRadius' | translate }}</span>
                       <span style="font-family: monospace;">{{ config().midRadius }} mm</span>
                     </div>
                     <input
@@ -189,7 +191,7 @@ import {
                   </div>
                   <div>
                     <div class="g--flex-center" style="justify-content: space-between; font-size: 0.82rem;">
-                      <span style="font-weight: 600;">Waist Height Pos:</span>
+                      <span style="font-weight: 600;">{{ 'tools.parametricLampDesigner.waistHeightPos' | translate }}</span>
                       <span style="font-family: monospace;">{{ Math.round(config().waistRatio * 100) }}%</span>
                     </div>
                     <input
@@ -207,8 +209,8 @@ import {
                 <!-- Mesh Segments Resolution -->
                 <div>
                   <div class="g--flex-center" style="justify-content: space-between; font-size: 0.82rem;">
-                    <span style="font-weight: 600;">Radial Resolution:</span>
-                    <span style="font-family: monospace;">{{ config().radialSegs }} segments</span>
+                    <span style="font-weight: 600;">{{ 'tools.parametricLampDesigner.radialResolution' | translate }}</span>
+                    <span style="font-family: monospace;">{{ config().radialSegs }} {{ 'tools.parametricLampDesigner.segments' | translate }}</span>
                   </div>
                   <input
                     type="range"
@@ -224,22 +226,22 @@ import {
             </app-card>
 
             <!-- 2. Ribs, Fluting & Surface -->
-            <app-card title="2. Ribs, Fluting &amp; Surface Texture">
+            <app-card [title]="'tools.parametricLampDesigner.ribsTitle' | translate">
               <div class="l-columns l-columns--1" style="gap: 12px;">
                 <div>
                   <label style="font-size: 0.85rem; font-weight: 600; display: block; margin-bottom: 4px;">
-                    Rib Wave Shape:
+                    {{ 'tools.parametricLampDesigner.ribWaveShape' | translate }}
                   </label>
                   <select
                     class="c-input__control"
                     style="width: 100%;"
                     [ngModel]="config().ribProfile"
                     (ngModelChange)="updateConfig({ ribProfile: $event })">
-                    <option value="sine">Smooth Sine Flutes</option>
-                    <option value="pleat">Sharp Origami Pleats</option>
-                    <option value="scallop">Rounded Scalloped Arches</option>
-                    <option value="gear">Flat-Top Fluted Grooves</option>
-                    <option value="voronoi">Voronoi Cellular Relief</option>
+                    <option value="sine">{{ 'tools.parametricLampDesigner.ribProfiles.sine' | translate }}</option>
+                    <option value="pleat">{{ 'tools.parametricLampDesigner.ribProfiles.pleat' | translate }}</option>
+                    <option value="scallop">{{ 'tools.parametricLampDesigner.ribProfiles.scallop' | translate }}</option>
+                    <option value="gear">{{ 'tools.parametricLampDesigner.ribProfiles.gear' | translate }}</option>
+                    <option value="voronoi">{{ 'tools.parametricLampDesigner.ribProfiles.voronoi' | translate }}</option>
                   </select>
                 </div>
 
@@ -247,7 +249,7 @@ import {
                 <div class="l-columns l-columns--2" style="gap: 12px;">
                   <div>
                     <div class="g--flex-center" style="justify-content: space-between; font-size: 0.82rem;">
-                      <span style="font-weight: 600;">Rib Count:</span>
+                      <span style="font-weight: 600;">{{ 'tools.parametricLampDesigner.ribCount' | translate }}</span>
                       <span style="font-family: monospace;">{{ config().ribCount }}</span>
                     </div>
                     <input
@@ -262,7 +264,7 @@ import {
                   </div>
                   <div>
                     <div class="g--flex-center" style="justify-content: space-between; font-size: 0.82rem;">
-                      <span style="font-weight: 600;">Rib Depth:</span>
+                      <span style="font-weight: 600;">{{ 'tools.parametricLampDesigner.ribDepth' | translate }}</span>
                       <span style="font-family: monospace;">{{ config().ribDepth }} mm</span>
                     </div>
                     <input
@@ -280,7 +282,7 @@ import {
                 <!-- Spiral Twist Angle -->
                 <div>
                   <div class="g--flex-center" style="justify-content: space-between; font-size: 0.85rem;">
-                    <span style="font-weight: 600;">Spiral Twist Angle:</span>
+                    <span style="font-weight: 600;">{{ 'tools.parametricLampDesigner.twistAngle' | translate }}</span>
                     <span style="font-family: monospace;">{{ config().twistAngle }}°</span>
                   </div>
                   <input
@@ -298,7 +300,7 @@ import {
                 <div class="l-columns l-columns--2" style="gap: 12px;">
                   <div>
                     <div class="g--flex-center" style="justify-content: space-between; font-size: 0.82rem;">
-                      <span style="font-weight: 600;">Vertical Waves:</span>
+                      <span style="font-weight: 600;">{{ 'tools.parametricLampDesigner.verticalWaves' | translate }}</span>
                       <span style="font-family: monospace;">{{ config().vWaveFreq }}</span>
                     </div>
                     <input
@@ -313,7 +315,7 @@ import {
                   </div>
                   <div>
                     <div class="g--flex-center" style="justify-content: space-between; font-size: 0.82rem;">
-                      <span style="font-weight: 600;">Wave Amplitude:</span>
+                      <span style="font-weight: 600;">{{ 'tools.parametricLampDesigner.waveAmplitude' | translate }}</span>
                       <span style="font-family: monospace;">{{ config().vWaveAmp }} mm</span>
                     </div>
                     <input
@@ -331,12 +333,12 @@ import {
             </app-card>
 
             <!-- 3. 3D Print & Socket Fitting -->
-            <app-card title="3. 3D Print &amp; Socket Mount">
+            <app-card [title]="'tools.parametricLampDesigner.printMountTitle' | translate">
               <div class="l-columns l-columns--1" style="gap: 12px;">
                 <!-- Print Mode Toggle -->
                 <div>
                   <label style="font-size: 0.85rem; font-weight: 600; display: block; margin-bottom: 4px;">
-                    Print Mode:
+                    {{ 'tools.parametricLampDesigner.printMode' | translate }}
                   </label>
                   <div class="g--flex-center" style="gap: 8px;">
                     <button
@@ -346,7 +348,7 @@ import {
                       [class.c-button--primary]="config().printMode === 'shell'"
                       [class.c-button--outline]="config().printMode !== 'shell'"
                       (click)="updateConfig({ printMode: 'shell' })">
-                      Watertight Hollow Shell
+                      {{ 'tools.parametricLampDesigner.printModes.shell' | translate }}
                     </button>
                     <button
                       type="button"
@@ -355,7 +357,7 @@ import {
                       [class.c-button--primary]="config().printMode === 'vase'"
                       [class.c-button--outline]="config().printMode !== 'vase'"
                       (click)="updateConfig({ printMode: 'vase' })">
-                      Spiralize Vase Mode
+                      {{ 'tools.parametricLampDesigner.printModes.vase' | translate }}
                     </button>
                   </div>
                 </div>
@@ -363,7 +365,7 @@ import {
                 @if (config().printMode === 'shell') {
                   <div>
                     <div class="g--flex-center" style="justify-content: space-between; font-size: 0.85rem;">
-                      <span style="font-weight: 600;">Wall Thickness:</span>
+                      <span style="font-weight: 600;">{{ 'tools.parametricLampDesigner.wallThickness' | translate }}</span>
                       <span style="font-family: monospace;">{{ config().wallThickness }} mm</span>
                     </div>
                     <input
@@ -382,31 +384,31 @@ import {
                 <div class="l-columns l-columns--2" style="gap: 12px;">
                   <div>
                     <label style="font-size: 0.82rem; font-weight: 600; display: block; margin-bottom: 4px;">
-                      Socket Preset:
+                      {{ 'tools.parametricLampDesigner.socketPreset' | translate }}
                     </label>
                     <select
                       class="c-input__control"
                       style="width: 100%;"
                       [ngModel]="config().socketPreset"
                       (ngModelChange)="onSocketPresetChange($event)">
-                      <option value="e27">E27 (41.0 mm)</option>
-                      <option value="e14">E14 (28.0 mm)</option>
-                      <option value="ikea">IKEA Stråla (34.0 mm)</option>
-                      <option value="custom">Custom Diameter</option>
-                      <option value="none">None (Pure Shade)</option>
+                      <option value="e27">{{ 'tools.parametricLampDesigner.socketPresets.e27' | translate }}</option>
+                      <option value="e14">{{ 'tools.parametricLampDesigner.socketPresets.e14' | translate }}</option>
+                      <option value="ikea">{{ 'tools.parametricLampDesigner.socketPresets.ikea' | translate }}</option>
+                      <option value="custom">{{ 'tools.parametricLampDesigner.socketPresets.custom' | translate }}</option>
+                      <option value="none">{{ 'tools.parametricLampDesigner.socketPresets.none' | translate }}</option>
                     </select>
                   </div>
                   <div>
                     <label style="font-size: 0.82rem; font-weight: 600; display: block; margin-bottom: 4px;">
-                      Mount Position:
+                      {{ 'tools.parametricLampDesigner.mountPos' | translate }}
                     </label>
                     <select
                       class="c-input__control"
                       style="width: 100%;"
                       [ngModel]="config().mountPos"
                       (ngModelChange)="updateConfig({ mountPos: $event })">
-                      <option value="bottom">Bottom (Table / Floor)</option>
-                      <option value="top">Top (Pendant Hanging)</option>
+                      <option value="bottom">{{ 'tools.parametricLampDesigner.mountPositions.bottom' | translate }}</option>
+                      <option value="top">{{ 'tools.parametricLampDesigner.mountPositions.top' | translate }}</option>
                     </select>
                   </div>
                 </div>
@@ -414,7 +416,7 @@ import {
                 @if (config().socketPreset === 'custom') {
                   <div>
                     <div class="g--flex-center" style="justify-content: space-between; font-size: 0.82rem;">
-                      <span style="font-weight: 600;">Custom Socket Hole Dia:</span>
+                      <span style="font-weight: 600;">{{ 'tools.parametricLampDesigner.customSocketDia' | translate }}</span>
                       <span style="font-family: monospace;">{{ config().socketDia }} mm</span>
                     </div>
                     <input
@@ -433,7 +435,7 @@ import {
                   <div class="l-columns l-columns--2" style="gap: 12px;">
                     <div>
                       <div class="g--flex-center" style="justify-content: space-between; font-size: 0.82rem;">
-                        <span style="font-weight: 600;">Spoke Count:</span>
+                        <span style="font-weight: 600;">{{ 'tools.parametricLampDesigner.spokeCount' | translate }}</span>
                         <span style="font-family: monospace;">{{ config().spokeCount }}</span>
                       </div>
                       <input
@@ -448,7 +450,7 @@ import {
                     </div>
                     <div>
                       <div class="g--flex-center" style="justify-content: space-between; font-size: 0.82rem;">
-                        <span style="font-weight: 600;">Spoke Width:</span>
+                        <span style="font-weight: 600;">{{ 'tools.parametricLampDesigner.spokeWidth' | translate }}</span>
                         <span style="font-family: monospace;">{{ config().spokeWidth }} mm</span>
                       </div>
                       <input
@@ -467,7 +469,7 @@ import {
             </app-card>
 
             <!-- 4. Material Simulation -->
-            <app-card title="4. Filament Simulation (Preview Only)">
+            <app-card [title]="'tools.parametricLampDesigner.filamentTitle' | translate">
               <div class="g--flex-center" style="gap: 8px; flex-wrap: wrap;">
                 @for (fil of filaments; track fil.id) {
                   <button
@@ -476,7 +478,7 @@ import {
                     [class.c-button--primary]="selectedFilamentId() === fil.id"
                     [class.c-button--outline]="selectedFilamentId() !== fil.id"
                     (click)="selectFilament(fil.id)">
-                    {{ fil.name }}
+                    {{ 'tools.parametricLampDesigner.filaments.' + fil.id | translate }}
                   </button>
                 }
               </div>
@@ -495,10 +497,10 @@ import {
               <div class="c-lamp-designer__viewport-hud">
                 <div class="c-lamp-designer__hud-group">
                   <span class="c-lamp-designer__hud-badge">
-                    Bed: 256×256 mm
+                    {{ 'tools.parametricLampDesigner.bedSize' | translate }}
                   </span>
                   <span class="c-lamp-designer__hud-badge">
-                    Triangles: {{ metrics()?.triangleCount | number }}
+                    {{ 'tools.parametricLampDesigner.triangles' | translate }} {{ metrics()?.triangleCount | number }}
                   </span>
                 </div>
 
@@ -509,7 +511,7 @@ import {
                     [class.c-lamp-designer__hud-btn--active]="lampLit()"
                     (click)="toggleLampLit()"
                     title="Toggle Bulb Illumination">
-                    💡 {{ lampLit() ? 'Bulb ON' : 'Bulb OFF' }}
+                    {{ lampLit() ? ('tools.parametricLampDesigner.bulbOn' | translate) : ('tools.parametricLampDesigner.bulbOff' | translate) }}
                   </button>
                   <button
                     type="button"
@@ -517,14 +519,14 @@ import {
                     [class.c-lamp-designer__hud-btn--active]="wireframe()"
                     (click)="toggleWireframe()"
                     title="Toggle Wireframe Mesh">
-                    Mesh
+                    {{ 'tools.parametricLampDesigner.mesh' | translate }}
                   </button>
                   <button
                     type="button"
                     class="c-lamp-designer__hud-btn"
                     (click)="resetCamera()"
                     title="Reset Camera View">
-                    Reset View
+                    {{ 'tools.parametricLampDesigner.resetView' | translate }}
                   </button>
                 </div>
               </div>
@@ -534,34 +536,42 @@ import {
             </div>
 
             <!-- Print Telemetry & Specifications -->
-            <app-card title="Manufacturing Telemetry &amp; Slicer Settings">
+            <app-card [title]="'tools.parametricLampDesigner.telemetryTitle' | translate">
               @if (metrics(); as m) {
                 <div class="l-columns l-columns--3 g--margin-bottom-4" style="gap: 16px; text-align: center;">
                   <div style="background: var(--color-bg-secondary); padding: 12px; border-radius: 8px;">
-                    <div style="font-size: 0.8rem; color: var(--color-text-secondary); font-weight: 600;">DIMENSIONS</div>
+                    <div style="font-size: 0.8rem; color: var(--color-text-secondary); font-weight: 600;">
+                      {{ 'tools.parametricLampDesigner.dimensions' | translate }}
+                    </div>
                     <div style="font-size: 1.15rem; font-weight: 700; margin-top: 4px;">
                       {{ m.dimensionsMm.width }} × {{ m.dimensionsMm.depth }} × {{ m.dimensionsMm.height }} mm
                     </div>
                   </div>
                   <div style="background: var(--color-bg-secondary); padding: 12px; border-radius: 8px;">
-                    <div style="font-size: 0.8rem; color: var(--color-text-secondary); font-weight: 600;">EST. FILAMENT</div>
+                    <div style="font-size: 0.8rem; color: var(--color-text-secondary); font-weight: 600;">
+                      {{ 'tools.parametricLampDesigner.estFilament' | translate }}
+                    </div>
                     <div style="font-size: 1.15rem; font-weight: 700; margin-top: 4px; color: #10b981;">
-                      ~{{ m.estimatedGrams }} grams
+                      ~{{ m.estimatedGrams }} {{ 'tools.parametricLampDesigner.grams' | translate }}
                     </div>
                   </div>
                   <div style="background: var(--color-bg-secondary); padding: 12px; border-radius: 8px;">
-                    <div style="font-size: 0.8rem; color: var(--color-text-secondary); font-weight: 600;">EST. PRINT TIME</div>
+                    <div style="font-size: 0.8rem; color: var(--color-text-secondary); font-weight: 600;">
+                      {{ 'tools.parametricLampDesigner.estPrintTime' | translate }}
+                    </div>
                     <div style="font-size: 1.15rem; font-weight: 700; margin-top: 4px;">
-                      ~{{ m.estimatedPrintTimeHours }} hours
+                      ~{{ m.estimatedPrintTimeHours }} {{ 'tools.parametricLampDesigner.hours' | translate }}
                     </div>
                   </div>
                 </div>
 
                 <div style="border-top: 1px solid var(--color-border); padding-top: 12px;">
-                  <span style="font-size: 0.85rem; font-weight: 600; display: block; margin-bottom: 6px;">Recommended Slicer Instructions:</span>
+                  <span style="font-size: 0.85rem; font-weight: 600; display: block; margin-bottom: 6px;">
+                    {{ 'tools.parametricLampDesigner.slicerInstructions' | translate }}
+                  </span>
                   <ul style="margin: 0; padding-left: 20px; font-size: 0.85rem; color: var(--color-text-secondary);">
                     @for (tip of m.slicerTips; track tip) {
-                      <li>{{ tip }}</li>
+                      <li>{{ (tipI18nMap[tip] || tip) | translate }}</li>
                     }
                   </ul>
                 </div>
@@ -576,7 +586,7 @@ import {
                     type="button"
                     class="c-button c-button--outline"
                     (click)="captureSnapshot()">
-                    📷 High-Res PNG
+                    {{ 'tools.parametricLampDesigner.exportPng' | translate }}
                   </button>
                 </div>
                 <div class="l-extremo__area-derecha g--flex-center" style="gap: 10px;">
@@ -584,13 +594,13 @@ import {
                     type="button"
                     class="c-button c-button--secondary"
                     (click)="download3mf()">
-                    Download .3MF Archive
+                    {{ 'tools.parametricLampDesigner.export3mf' | translate }}
                   </button>
                   <button
                     type="button"
                     class="c-button c-button--primary"
                     (click)="downloadStl()">
-                    Download Print-Ready .STL
+                    {{ 'tools.parametricLampDesigner.exportStl' | translate }}
                   </button>
                 </div>
               </div>
@@ -609,6 +619,21 @@ export class ParametricLampDesignerComponent implements AfterViewInit, OnDestroy
   readonly Math = Math;
   readonly presets = SAMPLE_LAMP_PRESETS;
   readonly filaments = FILAMENT_OPTIONS;
+
+  readonly tipI18nMap: Record<string, string> = {
+    'Print with 0% infill and 3-4 perimeter walls for translucent diffusion.':
+      'tools.parametricLampDesigner.slicerTips.infill',
+    'No supports needed: overhangs and collar spokes are self-supporting.':
+      'tools.parametricLampDesigner.slicerTips.supports',
+    'Recommended layer height 0.16mm - 0.20mm for smooth slope transitions.':
+      'tools.parametricLampDesigner.slicerTips.layerHeight',
+    'Enable "Spiralize Outer Contour" (Vase Mode) in your slicer.':
+      'tools.parametricLampDesigner.slicerTips.vaseMode1',
+    'Set line width to 0.6mm - 0.8mm for high optical strength.':
+      'tools.parametricLampDesigner.slicerTips.vaseMode2',
+    'Recommended 0.20mm - 0.24mm layer height with 0% infill.':
+      'tools.parametricLampDesigner.slicerTips.vaseMode3',
+  };
 
   // Reactive state
   readonly config = signal<LampConfig>({ ...DEFAULT_LAMP_CONFIG });

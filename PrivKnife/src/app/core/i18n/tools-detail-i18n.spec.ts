@@ -47,22 +47,39 @@ describe('Tools Detail Pages Localization (Batch 2: Tools 31–60)', () => {
     const fixture = TestBed.createComponent(ParametricLampDesignerComponent);
     fixture.detectChanges();
 
-    const h1 = fixture.nativeElement.querySelector('h1');
-    const subtitle = fixture.nativeElement.querySelector('.g--text-center p');
-    expect(h1.textContent.trim()).toBe(i18nService.t('tools.parametricLampDesigner.name'));
-    expect(subtitle.textContent.trim()).toBe(i18nService.t('tools.parametricLampDesigner.description'));
+    const textContent = fixture.nativeElement.textContent;
+    expect(textContent).toContain(i18nService.t('tools.parametricLampDesigner.name'));
+    expect(textContent).toContain(i18nService.t('tools.parametricLampDesigner.description'));
+    expect(textContent).toContain(i18nService.t('tools.parametricLampDesigner.curatedPresets'));
+    expect(textContent).toContain(i18nService.t('tools.parametricLampDesigner.resetDefaults'));
+    expect(textContent).toContain(i18nService.t('tools.parametricLampDesigner.totalHeight'));
+    expect(textContent).toContain(i18nService.t('tools.parametricLampDesigner.dimensions'));
+    expect(textContent).toContain(i18nService.t('tools.parametricLampDesigner.bulbOn'));
+    expect(textContent).toContain(i18nService.t('tools.parametricLampDesigner.slicerInstructions'));
 
     // Switch to Spanish
     await i18nService.setLanguage('es');
     fixture.detectChanges();
-    expect(h1.textContent.trim()).toBe(i18nService.t('tools.parametricLampDesigner.name'));
-    expect(subtitle.textContent.trim()).toBe(i18nService.t('tools.parametricLampDesigner.description'));
+    const esText = fixture.nativeElement.textContent;
+    expect(esText).toContain('Diseñador Paramétrico 3D de Lámparas y Pantallas');
+    expect(esText).toContain('Preajustes Seleccionados:');
+    expect(esText).toContain('↺ Restablecer Valores');
+    expect(esText).toContain('Altura Total:');
+    expect(esText).toContain('DIMENSIONES');
+    expect(esText).toContain('💡 Bombilla ENCENDIDA');
+    expect(esText).toContain('Instrucciones Recomendadas para el Laminador:');
+    expect(esText).toContain('Descargar Archivo .3MF');
+    expect(esText).toContain('Descargar .STL Listo para Imprimir');
 
     // Switch to French
     await i18nService.setLanguage('fr');
     fixture.detectChanges();
-    expect(h1.textContent.trim()).toBe(i18nService.t('tools.parametricLampDesigner.name'));
-    expect(subtitle.textContent.trim()).toBe(i18nService.t('tools.parametricLampDesigner.description'));
+    const frText = fixture.nativeElement.textContent;
+    expect(frText).toContain('Concepteur Paramétrique 3D de Lampes et Abat-jour');
+    expect(frText).toContain('Préréglages Sélectionnés :');
+    expect(frText).toContain('↺ Réinitialiser');
+    expect(frText).toContain('Hauteur Totale :');
+    expect(frText).toContain('💡 Ampoule ALLUMÉE');
 
     fixture.destroy();
   });
