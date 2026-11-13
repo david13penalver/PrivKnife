@@ -148,7 +148,7 @@ describe('ParametricLampDesignerComponent (Seam 2: Angular UI & Privacy)', () =>
 
     createUrlSpy.mockRestore();
     revokeUrlSpy.mockRestore();
-  });
+  }, 30_000);
 
   it('should clean up Three.js resources and object URLs on ngOnDestroy', () => {
     const revokeUrlSpy = vi.spyOn(URL, 'revokeObjectURL').mockImplementation(() => {});

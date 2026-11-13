@@ -1,11 +1,13 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { provideRouter } from '@angular/router';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import { stubClipboard } from '../../../core/testing/clipboard-mock';
 import { ColorPaletteExtractorComponent } from './color-palette-extractor.component';
 import { createMockImageFile } from './test-fixtures';
 import { ExtractedColor } from './types';
 
 describe('ColorPaletteExtractorComponent (Seam 2: Studio UI, Contrast Matrix & Multi-Format Exporters)', () => {
+  let clipboardCleanup: (() => void) | undefined;
   let fixture: ComponentFixture<ColorPaletteExtractorComponent>;
   let component: ColorPaletteExtractorComponent;
   let createObjectURLSpy: any;
@@ -28,6 +30,8 @@ describe('ColorPaletteExtractorComponent (Seam 2: Studio UI, Contrast Matrix & M
   });
 
   afterEach(() => {
+    clipboardCleanup?.();
+    clipboardCleanup = undefined;
     vi.restoreAllMocks();
   });
 
@@ -72,9 +76,7 @@ describe('ColorPaletteExtractorComponent (Seam 2: Studio UI, Contrast Matrix & M
 
   it('should copy CSS variables to clipboard with feedback state', async () => {
     const writeTextSpy = vi.fn().mockResolvedValue(undefined);
-    Object.assign(navigator, {
-      clipboard: { writeText: writeTextSpy },
-    });
+    clipboardCleanup = stubClipboard(writeTextSpy);
 
     await component.copyCssVariables();
 

@@ -1,5 +1,6 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
+import { stubClipboard } from '../../../core/testing/clipboard-mock';
 import { LocalOcrTextExtractorComponent } from './local-ocr-text-extractor.component';
 import {
   createSyntheticImageFile,
@@ -7,6 +8,7 @@ import {
 } from './test-fixtures';
 
 describe('LocalOcrTextExtractorComponent (Seam 2 & 4)', () => {
+  let clipboardCleanup: (() => void) | undefined;
   let component: LocalOcrTextExtractorComponent;
   let fixture: ComponentFixture<LocalOcrTextExtractorComponent>;
   let fetchSpy: ReturnType<typeof vi.spyOn>;
@@ -26,6 +28,8 @@ describe('LocalOcrTextExtractorComponent (Seam 2 & 4)', () => {
   });
 
   afterEach(() => {
+    clipboardCleanup?.();
+    clipboardCleanup = undefined;
     fetchSpy.mockRestore();
     xhrSpy.mockRestore();
     fixture.destroy();
@@ -168,11 +172,7 @@ describe('LocalOcrTextExtractorComponent (Seam 2 & 4)', () => {
 
     it('should copy extracted text to clipboard', async () => {
       const writeTextSpy = vi.fn().mockResolvedValue(undefined);
-      Object.assign(navigator, {
-        clipboard: {
-          writeText: writeTextSpy,
-        },
-      });
+      clipboardCleanup = stubClipboard(writeTextSpy);
 
       const file = createSyntheticImageFile('invoice.png', 1024);
       await component.handleFileSelected(file);

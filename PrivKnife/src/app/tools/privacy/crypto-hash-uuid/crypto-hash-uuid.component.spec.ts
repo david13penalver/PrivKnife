@@ -1,10 +1,12 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { provideRouter } from '@angular/router';
 import { describe, expect, it, vi, beforeEach, afterEach } from 'vitest';
+import { stubClipboard } from '../../../core/testing/clipboard-mock';
 import { CryptoHashUuidComponent } from './crypto-hash-uuid.component';
 import { UUID_V4_REGEX } from './test-vectors';
 
 describe('CryptoHashUuidComponent (Seam 2: UI & Privacy Boundary)', () => {
+  let clipboardCleanup: (() => void) | undefined;
   let fixture: ComponentFixture<CryptoHashUuidComponent>;
   let component: CryptoHashUuidComponent;
   let createObjectURLSpy: any;
@@ -28,6 +30,8 @@ describe('CryptoHashUuidComponent (Seam 2: UI & Privacy Boundary)', () => {
   });
 
   afterEach(() => {
+    clipboardCleanup?.();
+    clipboardCleanup = undefined;
     vi.restoreAllMocks();
   });
 
@@ -119,11 +123,7 @@ describe('CryptoHashUuidComponent (Seam 2: UI & Privacy Boundary)', () => {
 
   it('should copy output to clipboard and display feedback', async () => {
     const clipboardSpy = vi.fn().mockResolvedValue(undefined);
-    Object.assign(navigator, {
-      clipboard: {
-        writeText: clipboardSpy,
-      },
-    });
+    clipboardCleanup = stubClipboard(clipboardSpy);
 
     await component.copyToClipboard();
     fixture.detectChanges();

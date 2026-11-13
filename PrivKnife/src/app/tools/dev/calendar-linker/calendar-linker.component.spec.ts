@@ -1,9 +1,11 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { provideRouter } from '@angular/router';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import { stubClipboard } from '../../../core/testing/clipboard-mock';
 import { CalendarLinkerComponent } from './calendar-linker.component';
 
 describe('CalendarLinkerComponent (Seam 2: UI, Reactivity, Providers & Privacy Guard)', () => {
+  let clipboardCleanup: (() => void) | undefined;
   let fixture: ComponentFixture<CalendarLinkerComponent>;
   let component: CalendarLinkerComponent;
   let createObjectURLSpy: any;
@@ -26,6 +28,8 @@ describe('CalendarLinkerComponent (Seam 2: UI, Reactivity, Providers & Privacy G
   });
 
   afterEach(() => {
+    clipboardCleanup?.();
+    clipboardCleanup = undefined;
     vi.restoreAllMocks();
   });
 
@@ -80,9 +84,7 @@ describe('CalendarLinkerComponent (Seam 2: UI, Reactivity, Providers & Privacy G
 
   it('should copy provider links and embed snippets to clipboard with feedback', async () => {
     const writeTextSpy = vi.fn().mockResolvedValue(undefined);
-    Object.assign(navigator, {
-      clipboard: { writeText: writeTextSpy },
-    });
+    clipboardCleanup = stubClipboard(writeTextSpy);
 
     // Copy single provider URL
     await component.copyProviderUrl('google');

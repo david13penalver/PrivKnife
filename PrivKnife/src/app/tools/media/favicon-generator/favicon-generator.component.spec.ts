@@ -3,6 +3,7 @@ import { provideRouter } from '@angular/router';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { FaviconGeneratorComponent } from './favicon-generator.component';
 import { createMockImageFile } from './test-fixtures';
+import { stubClipboard } from '../../../core/testing/clipboard-mock';
 
 describe('FaviconGeneratorComponent (Seam 2: UI, Signals, Multi-Platform Previews & Privacy Boundary)', () => {
   let fixture: ComponentFixture<FaviconGeneratorComponent>;
@@ -63,14 +64,15 @@ describe('FaviconGeneratorComponent (Seam 2: UI, Signals, Multi-Platform Preview
 
   it('should copy HTML snippet to clipboard with feedback state', async () => {
     const writeTextSpy = vi.fn().mockResolvedValue(undefined);
-    Object.assign(navigator, {
-      clipboard: { writeText: writeTextSpy },
-    });
+    const restoreClipboard = stubClipboard(writeTextSpy);
+    try {
+      await component.copyHtmlSnippet();
 
-    await component.copyHtmlSnippet();
-
-    expect(writeTextSpy).toHaveBeenCalledWith(component.htmlSnippet());
-    expect(component.copiedSnippet()).toBe(true);
+      expect(writeTextSpy).toHaveBeenCalledWith(component.htmlSnippet());
+      expect(component.copiedSnippet()).toBe(true);
+    } finally {
+      restoreClipboard();
+    }
   });
 
   it('should compile and download ZIP archive and immediately revoke object URL', async () => {

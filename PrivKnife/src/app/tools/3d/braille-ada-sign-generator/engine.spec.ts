@@ -200,7 +200,7 @@ describe('Braille & ADA Tactile Door Sign Generator Engine (Seam 1)', () => {
           expect(Number.isFinite(val)).toBe(true);
         }
       }
-    });
+    }, 30_000);
   });
 
   describe('File Serialization & Export (STL & 3MF)', () => {

@@ -1,5 +1,6 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
+import { stubClipboard } from '../../../core/testing/clipboard-mock';
 import { PiiScrubberAnonymizerComponent } from './pii-scrubber-anonymizer.component';
 import {
   createSyntheticLogFile,
@@ -7,6 +8,7 @@ import {
 } from './test-fixtures';
 
 describe('PiiScrubberAnonymizerComponent (Seam 2 & 4)', () => {
+  let clipboardCleanup: (() => void) | undefined;
   let component: PiiScrubberAnonymizerComponent;
   let fixture: ComponentFixture<PiiScrubberAnonymizerComponent>;
   let fetchSpy: ReturnType<typeof vi.spyOn>;
@@ -26,6 +28,8 @@ describe('PiiScrubberAnonymizerComponent (Seam 2 & 4)', () => {
   });
 
   afterEach(() => {
+    clipboardCleanup?.();
+    clipboardCleanup = undefined;
     fetchSpy.mockRestore();
     xhrSpy.mockRestore();
     fixture.destroy();
@@ -123,11 +127,7 @@ describe('PiiScrubberAnonymizerComponent (Seam 2 & 4)', () => {
 
     it('should copy sanitized content to clipboard', async () => {
       const writeTextSpy = vi.fn().mockResolvedValue(undefined);
-      Object.assign(navigator, {
-        clipboard: {
-          writeText: writeTextSpy,
-        },
-      });
+      clipboardCleanup = stubClipboard(writeTextSpy);
 
       component.inputText.set(SAMPLE_SERVER_LOG);
       await component.scrubData();

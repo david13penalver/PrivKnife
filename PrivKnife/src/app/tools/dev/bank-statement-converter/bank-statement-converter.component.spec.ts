@@ -6,12 +6,14 @@ import {
   createSyntheticOfxFile,
   SAMPLE_BANK_CSV,
 } from './test-fixtures';
+import { stubClipboard } from '../../../core/testing/clipboard-mock';
 
 describe('BankStatementConverterComponent (Seam 2 & 4)', () => {
   let component: BankStatementConverterComponent;
   let fixture: ComponentFixture<BankStatementConverterComponent>;
   let fetchSpy: ReturnType<typeof vi.spyOn>;
   let xhrSpy: ReturnType<typeof vi.spyOn>;
+  let restoreClipboard: (() => void) | undefined;
 
   beforeEach(async () => {
     fetchSpy = vi.spyOn(window, 'fetch');
@@ -27,6 +29,8 @@ describe('BankStatementConverterComponent (Seam 2 & 4)', () => {
   });
 
   afterEach(() => {
+    restoreClipboard?.();
+    restoreClipboard = undefined;
     fetchSpy.mockRestore();
     xhrSpy.mockRestore();
     fixture.destroy();
@@ -133,11 +137,7 @@ describe('BankStatementConverterComponent (Seam 2 & 4)', () => {
 
     it('should copy normalized CSV to clipboard', async () => {
       const writeTextSpy = vi.fn().mockResolvedValue(undefined);
-      Object.assign(navigator, {
-        clipboard: {
-          writeText: writeTextSpy,
-        },
-      });
+      restoreClipboard = stubClipboard(writeTextSpy);
 
       component.inputContent.set(SAMPLE_BANK_CSV);
       await component.convertStatement();
@@ -148,11 +148,7 @@ describe('BankStatementConverterComponent (Seam 2 & 4)', () => {
 
     it('should copy formatted text in xlsx mode without silent failure (DEFECT-50-03)', async () => {
       const writeTextSpy = vi.fn().mockResolvedValue(undefined);
-      Object.assign(navigator, {
-        clipboard: {
-          writeText: writeTextSpy,
-        },
-      });
+      restoreClipboard = stubClipboard(writeTextSpy);
 
       component.setExportFormat('xlsx');
       component.inputContent.set(SAMPLE_BANK_CSV);

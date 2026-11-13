@@ -1,11 +1,13 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { provideRouter } from '@angular/router';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import { stubClipboard } from '../../../core/testing/clipboard-mock';
 import { MeshGradientMakerComponent } from './mesh-gradient-maker.component';
 import { GRADIENT_PRESETS } from './test-fixtures';
 import { MeshPoint } from './types';
 
 describe('MeshGradientMakerComponent (Seam 2: UI, Reactivity, Code Exporters & Privacy Guard)', () => {
+  let clipboardCleanup: (() => void) | undefined;
   let fixture: ComponentFixture<MeshGradientMakerComponent>;
   let component: MeshGradientMakerComponent;
   let createObjectURLSpy: any;
@@ -28,6 +30,8 @@ describe('MeshGradientMakerComponent (Seam 2: UI, Reactivity, Code Exporters & P
   });
 
   afterEach(() => {
+    clipboardCleanup?.();
+    clipboardCleanup = undefined;
     vi.restoreAllMocks();
   });
 
@@ -115,9 +119,7 @@ describe('MeshGradientMakerComponent (Seam 2: UI, Reactivity, Code Exporters & P
 
   it('should switch code tabs and copy snippet to clipboard with feedback state', async () => {
     const writeTextSpy = vi.fn().mockResolvedValue(undefined);
-    Object.assign(navigator, {
-      clipboard: { writeText: writeTextSpy },
-    });
+    clipboardCleanup = stubClipboard(writeTextSpy);
 
     component.setActiveCodeTab('tailwind');
     expect(component.activeCodeTab()).toBe('tailwind');

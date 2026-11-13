@@ -1,10 +1,12 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { provideRouter } from '@angular/router';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import { stubClipboard } from '../../../core/testing/clipboard-mock';
 import { SubtitlesShifterComponent } from './subtitles-shifter.component';
 import { createMockSubtitleFile, SAMPLE_SRT } from './test-fixtures';
 
 describe('SubtitlesShifterComponent (Seam 2: UI, Reactivity, Conversion & Privacy Guard)', () => {
+  let clipboardCleanup: (() => void) | undefined;
   let fixture: ComponentFixture<SubtitlesShifterComponent>;
   let component: SubtitlesShifterComponent;
   let createObjectURLSpy: any;
@@ -27,6 +29,8 @@ describe('SubtitlesShifterComponent (Seam 2: UI, Reactivity, Conversion & Privac
   });
 
   afterEach(() => {
+    clipboardCleanup?.();
+    clipboardCleanup = undefined;
     vi.restoreAllMocks();
   });
 
@@ -98,9 +102,7 @@ describe('SubtitlesShifterComponent (Seam 2: UI, Reactivity, Conversion & Privac
 
   it('should copy serialized subtitles to clipboard with feedback state', async () => {
     const writeTextSpy = vi.fn().mockResolvedValue(undefined);
-    Object.assign(navigator, {
-      clipboard: { writeText: writeTextSpy },
-    });
+    clipboardCleanup = stubClipboard(writeTextSpy);
 
     await component.copySubtitles();
 

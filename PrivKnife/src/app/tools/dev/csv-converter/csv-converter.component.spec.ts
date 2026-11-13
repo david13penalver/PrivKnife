@@ -1,10 +1,12 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { provideRouter } from '@angular/router';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import { stubClipboard } from '../../../core/testing/clipboard-mock';
 import * as XLSX from 'xlsx';
 import { CsvConverterComponent } from './csv-converter.component';
 
 describe('CsvConverterComponent (Seam 2: UI & Privacy Boundary)', () => {
+  let clipboardCleanup: (() => void) | undefined;
   let fixture: ComponentFixture<CsvConverterComponent>;
   let component: CsvConverterComponent;
   let createObjectURLSpy: any;
@@ -28,6 +30,8 @@ describe('CsvConverterComponent (Seam 2: UI & Privacy Boundary)', () => {
   });
 
   afterEach(() => {
+    clipboardCleanup?.();
+    clipboardCleanup = undefined;
     vi.restoreAllMocks();
   });
 
@@ -75,11 +79,7 @@ describe('CsvConverterComponent (Seam 2: UI & Privacy Boundary)', () => {
 
   it('should copy output to clipboard', async () => {
     const writeTextSpy = vi.fn().mockResolvedValue(undefined);
-    Object.assign(navigator, {
-      clipboard: {
-        writeText: writeTextSpy,
-      },
-    });
+    clipboardCleanup = stubClipboard(writeTextSpy);
 
     await component.copyToClipboard();
     expect(writeTextSpy).toHaveBeenCalledWith(component.outputCode());

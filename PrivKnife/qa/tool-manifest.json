@@ -1,0 +1,356 @@
+[
+  {
+    "id": "qr-stand-keychain",
+    "route": "/tools/3d-qr-stand",
+    "category": "3d",
+    "source": "PrivKnife/src/app/tools/3d/qr-stand-keychain"
+  },
+  {
+    "id": "bpm-tap-detector",
+    "route": "/tools/audio-bpm-detector",
+    "category": "audio-video",
+    "source": "PrivKnife/src/app/tools/audio-video/bpm-tap-detector"
+  },
+  {
+    "id": "audio-trimmer-booster",
+    "route": "/tools/audio-trimmer-booster",
+    "category": "audio-video",
+    "source": "PrivKnife/src/app/tools/audio-video/audio-trimmer-booster"
+  },
+  {
+    "id": "background-remover",
+    "route": "/tools/background-remover",
+    "category": "media",
+    "source": "PrivKnife/src/app/tools/media/background-remover"
+  },
+  {
+    "id": "bank-statement-converter",
+    "route": "/tools/bank-statement-converter",
+    "category": "dev",
+    "source": "PrivKnife/src/app/tools/dev/bank-statement-converter"
+  },
+  {
+    "id": "barcode-labels",
+    "route": "/tools/barcode-labels",
+    "category": "documents",
+    "source": "PrivKnife/src/app/tools/documents/barcode-labels"
+  },
+  {
+    "id": "batch-compressor",
+    "route": "/tools/batch-image-compressor",
+    "category": "media",
+    "source": "PrivKnife/src/app/tools/media/batch-compressor"
+  },
+  {
+    "id": "braille-ada-sign-generator",
+    "route": "/tools/braille-ada-sign-generator",
+    "category": "3d",
+    "source": "PrivKnife/src/app/tools/3d/braille-ada-sign-generator"
+  },
+  {
+    "id": "calendar-linker",
+    "route": "/tools/calendar-linker",
+    "category": "dev",
+    "source": "PrivKnife/src/app/tools/dev/calendar-linker"
+  },
+  {
+    "id": "cappuccino-stencil-maker",
+    "route": "/tools/cappuccino-stencil-maker",
+    "category": "3d",
+    "source": "PrivKnife/src/app/tools/3d/cappuccino-stencil-maker"
+  },
+  {
+    "id": "color-palette-extractor",
+    "route": "/tools/color-palette-extractor",
+    "category": "dev",
+    "source": "PrivKnife/src/app/tools/dev/color-palette-extractor"
+  },
+  {
+    "id": "cookie-cutter",
+    "route": "/tools/cookie-cutter",
+    "category": "3d",
+    "source": "PrivKnife/src/app/tools/3d/cookie-cutter"
+  },
+  {
+    "id": "crypto-hash-uuid",
+    "route": "/tools/crypto-hash-uuid",
+    "category": "privacy",
+    "source": "PrivKnife/src/app/tools/privacy/crypto-hash-uuid"
+  },
+  {
+    "id": "mesh-gradient-maker",
+    "route": "/tools/css-mesh-gradient-maker",
+    "category": "dev",
+    "source": "PrivKnife/src/app/tools/dev/mesh-gradient-maker"
+  },
+  {
+    "id": "csv-converter",
+    "route": "/tools/csv-to-sql-json",
+    "category": "dev",
+    "source": "PrivKnife/src/app/tools/dev/csv-converter"
+  },
+  {
+    "id": "csv-vector-chart-builder",
+    "route": "/tools/csv-vector-chart-builder",
+    "category": "dev",
+    "source": "PrivKnife/src/app/tools/dev/csv-vector-chart-builder"
+  },
+  {
+    "id": "desk-wedge-nameplate",
+    "route": "/tools/desk-wedge-nameplate",
+    "category": "3d",
+    "source": "PrivKnife/src/app/tools/3d/desk-wedge-nameplate"
+  },
+  {
+    "id": "diff-checker",
+    "route": "/tools/diff-checker",
+    "category": "dev",
+    "source": "PrivKnife/src/app/tools/dev/diff-checker"
+  },
+  {
+    "id": "dns-checker",
+    "route": "/tools/dns-checker",
+    "category": "dev",
+    "source": "PrivKnife/src/app/tools/dev/dns-checker"
+  },
+  {
+    "id": "electronics-box-enclosure",
+    "route": "/tools/electronics-box-enclosure",
+    "category": "3d",
+    "source": "PrivKnife/src/app/tools/3d/electronics-box-enclosure"
+  },
+  {
+    "id": "email-signature-generator",
+    "route": "/tools/email-signature-generator",
+    "category": "dev",
+    "source": "PrivKnife/src/app/tools/dev/email-signature-generator"
+  },
+  {
+    "id": "emergency-recovery-kit",
+    "route": "/tools/emergency-recovery-kit",
+    "category": "privacy",
+    "source": "PrivKnife/src/app/tools/privacy/emergency-recovery-kit"
+  },
+  {
+    "id": "exif-stripper",
+    "route": "/tools/exif-stripper",
+    "category": "privacy",
+    "source": "PrivKnife/src/app/tools/privacy/exif-stripper"
+  },
+  {
+    "id": "face-plate-blur",
+    "route": "/tools/face-plate-blur",
+    "category": "privacy",
+    "source": "PrivKnife/src/app/tools/privacy/face-plate-blur"
+  },
+  {
+    "id": "favicon-generator",
+    "route": "/tools/favicon-app-icon-suite",
+    "category": "media",
+    "source": "PrivKnife/src/app/tools/media/favicon-generator"
+  },
+  {
+    "id": "file-encryptor-vault",
+    "route": "/tools/file-encryptor-vault",
+    "category": "privacy",
+    "source": "PrivKnife/src/app/tools/privacy/file-encryptor-vault"
+  },
+  {
+    "id": "floor-plan-furniture-scaler",
+    "route": "/tools/floor-plan-furniture-scaler",
+    "category": "documents",
+    "source": "PrivKnife/src/app/tools/documents/floor-plan-furniture-scaler"
+  },
+  {
+    "id": "font-subsetter-converter",
+    "route": "/tools/font-subsetter-converter",
+    "category": "dev",
+    "source": "PrivKnife/src/app/tools/dev/font-subsetter-converter"
+  },
+  {
+    "id": "geometric-plant-pot",
+    "route": "/tools/geometric-plant-pot",
+    "category": "3d",
+    "source": "PrivKnife/src/app/tools/3d/geometric-plant-pot"
+  },
+  {
+    "id": "grid-paper",
+    "route": "/tools/grid-paper",
+    "category": "documents",
+    "source": "PrivKnife/src/app/tools/documents/grid-paper"
+  },
+  {
+    "id": "gridfinity-bin-generator",
+    "route": "/tools/gridfinity-bin-generator",
+    "category": "3d",
+    "source": "PrivKnife/src/app/tools/3d/gridfinity-bin-generator"
+  },
+  {
+    "id": "heic-avif-converter",
+    "route": "/tools/heic-avif-converter",
+    "category": "media",
+    "source": "PrivKnife/src/app/tools/media/heic-avif-converter"
+  },
+  {
+    "id": "hsw-insert-adapter",
+    "route": "/tools/hsw-insert-adapter",
+    "category": "3d",
+    "source": "PrivKnife/src/app/tools/3d/hsw-insert-adapter"
+  },
+  {
+    "id": "invoice-maker",
+    "route": "/tools/invoice-maker",
+    "category": "documents",
+    "source": "PrivKnife/src/app/tools/documents/invoice-maker"
+  },
+  {
+    "id": "keycap-switch-tester-maker",
+    "route": "/tools/keycap-switch-tester-maker",
+    "category": "3d",
+    "source": "PrivKnife/src/app/tools/3d/keycap-switch-tester-maker"
+  },
+  {
+    "id": "lithophane-maker",
+    "route": "/tools/lithophane-maker",
+    "category": "3d",
+    "source": "PrivKnife/src/app/tools/3d/lithophane-maker"
+  },
+  {
+    "id": "local-ocr-text-extractor",
+    "route": "/tools/local-ocr-text-extractor",
+    "category": "documents",
+    "source": "PrivKnife/src/app/tools/documents/local-ocr-text-extractor"
+  },
+  {
+    "id": "markdown-cheatsheet",
+    "route": "/tools/markdown-cheatsheet",
+    "category": "documents",
+    "source": "PrivKnife/src/app/tools/documents/markdown-cheatsheet"
+  },
+  {
+    "id": "nutrition-label-maker",
+    "route": "/tools/nutrition-label-maker",
+    "category": "documents",
+    "source": "PrivKnife/src/app/tools/documents/nutrition-label-maker"
+  },
+  {
+    "id": "og-card-maker",
+    "route": "/tools/og-card-maker",
+    "category": "media",
+    "source": "PrivKnife/src/app/tools/media/og-card-maker"
+  },
+  {
+    "id": "parametric-lamp-designer",
+    "route": "/tools/parametric-lamp-designer",
+    "category": "3d",
+    "source": "PrivKnife/src/app/tools/3d/parametric-lamp-designer"
+  },
+  {
+    "id": "passport-biometric-photo",
+    "route": "/tools/passport-biometric-photo",
+    "category": "media",
+    "source": "PrivKnife/src/app/tools/media/passport-biometric-photo"
+  },
+  {
+    "id": "pdf-merger",
+    "route": "/tools/pdf-merger-splitter",
+    "category": "documents",
+    "source": "PrivKnife/src/app/tools/documents/pdf-merger"
+  },
+  {
+    "id": "pdf-redaction",
+    "route": "/tools/pdf-redaction",
+    "category": "privacy",
+    "source": "PrivKnife/src/app/tools/privacy/pdf-redaction"
+  },
+  {
+    "id": "pdf-signer-stamper",
+    "route": "/tools/pdf-signer-stamper",
+    "category": "documents",
+    "source": "PrivKnife/src/app/tools/documents/pdf-signer-stamper"
+  },
+  {
+    "id": "pet-id-tag-generator",
+    "route": "/tools/pet-id-tag-generator",
+    "category": "3d",
+    "source": "PrivKnife/src/app/tools/3d/pet-id-tag-generator"
+  },
+  {
+    "id": "pii-scrubber-anonymizer",
+    "route": "/tools/pii-scrubber-anonymizer",
+    "category": "privacy",
+    "source": "PrivKnife/src/app/tools/privacy/pii-scrubber-anonymizer"
+  },
+  {
+    "id": "robots-sitemap-builder",
+    "route": "/tools/robots-sitemap-builder",
+    "category": "dev",
+    "source": "PrivKnife/src/app/tools/dev/robots-sitemap-builder"
+  },
+  {
+    "id": "screenshot-mockup",
+    "route": "/tools/screenshot-mockup",
+    "category": "media",
+    "source": "PrivKnife/src/app/tools/media/screenshot-mockup"
+  },
+  {
+    "id": "seamless-texture-generator",
+    "route": "/tools/seamless-texture-generator",
+    "category": "media",
+    "source": "PrivKnife/src/app/tools/media/seamless-texture-generator"
+  },
+  {
+    "id": "skadis-pegboard-maker",
+    "route": "/tools/skadis-pegboard-maker",
+    "category": "3d",
+    "source": "PrivKnife/src/app/tools/3d/skadis-pegboard-maker"
+  },
+  {
+    "id": "soundwave-art-maker",
+    "route": "/tools/soundwave-art-maker",
+    "category": "audio-video",
+    "source": "PrivKnife/src/app/tools/audio-video/soundwave-art-maker"
+  },
+  {
+    "id": "subtitles-shifter",
+    "route": "/tools/subtitles-shifter",
+    "category": "media",
+    "source": "PrivKnife/src/app/tools/media/subtitles-shifter"
+  },
+  {
+    "id": "svg-optimizer-cleaner",
+    "route": "/tools/svg-optimizer-cleaner",
+    "category": "dev",
+    "source": "PrivKnife/src/app/tools/dev/svg-optimizer-cleaner"
+  },
+  {
+    "id": "table-tent-maker",
+    "route": "/tools/table-tent-maker",
+    "category": "documents",
+    "source": "PrivKnife/src/app/tools/documents/table-tent-maker"
+  },
+  {
+    "id": "under-desk-clamp-generator",
+    "route": "/tools/under-desk-clamp-generator",
+    "category": "3d",
+    "source": "PrivKnife/src/app/tools/3d/under-desk-clamp-generator"
+  },
+  {
+    "id": "video-compressor-resizer",
+    "route": "/tools/video-compressor-resizer",
+    "category": "audio-video",
+    "source": "PrivKnife/src/app/tools/audio-video/video-compressor-resizer"
+  },
+  {
+    "id": "video-gif-trimmer",
+    "route": "/tools/video-to-gif",
+    "category": "audio-video",
+    "source": "PrivKnife/src/app/tools/audio-video/video-gif-trimmer"
+  },
+  {
+    "id": "web-vitals",
+    "route": "/tools/web-vitals",
+    "category": "dev",
+    "source": "PrivKnife/src/app/tools/dev/web-vitals"
+  }
+]
