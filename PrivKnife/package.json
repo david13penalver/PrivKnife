@@ -13,6 +13,7 @@
     "qa:smoke:es": "node qa/smoke.mjs --language es --width 390",
     "qa:coverage": "node qa/coverage-manifest.mjs",
     "qa:secure-preview": "node qa/secure-preview.mjs",
+    "qa:resource-lifecycle": "node qa/resource-lifecycle.mjs",
     "qa:security:browser": "node qa/security-browser.mjs",
     "qa:bundle-budget": "node qa/bundle-budget.mjs"
   },

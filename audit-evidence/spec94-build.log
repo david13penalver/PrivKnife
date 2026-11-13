@@ -31,7 +31,7 @@ chunk-C9zGAWs3.js   | -             | 383.22 kB |               149.92 kB
 worker-GAOTMGO6.js  | worker        | 378.99 kB |                80.78 kB
 ...and 107 more lazy chunks files. Use "--verbose" to show all the files.
 
-Application bundle generation complete. [14.716 seconds] - 2026-11-13T20:27:39.144Z
+Application bundle generation complete. [9.768 seconds] - 2026-11-13T20:41:02.919Z
 
 ▲ [WARNING] bundle initial exceeded maximum budget. Budget 200.00 kB was not met by 187.32 kB with a total of 387.32 kB.
 

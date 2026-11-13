@@ -22,6 +22,6 @@ Status: **In progress; acceptance blocked.** Checked boxes indicate completed pr
 - [ ] T94-AC-01: PageSpeed and DNS network behavior were tested, but zero unexpected requests were not verified during every tool workflow.
 - [ ] T94-AC-02: Sanitizer attack fixtures pass; safe content preview/export was not exercised across every sanitized surface.
 - [ ] T94-AC-03: Local production CSP, worker/WASM smoke and DNS disclosure pass; deployed production headers could not be fetched because `privknife.com` did not resolve in this environment.
-- [ ] T94-AC-04: Repeated reset/navigation returns resource counts to baseline; no unhandled worker promise hangs; no processing task over 50ms remains on the UI thread.
+- [ ] T94-AC-04: Route-only Worker/object URL counts return to baseline for all 58 tools; processing workflows, Three.js GPU resource baselines, long-task timing and complete progress behavior remain open.
 - [ ] T94-AC-05: Raw initial JS is below 200KB and heavy tool libraries are lazy chunks. Measured raw initial JavaScript: 352,369 bytes; the criterion fails.
 - [ ] T94-CLOSE: Evidence and blockers are recorded, but acceptance criteria remain open; do not close or start Spec 95 until the blockers are resolved or explicitly re-scoped.
