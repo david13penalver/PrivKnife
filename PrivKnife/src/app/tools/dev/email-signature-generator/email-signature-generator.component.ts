@@ -9,6 +9,7 @@ import {
 } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
+import { sanitizeHtmlMarkup } from '../../../core/security/markup-sanitizer';
 import { Badge } from '../../../components/badge/badge';
 import { Button } from '../../../components/button/button';
 import { Card } from '../../../components/card/card';
@@ -947,7 +948,7 @@ export class EmailSignatureGeneratorComponent implements OnInit {
   readonly generatedHtml = computed(() => generateSignatureHtml(this.config()));
   readonly generatedPlainText = computed(() => generatePlainTextSignature(this.config()));
   readonly safePreviewHtml = computed<SafeHtml>(() =>
-    this.sanitizer.bypassSecurityTrustHtml(this.generatedHtml())
+    this.sanitizer.bypassSecurityTrustHtml(sanitizeHtmlMarkup(this.generatedHtml()))
   );
 
   ngOnInit(): void {

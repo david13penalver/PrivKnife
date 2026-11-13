@@ -413,6 +413,9 @@ import {
               <h2 class="c-card__title">Export Deliverables</h2>
             </div>
             <div class="c-card__body">
+              @if (exportError()) {
+                <div class="c-alert c-alert--danger g--margin-bottom-3" role="alert">{{ exportError() }}</div>
+              }
               <div class="export-buttons-grid">
                 <button
                   type="button"
@@ -466,12 +469,14 @@ export class CappuccinoStencilMakerComponent implements OnInit, OnDestroy {
   readonly invertCutout = signal<boolean>(DEFAULT_STENCIL_OPTIONS.invertCutout);
   readonly rimBevel = signal<boolean>(DEFAULT_STENCIL_OPTIONS.rimBevel);
   readonly isGenerating = signal<boolean>(false);
+  readonly exportError = signal<string | null>(null);
 
   // Active metrics
   readonly currentMetrics = signal<StencilMetrics | null>(null);
 
   private readonly activeDownloadUrls: string[] = [];
   private worker: Worker | null = null;
+  private workerFailed = false;
   private workerRequestId = 0;
 
   // Three.js scene instances
@@ -493,7 +498,10 @@ export class CappuccinoStencilMakerComponent implements OnInit, OnDestroy {
     if (typeof Worker !== 'undefined') {
       try {
         this.worker = new Worker(new URL('./worker.ts', import.meta.url), { type: 'module' });
-      } catch {}
+      } catch {
+        this.workerFailed = true;
+        this.exportError.set('Export worker could not start. Please reload the tool and try again.');
+      }
     }
     this.initThree();
     this.updatePreviewMesh();
@@ -585,7 +593,9 @@ export class CappuccinoStencilMakerComponent implements OnInit, OnDestroy {
   }
 
   async downloadFormat(format: StencilExportFormat): Promise<void> {
+    if (this.workerFailed) return;
     this.isGenerating.set(true);
+    this.exportError.set(null);
     try {
       const options = this.getCurrentOptions();
       let blob: Blob;
@@ -594,13 +604,16 @@ export class CappuccinoStencilMakerComponent implements OnInit, OnDestroy {
       if (this.worker) {
         const id = ++this.workerRequestId;
         const result = await new Promise<{ blob: Blob; fileName: string }>((resolve, reject) => {
+          const worker = this.worker!;
           const handler = (e: MessageEvent<StencilWorkerResponse>) => {
             if (e.data.id === id) {
               if (e.data.type === 'error') {
-                this.worker?.removeEventListener('message', handler);
+                worker.removeEventListener('message', handler);
+                worker.onerror = null;
                 reject(new Error(e.data.error || 'Worker export error'));
               } else if (e.data.type === 'result') {
-                this.worker?.removeEventListener('message', handler);
+                worker.removeEventListener('message', handler);
+                worker.onerror = null;
                 if (e.data.buffer && e.data.fileName) {
                   const b = new Blob([e.data.buffer], {
                     type: e.data.mimeType || 'application/octet-stream',
@@ -615,13 +628,22 @@ export class CappuccinoStencilMakerComponent implements OnInit, OnDestroy {
               }
             }
           };
-          this.worker?.addEventListener('message', handler);
+          worker.onerror = (event: ErrorEvent) => {
+            event.preventDefault();
+            worker.removeEventListener('message', handler);
+            worker.onerror = null;
+            worker.terminate();
+            this.workerFailed = true;
+            this.worker = null;
+            reject(new Error(event.message || 'Stencil export worker failed'));
+          };
+          worker.addEventListener('message', handler);
           const request: StencilWorkerRequest = {
             id,
             options,
             format,
           };
-          this.worker?.postMessage(request);
+          worker.postMessage(request);
         });
         blob = result.blob;
         fileName = result.fileName;
@@ -635,6 +657,8 @@ export class CappuccinoStencilMakerComponent implements OnInit, OnDestroy {
       }
 
       this.triggerFileDownload(blob, fileName);
+    } catch (error) {
+      this.exportError.set(error instanceof Error ? error.message : 'Stencil export failed. Please try again.');
     } finally {
       this.isGenerating.set(false);
     }

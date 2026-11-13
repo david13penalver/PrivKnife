@@ -1,11 +1,5 @@
 import { TranslatePipe } from '../../../core/i18n';
-import {
-  Component,
-  ElementRef,
-  OnDestroy,
-  ViewChild,
-  signal,
-} from '@angular/core';
+import { Component, ElementRef, OnDestroy, ViewChild, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import {
@@ -126,7 +120,7 @@ export class SeamlessTextureGeneratorComponent implements OnDestroy {
       }
     } catch {
       this.errorMessage.set(
-        'Failed to decode image file. Please upload a valid PNG, JPG, or WebP texture.'
+        'Failed to decode image file. Please upload a valid PNG, JPG, or WebP texture.',
       );
       this.result.set(null);
     } finally {
@@ -185,6 +179,19 @@ export class SeamlessTextureGeneratorComponent implements OnDestroy {
               }
             }
           };
+          this.worker.onerror = (event: ErrorEvent) => {
+            event.preventDefault();
+            const failedWorker = this.worker;
+            if (!failedWorker) return;
+            failedWorker.onmessage = null;
+            failedWorker.onerror = null;
+            failedWorker.terminate();
+            this.worker = undefined;
+            this.errorMessage.set(
+              event.message || 'Texture processing worker failed. Please try again.',
+            );
+            this.result.set(null);
+          };
         }
 
         const id = ++this.requestId;
@@ -197,7 +204,11 @@ export class SeamlessTextureGeneratorComponent implements OnDestroy {
         this.worker.postMessage(request);
         return;
       } catch {
-        // Fall back to main thread execution
+        this.worker?.terminate();
+        this.worker = undefined;
+        this.errorMessage.set('Texture processing worker could not start. Please try again.');
+        this.result.set(null);
+        return;
       }
     }
 

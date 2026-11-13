@@ -1,0 +1,49 @@
+PASS qr-stand-keychain en 390px
+PASS bpm-tap-detector en 390px
+PASS audio-trimmer-booster en 390px
+PASS background-remover en 390px
+PASS bank-statement-converter en 390px
+PASS barcode-labels en 390px
+PASS batch-compressor en 390px
+PASS braille-ada-sign-generator en 390px
+PASS calendar-linker en 390px
+PASS cappuccino-stencil-maker en 390px
+PASS color-palette-extractor en 390px
+PASS cookie-cutter en 390px
+PASS crypto-hash-uuid en 390px
+PASS mesh-gradient-maker en 390px
+PASS csv-converter en 390px
+PASS csv-vector-chart-builder en 390px
+PASS desk-wedge-nameplate en 390px
+PASS diff-checker en 390px
+PASS dns-checker en 390px
+PASS electronics-box-enclosure en 390px
+PASS email-signature-generator en 390px
+PASS emergency-recovery-kit en 390px
+PASS exif-stripper en 390px
+PASS face-plate-blur en 390px
+PASS favicon-generator en 390px
+PASS file-encryptor-vault en 390px
+PASS floor-plan-furniture-scaler en 390px
+PASS font-subsetter-converter en 390px
+PASS geometric-plant-pot en 390px
+PASS grid-paper en 390px
+PASS gridfinity-bin-generator en 390px
+PASS heic-avif-converter en 390px
+PASS hsw-insert-adapter en 390px
+PASS invoice-maker en 390px
+PASS keycap-switch-tester-maker en 390px
+PASS lithophane-maker en 390px
+PASS local-ocr-text-extractor en 390px
+PASS markdown-cheatsheet en 390px
+PASS nutrition-label-maker en 390px
+PASS og-card-maker en 390px
+file:///home/deivision/Projects/Programming/PrivKnife/PrivKnife/qa/smoke.mjs:29
+  if (failures.length) throw new Error(failures.join('\n'));
+                             ^
+
+Error: page error: raw translation keys rendered: tools.parametricLampDesigner.presets.empire, tools.parametricLampDesigner.presets.ripple, tools.parametricLampDesigner.presets.vase
+    at assertBrowserHealthy (file:///home/deivision/Projects/Programming/PrivKnife/PrivKnife/qa/smoke.mjs:29:30)
+    at file:///home/deivision/Projects/Programming/PrivKnife/PrivKnife/qa/smoke.mjs:127:7
+
+Node.js v26.12.0

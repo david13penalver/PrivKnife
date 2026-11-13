@@ -229,12 +229,19 @@ export const en = {
       description: 'Remove backgrounds from portrait, product, and graphic photos with AI running 100% locally in your browser.',
     },
     dnsChecker: {
-      name: 'Global DNS Propagation & WHOIS Checker',
-      description: 'Check worldwide DNS records (A, AAAA, MX, CNAME, TXT) and WHOIS info via direct browser DNS-over-HTTPS.',
+      name: 'DNS Resolver Comparison',
+      description: 'Compare DNS answers from selected public resolvers. Queries are sent directly from your browser only after you review and authorize the disclosure.',
+      externalRequestTitle: 'This query leaves your device',
+      externalRequestDisclosure: 'When you run a query, the selected domain and record type are sent directly to Cloudflare (cloudflare-dns.com), Google Public DNS (dns.google), Quad9 (dns.quad9.net:5053), and AdGuard DNS (dns.adguard-dns.com). These independent providers may log requests. PrivKnife does not receive the query; your expected value and files are not sent.',
+      externalRequestConsent: 'I understand and authorize sending the domain and record type to these DNS providers when I run a query.',
+      consentRequired: 'Review and accept the DNS query disclosure before running a query.',
+      runQuery: 'Check DNS',
     },
     webVitals: {
       name: 'Website Performance & Core Web Vitals Checker',
       description: 'Audit performance, accessibility, and Core Web Vitals (LCP, INP, CLS) with actionable diagnostic tips.',
+      disabledTitle: 'This tool is unavailable',
+      disabledDescription: 'The former checker sent the website address to Google PageSpeed for processing. PrivKnife does not send target URLs to third-party services, so this tool has been disabled. Use your browser’s built-in developer tools for local performance checks.',
     },
     parametricLampDesigner: {
       name: '3D Parametric Lamp & Lampshade Designer',
@@ -317,6 +324,9 @@ export const en = {
         twist: 'Hourglass Twist',
         origami: 'Origami Lantern',
         cocoon: 'Voronoi Cocoon',
+        empire: 'Empire Pleat',
+        ripple: 'Swirl Ripple',
+        vase: 'Modern Spiral Vase',
       },
       filaments: {
         warmwhite: 'Warm White PLA',

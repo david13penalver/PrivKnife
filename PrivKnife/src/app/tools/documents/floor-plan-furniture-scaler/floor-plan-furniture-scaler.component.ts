@@ -9,7 +9,7 @@ import {
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
-import DOMPurify from 'dompurify';
+import { sanitizeSvgMarkup } from '../../../core/security/markup-sanitizer';
 import {
   BlueprintScale,
   ClearanceWarning,
@@ -35,19 +35,6 @@ import {
   resizeRoomDimensions,
   snapToGrid,
 } from './engine';
-
-function getSanitizer(): { sanitize: (html: string, options?: any) => string } {
-  if (DOMPurify && typeof (DOMPurify as any).sanitize === 'function') {
-    return DOMPurify as any;
-  }
-  const win = typeof window !== 'undefined' ? window : undefined;
-  if (typeof DOMPurify === 'function' && win) {
-    return (DOMPurify as any)(win);
-  }
-  return {
-    sanitize: (dirty: string) => dirty,
-  };
-}
 
 @Component({
   selector: 'app-floor-plan-furniture-scaler',
@@ -83,9 +70,7 @@ export class FloorPlanFurnitureScalerComponent implements OnDestroy {
 
   readonly sanitizedSvg = computed<SafeHtml>(() => {
     const rawSvg = this.svgPreview();
-    const cleanSvg = getSanitizer().sanitize(rawSvg, {
-      USE_PROFILES: { svg: true, svgFilters: true },
-    });
+    const cleanSvg = sanitizeSvgMarkup(rawSvg);
     return this.sanitizer.bypassSecurityTrustHtml(cleanSvg);
   });
 

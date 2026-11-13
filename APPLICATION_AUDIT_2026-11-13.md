@@ -558,3 +558,17 @@ Evidence: [recheck JSON](audit-evidence/lamp-recheck.json), [execution log](audi
 These four page-load checks are now complete; they do not certify STL/3MF output correctness, all parameter combinations, touch gestures, or physical-phone compatibility. The earlier functional acceptance backlog remains applicable.
 
 Early invoice localStorage exceptions originated from the audit language-injection script running inside restricted frames, not the app. The harness was subsequently corrected.
+
+## Spec 94 re-audit — current disposition (2026-11-13)
+
+This section supersedes the baseline Web Vitals, DNS/WHOIS, sanitizer, CSP and browser-route status above. Detailed implementation and evidence are in [Spec 94](specs/94%20-%20Audit%20Remediation%20-%20Privacy%20Containment%20and%20Resource%20Safety/spec.md) and its [evidence report](specs/94%20-%20Audit%20Remediation%20-%20Privacy%20Containment%20and%20Resource%20Safety/evidence.md).
+
+- **PageSpeed:** the Google PageSpeed request path is removed. The bookmarked Web Vitals route now explains the unavailable external audit and is excluded from the private tool catalog.
+- **DNS/WHOIS:** the WHOIS proxy was removed. Direct DNS-over-HTTPS is limited to four documented resolvers behind explicit consent; requests carry only the entered domain and record type.
+- **Markup and CSP:** DOMPurify is used before trusted HTML/SVG preview rendering. CSP is configured for the local production preview and supported deployment files. Deployed response headers remain unverified because `privknife.com` did not resolve during the live header check.
+- **Route smoke:** all 58 canonical tool routes pass in Chromium at 390px and 1440px in English and Spanish, with no detected route errors, failed requests, horizontal overflow, ad slots or raw translation keys. This does not certify physical devices or every tool’s complete workflow.
+- **Worker/resource audit:** static ownership checks pass and missing worker error paths were repaired. Reset/navigation resource baselines and UI-thread task timings remain unmeasured across all applicable tools.
+- **Test coverage:** 1,730 tests pass across 139 test files, and the manifest includes 143 executable tool files. Aggregate coverage remains 76.26% statements, 59.61% branches, 54.83% functions and 78.98% lines; only 1 of 143 files reaches 100% in all four metrics.
+- **Initial JavaScript:** production build succeeds, but raw initial JavaScript measures 352,369 bytes against the 200,000-byte Spec 94 limit. The separate transfer estimate is 105.77 kB and does not satisfy the raw-byte gate.
+
+**Spec 94 is not complete.** AC-94-04 remains unverified and AC-94-05 fails. See the evidence report for logs, scope limits and required next decisions. Do not treat route-load smoke or aggregate test success as full tool workflow acceptance.

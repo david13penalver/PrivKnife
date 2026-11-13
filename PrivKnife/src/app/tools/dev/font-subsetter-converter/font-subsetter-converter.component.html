@@ -17,7 +17,9 @@
     <!-- Configuration & Upload Area -->
     <section class="l-columns__area c-card">
       <div class="c-card__header l-extremo">
-        <h2 class="c-card__title l-extremo__area-izquierda">{{ 'tools.fontSubsetterConverter.configTitle' | translate }}</h2>
+        <h2 class="c-card__title l-extremo__area-izquierda">
+          {{ 'tools.fontSubsetterConverter.configTitle' | translate }}
+        </h2>
         <div class="l-extremo__area-derecha">
           <button
             type="button"
@@ -30,6 +32,9 @@
       </div>
 
       <div class="c-card__body">
+        @if (workerError()) {
+          <div class="c-alert c-alert--danger" role="alert">{{ workerError() }}</div>
+        }
         <!-- Dropzone -->
         <div
           class="c-dropzone g--margin-bottom-4"
@@ -184,11 +189,7 @@
 
       <div class="c-card__footer l-extremo">
         <div class="l-extremo__area-izquierda">
-          <button
-            type="button"
-            class="c-button c-button--outline"
-            (click)="reset()"
-          >
+          <button type="button" class="c-button c-button--outline" (click)="reset()">
             Reset to Defaults
           </button>
         </div>
@@ -208,7 +209,9 @@
     <!-- Preview & Deliverable Column -->
     <section class="l-columns__area c-card">
       <div class="c-card__header l-extremo">
-        <h2 class="c-card__title l-extremo__area-izquierda">{{ 'tools.fontSubsetterConverter.metricsTitle' | translate }}</h2>
+        <h2 class="c-card__title l-extremo__area-izquierda">
+          {{ 'tools.fontSubsetterConverter.metricsTitle' | translate }}
+        </h2>
         <div class="l-extremo__area-derecha">
           <button
             type="button"
@@ -227,7 +230,9 @@
           <div class="c-font-subsetter__stats-banner g--margin-bottom-4">
             <div class="c-font-subsetter__stat-item">
               <span class="c-font-subsetter__stat-label">Original</span>
-              <span class="c-font-subsetter__stat-value">{{ formatBytes(result()!.stats.originalBytes) }}</span>
+              <span class="c-font-subsetter__stat-value">{{
+                formatBytes(result()!.stats.originalBytes)
+              }}</span>
             </div>
             <div class="c-font-subsetter__stat-arrow">➔</div>
             <div class="c-font-subsetter__stat-item">
@@ -244,7 +249,9 @@
             </div>
             <div class="c-font-subsetter__stat-item">
               <span class="c-font-subsetter__stat-label">Glyphs</span>
-              <span class="c-font-subsetter__stat-value">{{ result()!.stats.retainedGlyphCount }}</span>
+              <span class="c-font-subsetter__stat-value">{{
+                result()!.stats.retainedGlyphCount
+              }}</span>
             </div>
           </div>
 
@@ -278,13 +285,25 @@
 
           <!-- Waterfall Multi-size Preview -->
           <div class="c-font-subsetter__waterfall g--margin-bottom-4">
-            <div class="c-font-subsetter__waterfall-line" [style.font-family]="previewFontFamily()" style="font-size: 12px">
+            <div
+              class="c-font-subsetter__waterfall-line"
+              [style.font-family]="previewFontFamily()"
+              style="font-size: 12px"
+            >
               12px: {{ specimenText() }}
             </div>
-            <div class="c-font-subsetter__waterfall-line" [style.font-family]="previewFontFamily()" style="font-size: 18px">
+            <div
+              class="c-font-subsetter__waterfall-line"
+              [style.font-family]="previewFontFamily()"
+              style="font-size: 18px"
+            >
               18px: {{ specimenText() }}
             </div>
-            <div class="c-font-subsetter__waterfall-line" [style.font-family]="previewFontFamily()" style="font-size: 28px">
+            <div
+              class="c-font-subsetter__waterfall-line"
+              [style.font-family]="previewFontFamily()"
+              style="font-size: 28px"
+            >
               28px: {{ specimenText() }}
             </div>
           </div>
@@ -292,7 +311,9 @@
           <!-- @font-face Code Snippet -->
           <div class="c-font-subsetter__code-box">
             <div class="c-font-subsetter__code-header l-extremo">
-              <span class="c-font-subsetter__code-title l-extremo__area-izquierda">@font-face CSS snippet</span>
+              <span class="c-font-subsetter__code-title l-extremo__area-izquierda"
+                >@font-face CSS snippet</span
+              >
               <button
                 type="button"
                 class="c-button c-button--outline c-button--small l-extremo__area-derecha"
@@ -304,13 +325,14 @@
             <pre class="c-font-subsetter__code-block"><code>{{ result()?.cssSnippet }}</code></pre>
           </div>
         } @else if (result() && !result()?.success) {
-          <div class="c-alert c-alert--danger">
-            <strong>Error:</strong> {{ result()?.error }}
-          </div>
+          <div class="c-alert c-alert--danger"><strong>Error:</strong> {{ result()?.error }}</div>
         } @else {
           <div class="empty-state">
             <span class="empty-state__icon">🔤</span>
-            <p>Upload a font or load the sample preset to inspect glyph subsetting and @font-face rules.</p>
+            <p>
+              Upload a font or load the sample preset to inspect glyph subsetting and @font-face
+              rules.
+            </p>
           </div>
         }
       </div>

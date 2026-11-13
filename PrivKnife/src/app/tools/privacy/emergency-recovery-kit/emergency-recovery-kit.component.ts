@@ -10,7 +10,7 @@ import {
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
-import DOMPurify from 'dompurify';
+import { sanitizeSvgMarkup } from '../../../core/security/markup-sanitizer';
 import { EmergencyRecoveryKitOptions, PaperFormat } from './types';
 import {
   DEFAULT_EMERGENCY_KIT_OPTIONS,
@@ -46,9 +46,7 @@ export class EmergencyRecoveryKitComponent implements OnDestroy {
   });
 
   readonly sanitizedSvg = computed<SafeHtml>(() => {
-    const cleanSvg = DOMPurify.sanitize(this.svgPreview(), {
-      USE_PROFILES: { svg: true, svgFilters: true },
-    });
+    const cleanSvg = sanitizeSvgMarkup(this.svgPreview());
     return this.sanitizer.bypassSecurityTrustHtml(cleanSvg);
   });
 

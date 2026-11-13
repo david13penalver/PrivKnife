@@ -1,0 +1,34 @@
+npm notice run priv-knife@0.0.0 qa:bundle-budget
+npm notice run node qa/bundle-budget.mjs
+{
+  "accounting": "sum of raw bytes for script[src] and modulepreload[href] tags in production index.html",
+  "maxBytes": 200000,
+  "totalBytes": 352369,
+  "pass": false,
+  "chunks": [
+    {
+      "file": "chunk-Bzu7LT3n.js",
+      "bytes": 1673
+    },
+    {
+      "file": "chunk-BGO4EBWJ.js",
+      "bytes": 160122
+    },
+    {
+      "file": "chunk-D6MHiGsU.js",
+      "bytes": 10144
+    },
+    {
+      "file": "chunk-C4XzSZ6S.js",
+      "bytes": 15107
+    },
+    {
+      "file": "chunk-Bn8cRJM-.js",
+      "bytes": 26916
+    },
+    {
+      "file": "main-XKHAGCXW.js",
+      "bytes": 138407
+    }
+  ]
+}

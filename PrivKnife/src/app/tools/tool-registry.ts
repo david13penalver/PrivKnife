@@ -31,7 +31,6 @@ import { emailSignatureGeneratorTool } from './dev/email-signature-generator';
 import { cssMeshGradientMakerTool } from './dev/mesh-gradient-maker';
 import { robotsSitemapBuilderTool } from './dev/robots-sitemap-builder';
 import { svgOptimizerCleanerTool } from './dev/svg-optimizer-cleaner';
-import { webVitalsTool } from './dev/web-vitals';
 import { averyBarcodeSheetTool } from './documents/barcode-labels';
 import { floorPlanFurnitureScalerTool } from './documents/floor-plan-furniture-scaler';
 import { gridPaperTool } from './documents/grid-paper';
@@ -118,7 +117,6 @@ export const TOOL_REGISTRY: ToolDefinition[] = [
   csvVectorChartBuilderTool,
   backgroundRemoverTool,
   dnsCheckerTool,
-  webVitalsTool,
 ];
 
 export function getToolById(id: string): ToolDefinition | undefined {
@@ -243,7 +241,6 @@ export const TOOL_I18N_MAP: Record<string, string> = {
   'backgroundRemover': 'backgroundRemover',
   'background-remover': 'backgroundRemover',
   'dns-checker': 'dnsChecker',
-  'web-vitals': 'webVitals',
 };
 
 export function getToolI18nKey(id: string): string | undefined {

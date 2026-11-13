@@ -131,7 +131,7 @@ describe('Home Component (Presentation & Tool Catalog)', () => {
 
   it('should have an i18nKey defined for every single tool in the catalog (Spec 91)', () => {
     const tools = component.allTools();
-    expect(tools.length).toBeGreaterThanOrEqual(59);
+    expect(tools.length).toBeGreaterThanOrEqual(58);
 
     for (const tool of tools) {
       expect(tool.i18nKey).toBeDefined();

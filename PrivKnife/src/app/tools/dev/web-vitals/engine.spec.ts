@@ -1,6 +1,5 @@
-import { describe, expect, it, vi } from 'vitest';
+import { describe, expect, it } from 'vitest';
 import {
-  buildPageSpeedApiUrl,
   exportAuditReportAsJson,
   exportAuditReportAsMarkdown,
   getMetricRating,
@@ -8,7 +7,6 @@ import {
   isValidUrl,
   normalizeUrl,
   parsePageSpeedResponse,
-  runPageSpeedAudit,
 } from './engine';
 import { SAMPLE_FAST_SITE_REPORT } from './test-fixtures';
 
@@ -40,16 +38,6 @@ describe('Website Performance & Core Web Vitals Engine', () => {
     expect(getMetricRating(1.8, 2.5, 4.0)).toBe('good');
     expect(getMetricRating(3.2, 2.5, 4.0)).toBe('needs-improvement');
     expect(getMetricRating(4.5, 2.5, 4.0)).toBe('poor');
-  });
-
-  it('builds PageSpeed Insights REST API query URL with categories and strategy', () => {
-    const urlStr = buildPageSpeedApiUrl('https://example.com', 'mobile', 'TEST_KEY');
-    const parsed = new URL(urlStr);
-
-    expect(parsed.searchParams.get('url')).toBe('https://example.com');
-    expect(parsed.searchParams.get('strategy')).toBe('mobile');
-    expect(parsed.searchParams.getAll('category')).toContain('performance');
-    expect(parsed.searchParams.get('key')).toBe('TEST_KEY');
   });
 
   it('parses raw Lighthouse JSON payload into structured VitalsAuditReport', () => {
@@ -97,46 +85,6 @@ describe('Website Performance & Core Web Vitals Engine', () => {
     expect(report.diagnostics[0].priority).toBe('high');
   });
 
-  it('executes audit query with mock fetch returning complete audit report', async () => {
-    const mockJson = {
-      lighthouseResult: {
-        categories: { performance: { score: 0.88 } },
-        audits: {
-          'largest-contentful-paint': { numericValue: 2100 },
-        },
-      },
-    };
-
-    const mockFetch = vi.fn().mockResolvedValue({
-      ok: true,
-      status: 200,
-      json: async () => mockJson,
-    });
-
-    const report = await runPageSpeedAudit(
-      'example.com',
-      'desktop',
-      undefined,
-      mockFetch as unknown as typeof fetch
-    );
-
-    expect(report.overallScore).toBe(88);
-    expect(report.strategy).toBe('desktop');
-    expect(report.vitals.lcp.value).toBe(2.1);
-  });
-
-  it('handles PageSpeed API errors with descriptive exceptions', async () => {
-    const mockFetchError = vi.fn().mockResolvedValue({
-      ok: false,
-      status: 429,
-      statusText: 'Too Many Requests',
-    });
-
-    await expect(
-      runPageSpeedAudit('example.com', 'mobile', undefined, mockFetchError as unknown as typeof fetch)
-    ).rejects.toThrow('Google PageSpeed API Error: HTTP 429');
-  });
-
   it('exports audit report as downloadable JSON and Markdown summary Blobs', async () => {
     const jsonBlob = exportAuditReportAsJson(SAMPLE_FAST_SITE_REPORT);
     expect(jsonBlob).toBeInstanceOf(Blob);
@@ -150,10 +98,4 @@ describe('Website Performance & Core Web Vitals Engine', () => {
     expect(mdText).toContain('PrivKnife');
   });
 
-  it('maintains 100% privacy with zero telemetry or tracking requests', () => {
-    const apiUrl = buildPageSpeedApiUrl('https://example.com', 'mobile');
-    expect(apiUrl).toContain('googleapis.com/pagespeedonline');
-    expect(apiUrl).not.toContain('google-analytics');
-    expect(apiUrl).not.toContain('mixpanel');
-  });
 });

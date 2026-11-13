@@ -231,12 +231,19 @@ export const it: TranslationSchema = {
       description: 'Rimuovi lo sfondo da ritratti, prodotti e grafiche tramite IA eseguita al 100% in locale nel browser.',
     },
     dnsChecker: {
-      name: 'Controllo Propagazione DNS Mondiale & WHOIS',
-      description: 'Verifica record DNS mondiali (A, AAAA, MX, CNAME, TXT) e dati WHOIS tramite DNS-over-HTTPS diretto.',
+      name: 'Confronto dei resolver DNS',
+      description: 'Confronta le risposte DNS dei resolver pubblici. Le query vengono inviate direttamente dal browser solo dopo aver letto e autorizzato la comunicazione.',
+      externalRequestTitle: 'Questa query lascia il tuo dispositivo',
+      externalRequestDisclosure: 'Quando avvii una query, il dominio e il tipo di record selezionati vengono inviati direttamente a Cloudflare (cloudflare-dns.com), Google Public DNS (dns.google), Quad9 (dns.quad9.net:5053) e AdGuard DNS (dns.adguard-dns.com). Questi provider indipendenti potrebbero registrare le query. PrivKnife non riceve la query; il valore atteso e i file non vengono inviati.',
+      externalRequestConsent: 'Comprendo e autorizzo l’invio del dominio e del tipo di record a questi provider DNS quando avvio una query.',
+      consentRequired: 'Leggi e accetta l’informativa DNS prima di avviare una query.',
+      runQuery: 'Controlla DNS',
     },
     webVitals: {
       name: 'Verifica Prestazioni del Sito & Core Web Vitals',
       description: 'Analizza velocità, accessibilità e Core Web Vitals (LCP, INP, CLS) con diagnosi pratiche per sviluppatori.',
+      disabledTitle: 'Questo strumento non è disponibile',
+      disabledDescription: 'Il vecchio strumento inviava l’indirizzo del sito a Google PageSpeed per l’elaborazione. PrivKnife non invia indirizzi a servizi di terze parti, quindi questo strumento è stato disattivato. Usa gli strumenti per sviluppatori integrati nel browser per controlli locali delle prestazioni.',
     },
     parametricLampDesigner: {
       name: 'Designer Parametrico 3D di Lampade e Paralumi',
@@ -319,6 +326,9 @@ export const it: TranslationSchema = {
         twist: 'Torsione Clessidra',
         origami: 'Lanterna Origami',
         cocoon: 'Bozzolo Voronoi',
+        empire: 'Pieghe Empire',
+        ripple: 'Onda vorticosa',
+        vase: 'Vaso a spirale moderno',
       },
       filaments: {
         warmwhite: 'PLA Bianco Caldo',

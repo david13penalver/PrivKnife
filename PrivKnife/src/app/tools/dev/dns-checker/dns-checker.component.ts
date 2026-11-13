@@ -3,20 +3,17 @@ import {
   ChangeDetectionStrategy,
   Component,
   OnDestroy,
-  OnInit,
   computed,
   signal,
 } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Badge } from '../../../components/badge/badge';
-import { Card } from '../../../components/card/card';
 import {
   calculatePropagationSummary,
   exportDnsResultsAsCsv,
   exportDnsResultsAsJson,
   isValidDomain,
   queryDohProvider,
-  queryWhoisRdap,
   sanitizeDomain,
 } from './engine';
 import {
@@ -29,14 +26,13 @@ import {
   DnsQueryResult,
   DnsRecordType,
   PropagationSummary,
-  WhoisResult,
 } from './types';
 
 @Component({
   selector: 'app-dns-checker',
   standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [FormsModule, Badge, Card, TranslatePipe],
+  imports: [FormsModule, Badge, TranslatePipe],
   template: `
     <div class="l-columns l-columns--1 g--margin-x-auto" style="max-width: 1280px; padding: 0 16px;">
       <!-- Header & Privacy Indicator -->
@@ -50,6 +46,21 @@ import {
         <p class="g--margin-top-2 g--margin-x-auto" style="max-width: 780px; color: var(--color-text-secondary); font-size: 1.1rem;">
           {{ 'tools.dnsChecker.description' | translate }}
         </p>
+      </div>
+
+      <div class="l-columns__area g--margin-bottom-5">
+        <section class="c-card" style="padding: 20px;" role="note" aria-labelledby="dns-query-disclosure-title">
+          <h2 id="dns-query-disclosure-title">{{ 'tools.dnsChecker.externalRequestTitle' | translate }}</h2>
+          <p>{{ 'tools.dnsChecker.externalRequestDisclosure' | translate }}</p>
+          <label class="g--flex-center" style="justify-content: flex-start; gap: 10px; align-items: flex-start;">
+            <input
+              type="checkbox"
+              [checked]="externalQueryConsent()"
+              [disabled]="isQuerying()"
+              (change)="externalQueryConsent.set($any($event.target).checked)" />
+            <span>{{ 'tools.dnsChecker.externalRequestConsent' | translate }}</span>
+          </label>
+        </section>
       </div>
 
       <!-- Presets Ribbon -->
@@ -135,11 +146,11 @@ import {
                   type="submit"
                   class="c-button c-button--primary"
                   style="width: 100%; font-weight: 700;"
-                  [disabled]="isQuerying()">
+                  [disabled]="isQuerying() || !externalQueryConsent()">
                   @if (isQuerying()) {
                     Querying...
                   } @else {
-                    🔍 Check DNS
+                    🔍 {{ 'tools.dnsChecker.runQuery' | translate }}
                   }
                 </button>
               </div>
@@ -148,36 +159,16 @@ import {
             <!-- Error message if domain is invalid -->
             @if (validationError()) {
               <div style="color: var(--color-danger, #ef4444); font-size: 0.85rem; font-weight: 600;">
-                {{ validationError() }}
+                {{ (validationError() ?? '') | translate }}
               </div>
             }
           </form>
         </div>
       </div>
 
-      <!-- Navigation Tabs: DNS Table vs WHOIS -->
+      <!-- Export Actions -->
       <div class="l-columns__area g--margin-bottom-4">
         <div class="g--flex-center" style="gap: 12px; justify-content: space-between; flex-wrap: wrap;">
-          <div class="g--flex-center" style="gap: 8px; flex-wrap: wrap; width: 100%;">
-            <button
-              type="button"
-              class="c-button"
-              [class.c-button--primary]="activeTab() === 'dns'"
-              [class.c-button--outline]="activeTab() !== 'dns'"
-              (click)="setActiveTab('dns')">
-              🌐 Global DNS ({{ results().length }} Resolvers)
-            </button>
-            <button
-              type="button"
-              class="c-button"
-              [class.c-button--primary]="activeTab() === 'whois'"
-              [class.c-button--outline]="activeTab() !== 'whois'"
-              (click)="loadWhoisTab()">
-              📋 WHOIS &amp; RDAP Details
-            </button>
-          </div>
-
-          <!-- Export Actions -->
           <div class="g--flex-center" style="gap: 8px;">
             <button
               type="button"
@@ -198,7 +189,7 @@ import {
       </div>
 
       <!-- TAB 1: Global DNS Propagation Table -->
-      @if (activeTab() === 'dns') {
+      @if (results().length > 0) {
         <!-- Summary Banner -->
         <div class="l-columns__area g--margin-bottom-5">
           <div class="c-card" style="padding: 16px;">
@@ -245,8 +236,7 @@ import {
             <table style="width: 100%; border-collapse: collapse; text-align: left; font-size: 0.9rem;">
               <thead>
                 <tr style="background: rgba(0,0,0,0.15); border-bottom: 1px solid var(--color-border); color: var(--color-text-secondary); font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.05em;">
-                  <th style="padding: 12px 16px;">Region &amp; Location</th>
-                  <th style="padding: 12px 16px;">Provider</th>
+                  <th style="padding: 12px 16px;">Resolver &amp; Host</th>
                   <th style="padding: 12px 16px;">Status</th>
                   <th style="padding: 12px 16px;">Resolved Record(s)</th>
                   <th style="padding: 12px 16px; text-align: right;">TTL</th>
@@ -256,16 +246,10 @@ import {
               <tbody>
                 @for (res of results(); track res.providerId) {
                   <tr style="border-bottom: 1px solid var(--color-border);">
-                    <!-- Region & Location -->
-                    <td style="padding: 12px 16px;">
-                      <strong>{{ res.region }}</strong>
-                      <div style="color: var(--color-text-secondary); font-size: 0.8rem;">{{ res.city }}</div>
-                    </td>
-
-                    <!-- Provider & IP -->
+                    <!-- Resolver and its actual request host; resolver networks are not geographic probes. -->
                     <td style="padding: 12px 16px;">
                       <div>{{ res.providerName }}</div>
-                      <code style="font-size: 0.75rem; color: var(--color-text-secondary);">{{ res.ip }}</code>
+                      <code style="font-size: 0.75rem; color: var(--color-text-secondary);">{{ res.city }}</code>
                     </td>
 
                     <!-- Status Badge -->
@@ -317,81 +301,6 @@ import {
         </div>
       }
 
-      <!-- TAB 2: WHOIS & RDAP Details -->
-      @if (activeTab() === 'whois') {
-        <div class="l-columns__area g--margin-bottom-6">
-          @if (isWhoisLoading()) {
-            <div class="c-card" style="padding: 32px; text-align: center;">
-              <h3>Querying RDAP Domain Registry...</h3>
-              <p style="color: var(--color-text-secondary);">Direct browser lookup against rdap.org registry.</p>
-            </div>
-          } @else if (whoisData()) {
-            <div class="l-columns l-columns--1" style="gap: 16px;">
-              <app-card title="Domain Registration Overview (RDAP / WHOIS)">
-                <div class="l-columns l-columns--2 dns-details-grid" style="gap: 16px;">
-                  <div>
-                    <span style="color: var(--color-text-secondary); display: block; font-size: 0.8rem;">Domain Name</span>
-                    <strong style="font-size: 1.1rem; font-family: monospace;">{{ whoisData()?.domain }}</strong>
-                  </div>
-                  <div>
-                    <span style="color: var(--color-text-secondary); display: block; font-size: 0.8rem;">Registrar</span>
-                    <strong>{{ whoisData()?.registrar || 'Not Specified' }}</strong>
-                  </div>
-                  <div>
-                    <span style="color: var(--color-text-secondary); display: block; font-size: 0.8rem;">Created On</span>
-                    <span>{{ whoisData()?.creationDate || 'Not Available' }}</span>
-                  </div>
-                  <div>
-                    <span style="color: var(--color-text-secondary); display: block; font-size: 0.8rem;">Expires On</span>
-                    <span>{{ whoisData()?.expirationDate || 'Not Available' }}</span>
-                  </div>
-                  <div>
-                    <span style="color: var(--color-text-secondary); display: block; font-size: 0.8rem;">Last Updated</span>
-                    <span>{{ whoisData()?.updatedDate || 'Not Available' }}</span>
-                  </div>
-                  <div>
-                    <span style="color: var(--color-text-secondary); display: block; font-size: 0.8rem;">DNSSEC</span>
-                    <span [style.color]="whoisData()?.dnssec ? '#10b981' : '#f59e0b'">
-                      {{ whoisData()?.dnssec ? '✓ Active / Signed' : '○ Inactive / Unsigned' }}
-                    </span>
-                  </div>
-                </div>
-
-                <!-- Nameservers -->
-                @if ((whoisData()?.nameServers?.length || 0) > 0) {
-                  <div style="margin-top: 16px; padding-top: 16px; border-top: 1px solid var(--color-border);">
-                    <span style="color: var(--color-text-secondary); display: block; font-size: 0.8rem; margin-bottom: 6px;">
-                      Authoritative Name Servers:
-                    </span>
-                    <div class="g--flex-center" style="gap: 8px; flex-wrap: wrap;">
-                      @for (ns of whoisData()?.nameServers; track ns) {
-                        <code style="background: rgba(0,0,0,0.15); padding: 3px 8px; border-radius: 4px; font-size: 0.85rem;">
-                          {{ ns }}
-                        </code>
-                      }
-                    </div>
-                  </div>
-                }
-              </app-card>
-
-              <!-- Raw RDAP JSON Accordion -->
-              @if (whoisData()?.rawJson) {
-                <app-card title="Raw RDAP JSON Response">
-                  <pre style="background: rgba(0,0,0,0.3); padding: 12px; border-radius: 6px; overflow-x: auto; max-height: 260px; font-size: 0.8rem;">{{ whoisData()?.rawJson }}</pre>
-                </app-card>
-              }
-            </div>
-          } @else {
-            <div class="c-card" style="padding: 32px; text-align: center;">
-              <h3>No WHOIS Data Available</h3>
-              <p style="color: var(--color-text-secondary);">Click "Lookup WHOIS" to query the domain registry.</p>
-              <button type="button" class="c-button c-button--primary" (click)="fetchWhois()">
-                Lookup WHOIS Now
-              </button>
-            </div>
-          }
-        </div>
-      }
     </div>
   `,
   styles: [
@@ -409,9 +318,6 @@ import {
           grid-template-columns: repeat(2, 1fr) !important;
         }
 
-        .dns-details-grid {
-          grid-template-columns: 1fr !important;
-        }
       }
 
       @media (max-width: 500px) {
@@ -422,30 +328,23 @@ import {
     `,
   ],
 })
-export class DnsCheckerComponent implements OnInit, OnDestroy {
+export class DnsCheckerComponent implements OnDestroy {
   readonly providers = GLOBAL_DOH_PROVIDERS;
   readonly presets = PRESET_TEST_DOMAINS;
   readonly recordTypes: DnsRecordType[] = ['A', 'AAAA', 'CNAME', 'MX', 'TXT', 'NS', 'PTR', 'SOA'];
 
   readonly config = signal<DnsCheckerConfig>({ ...DEFAULT_DNS_CONFIG });
   readonly isQuerying = signal<boolean>(false);
-  readonly isWhoisLoading = signal<boolean>(false);
-  readonly activeTab = signal<'dns' | 'whois'>('dns');
+  readonly externalQueryConsent = signal<boolean>(false);
   readonly validationError = signal<string | null>(null);
 
   readonly results = signal<DnsQueryResult[]>([]);
-  readonly whoisData = signal<WhoisResult | null>(null);
 
   readonly summary = computed<PropagationSummary>(() => {
     return calculatePropagationSummary(this.results(), this.config().expectedValue);
   });
 
   private abortController: AbortController | null = null;
-
-  ngOnInit(): void {
-    // Initialize initial query for default domain
-    this.executeDnsQueries();
-  }
 
   ngOnDestroy(): void {
     if (this.abortController) {
@@ -468,31 +367,21 @@ export class DnsCheckerComponent implements OnInit, OnDestroy {
     this.config.update((c) => ({ ...c, expectedValue: val }));
   }
 
-  setActiveTab(tab: 'dns' | 'whois'): void {
-    this.activeTab.set(tab);
-  }
-
-  loadWhoisTab(): void {
-    this.activeTab.set('whois');
-    if (!this.whoisData()) {
-      this.fetchWhois();
-    }
-  }
-
   loadPreset(preset: (typeof PRESET_TEST_DOMAINS)[0]): void {
     this.config.set({
       domain: preset.name,
       recordType: preset.type,
       expectedValue: preset.expected,
     });
-    this.whoisData.set(null);
-    this.executeDnsQueries();
+    this.results.set([]);
+    this.validationError.set(null);
   }
 
   resetDefaults(): void {
     this.config.set({ ...DEFAULT_DNS_CONFIG });
-    this.whoisData.set(null);
-    this.executeDnsQueries();
+    this.results.set([]);
+    this.validationError.set(null);
+    this.externalQueryConsent.set(false);
   }
 
   onSubmit(event: Event): void {
@@ -501,6 +390,11 @@ export class DnsCheckerComponent implements OnInit, OnDestroy {
   }
 
   async executeDnsQueries(): Promise<void> {
+    if (!this.externalQueryConsent()) {
+      this.validationError.set('tools.dnsChecker.consentRequired');
+      return;
+    }
+
     const rawDomain = this.config().domain;
     const cleanDomain = sanitizeDomain(rawDomain);
 
@@ -510,6 +404,9 @@ export class DnsCheckerComponent implements OnInit, OnDestroy {
     }
 
     this.validationError.set(null);
+    this.abortController?.abort();
+    const requestController = new AbortController();
+    this.abortController = requestController;
     this.isQuerying.set(true);
 
     // Initialize pending rows
@@ -526,11 +423,6 @@ export class DnsCheckerComponent implements OnInit, OnDestroy {
     }));
     this.results.set(pendingResults);
 
-    if (this.abortController) {
-      this.abortController.abort();
-    }
-    this.abortController = new AbortController();
-
     const recordType = this.config().recordType;
     const expected = this.config().expectedValue;
 
@@ -540,34 +432,25 @@ export class DnsCheckerComponent implements OnInit, OnDestroy {
           provider,
           cleanDomain,
           recordType,
-          expected
+          expected,
+          window.fetch.bind(window),
+          6000,
+          requestController.signal
         );
         // Progressively update results
-        this.results.update((current) =>
-          current.map((item) => (item.providerId === provider.id ? res : item))
-        );
+        if (this.abortController === requestController && !requestController.signal.aborted) {
+          this.results.update((current) =>
+            current.map((item) => (item.providerId === provider.id ? res : item))
+          );
+        }
         return res;
       });
 
       await Promise.allSettled(queryPromises);
     } finally {
-      this.isQuerying.set(false);
-    }
-  }
-
-  async fetchWhois(): Promise<void> {
-    const cleanDomain = sanitizeDomain(this.config().domain);
-    if (!cleanDomain || !isValidDomain(cleanDomain)) {
-      this.validationError.set('Please enter a valid domain name for WHOIS lookup');
-      return;
-    }
-
-    this.isWhoisLoading.set(true);
-    try {
-      const data = await queryWhoisRdap(cleanDomain);
-      this.whoisData.set(data);
-    } finally {
-      this.isWhoisLoading.set(false);
+      if (this.abortController === requestController) {
+        this.isQuerying.set(false);
+      }
     }
   }
 
@@ -579,13 +462,12 @@ export class DnsCheckerComponent implements OnInit, OnDestroy {
       this.config().domain,
       this.config().recordType
     );
-    this.triggerDownload(blob, `dns_propagation_${this.config().domain}_${this.config().recordType}.csv`);
+      this.triggerDownload(blob, `dns_resolver_comparison_${this.config().domain}_${this.config().recordType}.csv`);
   }
 
   exportJson(): void {
     const blob = exportDnsResultsAsJson(
       this.results(),
-      this.whoisData(),
       this.config()
     );
     this.triggerDownload(blob, `dns_audit_${this.config().domain}_${this.config().recordType}.json`);

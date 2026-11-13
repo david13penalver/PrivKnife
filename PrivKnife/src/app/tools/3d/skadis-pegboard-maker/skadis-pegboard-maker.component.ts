@@ -368,6 +368,9 @@ import {
 
               <!-- Export Box -->
               <div class="export-box g--margin-top-4">
+                @if (exportError()) {
+                  <div class="c-alert c-alert--danger g--margin-bottom-3" role="alert">{{ exportError() }}</div>
+                }
                 <div class="export-format-selector">
                   <label class="c-input__label">Export Format:</label>
                   <div class="format-radios">
@@ -431,6 +434,7 @@ export class SkadisPegboardMakerComponent implements OnInit, AfterViewInit, OnDe
   readonly lockingWedge = signal<boolean>(DEFAULT_SKADIS_OPTIONS.lockingWedge);
   readonly exportFormat = signal<'stl' | '3mf'>('stl');
   readonly isGenerating = signal<boolean>(false);
+  readonly exportError = signal<string | null>(null);
   readonly activePresetId = signal<string>('skadis_single_hook');
 
   readonly presets = SKADIS_PRESETS;
@@ -452,6 +456,7 @@ export class SkadisPegboardMakerComponent implements OnInit, AfterViewInit, OnDe
 
   private activeDownloadUrls: string[] = [];
   private worker?: Worker;
+  private workerFailed = false;
 
   // Three.js References
   private scene: THREE.Scene | null = null;
@@ -474,7 +479,8 @@ export class SkadisPegboardMakerComponent implements OnInit, AfterViewInit, OnDe
       try {
         this.worker = new Worker(new URL('./worker.ts', import.meta.url), { type: 'module' });
       } catch {
-        // Fallback
+        this.workerFailed = true;
+        this.exportError.set('Export worker could not start. Please reload the tool and try again.');
       }
     }
     this.rebuildMesh();
@@ -617,7 +623,9 @@ export class SkadisPegboardMakerComponent implements OnInit, AfterViewInit, OnDe
   // --- DOWNLOAD ACTIONS ---
 
   async downloadFormat(format: 'stl' | '3mf'): Promise<void> {
+    if (this.workerFailed) return;
     this.isGenerating.set(true);
+    this.exportError.set(null);
 
     const options: SkadisPegboardMakerOptions = {
       pegboardSystem: this.pegboardSystem(),
@@ -635,13 +643,16 @@ export class SkadisPegboardMakerComponent implements OnInit, AfterViewInit, OnDe
       if (this.worker) {
         await new Promise<void>((resolve, reject) => {
           const reqId = Date.now();
+          const worker = this.worker!;
           const handler = (event: MessageEvent<SkadisPegboardWorkerResponse>) => {
             if (event.data.id !== reqId) return;
             if (event.data.type === 'error') {
               this.worker?.removeEventListener('message', handler);
+              worker.onerror = null;
               reject(new Error(event.data.error || 'Export failed'));
             } else if (event.data.type === 'result' && event.data.buffer) {
               this.worker?.removeEventListener('message', handler);
+              worker.onerror = null;
               const blob = new Blob([event.data.buffer], {
                 type: event.data.mimeType || 'application/octet-stream',
               });
@@ -649,7 +660,16 @@ export class SkadisPegboardMakerComponent implements OnInit, AfterViewInit, OnDe
               resolve();
             }
           };
-          this.worker!.addEventListener('message', handler);
+          worker.onerror = (event: ErrorEvent) => {
+            event.preventDefault();
+            worker.removeEventListener('message', handler);
+            worker.onerror = null;
+            worker.terminate();
+            this.workerFailed = true;
+            if (this.worker === worker) this.worker = undefined;
+            reject(new Error(event.message || 'Skadis export worker failed'));
+          };
+          worker.addEventListener('message', handler);
           this.worker!.postMessage({ id: reqId, options, format } as SkadisPegboardWorkerRequest);
         });
       } else {
@@ -658,11 +678,8 @@ export class SkadisPegboardMakerComponent implements OnInit, AfterViewInit, OnDe
           this.triggerFileDownload(result.blob, result.fileName);
         }
       }
-    } catch {
-      const result = await processSkadisHolder(options, format);
-      if (result.success && result.blob) {
-        this.triggerFileDownload(result.blob, result.fileName);
-      }
+    } catch (error) {
+      this.exportError.set(error instanceof Error ? error.message : 'Pegboard export failed. Please try again.');
     } finally {
       this.isGenerating.set(false);
     }

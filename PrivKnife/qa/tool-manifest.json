@@ -346,11 +346,5 @@
     "route": "/tools/video-to-gif",
     "category": "audio-video",
     "source": "PrivKnife/src/app/tools/audio-video/video-gif-trimmer"
-  },
-  {
-    "id": "web-vitals",
-    "route": "/tools/web-vitals",
-    "category": "dev",
-    "source": "PrivKnife/src/app/tools/dev/web-vitals"
   }
 ]

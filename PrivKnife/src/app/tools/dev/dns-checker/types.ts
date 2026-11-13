@@ -39,18 +39,6 @@ export interface DnsQueryResult {
   errorMessage?: string;
 }
 
-export interface WhoisResult {
-  domain: string;
-  registrar?: string;
-  creationDate?: string;
-  expirationDate?: string;
-  updatedDate?: string;
-  nameServers: string[];
-  status: string[];
-  dnssec?: boolean;
-  rawJson?: string;
-}
-
 export interface DnsCheckerConfig {
   domain: string;
   recordType: DnsRecordType;

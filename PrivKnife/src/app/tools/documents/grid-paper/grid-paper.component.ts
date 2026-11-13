@@ -10,6 +10,7 @@ import {
 } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
+import { sanitizeSvgMarkup } from '../../../core/security/markup-sanitizer';
 import { Badge } from '../../../components/badge/badge';
 import { Card } from '../../../components/card/card';
 import {
@@ -644,7 +645,7 @@ export class GridPaperComponent implements OnInit {
   readonly previewSvg = computed<string>(() => generatePaperSvg(this.options()));
 
   readonly safePreviewSvg = computed<SafeHtml>(() =>
-    this.sanitizer.bypassSecurityTrustHtml(this.previewSvg())
+    this.sanitizer.bypassSecurityTrustHtml(sanitizeSvgMarkup(this.previewSvg()))
   );
 
   readonly paperDimensions = computed(() => {

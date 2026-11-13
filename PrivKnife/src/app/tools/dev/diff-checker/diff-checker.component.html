@@ -126,19 +126,11 @@
             Ignore Whitespace
           </label>
           <label class="c-checkbox-label">
-            <input
-              type="checkbox"
-              [checked]="ignoreCase()"
-              (change)="toggleIgnoreCase()"
-            />
+            <input type="checkbox" [checked]="ignoreCase()" (change)="toggleIgnoreCase()" />
             Ignore Case
           </label>
           <label class="c-checkbox-label">
-            <input
-              type="checkbox"
-              [checked]="syncScroll()"
-              (change)="toggleSyncScroll()"
-            />
+            <input type="checkbox" [checked]="syncScroll()" (change)="toggleSyncScroll()" />
             Sync Scroll
           </label>
         </div>
@@ -151,7 +143,9 @@
     <!-- Original Input -->
     <section class="l-columns__area c-card">
       <div class="c-card__header l-extremo">
-        <h2 class="c-card__title l-extremo__area-izquierda">{{ 'tools.diffChecker.originalTitle' | translate }}</h2>
+        <h2 class="c-card__title l-extremo__area-izquierda">
+          {{ 'tools.diffChecker.originalTitle' | translate }}
+        </h2>
         <div class="l-extremo__area-derecha">
           <input
             #origFileInput
@@ -184,7 +178,9 @@
     <!-- Modified Input -->
     <section class="l-columns__area c-card">
       <div class="c-card__header l-extremo">
-        <h2 class="c-card__title l-extremo__area-izquierda">{{ 'tools.diffChecker.modifiedTitle' | translate }}</h2>
+        <h2 class="c-card__title l-extremo__area-izquierda">
+          {{ 'tools.diffChecker.modifiedTitle' | translate }}
+        </h2>
         <div class="l-extremo__area-derecha">
           <input
             #modFileInput
@@ -263,7 +259,9 @@
     </div>
 
     <div class="c-card__body c-diff-checker__viewer-wrapper">
-      @if (result().lines.length === 0) {
+      @if (workerError()) {
+        <div class="c-alert c-alert--danger" role="alert">{{ workerError() }}</div>
+      } @else if (result().lines.length === 0) {
         <div class="c-diff-checker__empty">
           <span class="c-diff-checker__empty-icon">🔍</span>
           <p>Enter text in both boxes above or click a sample to generate comparison.</p>
@@ -281,7 +279,9 @@
                     @if (line.type === 'modified' && line.leftTokens) {
                       @for (t of line.leftTokens; track $index) {
                         @if (t.type === 'removed') {
-                          <mark class="c-diff-checker__token c-diff-checker__token--del">{{ t.value }}</mark>
+                          <mark class="c-diff-checker__token c-diff-checker__token--del">{{
+                            t.value
+                          }}</mark>
                         } @else {
                           <span>{{ t.value }}</span>
                         }
@@ -299,7 +299,9 @@
                     @if (line.type === 'modified' && line.rightTokens) {
                       @for (t of line.rightTokens; track $index) {
                         @if (t.type === 'added') {
-                          <mark class="c-diff-checker__token c-diff-checker__token--ins">{{ t.value }}</mark>
+                          <mark class="c-diff-checker__token c-diff-checker__token--ins">{{
+                            t.value
+                          }}</mark>
                         } @else {
                           <span>{{ t.value }}</span>
                         }
@@ -340,7 +342,9 @@
                       @if (line.leftTokens) {
                         @for (t of line.leftTokens; track $index) {
                           @if (t.type === 'removed') {
-                            <mark class="c-diff-checker__token c-diff-checker__token--del">{{ t.value }}</mark>
+                            <mark class="c-diff-checker__token c-diff-checker__token--del">{{
+                              t.value
+                            }}</mark>
                           } @else {
                             <span>{{ t.value }}</span>
                           }
@@ -359,7 +363,9 @@
                       @if (line.rightTokens) {
                         @for (t of line.rightTokens; track $index) {
                           @if (t.type === 'added') {
-                            <mark class="c-diff-checker__token c-diff-checker__token--ins">{{ t.value }}</mark>
+                            <mark class="c-diff-checker__token c-diff-checker__token--ins">{{
+                              t.value
+                            }}</mark>
                           } @else {
                             <span>{{ t.value }}</span>
                           }
@@ -398,11 +404,7 @@
     <!-- Footer Actions -->
     <div class="c-card__footer l-extremo">
       <div class="l-extremo__area-izquierda">
-        <button
-          type="button"
-          class="c-button c-button--outline"
-          (click)="reset()"
-        >
+        <button type="button" class="c-button c-button--outline" (click)="reset()">
           {{ 'common.resetDefaults' | translate }}
         </button>
       </div>

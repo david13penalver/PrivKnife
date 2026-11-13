@@ -34,6 +34,7 @@ describe('DiffCheckerComponent (Seam 2 & 4)', () => {
     xhrSpy.mockRestore();
     revokeObjectURLSpy.mockRestore();
     fixture.destroy();
+    vi.unstubAllGlobals();
   });
 
   describe('Task 3.1: Initialization & Controls Reactivity', () => {
@@ -135,6 +136,33 @@ describe('DiffCheckerComponent (Seam 2 & 4)', () => {
   });
 
   describe('Task 3.3: Memory Hygiene & Disposal', () => {
+    it('reports worker runtime errors, terminates the worker, and preserves the UI thread', () => {
+      const workers: Array<{
+        onerror: ((event: ErrorEvent) => void) | null;
+        postMessage: ReturnType<typeof vi.fn>;
+        terminate: ReturnType<typeof vi.fn>;
+      }> = [];
+      class FailingWorker {
+        onmessage: ((event: MessageEvent) => void) | null = null;
+        onerror: ((event: ErrorEvent) => void) | null = null;
+        postMessage = vi.fn();
+        terminate = vi.fn();
+        constructor() {
+          workers.push(this);
+        }
+      }
+      vi.stubGlobal('Worker', FailingWorker);
+
+      component.setOriginalText('large source');
+      workers[0].onerror?.({
+        message: 'simulated worker crash',
+        preventDefault: vi.fn(),
+      } as unknown as ErrorEvent);
+
+      expect(component.workerError()).toContain('simulated worker crash');
+      expect(workers[0].terminate).toHaveBeenCalledOnce();
+    });
+
     it('should reset inputs and revoke cached URLs upon reset', () => {
       component.loadSampleCode();
       expect(component.originalText()).not.toBe('');

@@ -29,6 +29,7 @@ describe('SeamlessTextureGeneratorComponent (Seam 2 & 4)', () => {
     xhrSpy.mockRestore();
     revokeObjectURLSpy.mockRestore();
     fixture.destroy();
+    vi.unstubAllGlobals();
   });
 
   describe('Task 3.1: Initialization & Controls Reactivity', () => {
@@ -121,7 +122,9 @@ describe('SeamlessTextureGeneratorComponent (Seam 2 & 4)', () => {
 
     it('should download normal PNG and revoke object URL immediately', async () => {
       await component.loadSampleSurface();
-      const createObjectURLSpy = vi.spyOn(URL, 'createObjectURL').mockReturnValue('blob:mock-normal');
+      const createObjectURLSpy = vi
+        .spyOn(URL, 'createObjectURL')
+        .mockReturnValue('blob:mock-normal');
 
       component.downloadNormal();
 
@@ -146,6 +149,33 @@ describe('SeamlessTextureGeneratorComponent (Seam 2 & 4)', () => {
   });
 
   describe('Task 3.3: Error Handling & Resource Disposal (DEFECT-57-02)', () => {
+    it('reports worker runtime errors and terminates the failed worker', async () => {
+      const workers: Array<{
+        onerror: ((event: ErrorEvent) => void) | null;
+        postMessage: ReturnType<typeof vi.fn>;
+        terminate: ReturnType<typeof vi.fn>;
+      }> = [];
+      class FailingWorker {
+        onmessage: ((event: MessageEvent) => void) | null = null;
+        onerror: ((event: ErrorEvent) => void) | null = null;
+        postMessage = vi.fn();
+        terminate = vi.fn();
+        constructor() {
+          workers.push(this);
+        }
+      }
+      vi.stubGlobal('Worker', FailingWorker);
+
+      await component.loadSampleSurface();
+      workers[0].onerror?.({
+        message: 'simulated texture worker crash',
+        preventDefault: vi.fn(),
+      } as unknown as ErrorEvent);
+
+      expect(component.errorMessage()).toContain('simulated texture worker crash');
+      expect(workers[0].terminate).toHaveBeenCalledOnce();
+    });
+
     it('should set errorMessage and not load sample brick texture when file decoding fails', async () => {
       const corruptFile = new File(['CORRUPT_BYTES'], 'corrupt.png', { type: 'image/png' });
       // In jsdom / test environment, createImageBitmap might not exist or fail
@@ -157,7 +187,7 @@ describe('SeamlessTextureGeneratorComponent (Seam 2 & 4)', () => {
       const compiled = fixture.nativeElement as HTMLElement;
       expect(compiled.querySelector('.c-alert--danger')).toBeTruthy();
       expect(compiled.querySelector('.c-alert--danger')?.textContent).toContain(
-        'Failed to decode image file'
+        'Failed to decode image file',
       );
     });
 

@@ -231,12 +231,19 @@ export const ar: TranslationSchema = {
       description: 'إزالة خلفيات الصور الشخصية والمنتجات والرسومات باستخدام ذكاء اصطناعي يعمل محلياً في متصفحك.',
     },
     dnsChecker: {
-      name: 'فاحص انتشار DNS العالمي وسجلات WHOIS',
-      description: 'التحقق من سجلات DNS العالمية (A, AAAA, MX, CNAME, TXT) وبيانات WHOIS مباشرة عبر DoH من المتصفح.',
+      name: 'مقارنة محللات DNS',
+      description: 'قارن إجابات محللات DNS العامة. لا تُرسل الاستعلامات مباشرة من المتصفح إلا بعد مراجعة الإفصاح والموافقة عليه.',
+      externalRequestTitle: 'سيغادر هذا الاستعلام جهازك',
+      externalRequestDisclosure: 'عند تشغيل الاستعلام، يُرسل النطاق ونوع السجل المحددان مباشرةً إلى Cloudflare (cloudflare-dns.com) وGoogle Public DNS (dns.google) وQuad9 (dns.quad9.net:5053) وAdGuard DNS (dns.adguard-dns.com). قد تسجل هذه الجهات المستقلة الاستعلامات. لا تستقبل PrivKnife الاستعلام؛ ولا تُرسل القيمة المتوقعة أو الملفات.',
+      externalRequestConsent: 'أفهم وأوافق على إرسال النطاق ونوع السجل إلى مزودي DNS هؤلاء عند تشغيل الاستعلام.',
+      consentRequired: 'راجع إشعار خصوصية DNS ووافق عليه قبل تشغيل الاستعلام.',
+      runQuery: 'تحقق من DNS',
     },
     webVitals: {
       name: 'فاحص أداء المواقع ومؤشرات Core Web Vitals',
       description: 'فحص سرعة الموقع وإمكانية الوصول ومؤشرات الأداء الأساسية (LCP, INP, CLS) مع نصائح تحسين عملية.',
+      disabledTitle: 'هذه الأداة غير متاحة',
+      disabledDescription: 'كانت الأداة السابقة ترسل عنوان الموقع إلى Google PageSpeed لمعالجته. لا ترسل PrivKnife العناوين المستهدفة إلى خدمات خارجية، لذلك تم تعطيل هذه الأداة. استخدم أدوات المطور المدمجة في متصفحك لفحص الأداء محلياً.',
     },
     parametricLampDesigner: {
       name: 'مصمم المصابيح وأغطيتها ثلاثي الأبعاد البارامتري',
@@ -319,6 +326,9 @@ export const ar: TranslationSchema = {
         twist: 'التواء الساعة الرملية',
         origami: 'فانوس أوريغامي',
         cocoon: 'شرنقة فورونوي',
+        empire: 'ثنيات إمبراطورية',
+        ripple: 'تموج حلزوني',
+        vase: 'مزهرية لولبية عصرية',
       },
       filaments: {
         warmwhite: 'PLA أبيض دافئ',

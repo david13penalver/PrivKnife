@@ -69,29 +69,6 @@ export function getScoreRating(score: number): MetricRating {
 }
 
 /**
- * Builds the direct Google PageSpeed Insights REST API query URL.
- */
-export function buildPageSpeedApiUrl(
-  targetUrl: string,
-  strategy: AuditStrategy,
-  apiKey?: string
-): string {
-  const url = new URL('https://www.googleapis.com/pagespeedonline/v5/runPagespeed');
-  url.searchParams.set('url', targetUrl);
-  url.searchParams.set('strategy', strategy);
-  url.searchParams.append('category', 'performance');
-  url.searchParams.append('category', 'accessibility');
-  url.searchParams.append('category', 'best-practices');
-  url.searchParams.append('category', 'seo');
-
-  if (apiKey && apiKey.trim()) {
-    url.searchParams.set('key', apiKey.trim());
-  }
-
-  return url.toString();
-}
-
-/**
  * Parses raw Google PageSpeed Insights / Lighthouse v5+ JSON response.
  */
 export function parsePageSpeedResponse(
@@ -265,52 +242,6 @@ export function parsePageSpeedResponse(
     diagnostics,
     lighthouseVersion: lh.lighthouseVersion || '12.0.0',
   };
-}
-
-/**
- * Executes direct client-side Google PageSpeed Insights query.
- */
-export async function runPageSpeedAudit(
-  url: string,
-  strategy: AuditStrategy,
-  apiKey?: string,
-  fetchImpl: typeof fetch = window.fetch.bind(window),
-  timeoutMs: number = 30000
-): Promise<VitalsAuditReport> {
-  const cleanUrl = normalizeUrl(url);
-  const apiUrl = buildPageSpeedApiUrl(cleanUrl, strategy, apiKey);
-  const startTime = performance.now();
-
-  const controller = new AbortController();
-  const timer = setTimeout(() => controller.abort(), timeoutMs);
-
-  try {
-    const response = await fetchImpl(apiUrl, {
-      method: 'GET',
-      headers: {
-        Accept: 'application/json',
-      },
-      signal: controller.signal,
-    });
-
-    clearTimeout(timer);
-    const fetchTimeMs = Math.round(performance.now() - startTime);
-
-    if (!response.ok) {
-      throw new Error(`Google PageSpeed API Error: HTTP ${response.status} ${response.statusText}`);
-    }
-
-    const json = await response.json();
-    return parsePageSpeedResponse(json, cleanUrl, strategy, fetchTimeMs);
-  } catch (err: any) {
-    clearTimeout(timer);
-    const isTimeout = err?.name === 'AbortError';
-    throw new Error(
-      isTimeout
-        ? 'Audit request timed out after 30 seconds'
-        : err?.message || 'Failed to connect to Google PageSpeed API'
-    );
-  }
 }
 
 /**

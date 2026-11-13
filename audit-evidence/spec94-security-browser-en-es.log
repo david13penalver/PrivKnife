@@ -1,0 +1,5 @@
+npm notice run priv-knife@0.0.0 qa:security:browser
+npm notice run node qa/security-browser.mjs
+PASS privacy network flow, consent, CSP, blob Worker and WebAssembly: en
+PASS privacy network flow, consent, CSP, blob Worker and WebAssembly: es
+PASS secure production preview: http://127.0.0.1:4201

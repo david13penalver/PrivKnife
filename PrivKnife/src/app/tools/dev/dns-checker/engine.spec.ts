@@ -6,18 +6,15 @@ import {
   exportDnsResultsAsJson,
   isValidDomain,
   parseDohResponse,
-  parseRdapResponse,
   queryDohProvider,
-  queryWhoisRdap,
   sanitizeDomain,
 } from './engine';
 import {
   GLOBAL_DOH_PROVIDERS,
   MOCK_DOH_GOOGLE_RESPONSE,
-  MOCK_RDAP_WHOIS_RESPONSE,
 } from './test-fixtures';
 
-describe('Global DNS Propagation & WHOIS Checker Engine', () => {
+describe('DNS Resolver Comparison Engine', () => {
   it('sanitizes domain inputs removing protocols, paths, and trailing dots', () => {
     expect(sanitizeDomain('https://example.com/')).toBe('example.com');
     expect(sanitizeDomain('HTTP://Sub.Domain.org:8080/path?query=1')).toBe('sub.domain.org');
@@ -40,6 +37,17 @@ describe('Global DNS Propagation & WHOIS Checker Engine', () => {
 
     expect(parsed.searchParams.get('name')).toBe('example.com');
     expect(parsed.searchParams.get('type')).toBe('A');
+    expect([...parsed.searchParams.keys()].sort()).toEqual(['name', 'type']);
+  });
+
+  it('uses only the four disclosed resolver origins', () => {
+    expect(GLOBAL_DOH_PROVIDERS).toHaveLength(4);
+    expect(GLOBAL_DOH_PROVIDERS.map((provider) => new URL(provider.endpointUrl).host).sort()).toEqual([
+      'cloudflare-dns.com',
+      'dns.adguard-dns.com',
+      'dns.google',
+      'dns.quad9.net:5053',
+    ]);
   });
 
   it('parses RFC/Google DoH JSON responses extracting records and TTL', () => {
@@ -102,26 +110,29 @@ describe('Global DNS Propagation & WHOIS Checker Engine', () => {
     expect(result.errorMessage).toBeDefined();
   });
 
-  it('parses RDAP WHOIS response extracting registrar, dates, and nameservers', () => {
-    const whois = parseRdapResponse(MOCK_RDAP_WHOIS_RESPONSE, 'example.com');
+  it('aborts in-flight DoH requests when the caller cancels them', async () => {
+    const controller = new AbortController();
+    const mockFetch = vi.fn((_input: RequestInfo | URL, init?: RequestInit) =>
+      new Promise<Response>((_resolve, reject) => {
+        init?.signal?.addEventListener('abort', () => reject(new DOMException('Aborted', 'AbortError')));
+      })
+    );
+    const query = queryDohProvider(
+      GLOBAL_DOH_PROVIDERS[0],
+      'example.com',
+      'A',
+      '',
+      mockFetch as unknown as typeof fetch,
+      6000,
+      controller.signal
+    );
 
-    expect(whois.domain).toBe('example.com');
-    expect(whois.registrar).toContain('Internet Assigned Numbers Authority');
-    expect(whois.creationDate).toBe('1995-08-14T04:00:00Z');
-    expect(whois.expirationDate).toBe('2026-08-13T04:00:00Z');
-    expect(whois.nameServers).toContain('A.IANA-SERVERS.NET');
-  });
+    controller.abort();
+    const result = await query;
 
-  it('queries RDAP registry with mock fetch and parses result', async () => {
-    const mockFetch = vi.fn().mockResolvedValue({
-      ok: true,
-      status: 200,
-      json: async () => MOCK_RDAP_WHOIS_RESPONSE,
-    });
-
-    const whois = await queryWhoisRdap('example.com', mockFetch as unknown as typeof fetch);
-    expect(whois.domain).toBe('example.com');
-    expect(whois.registrar).toBeDefined();
+    expect(mockFetch).toHaveBeenCalledOnce();
+    expect(result.status).toBe('error');
+    expect(result.errorMessage).toBe('Request cancelled');
   });
 
   it('calculates global propagation summary accurately', () => {
@@ -203,7 +214,7 @@ describe('Global DNS Propagation & WHOIS Checker Engine', () => {
     expect(csvText).toContain('Cloudflare');
     expect(csvText).toContain('93.184.215.14');
 
-    const jsonBlob = exportDnsResultsAsJson(mockResults, null, {
+    const jsonBlob = exportDnsResultsAsJson(mockResults, {
       domain: 'example.com',
       recordType: 'A',
       expectedValue: '93.184.215.14',
@@ -211,7 +222,7 @@ describe('Global DNS Propagation & WHOIS Checker Engine', () => {
     expect(jsonBlob).toBeInstanceOf(Blob);
     expect(jsonBlob.type).toContain('application/json');
     const jsonText = await jsonBlob.text();
-    expect(jsonText).toContain('PrivKnife Global DNS Propagation');
+    expect(jsonText).toContain('PrivKnife DNS Resolver Comparison');
   });
 
   it('operates with zero telemetry tracking', () => {

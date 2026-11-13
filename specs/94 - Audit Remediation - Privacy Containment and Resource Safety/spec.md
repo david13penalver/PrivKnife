@@ -1,6 +1,6 @@
 # Spec 94: Audit Remediation - Privacy Containment and Resource Safety
 
-- **Status:** Ready for implementation; tasks unchecked.
+- **Status:** Implementation in progress; acceptance is blocked by AC-94-04 evidence gaps and AC-94-05 bundle-budget failure.
 - **Source:** [Application audit](../../APPLICATION_AUDIT_2026-11-13.md), including the completed lamp follow-up.
 - **Dependencies:** [92: Audit Remediation - Reliable Test and Browser Infrastructure](../92%20-%20Audit%20Remediation%20-%20Reliable%20Test%20and%20Browser%20Infrastructure/spec.md)
 - **Companion documents:** [Plan](plan.md), [Tasks](tasks.md).
@@ -31,4 +31,8 @@ Web Vitals constructs Google PageSpeed requests, contradicting the private-suite
 
 All processing remains client-side with zero telemetry or ingestion. Preserve Angular standalone/lazy loading, Signals, typed forms, BEM/SASS conventions and cleanup requirements from AGENTS.md. No production implementation is performed by this documentation change. Existing specs remain design references; historical “ready”/“complete” labels are not evidence that the current audit gates pass.
 
-Full linguistic certification beyond English/Spanish is deferred. Real-device or unavailable-codec checks must be recorded as blocked, never inferred from Chromium emulation. Workflows and fixtures must stay local.
+Full linguistic certification beyond English/Spanish is deferred. Real-device or unavailable-codec checks must be recorded as blocked, never inferred from Chromium emulation. Workflows and fixtures must stay local. Implementation is included in this spec; no task or acceptance criterion is complete without evidence recorded in [evidence.md](evidence.md).
+
+## Current disposition
+
+The PageSpeed execution path is disabled, the DNS-over-HTTPS exception is disclosed and consent-gated, markup sanitization is centralized, production CSP configurations are present, and all 58 tool routes pass the recorded English/Spanish mobile and desktop browser smoke. AC-94-04 remains open because reset/navigation resource baselines and UI-thread task timings were not instrumented across the applicable tools. AC-94-05 fails: the measured raw initial JavaScript is 352,369 bytes against the 200,000-byte limit. See [evidence.md](evidence.md) for measurements and deployment limitations.

@@ -4,6 +4,7 @@ import {
   SvgOptimizerCleanerResult,
   SvgOptimizationStats,
 } from './types';
+import { sanitizeSvgMarkup as sanitizeWithDomPurify } from '../../../core/security/markup-sanitizer';
 
 /**
  * Validate an SVG string
@@ -136,58 +137,7 @@ function cleanMetadataElements(doc: Document) {
  */
 export function sanitizeSvgMarkup(svgContent: string): string {
   if (!svgContent || typeof svgContent !== 'string') return '';
-  try {
-    const parser = new DOMParser();
-    const doc = parser.parseFromString(svgContent.trim(), 'image/svg+xml');
-    if (doc.querySelector('parsererror')) {
-      return '';
-    }
-
-    // Remove dangerous elements
-    const dangerousTags = [
-      'script',
-      'foreignObject',
-      'foreignobject',
-      'iframe',
-      'object',
-      'embed',
-      'meta',
-      'link',
-      'applet',
-    ];
-    dangerousTags.forEach((tag) => {
-      doc.querySelectorAll(tag).forEach((el) => el.parentNode?.removeChild(el));
-    });
-
-    // Remove on* event attributes and javascript: URLs
-    const allEls = doc.querySelectorAll('*');
-    allEls.forEach((el) => {
-      const toRemove: string[] = [];
-      for (let i = 0; i < el.attributes.length; i++) {
-        const attr = el.attributes[i];
-        const name = attr.name.toLowerCase();
-        const val = attr.value.trim().toLowerCase();
-
-        if (name.startsWith('on')) {
-          toRemove.push(attr.name);
-        } else if (
-          (name === 'href' || name === 'xlink:href') &&
-          (val.startsWith('javascript:') || val.startsWith('data:text/html'))
-        ) {
-          toRemove.push(attr.name);
-        }
-      }
-      toRemove.forEach((a) => el.removeAttribute(a));
-    });
-
-    return new XMLSerializer().serializeToString(doc.documentElement);
-  } catch {
-    return svgContent
-      .replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, '')
-      .replace(/<foreignObject\b[^<]*(?:(?!<\/foreignObject>)<[^<]*)*<\/foreignObject>/gi, '')
-      .replace(/\son\w+\s*=\s*(['"]).*?\1/gi, '')
-      .replace(/href\s*=\s*(['"])javascript:.*?\1/gi, '');
-  }
+  return sanitizeWithDomPurify(svgContent);
 }
 
 /**
@@ -370,7 +320,8 @@ export function optimizeSvg(
   svgContent: string,
   options: SvgOptimizerCleanerOptions
 ): SvgOptimizerCleanerResult {
-  const validation = validateSvg(svgContent);
+  const sanitizedInput = sanitizeWithDomPurify(svgContent);
+  const validation = validateSvg(sanitizedInput);
   if (!validation.isValid) {
     return {
       success: false,
@@ -392,43 +343,9 @@ export function optimizeSvg(
 
   try {
     const parser = new DOMParser();
-    const doc = parser.parseFromString(svgContent.trim(), 'image/svg+xml');
+    const doc = parser.parseFromString(sanitizedInput.trim(), 'image/svg+xml');
     const svgRoot = doc.documentElement;
 
-    // 0. Security sanitization pass: strip executable script tags, foreignObject, on* handlers
-    const dangerousTags = [
-      'script',
-      'foreignObject',
-      'foreignobject',
-      'iframe',
-      'object',
-      'embed',
-      'meta',
-      'link',
-      'applet',
-    ];
-    dangerousTags.forEach((tag) => {
-      doc.querySelectorAll(tag).forEach((el) => el.parentNode?.removeChild(el));
-    });
-
-    const allElements = doc.querySelectorAll('*');
-    allElements.forEach((el) => {
-      const dangerousAttrs: string[] = [];
-      for (let i = 0; i < el.attributes.length; i++) {
-        const attr = el.attributes[i];
-        const aName = attr.name.toLowerCase();
-        const aVal = attr.value.trim().toLowerCase();
-        if (aName.startsWith('on')) {
-          dangerousAttrs.push(attr.name);
-        } else if (
-          (aName === 'href' || aName === 'xlink:href') &&
-          (aVal.startsWith('javascript:') || aVal.startsWith('data:text/html'))
-        ) {
-          dangerousAttrs.push(attr.name);
-        }
-      }
-      dangerousAttrs.forEach((a) => el.removeAttribute(a));
-    });
 
     // 1. Comments
     if (options.stripMetadataComments) {

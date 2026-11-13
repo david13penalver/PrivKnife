@@ -1,11 +1,5 @@
 import { TranslatePipe } from '../../../core/i18n';
-import {
-  Component,
-  ElementRef,
-  OnDestroy,
-  ViewChild,
-  signal,
-} from '@angular/core';
+import { Component, ElementRef, OnDestroy, ViewChild, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import {
@@ -52,13 +46,13 @@ export class DiffCheckerComponent implements OnDestroy {
   readonly syntaxLanguage = signal<SyntaxLanguage>('javascript');
   readonly syncScroll = signal<boolean>(true);
   readonly copiedFeedback = signal<boolean>(false);
+  readonly workerError = signal<string | null>(null);
 
   // Result Signal
-  readonly result = signal<DiffCheckerResult>(
-    computeDiff('', '', DEFAULT_DIFF_OPTIONS)
-  );
+  readonly result = signal<DiffCheckerResult>(computeDiff('', '', DEFAULT_DIFF_OPTIONS));
 
   private triggerDiff() {
+    this.workerError.set(null);
     const orig = this.originalText();
     const mod = this.modifiedText();
     const options: DiffCheckerOptions = {
@@ -76,12 +70,20 @@ export class DiffCheckerComponent implements OnDestroy {
           this.worker = new Worker(new URL('./worker.ts', import.meta.url), {
             type: 'module',
           });
-          this.worker.onmessage = (
-            event: MessageEvent<DiffWorkerResponse>
-          ) => {
+          this.worker.onmessage = (event: MessageEvent<DiffWorkerResponse>) => {
             if (event.data.requestId === this.requestId) {
               this.result.set(event.data.result);
             }
+          };
+          this.worker.onerror = (event: ErrorEvent) => {
+            event.preventDefault();
+            const failedWorker = this.worker;
+            if (!failedWorker) return;
+            failedWorker.onmessage = null;
+            failedWorker.onerror = null;
+            failedWorker.terminate();
+            this.worker = null;
+            this.workerError.set(event.message || 'Diff worker failed. Please try again.');
           };
         }
 
@@ -94,7 +96,10 @@ export class DiffCheckerComponent implements OnDestroy {
         } satisfies DiffWorkerRequest);
         return;
       } catch {
-        // Fall back to synchronous execution
+        this.worker?.terminate();
+        this.worker = null;
+        this.workerError.set('Diff worker could not start. Please try again.');
+        return;
       }
     }
 

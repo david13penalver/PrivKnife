@@ -579,6 +579,9 @@ import {
             </app-card>
 
             <!-- Export Actions Card -->
+            @if (exportError()) {
+              <div class="c-alert c-alert--danger g--margin-bottom-3" role="alert">{{ exportError() }}</div>
+            }
             <div class="c-card" style="padding: 16px;">
               <div class="l-extremo" style="flex-wrap: wrap; gap: 12px;">
                 <div class="l-extremo__area-izquierda g--flex-center" style="gap: 8px;">
@@ -614,6 +617,7 @@ import {
   `,
 })
 export class ParametricLampDesignerComponent implements AfterViewInit, OnDestroy {
+  readonly exportError = signal<string | null>(null);
   @ViewChild('rendererContainer') rendererContainer!: ElementRef<HTMLDivElement>;
 
   readonly Math = Math;
@@ -760,14 +764,16 @@ export class ParametricLampDesignerComponent implements AfterViewInit, OnDestroy
   }
 
   async downloadStl(): Promise<void> {
+    this.exportError.set(null);
     const baseName = `PrivKnife_Shade_${this.config().curveType}_${this.config().height}mm_${this.config().socketPreset.toUpperCase()}`;
     let buffer: ArrayBuffer | undefined;
 
     if (typeof Worker !== 'undefined') {
       try {
         buffer = await this.executeWorkerTask('export-stl');
-      } catch {
-        // Fallback to synchronous in test or restricted environments
+      } catch (error) {
+        this.exportError.set(error instanceof Error ? error.message : 'Lamp export failed. Please try again.');
+        return;
       }
     }
 
@@ -784,6 +790,7 @@ export class ParametricLampDesignerComponent implements AfterViewInit, OnDestroy
   }
 
   async download3mf(): Promise<void> {
+    this.exportError.set(null);
     const baseName = `PrivKnife_Shade_${this.config().curveType}_${this.config().height}mm_${this.config().socketPreset.toUpperCase()}`;
     let blob: Blob | undefined;
 
@@ -793,8 +800,9 @@ export class ParametricLampDesignerComponent implements AfterViewInit, OnDestroy
         blob = new Blob([buffer], {
           type: 'application/vnd.ms-package.3dmanufacturing-3dmodel+xml',
         });
-      } catch {
-        // Fallback
+      } catch (error) {
+        this.exportError.set(error instanceof Error ? error.message : 'Lamp export failed. Please try again.');
+        return;
       }
     }
 
@@ -834,20 +842,31 @@ export class ParametricLampDesignerComponent implements AfterViewInit, OnDestroy
         if (!this.worker) {
           this.worker = new Worker(new URL('./worker', import.meta.url), { type: 'module' });
         }
+        const worker = this.worker;
         const id = Date.now();
         const handler = (e: MessageEvent<LampWorkerResponse>) => {
           if (e.data.id === id) {
             if (e.data.type === 'result' && e.data.buffer) {
-              this.worker?.removeEventListener('message', handler);
+              worker.removeEventListener('message', handler);
+              worker.onerror = null;
               resolve(e.data.buffer);
             } else if (e.data.type === 'error') {
-              this.worker?.removeEventListener('message', handler);
+              worker.removeEventListener('message', handler);
+              worker.onerror = null;
               reject(new Error(e.data.error || 'Worker task failed'));
             }
           }
         };
-        this.worker.addEventListener('message', handler);
-        this.worker.postMessage({ id, type, config: this.config() } as LampWorkerRequest);
+        worker.onerror = (event: ErrorEvent) => {
+          event.preventDefault();
+          worker.removeEventListener('message', handler);
+          worker.onerror = null;
+          worker.terminate();
+          if (this.worker === worker) this.worker = undefined;
+          reject(new Error(event.message || 'Lamp generation worker failed'));
+        };
+        worker.addEventListener('message', handler);
+        worker.postMessage({ id, type, config: this.config() } as LampWorkerRequest);
       } catch (err) {
         reject(err);
       }

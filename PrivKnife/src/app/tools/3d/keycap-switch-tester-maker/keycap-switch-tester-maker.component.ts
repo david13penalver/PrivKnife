@@ -420,6 +420,9 @@ import {
 
               <!-- Export Buttons -->
               <div class="export-actions g--margin-top-4">
+                @if (exportError()) {
+                  <div class="c-alert c-alert--danger g--margin-bottom-3" role="alert">{{ exportError() }}</div>
+                }
                 <div class="export-buttons-grid">
                   <button
                     type="button"
@@ -471,12 +474,14 @@ export class KeycapSwitchTesterMakerComponent implements OnInit, OnDestroy {
   readonly trayTiltAngleDeg = signal<number>(DEFAULT_KEYCAP_OPTIONS.trayTiltAngleDeg);
   readonly trayWallThicknessMm = signal<number>(DEFAULT_KEYCAP_OPTIONS.trayWallThicknessMm);
   readonly isGenerating = signal<boolean>(false);
+  readonly exportError = signal<string | null>(null);
 
   // Active metrics
   readonly currentMetrics = signal<KeycapMetrics | null>(null);
 
   private readonly activeDownloadUrls: string[] = [];
   private worker: Worker | null = null;
+  private workerFailed = false;
   private workerRequestId = 0;
 
   // Three.js scene instances
@@ -498,7 +503,10 @@ export class KeycapSwitchTesterMakerComponent implements OnInit, OnDestroy {
     if (typeof Worker !== 'undefined') {
       try {
         this.worker = new Worker(new URL('./worker.ts', import.meta.url), { type: 'module' });
-      } catch {}
+      } catch {
+        this.workerFailed = true;
+        this.exportError.set('Export worker could not start. Please reload the tool and try again.');
+      }
     }
     this.initThree();
     this.updatePreviewMesh();
@@ -589,7 +597,9 @@ export class KeycapSwitchTesterMakerComponent implements OnInit, OnDestroy {
   }
 
   async downloadFormat(format: KeycapExportFormat): Promise<void> {
+    if (this.workerFailed) return;
     this.isGenerating.set(true);
+    this.exportError.set(null);
     try {
       const options = this.getCurrentOptions();
       let blob: Blob;
@@ -598,13 +608,16 @@ export class KeycapSwitchTesterMakerComponent implements OnInit, OnDestroy {
       if (this.worker) {
         const id = ++this.workerRequestId;
         const result = await new Promise<{ blob: Blob; fileName: string }>((resolve, reject) => {
+          const worker = this.worker!;
           const handler = (e: MessageEvent<KeycapWorkerResponse>) => {
             if (e.data.id === id) {
               if (e.data.type === 'error') {
-                this.worker?.removeEventListener('message', handler);
+                worker.removeEventListener('message', handler);
+                worker.onerror = null;
                 reject(new Error(e.data.error || 'Worker export error'));
               } else if (e.data.type === 'result') {
-                this.worker?.removeEventListener('message', handler);
+                worker.removeEventListener('message', handler);
+                worker.onerror = null;
                 if (e.data.buffer && e.data.fileName) {
                   const b = new Blob([e.data.buffer], {
                     type: e.data.mimeType || 'application/octet-stream',
@@ -616,13 +629,22 @@ export class KeycapSwitchTesterMakerComponent implements OnInit, OnDestroy {
               }
             }
           };
-          this.worker?.addEventListener('message', handler);
+          worker.onerror = (event: ErrorEvent) => {
+            event.preventDefault();
+            worker.removeEventListener('message', handler);
+            worker.onerror = null;
+            worker.terminate();
+            this.workerFailed = true;
+            this.worker = null;
+            reject(new Error(event.message || 'Keycap export worker failed'));
+          };
+          worker.addEventListener('message', handler);
           const request: KeycapWorkerRequest = {
             id,
             options,
             format,
           };
-          this.worker?.postMessage(request);
+          worker.postMessage(request);
         });
         blob = result.blob;
         fileName = result.fileName;
@@ -636,6 +658,8 @@ export class KeycapSwitchTesterMakerComponent implements OnInit, OnDestroy {
       }
 
       this.triggerFileDownload(blob, fileName);
+    } catch (error) {
+      this.exportError.set(error instanceof Error ? error.message : 'Keycap export failed. Please try again.');
     } finally {
       this.isGenerating.set(false);
     }

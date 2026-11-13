@@ -231,12 +231,19 @@ export const es: TranslationSchema = {
       description: 'Elimina fondos de fotos de retratos, productos y gráficos con IA ejecutándose 100% de forma local en tu navegador.',
     },
     dnsChecker: {
-      name: 'Verificador Global de Propagación DNS y WHOIS',
-      description: 'Consulta registros DNS mundiales (A, AAAA, MX, CNAME, TXT) e información WHOIS mediante DNS-over-HTTPS directo.',
+      name: 'Comparador de resolutores DNS',
+      description: 'Compara las respuestas DNS de resolutores públicos. Las consultas se envían directamente desde el navegador solo después de revisar y autorizar el envío.',
+      externalRequestTitle: 'Esta consulta sale de tu dispositivo',
+      externalRequestDisclosure: 'Al ejecutar una consulta, el dominio y el tipo de registro seleccionados se envían directamente a Cloudflare (cloudflare-dns.com), Google Public DNS (dns.google), Quad9 (dns.quad9.net:5053) y AdGuard DNS (dns.adguard-dns.com). Estos proveedores independientes pueden registrar las consultas. PrivKnife no recibe la consulta; el valor esperado y tus archivos no se envían.',
+      externalRequestConsent: 'Entiendo y autorizo el envío del dominio y el tipo de registro a estos proveedores DNS cuando ejecute una consulta.',
+      consentRequired: 'Revisa y acepta la información de privacidad antes de ejecutar una consulta DNS.',
+      runQuery: 'Comprobar DNS',
     },
     webVitals: {
       name: 'Analizador de Rendimiento Web y Core Web Vitals',
       description: 'Audita velocidad, accesibilidad y métricas Core Web Vitals (LCP, INP, CLS) con diagnósticos y consejos prácticos.',
+      disabledTitle: 'Esta herramienta no está disponible',
+      disabledDescription: 'El analizador anterior enviaba la dirección del sitio web a Google PageSpeed para procesarla. PrivKnife no envía direcciones a servicios de terceros, por lo que esta herramienta se ha desactivado. Puedes usar las herramientas de desarrollo integradas en tu navegador para revisar el rendimiento localmente.',
     },
     parametricLampDesigner: {
       name: 'Diseñador Paramétrico 3D de Lámparas y Pantallas',
@@ -319,6 +326,9 @@ export const es: TranslationSchema = {
         twist: 'Giro Reloj de Arena',
         origami: 'Farol Origami',
         cocoon: 'Capullo Voronoi',
+        empire: 'Pliegues imperiales',
+        ripple: 'Ondulación en espiral',
+        vase: 'Jarrón espiral moderno',
       },
       filaments: {
         warmwhite: 'PLA Blanco Cálido',

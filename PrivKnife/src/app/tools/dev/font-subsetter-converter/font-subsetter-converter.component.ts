@@ -34,17 +34,17 @@ export class FontSubsetterConverterComponent implements OnDestroy {
   readonly dropLayoutFeatures = signal<boolean>(true);
   readonly outputFormat = signal<FontOutputFormat>('woff2');
   readonly fontFamilyName = signal<string>('CustomFont');
-  readonly specimenText = signal<string>(
-    'The quick brown fox jumps over the lazy dog 1234567890'
-  );
+  readonly specimenText = signal<string>('The quick brown fox jumps over the lazy dog 1234567890');
   readonly specimenFontSize = signal<number>(24);
   readonly copiedCssFeedback = signal<boolean>(false);
   readonly previewFontFamily = signal<string>('inherit');
 
   // Result Signal
   readonly result = signal<FontSubsetterConverterResult | null>(null);
+  readonly workerError = signal<string | null>(null);
 
   private triggerSubset() {
+    this.workerError.set(null);
     const buffer = this.fontBuffer();
     if (!buffer) {
       this.result.set(null);
@@ -67,12 +67,23 @@ export class FontSubsetterConverterComponent implements OnDestroy {
           this.worker = new Worker(new URL('./worker.ts', import.meta.url), {
             type: 'module',
           });
-          this.worker.onmessage = (
-            event: MessageEvent<FontSubsetWorkerResponse>
-          ) => {
+          this.worker.onmessage = (event: MessageEvent<FontSubsetWorkerResponse>) => {
             if (event.data.id === this.requestId) {
               this.applyResult(event.data.result);
             }
+          };
+          this.worker.onerror = (event: ErrorEvent) => {
+            event.preventDefault();
+            const failedWorker = this.worker;
+            if (!failedWorker) return;
+            failedWorker.onmessage = null;
+            failedWorker.onerror = null;
+            failedWorker.terminate();
+            this.worker = null;
+            this.workerError.set(
+              event.message || 'Font subsetting worker failed. Please try again.',
+            );
+            this.previewFontFamily.set('inherit');
           };
         }
 
@@ -84,7 +95,11 @@ export class FontSubsetterConverterComponent implements OnDestroy {
         } satisfies FontSubsetWorkerRequest);
         return;
       } catch {
-        // Fall back to synchronous execution
+        this.worker?.terminate();
+        this.worker = null;
+        this.workerError.set('Font subsetting worker could not start. Please try again.');
+        this.previewFontFamily.set('inherit');
+        return;
       }
     }
 

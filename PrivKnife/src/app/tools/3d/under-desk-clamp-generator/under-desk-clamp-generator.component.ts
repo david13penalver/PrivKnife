@@ -390,6 +390,9 @@ import {
 
               <!-- Export Bar -->
               <div class="export-box g--margin-top-4">
+                @if (exportError()) {
+                  <div class="c-alert c-alert--danger g--margin-bottom-3" role="alert">{{ exportError() }}</div>
+                }
                 <div class="export-format-selector">
                   <label class="c-input__label">Export Format:</label>
                   <div class="format-radios">
@@ -456,6 +459,7 @@ export class UnderDeskClampGeneratorComponent implements OnInit, AfterViewInit, 
   readonly explodedView = signal<boolean>(false);
   readonly exportFormat = signal<'stl' | '3mf'>('stl');
   readonly isGenerating = signal<boolean>(false);
+  readonly exportError = signal<string | null>(null);
 
   readonly presets = CLAMP_PRESETS;
 
@@ -480,6 +484,7 @@ export class UnderDeskClampGeneratorComponent implements OnInit, AfterViewInit, 
   // Track created object URLs for memory hygiene
   private activeDownloadUrls: string[] = [];
   private worker?: Worker;
+  private workerFailed = false;
 
   // Three.js Scene References
   private scene: THREE.Scene | null = null;
@@ -502,7 +507,8 @@ export class UnderDeskClampGeneratorComponent implements OnInit, AfterViewInit, 
       try {
         this.worker = new Worker(new URL('./worker.ts', import.meta.url), { type: 'module' });
       } catch {
-        // Fallback to inline engine execution
+        this.workerFailed = true;
+        this.exportError.set('Export worker could not start. Please reload the tool and try again.');
       }
     }
     this.rebuildMesh();
@@ -682,7 +688,9 @@ export class UnderDeskClampGeneratorComponent implements OnInit, AfterViewInit, 
   // --- DOWNLOAD ACTIONS ---
 
   async downloadFormat(format: 'stl' | '3mf'): Promise<void> {
+    if (this.workerFailed) return;
     this.isGenerating.set(true);
+    this.exportError.set(null);
 
     const options: UnderDeskClampGeneratorOptions = {
       deskThicknessMm: this.deskThicknessMm(),
@@ -702,13 +710,16 @@ export class UnderDeskClampGeneratorComponent implements OnInit, AfterViewInit, 
       if (this.worker) {
         await new Promise<void>((resolve, reject) => {
           const reqId = Date.now();
+          const worker = this.worker!;
           const handler = (event: MessageEvent<UnderDeskClampWorkerResponse>) => {
             if (event.data.id !== reqId) return;
             if (event.data.type === 'error') {
-              this.worker?.removeEventListener('message', handler);
+              worker.removeEventListener('message', handler);
+              worker.onerror = null;
               reject(new Error(event.data.error || 'Export failed'));
             } else if (event.data.type === 'result' && event.data.buffer) {
-              this.worker?.removeEventListener('message', handler);
+              worker.removeEventListener('message', handler);
+              worker.onerror = null;
               const blob = new Blob([event.data.buffer], {
                 type: event.data.mimeType || 'application/octet-stream',
               });
@@ -716,8 +727,17 @@ export class UnderDeskClampGeneratorComponent implements OnInit, AfterViewInit, 
               resolve();
             }
           };
-          this.worker!.addEventListener('message', handler);
-          this.worker!.postMessage({ id: reqId, options, format } as UnderDeskClampWorkerRequest);
+          worker.onerror = (event: ErrorEvent) => {
+            event.preventDefault();
+            worker.removeEventListener('message', handler);
+            worker.onerror = null;
+            worker.terminate();
+            this.workerFailed = true;
+            if (this.worker === worker) this.worker = undefined;
+            reject(new Error(event.message || 'Clamp export worker failed'));
+          };
+          worker.addEventListener('message', handler);
+          worker.postMessage({ id: reqId, options, format } as UnderDeskClampWorkerRequest);
         });
       } else {
         const result = await processClamp(options, format);
@@ -725,12 +745,8 @@ export class UnderDeskClampGeneratorComponent implements OnInit, AfterViewInit, 
           this.triggerFileDownload(result.blob, result.fileName);
         }
       }
-    } catch {
-      // In case worker fails, fallback to inline
-      const result = await processClamp(options, format);
-      if (result.success && result.blob) {
-        this.triggerFileDownload(result.blob, result.fileName);
-      }
+    } catch (error) {
+      this.exportError.set(error instanceof Error ? error.message : 'Clamp export failed. Please try again.');
     } finally {
       this.isGenerating.set(false);
     }

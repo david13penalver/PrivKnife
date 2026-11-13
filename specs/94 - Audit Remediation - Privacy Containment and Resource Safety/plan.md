@@ -40,3 +40,7 @@ Run focused checks for each repair, then the owning spec acceptance suite. Use t
 ## Completion rule
 
 All tasks and acceptance criteria require evidence. Fixes discovered outside this scope belong to the owning spec and remain linked blockers until resolved. Do not mark a spec complete solely because unit tests pass, a file downloads, or a page loads.
+
+## Current progress
+
+Implementation and browser verification are recorded in [evidence.md](evidence.md). Privacy containment, sanitizer regression tests, worker error handling, route smoke, and production build evidence are present. Do not advance this spec to complete while AC-94-04 is unverified and AC-94-05 exceeds its raw-byte budget.

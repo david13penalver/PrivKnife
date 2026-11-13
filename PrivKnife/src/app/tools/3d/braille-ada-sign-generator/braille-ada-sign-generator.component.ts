@@ -396,6 +396,9 @@ import {
               }
 
               <!-- Export Buttons -->
+              @if (exportError()) {
+                <div class="c-alert c-alert--danger g--margin-bottom-3" role="alert">{{ exportError() }}</div>
+              }
               <div class="export-actions g--margin-top-4">
                 <div class="export-btn-group">
                   <button
@@ -435,6 +438,7 @@ export class BrailleAdaSignGeneratorComponent implements OnInit, OnDestroy {
   canvasWrapper!: ElementRef<HTMLDivElement>;
 
   readonly presets: SignPreset[] = SIGN_PRESETS;
+  readonly exportError = signal<string | null>(null);
 
   // Sign Configuration Signals
   readonly roomTitle = signal<string>(DEFAULT_BRAILLE_SIGN_OPTIONS.roomTitle);
@@ -467,6 +471,7 @@ export class BrailleAdaSignGeneratorComponent implements OnInit, OnDestroy {
 
   // Web Worker offloading
   private worker: Worker | null = null;
+  private workerFailed = false;
   private workerRequestId = 0;
 
   // Three.js scene instances
@@ -489,7 +494,8 @@ export class BrailleAdaSignGeneratorComponent implements OnInit, OnDestroy {
       try {
         this.worker = new Worker(new URL('./worker.ts', import.meta.url), { type: 'module' });
       } catch {
-        // Fallback to inline processing
+        this.workerFailed = true;
+        this.exportError.set('Export worker could not start. Please reload the tool and try again.');
       }
     }
     this.initThree();
@@ -625,21 +631,26 @@ export class BrailleAdaSignGeneratorComponent implements OnInit, OnDestroy {
   }
 
   async downloadFormat(format: SignExportFormat): Promise<void> {
+    if (this.workerFailed) return;
     this.isGenerating.set(true);
+    this.exportError.set(null);
     const options = this.getCurrentOptions();
 
     try {
       if (this.worker) {
         const reqId = ++this.workerRequestId;
         await new Promise<void>((resolve, reject) => {
+          const worker = this.worker!;
           const handler = (event: MessageEvent<BrailleAdaSignWorkerResponse>) => {
             if (event.data.id !== reqId) return;
 
             if (event.data.type === 'error') {
               this.worker?.removeEventListener('message', handler);
+              worker.onerror = null;
               reject(new Error(event.data.error || 'Export failed'));
             } else if (event.data.type === 'result' && event.data.buffer) {
               this.worker?.removeEventListener('message', handler);
+              worker.onerror = null;
               const blob = new Blob([event.data.buffer], {
                 type: event.data.mimeType || 'application/octet-stream',
               });
@@ -647,7 +658,16 @@ export class BrailleAdaSignGeneratorComponent implements OnInit, OnDestroy {
               resolve();
             }
           };
-          this.worker!.addEventListener('message', handler);
+          worker.onerror = (event: ErrorEvent) => {
+            event.preventDefault();
+            worker.removeEventListener('message', handler);
+            worker.onerror = null;
+            worker.terminate();
+            this.workerFailed = true;
+            if (this.worker === worker) this.worker = null;
+            reject(new Error(event.message || 'ADA sign export worker failed'));
+          };
+          worker.addEventListener('message', handler);
           this.worker!.postMessage({ id: reqId, options, format } as BrailleAdaSignWorkerRequest);
         });
       } else {
@@ -656,11 +676,8 @@ export class BrailleAdaSignGeneratorComponent implements OnInit, OnDestroy {
           this.triggerFileDownload(result.blob, result.fileName);
         }
       }
-    } catch {
-      const result = await processSign(options, format);
-      if (result.success && result.blob) {
-        this.triggerFileDownload(result.blob, result.fileName);
-      }
+    } catch (error) {
+      this.exportError.set(error instanceof Error ? error.message : 'Sign export failed. Please try again.');
     } finally {
       this.isGenerating.set(false);
     }

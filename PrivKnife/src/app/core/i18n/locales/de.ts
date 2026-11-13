@@ -231,12 +231,19 @@ export const de: TranslationSchema = {
       description: 'Entfernen Sie Hintergründe von Porträts und Produkten mit lokaler KI direkt und privat in Ihrem Browser.',
     },
     dnsChecker: {
-      name: 'Weltweiter DNS-Propagierungs- & WHOIS-Prüfer',
-      description: 'Überprüfen Sie weltweite DNS-Einträge (A, AAAA, MX, CNAME, TXT) und WHOIS-Daten via direktem Browser-DoH.',
+      name: 'DNS-Resolver vergleichen',
+      description: 'Vergleichen Sie DNS-Antworten öffentlicher Resolver. Abfragen werden erst nach Ihrer Prüfung und Zustimmung direkt aus dem Browser gesendet.',
+      externalRequestTitle: 'Diese Abfrage verlässt Ihr Gerät',
+      externalRequestDisclosure: 'Beim Start werden die ausgewählte Domain und der Record-Typ direkt an Cloudflare (cloudflare-dns.com), Google Public DNS (dns.google), Quad9 (dns.quad9.net:5053) und AdGuard DNS (dns.adguard-dns.com) gesendet. Diese unabhängigen Anbieter können Abfragen protokollieren. PrivKnife erhält die Abfrage nicht; Ihr Sollwert und Ihre Dateien werden nicht gesendet.',
+      externalRequestConsent: 'Ich verstehe und stimme zu, dass Domain und Record-Typ beim Start an diese DNS-Anbieter gesendet werden.',
+      consentRequired: 'Bitte lesen und bestätigen Sie den DNS-Datenschutzhinweis, bevor Sie eine Abfrage starten.',
+      runQuery: 'DNS prüfen',
     },
     webVitals: {
       name: 'Website-Geschwindigkeits- & Core-Web-Vitals-Prüfer',
       description: 'Überprüfen Sie Leistung, Barrierefreiheit und Core Web Vitals (LCP, INP, CLS) mit praktischen Optimierungstipps.',
+      disabledTitle: 'Dieses Tool ist nicht verfügbar',
+      disabledDescription: 'Der frühere Prüfer hat die Website-Adresse zur Verarbeitung an Google PageSpeed gesendet. PrivKnife sendet keine Zieladressen an Drittanbieter; deshalb wurde dieses Tool deaktiviert. Für lokale Leistungstests können Sie die integrierten Entwicklertools Ihres Browsers verwenden.',
     },
     parametricLampDesigner: {
       name: '3D Parametrischer Lampen- & Schirm-Designer',
@@ -319,6 +326,9 @@ export const de: TranslationSchema = {
         twist: 'Sanduhr-Drehung',
         origami: 'Origami-Laterne',
         cocoon: 'Voronoi-Kokon',
+        empire: 'Empire-Falten',
+        ripple: 'Wirbelwelle',
+        vase: 'Moderne Spiralvase',
       },
       filaments: {
         warmwhite: 'Warmweißes PLA',

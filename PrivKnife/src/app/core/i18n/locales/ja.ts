@@ -231,12 +231,19 @@ export const ja: TranslationSchema = {
       description: 'ブラウザ内蔵 AI により、人物、商品、イラストの背景を 100% ローカル処理で瞬時に自動消去。',
     },
     dnsChecker: {
-      name: 'グローバル DNS 伝播 & WHOIS チェッカー',
-      description: 'ブラウザ直結の DNS-over-HTTPS を使用し、世界中の DNS レコード (A, AAAA, MX, CNAME, TXT) とドメイン情報を確認。',
+      name: 'DNSリゾルバー比較',
+      description: '公開DNSリゾルバーの応答を比較します。内容を確認して許可した後にのみ、ブラウザーから直接クエリを送信します。',
+      externalRequestTitle: 'このクエリは端末外へ送信されます',
+      externalRequestDisclosure: 'クエリを実行すると、選択したドメインとレコードタイプがCloudflare (cloudflare-dns.com)、Google Public DNS (dns.google)、Quad9 (dns.quad9.net:5053)、AdGuard DNS (dns.adguard-dns.com) に直接送信されます。各プロバイダーはクエリを記録する場合があります。PrivKnifeはクエリを受信しません。期待値やファイルは送信されません。',
+      externalRequestConsent: 'クエリ実行時にドメインとレコードタイプをこれらのDNSプロバイダーへ送信することを理解し、許可します。',
+      consentRequired: 'DNSクエリを実行する前に、プライバシー情報を確認して同意してください。',
+      runQuery: 'DNSを確認',
     },
     webVitals: {
       name: 'ウェブサイト パフォーマンス & Core Web Vitals 診断',
       description: '表示速度、アクセシビリティ、Core Web Vitals (LCP, INP, CLS) を診断し、実践的な改善アドバイスを提供。',
+      disabledTitle: 'このツールは利用できません',
+      disabledDescription: '以前のチェッカーは、処理のためにウェブサイトのアドレスをGoogle PageSpeedへ送信していました。PrivKnifeは対象アドレスを第三者サービスへ送信しないため、このツールを無効にしました。ローカルでの性能確認にはブラウザー内蔵の開発者ツールをご利用ください。',
     },
     parametricLampDesigner: {
       name: '3Dパラメトリックランプ＆シェードデザイナー',
@@ -319,6 +326,9 @@ export const ja: TranslationSchema = {
         twist: 'アワーグラスツイスト',
         origami: '折り紙ランタン',
         cocoon: 'ボロノイコクーン',
+        empire: 'エンパイアプリーツ',
+        ripple: '渦巻きリップル',
+        vase: 'モダンスパイラル花瓶',
       },
       filaments: {
         warmwhite: 'ウォームホワイト PLA',

@@ -463,7 +463,7 @@ describe('ToolRegistry (Seam 3: Catalog & Architecture Verification)', () => {
   it('should find dns-checker tool by id and category', () => {
     const tool = getToolById('dns-checker');
     expect(tool).toBeDefined();
-    expect(tool?.name).toBe('Global DNS Propagation & WHOIS Checker');
+    expect(tool?.name).toBe('DNS Resolver Comparison');
     expect(tool?.category).toBe('dev');
     expect(tool?.isFullyClientSide).toBe(true);
 
@@ -471,15 +471,9 @@ describe('ToolRegistry (Seam 3: Catalog & Architecture Verification)', () => {
     expect(devTools.some((t) => t.id === 'dns-checker')).toBe(true);
   });
 
-  it('should find web-vitals tool by id and category', () => {
-    const tool = getToolById('web-vitals');
-    expect(tool).toBeDefined();
-    expect(tool?.name).toBe('Website Performance & Core Web Vitals Checker');
-    expect(tool?.category).toBe('dev');
-    expect(tool?.isFullyClientSide).toBe(true);
-
-    const devTools = getToolsByCategory('dev');
-    expect(devTools.some((t) => t.id === 'web-vitals')).toBe(true);
+  it('does not list the disabled web-vitals tool in the catalog', () => {
+    expect(getToolById('web-vitals')).toBeUndefined();
+    expect(getToolsByCategory('dev').some((tool) => tool.id === 'web-vitals')).toBe(false);
   });
 
   it('should find face-plate-blur tool by id and category', () => {

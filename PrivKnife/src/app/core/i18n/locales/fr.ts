@@ -231,12 +231,19 @@ export const fr: TranslationSchema = {
       description: 'Supprimez l\'arrière-plan de portraits, produits et graphismes grâce à une IA tournant 100% dans votre navigateur.',
     },
     dnsChecker: {
-      name: 'Vérificateur Mondial de Propagation DNS & WHOIS',
-      description: 'Consultez les enregistrements DNS mondiaux (A, AAAA, MX, CNAME, TXT) et WHOIS via DNS-over-HTTPS direct.',
+      name: 'Comparateur de résolveurs DNS',
+      description: 'Comparez les réponses DNS de résolveurs publics. Les requêtes ne sont envoyées directement depuis le navigateur qu’après lecture et autorisation.',
+      externalRequestTitle: 'Cette requête quitte votre appareil',
+      externalRequestDisclosure: 'Lors du lancement, le domaine et le type d’enregistrement choisis sont envoyés directement à Cloudflare (cloudflare-dns.com), Google Public DNS (dns.google), Quad9 (dns.quad9.net:5053) et AdGuard DNS (dns.adguard-dns.com). Ces fournisseurs indépendants peuvent journaliser les requêtes. PrivKnife ne reçoit pas la requête ; la valeur attendue et vos fichiers ne sont pas envoyés.',
+      externalRequestConsent: 'Je comprends et j’autorise l’envoi du domaine et du type d’enregistrement à ces fournisseurs DNS lorsque je lance une requête.',
+      consentRequired: 'Veuillez lire et accepter l’avis de confidentialité DNS avant de lancer une requête.',
+      runQuery: 'Vérifier le DNS',
     },
     webVitals: {
       name: 'Vérificateur de Performance Web & Core Web Vitals',
       description: 'Auditez la vitesse, l\'accessibilité et les Core Web Vitals (LCP, INP, CLS) avec diagnostics pour développeurs.',
+      disabledTitle: 'Cet outil est indisponible',
+      disabledDescription: 'L’ancien vérificateur envoyait l’adresse du site à Google PageSpeed pour traitement. PrivKnife n’envoie pas d’adresses cibles à des services tiers ; cet outil a donc été désactivé. Utilisez les outils de développement intégrés à votre navigateur pour vérifier les performances localement.',
     },
     parametricLampDesigner: {
       name: 'Concepteur Paramétrique 3D de Lampes et Abat-jour',
@@ -319,6 +326,9 @@ export const fr: TranslationSchema = {
         twist: 'Torsion Sablier',
         origami: 'Lanterne Origami',
         cocoon: 'Cocon Voronoi',
+        empire: 'Plis Empire',
+        ripple: 'Ondulation tourbillonnante',
+        vase: 'Vase spirale moderne',
       },
       filaments: {
         warmwhite: 'PLA Blanc Chaud',

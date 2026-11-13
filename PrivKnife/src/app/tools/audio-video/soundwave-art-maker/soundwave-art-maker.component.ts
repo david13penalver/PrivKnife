@@ -9,6 +9,7 @@ import {
 } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
+import { sanitizeSvgMarkup } from '../../../core/security/markup-sanitizer';
 import { Badge } from '../../../components/badge/badge';
 import { Dropzone } from '../../../components/dropzone/dropzone';
 import { Card } from '../../../components/card/card';
@@ -429,7 +430,7 @@ export class SoundwaveArtMakerComponent implements OnInit {
   );
 
   readonly safeSvgPreview = computed<SafeHtml>(() =>
-    this.sanitizer.bypassSecurityTrustHtml(this.svgPreview())
+    this.sanitizer.bypassSecurityTrustHtml(sanitizeSvgMarkup(this.svgPreview()))
   );
 
   private mediaRecorder: MediaRecorder | null = null;

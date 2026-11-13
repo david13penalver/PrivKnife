@@ -2,14 +2,13 @@ import { ToolDefinition } from '../../../core/models/tool.model';
 
 export const dnsCheckerTool: ToolDefinition = {
   id: 'dns-checker',
-  name: 'Global DNS Propagation & WHOIS Checker',
+  name: 'DNS Resolver Comparison',
   category: 'dev',
   description:
-    'Verify DNS record propagation across multiple global Anycast resolvers in real time using direct browser DNS-over-HTTPS (DoH) and inspect RDAP domain registration records.',
+    'Compare DNS answers from public resolvers using direct, explicitly authorized DNS-over-HTTPS requests from your browser.',
   keywords: [
     'dns propagation checker',
     'check A record propagation',
-    'online whois lookup tool',
     'test mx record global',
     'dns over https checker',
     'browser doh lookup',

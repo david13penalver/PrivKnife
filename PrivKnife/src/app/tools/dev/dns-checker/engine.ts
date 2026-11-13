@@ -4,7 +4,6 @@ import {
   DnsRecordType,
   DohProvider,
   PropagationSummary,
-  WhoisResult,
 } from './types';
 
 // RFC 1035 / IANA DNS record type numbers
@@ -120,12 +119,16 @@ export async function queryDohProvider(
   recordType: DnsRecordType,
   expectedValue: string,
   fetchImpl: typeof fetch = window.fetch.bind(window),
-  timeoutMs: number = 6000
+  timeoutMs: number = 6000,
+  parentSignal?: AbortSignal
 ): Promise<DnsQueryResult> {
   const queryUrl = buildDohQueryUrl(provider, domain, recordType);
   const startTime = performance.now();
 
   const controller = new AbortController();
+  const abortFromParent = () => controller.abort(parentSignal?.reason);
+  if (parentSignal?.aborted) abortFromParent();
+  else parentSignal?.addEventListener('abort', abortFromParent, { once: true });
   const timer = setTimeout(() => controller.abort(), timeoutMs);
 
   try {
@@ -137,10 +140,8 @@ export async function queryDohProvider(
       signal: controller.signal,
     });
 
-    clearTimeout(timer);
-    const latencyMs = Math.round(performance.now() - startTime);
-
     if (!response.ok) {
+      const latencyMs = Math.round(performance.now() - startTime);
       return {
         providerId: provider.id,
         providerName: provider.name,
@@ -156,6 +157,7 @@ export async function queryDohProvider(
     }
 
     const data = await response.json();
+    const latencyMs = Math.round(performance.now() - startTime);
     const { records, ttl, matchesExpected } = parseDohResponse(data, recordType, expectedValue);
 
     return {
@@ -172,7 +174,6 @@ export async function queryDohProvider(
       errorMessage: records.length === 0 ? 'No records found' : undefined,
     };
   } catch (err: any) {
-    clearTimeout(timer);
     const latencyMs = Math.round(performance.now() - startTime);
     const isTimeout = err?.name === 'AbortError';
 
@@ -186,105 +187,11 @@ export async function queryDohProvider(
       latencyMs,
       records: [],
       matchesExpected: false,
-      errorMessage: isTimeout ? 'Request timed out' : 'Network/CORS error',
+      errorMessage: parentSignal?.aborted ? 'Request cancelled' : isTimeout ? 'Request timed out' : 'Network/CORS error',
     };
-  }
-}
-
-/**
- * Parses RDAP JSON domain response into structured WHOIS details.
- */
-export function parseRdapResponse(data: any, domain: string): WhoisResult {
-  const result: WhoisResult = {
-    domain,
-    nameServers: [],
-    status: [],
-    dnssec: false,
-    rawJson: JSON.stringify(data, null, 2),
-  };
-
-  if (!data) return result;
-
-  // Registrar from entities
-  if (Array.isArray(data.entities)) {
-    const registrarEntity = data.entities.find((e: any) =>
-      Array.isArray(e.roles) && e.roles.includes('registrar')
-    );
-    if (registrarEntity) {
-      if (Array.isArray(registrarEntity.vcardArray?.[1])) {
-        const fnItem = registrarEntity.vcardArray[1].find((item: any) => item[0] === 'fn');
-        if (fnItem && fnItem[3]) {
-          result.registrar = String(fnItem[3]);
-        }
-      }
-      if (!result.registrar && registrarEntity.handle) {
-        result.registrar = registrarEntity.handle;
-      }
-    }
-  }
-
-  // Dates from events
-  if (Array.isArray(data.events)) {
-    for (const ev of data.events) {
-      if (ev.eventAction === 'registration') {
-        result.creationDate = ev.eventDate;
-      } else if (ev.eventAction === 'expiration') {
-        result.expirationDate = ev.eventDate;
-      } else if (ev.eventAction === 'last changed') {
-        result.updatedDate = ev.eventDate;
-      }
-    }
-  }
-
-  // Nameservers
-  if (Array.isArray(data.nameservers)) {
-    result.nameServers = data.nameservers
-      .map((ns: any) => ns.ldhName || ns.handle)
-      .filter(Boolean);
-  }
-
-  // Status flags
-  if (Array.isArray(data.status)) {
-    result.status = data.status;
-  }
-
-  // DNSSEC
-  if (data.secureDNS?.delegationSigned) {
-    result.dnssec = true;
-  }
-
-  return result;
-}
-
-/**
- * Queries RDAP registry directly from browser for WHOIS registration data.
- */
-export async function queryWhoisRdap(
-  domain: string,
-  fetchImpl: typeof fetch = window.fetch.bind(window)
-): Promise<WhoisResult> {
-  const clean = sanitizeDomain(domain);
-  const rdapUrl = `https://rdap.org/domain/${clean}`;
-
-  try {
-    const response = await fetchImpl(rdapUrl, {
-      headers: { Accept: 'application/rdap+json, application/json' },
-    });
-    if (!response.ok) {
-      return {
-        domain: clean,
-        nameServers: [],
-        status: [`HTTP ${response.status}`],
-      };
-    }
-    const data = await response.json();
-    return parseRdapResponse(data, clean);
-  } catch {
-    return {
-      domain: clean,
-      nameServers: [],
-      status: ['Lookup failed / offline'],
-    };
+  } finally {
+    clearTimeout(timer);
+    parentSignal?.removeEventListener('abort', abortFromParent);
   }
 }
 
@@ -341,11 +248,10 @@ export function exportDnsResultsAsCsv(
   domain: string,
   recordType: DnsRecordType
 ): Blob {
-  const headers = ['Region', 'City', 'Provider', 'IP', 'Status', 'Resolved Records', 'TTL (s)', 'Latency (ms)'];
+  const headers = ['Provider', 'Resolver host', 'IP', 'Status', 'Resolved Records', 'TTL (s)', 'Latency (ms)'];
   const rows = results.map((r) => [
-    `"${r.region}"`,
-    `"${r.city}"`,
     `"${r.providerName}"`,
+    `"${r.city}"`,
     `"${r.ip}"`,
     `"${r.matchesExpected ? 'MATCH' : r.status.toUpperCase()}"`,
     `"${r.records.join(', ')}"`,
@@ -358,20 +264,18 @@ export function exportDnsResultsAsCsv(
 }
 
 /**
- * Exports complete DNS and WHOIS audit as a JSON report blob.
+ * Exports a DNS resolver comparison as a JSON report blob.
  */
 export function exportDnsResultsAsJson(
   results: DnsQueryResult[],
-  whois: WhoisResult | null,
   config: DnsCheckerConfig
 ): Blob {
   const payload = {
-    tool: 'PrivKnife Global DNS Propagation & WHOIS Checker',
+    tool: 'PrivKnife DNS Resolver Comparison',
     generatedAt: new Date().toISOString(),
     config,
     summary: calculatePropagationSummary(results, config.expectedValue),
     results,
-    whois,
   };
 
   return new Blob([JSON.stringify(payload, null, 2)], {

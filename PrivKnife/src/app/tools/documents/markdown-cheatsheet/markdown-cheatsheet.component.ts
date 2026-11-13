@@ -9,6 +9,7 @@ import {
 } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
+import { sanitizeHtmlMarkup } from '../../../core/security/markup-sanitizer';
 import { Badge } from '../../../components/badge/badge';
 import { Button } from '../../../components/button/button';
 import { Card } from '../../../components/card/card';
@@ -536,7 +537,7 @@ export class MarkdownCheatsheetComponent implements OnInit {
 
   readonly renderedHtml = computed(() => generateCheatsheetPreviewHtml(this.config()));
   readonly safePreviewHtml = computed<SafeHtml>(() =>
-    this.sanitizer.bypassSecurityTrustHtml(this.renderedHtml())
+    this.sanitizer.bypassSecurityTrustHtml(sanitizeHtmlMarkup(this.renderedHtml()))
   );
 
   ngOnInit(): void {

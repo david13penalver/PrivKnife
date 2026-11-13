@@ -529,18 +529,17 @@ export const routes: Routes = [
   },
   {
     path: 'tools/dns-checker',
-    title: 'Global DNS Propagation & WHOIS Checker — PrivKnife',
+    title: 'DNS Resolver Comparison — PrivKnife',
     data: {
       description:
-        'Verify DNS record propagation across multiple global Anycast resolvers in real time using direct browser DNS-over-HTTPS (DoH) and inspect RDAP domain registration records.',
+        'Compare DNS answers from selected public resolvers with direct browser DNS-over-HTTPS requests after reviewing the disclosure and authorizing the query.',
       keywords: [
-        'dns propagation checker',
-        'check A record propagation',
-        'online whois lookup tool',
-        'test mx record global',
+        'dns resolver comparison',
+        'check DNS records',
+        'public DNS resolver',
+        'compare A and MX records',
         'dns over https checker',
         'browser doh lookup',
-        'global dns lookup tool',
       ],
       url: '/tools/dns-checker',
     },
@@ -559,19 +558,11 @@ export const routes: Routes = [
   },
   {
     path: 'tools/web-vitals',
-    title: 'Website Performance & Core Web Vitals Checker — PrivKnife',
+    title: 'Web Vitals checker unavailable — PrivKnife privacy notice',
     data: {
       description:
-        'Audit page loading speed, inspect official Google Core Web Vitals (LCP, INP, CLS, FCP, TTFB), and receive actionable developer diagnostics directly from your browser.',
-      keywords: [
-        'check website speed online',
-        'core web vitals checker',
-        'free page speed test',
-        'lighthouse audit online',
-        'lcp cls inp checker',
-        'website performance test',
-        'mobile speed test online',
-      ],
+        'This legacy route is disabled because its PageSpeed service sends the submitted website URL to Google for processing.',
+      keywords: ['privacy notice', 'disabled tool'],
       url: '/tools/web-vitals',
     },
     loadComponent: () =>

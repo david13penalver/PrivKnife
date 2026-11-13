@@ -9,6 +9,7 @@ import {
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
+import { sanitizeSvgMarkup } from '../../../core/security/markup-sanitizer';
 import {
   LabelExportFormat,
   NutritionLabelMakerOptions,
@@ -85,7 +86,7 @@ export class NutritionLabelMakerComponent implements OnDestroy {
   liveSvg = computed<string>(() => generateNutritionLabelSvg(this.currentOptions()));
 
   safeLiveSvg = computed<SafeHtml>(() =>
-    this.sanitizer.bypassSecurityTrustHtml(this.liveSvg())
+    this.sanitizer.bypassSecurityTrustHtml(sanitizeSvgMarkup(this.liveSvg()))
   );
 
   ngOnDestroy(): void {

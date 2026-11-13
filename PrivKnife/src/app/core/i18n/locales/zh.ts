@@ -231,12 +231,19 @@ export const zh: TranslationSchema = {
       description: '100% 在浏览器本地运行轻量 AI，精准抠出人像、商品及图形照片的主体。',
     },
     dnsChecker: {
-      name: '全球 DNS 解析记录与 WHOIS 查询',
-      description: '通过浏览器原生 DNS-over-HTTPS 直接查询全球 DNS 记录 (A, AAAA, MX, CNAME, TXT) 与域名信息。',
+      name: 'DNS 解析器比较',
+      description: '比较公共 DNS 解析器的响应。只有在查看并授权披露后，浏览器才会直接发送查询。',
+      externalRequestTitle: '此查询会离开您的设备',
+      externalRequestDisclosure: '运行查询时，所选域名和记录类型将直接发送给 Cloudflare (cloudflare-dns.com)、Google Public DNS (dns.google)、Quad9 (dns.quad9.net:5053) 和 AdGuard DNS (dns.adguard-dns.com)。这些独立服务可能记录查询。PrivKnife 不会接收查询；预期值和文件不会发送。',
+      externalRequestConsent: '我了解并授权在运行查询时向这些 DNS 服务发送域名和记录类型。',
+      consentRequired: '运行 DNS 查询前，请先阅读并同意隐私说明。',
+      runQuery: '检查 DNS',
     },
     webVitals: {
       name: '网页性能与 Core Web Vitals 检测诊断',
       description: '评估页面性能、无障碍性及核心性能指标 (LCP, INP, CLS)，并提供实用的优化建议。',
+      disabledTitle: '此工具暂不可用',
+      disabledDescription: '旧版检测器会将网站地址发送给 Google PageSpeed 处理。PrivKnife 不会将目标地址发送给第三方服务，因此已停用此工具。您可以使用浏览器内置开发者工具在本地检查性能。',
     },
     parametricLampDesigner: {
       name: '3D参数化台灯与灯罩设计器',
@@ -319,6 +326,9 @@ export const zh: TranslationSchema = {
         twist: '沙漏旋风',
         origami: '折纸灯笼',
         cocoon: 'Voronoi茧房',
+        empire: '帝国褶皱',
+        ripple: '漩涡波纹',
+        vase: '现代螺旋花瓶',
       },
       filaments: {
         warmwhite: '暖白 PLA',
