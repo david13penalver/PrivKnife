@@ -50,15 +50,6 @@ import {
         </p>
       </div>
 
-      <!-- Top Leaderboard Ad Slot (728x90) -->
-      <div class="l-columns__area g--margin-bottom-6 g--text-center print-hidden">
-        <div
-          class="ad-slot ad-slot--leaderboard"
-          style="max-width: 728px; height: 90px; margin: 0 auto; background: var(--color-bg-subtle); border: 1px dashed var(--color-border-subtle); border-radius: var(--radius-md); display: flex; align-items: center; justify-content: center; color: var(--color-text-muted); font-size: 0.75rem;">
-          <span>Responsive Ad Placement (728x90 Top Leaderboard)</span>
-        </div>
-      </div>
-
       <!-- Mobile Tab Switcher -->
       <div class="l-columns__area mobile-tab-bar g--margin-bottom-4 print-hidden">
         <div class="g--flex-center" style="gap: 8px;">
@@ -85,7 +76,7 @@ import {
 
       <!-- Main Two-Column Layout -->
       <div class="l-columns l-columns--2 tent-workspace" style="gap: 28px; align-items: start;">
-        
+
         <!-- LEFT COLUMN: Configurator Sidebar -->
         <div
           class="l-columns__area controls-pane print-hidden"
@@ -428,26 +419,18 @@ import {
             </app-button>
           </div>
 
-          <!-- Sidebar Ad Slot (300x250) -->
-          <div class="g--margin-bottom-4 g--text-center">
-            <div
-              class="ad-slot ad-slot--sidebar"
-              style="width: 300px; height: 250px; margin: 0 auto; background: var(--color-bg-subtle); border: 1px dashed var(--color-border-subtle); border-radius: var(--radius-md); display: flex; align-items: center; justify-content: center; color: var(--color-text-muted); font-size: 0.75rem;">
-              <span>Responsive Ad Placement (300x250 Medium Rectangle)</span>
-            </div>
-          </div>
         </div>
 
         <!-- RIGHT COLUMN: Interactive Live Simulated Sheet Preview -->
         <div
           class="l-columns__area preview-pane"
           [class.mobile-hidden]="activeMobileTab() === 'controls'">
-          
+
           <app-card [title]="previewTitle()">
             <div
               class="sheet-preview-viewport"
               style="background: #e2e8f0; padding: 24px; border-radius: var(--radius-md); display: flex; justify-content: center; overflow-x: auto;">
-              
+
               <!-- Simulated Sheet -->
               <div
                 class="simulated-sheet"
@@ -465,7 +448,7 @@ import {
                   box-sizing: border-box;
                   overflow: hidden;
                 ">
-                
+
                 <!-- TOP PANEL (Face A - Inverted 180°) -->
                 <div
                   class="panel-face panel-face--inverted"
@@ -482,7 +465,7 @@ import {
                     box-sizing: border-box;
                     text-align: center;
                   ">
-                  
+
                   <span
                     style="
                       font-size: 0.625rem;
@@ -567,7 +550,7 @@ import {
                     box-sizing: border-box;
                     text-align: center;
                   ">
-                  
+
                   @let back = effectiveBackPanel();
                   @if (config().showTableNumberBadge && back.tableNumber) {
                     <span
@@ -645,7 +628,7 @@ import {
         <div
           class="modal-card"
           style="background: #ffffff; border-radius: var(--radius-lg, 12px); max-width: 500px; width: 100%; padding: 24px; box-shadow: 0 10px 30px rgba(0,0,0,0.25);">
-          
+
           <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 12px;">
             <div style="font-size: 2rem;">⛺</div>
             <div>
@@ -666,13 +649,6 @@ import {
           <p style="font-size: 0.8125rem; color: #475569; margin-bottom: 16px; line-height: 1.4;">
             <strong>How to assemble:</strong> Print on heavy paper or cardstock (80 lb / 200+ gsm). Score lightly along the dashed line with a ruler, fold in half, and place on the table. Face A will be right-side up!
           </p>
-
-          <!-- Modal Ad Slot -->
-          <div
-            class="ad-slot ad-slot--modal"
-            style="width: 100%; height: 120px; background: var(--color-bg-subtle, #f8fafc); border: 1px dashed var(--color-border-subtle, #cbd5e1); border-radius: 6px; display: flex; align-items: center; justify-content: center; color: var(--color-text-muted, #94a3b8); font-size: 0.75rem; margin-bottom: 16px;">
-            <span>Responsive Ad Placement</span>
-          </div>
 
           <div style="display: flex; justify-content: flex-end;">
             <app-button variant="primary" (clicked)="closeDownloadModal()">

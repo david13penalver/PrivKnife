@@ -53,15 +53,6 @@ import {
         </p>
       </div>
 
-      <!-- Top Leaderboard Ad Slot (728x90) -->
-      <div class="l-columns__area g--margin-bottom-6 g--text-center print-hidden">
-        <div
-          class="ad-slot ad-slot--leaderboard"
-          style="max-width: 728px; height: 90px; margin: 0 auto; background: var(--color-bg-subtle); border: 1px dashed var(--color-border-subtle); border-radius: var(--radius-md); display: flex; align-items: center; justify-content: center; color: var(--color-text-muted); font-size: 0.75rem;">
-          <span>Responsive Ad Placement (728x90 Top Leaderboard)</span>
-        </div>
-      </div>
-
       <!-- Mobile Tab Switcher -->
       <div class="l-columns__area mobile-tab-bar g--margin-bottom-4 print-hidden">
         <div class="g--flex-center" style="gap: 8px;">
@@ -88,7 +79,7 @@ import {
 
       <!-- Main Two-Column Layout -->
       <div class="l-columns l-columns--2 barcode-workspace" style="gap: 28px; align-items: start;">
-        
+
         <!-- LEFT COLUMN: Configurator Sidebar -->
         <div
           class="l-columns__area controls-pane print-hidden"
@@ -382,15 +373,6 @@ import {
             </app-button>
           </div>
 
-          <!-- Sidebar Ad Slot (300x250) -->
-          <div class="g--margin-bottom-4 g--text-center">
-            <div
-              class="ad-slot ad-slot--sidebar"
-              style="width: 300px; height: 250px; margin: 0 auto; background: var(--color-bg-subtle); border: 1px dashed var(--color-border-subtle); border-radius: var(--radius-md); display: flex; align-items: center; justify-content: center; color: var(--color-text-muted); font-size: 0.75rem;">
-              <span>Responsive Ad Placement (300x250 Medium Rectangle)</span>
-            </div>
-          </div>
-
           <!-- Legal Avery Disclaimer -->
           <p style="font-size: 0.75rem; color: var(--color-text-muted); line-height: 1.4; border-top: 1px solid var(--color-border-subtle); padding-top: 12px;">
             *Avery&reg; and Avery product numbers are registered trademarks of CCL Label, Inc. PrivKnife is an independent software tool and is not affiliated with, endorsed by, or sponsored by Avery or CCL Label, Inc. Dimensions and layout templates are provided solely for compatibility and alignment.
@@ -401,12 +383,12 @@ import {
         <div
           class="l-columns__area preview-pane"
           [class.mobile-hidden]="activeMobileTab() === 'controls'">
-          
+
           <app-card [title]="previewSheetTitle()">
             <div
               class="sheet-preview-container"
               style="background: #e2e8f0; padding: 20px; border-radius: var(--radius-md); display: flex; justify-content: center; overflow-x: auto;">
-              
+
               <!-- Printable Sheet Canvas Simulated Page -->
               <div
                 class="simulated-sheet"
@@ -424,7 +406,7 @@ import {
                   padding: 12px;
                   box-sizing: border-box;
                 ">
-                
+
                 @for (pos of positions(); track pos.index) {
                   @if (pos.index < config().startOffsetIndex) {
                     <!-- Skipped Label Slot -->
@@ -464,7 +446,7 @@ import {
                         box-sizing: border-box;
                         overflow: hidden;
                       ">
-                      
+
                       @if (item.title) {
                         <div style="font-size: 0.625rem; font-weight: 700; color: #0f172a; text-align: center; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 100%;">
                           {{ item.title }}
@@ -513,7 +495,7 @@ import {
         <div
           class="modal-card"
           style="background: #ffffff; border-radius: var(--radius-lg, 12px); max-width: 500px; width: 100%; padding: 24px; box-shadow: 0 10px 30px rgba(0,0,0,0.25);">
-          
+
           <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 12px;">
             <div style="font-size: 2rem;">✅</div>
             <div>
@@ -528,13 +510,6 @@ import {
           <div
             style="background: #fef3c7; border: 1px solid #f59e0b; border-radius: 6px; padding: 12px; margin-bottom: 16px; font-size: 0.8125rem; color: #92400e;">
             <strong>⚠️ Crucial Printer Setting:</strong> When printing from Adobe Acrobat or your browser, select <strong>Actual Size</strong> or set Page Scale to <strong>100%</strong>. Never choose "Fit to Page", or labels will misalign with sticker cuts!
-          </div>
-
-          <!-- Modal Ad Slot -->
-          <div
-            class="ad-slot ad-slot--modal"
-            style="width: 100%; height: 120px; background: var(--color-bg-subtle, #f8fafc); border: 1px dashed var(--color-border-subtle, #cbd5e1); border-radius: 6px; display: flex; align-items: center; justify-content: center; color: var(--color-text-muted, #94a3b8); font-size: 0.75rem; margin-bottom: 16px;">
-            <span>Responsive Ad Placement</span>
           </div>
 
           <div style="display: flex; justify-content: flex-end;">

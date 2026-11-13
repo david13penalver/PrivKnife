@@ -1,0 +1,218 @@
+[
+  {
+    "route": "tools/parametric-lamp-designer",
+    "lang": "en",
+    "width": 390,
+    "errors": [],
+    "failed": [],
+    "h1": "3D Parametric Lamp & Lampshade Designer",
+    "documentLang": "en",
+    "title": "3D Parametric Lamp & Lampshade Designer — PrivKnife",
+    "overflow": false,
+    "ads": [],
+    "canvases": [
+      {
+        "width": 324,
+        "height": 380,
+        "rect": {
+          "x": 33,
+          "y": 639.796875,
+          "width": 324,
+          "height": 380,
+          "top": 639.796875,
+          "right": 357,
+          "bottom": 1019.796875,
+          "left": 33
+        }
+      }
+    ],
+    "text": "🇨🇭\nPrivKnife\n🇺🇸\nEN\n▼\n🌙 Dark\n🛡️ 100% In-Browser • Never Leaves Your Device\n3D Parametric Lamp & Lampshade Designer\n\nDesign bespoke spiral, ribbed, fluted, and Voronoi lampshades with standard E27, E14, or IKEA socket adapters and vase mode support.\n\nCurated Presets:\nNordic Flute\nOrigami Lantern\ntools.parametricLampDesigner.presets.empire\ntools.parametricLampDesigner.presets.ripple\ntools.parametricLampDesigner.presets.vase\n↺ Reset Defaults\n1. Silhouette & Proportions\nSilhouette Profile:\nSpline (Organic Bezier)\nConical (Two-Stage Flared)\nHourglass (Pinched Waist)\nBulbous (Rounded Lantern)\nS-Curve (Bell Flare)\nTotal Height:\n190 mm\nTop Radius:\n52 mm\nBottom Radius:\n70 mm\nMid/Waist Radius:\n88 mm\nWaist Height Pos:\n45%\nRadial Resolution:\n180 segments\n2. Ribs, Fluting & Surface Texture\nRib Wave Shape:\nSmooth Sine Flutes\nSharp Origami Pleats\nRounded Scalloped Arches\nFlat-Top Fluted Grooves\nVoronoi Cellular Relief\nRib Count:\n28\nRib Depth:\n6.5 mm\nSpiral Twist Angle:\n110°\nVertical Waves:\n0\nWave Amplitude:\n0 mm\n3. 3D Print & Socket Mount\nPrint Mode:\nWatertight Hollow Shell\nSpiralize Vase Mode\nWall Thickness:\n1.6 mm\nSocket Preset:\nE27 (41.0 mm)\nE14 (28.0 mm)\nIKEA Stråla (34.0 mm)\nCustom Diameter\nNone (Pure Shade)\nMount Position:\nBottom (Table / Floor)\nTop (Pendant Hanging)\nSpoke Count:\n4\nSpoke Width:\n6 mm\n4. Filament Simulation (Preview Only)\nWarm White PLA\nTranslucent Natural PETG\nAmber Glow PETG\nTerracotta Matte PLA\nSage Green Silk PLA\nBed: 256×256 mm\nTriangles: 70,392\n💡 Bulb ON\nMesh\nReset View\nManufacturing Telemetry & Slicer Settings\nDIMENSIONS\n190.1 × 190.1 × 190 mm\nEST. FILAMENT\n~248 grams\nEST. PRINT TIME\n~8.9 hours\nRecommended Slicer Instructions:\nPrint with 0% infill and 3-4 perimeter walls for translucent diffusion.\nNo supports needed: overhangs and collar spokes are self-supporting.\nRecommended layer height 0.16mm - 0.20mm for smooth slope transitions.\n📷 High-Res PNG\nDownload .3MF Archive\nDownload Print-Ready .STL\n© 2026 PrivKnife. Open Source under MIT License.\n🛡️\nZero Server Storage • Zero Telemetry • Zero Cookies\nPrivacy\nTerms\nUI Kit\nGitHub\nContact & Issues",
+    "buttons": [
+      "🇺🇸\nEN\n▼",
+      "🌙 Dark",
+      "Nordic Flute",
+      "Origami Lantern",
+      "tools.parametricLampDesigner.presets.empire",
+      "tools.parametricLampDesigner.presets.ripple",
+      "tools.parametricLampDesigner.presets.vase",
+      "↺ Reset Defaults",
+      "Watertight Hollow Shell",
+      "Spiralize Vase Mode",
+      "Warm White PLA",
+      "Translucent Natural PETG",
+      "Amber Glow PETG",
+      "Terracotta Matte PLA",
+      "Sage Green Silk PLA",
+      "💡 Bulb ON",
+      "Mesh",
+      "Reset View",
+      "📷 High-Res PNG",
+      "Download .3MF Archive",
+      "Download Print-Ready .STL"
+    ],
+    "elapsedMs": 1512,
+    "pendingRequests": []
+  },
+  {
+    "route": "tools/parametric-lamp-designer",
+    "lang": "en",
+    "width": 1440,
+    "errors": [],
+    "failed": [],
+    "h1": "3D Parametric Lamp & Lampshade Designer",
+    "documentLang": "en",
+    "title": "3D Parametric Lamp & Lampshade Designer — PrivKnife",
+    "overflow": false,
+    "ads": [],
+    "canvases": [
+      {
+        "width": 693,
+        "height": 520,
+        "rect": {
+          "x": 633.671875,
+          "y": 450.75,
+          "width": 693,
+          "height": 520,
+          "top": 450.75,
+          "right": 1326.671875,
+          "bottom": 970.75,
+          "left": 633.671875
+        }
+      }
+    ],
+    "text": "🇨🇭\nPrivKnife\nPrivate In-Browser Toolkit\n100% In-Browser\n🇺🇸\nEN\n▼\n🌙 Dark\n🛡️ 100% In-Browser • Never Leaves Your Device\n3D Parametric Lamp & Lampshade Designer\n\nDesign bespoke spiral, ribbed, fluted, and Voronoi lampshades with standard E27, E14, or IKEA socket adapters and vase mode support.\n\nCurated Presets:\nNordic Flute\nOrigami Lantern\ntools.parametricLampDesigner.presets.empire\ntools.parametricLampDesigner.presets.ripple\ntools.parametricLampDesigner.presets.vase\n↺ Reset Defaults\n1. Silhouette & Proportions\nSilhouette Profile:\nSpline (Organic Bezier)\nConical (Two-Stage Flared)\nHourglass (Pinched Waist)\nBulbous (Rounded Lantern)\nS-Curve (Bell Flare)\nTotal Height:\n190 mm\nTop Radius:\n52 mm\nBottom Radius:\n70 mm\nMid/Waist Radius:\n88 mm\nWaist Height Pos:\n45%\nRadial Resolution:\n180 segments\n2. Ribs, Fluting & Surface Texture\nRib Wave Shape:\nSmooth Sine Flutes\nSharp Origami Pleats\nRounded Scalloped Arches\nFlat-Top Fluted Grooves\nVoronoi Cellular Relief\nRib Count:\n28\nRib Depth:\n6.5 mm\nSpiral Twist Angle:\n110°\nVertical Waves:\n0\nWave Amplitude:\n0 mm\n3. 3D Print & Socket Mount\nPrint Mode:\nWatertight Hollow Shell\nSpiralize Vase Mode\nWall Thickness:\n1.6 mm\nSocket Preset:\nE27 (41.0 mm)\nE14 (28.0 mm)\nIKEA Stråla (34.0 mm)\nCustom Diameter\nNone (Pure Shade)\nMount Position:\nBottom (Table / Floor)\nTop (Pendant Hanging)\nSpoke Count:\n4\nSpoke Width:\n6 mm\n4. Filament Simulation (Preview Only)\nWarm White PLA\nTranslucent Natural PETG\nAmber Glow PETG\nTerracotta Matte PLA\nSage Green Silk PLA\nBed: 256×256 mm\nTriangles: 70,392\n💡 Bulb ON\nMesh\nReset View\nManufacturing Telemetry & Slicer Settings\nDIMENSIONS\n190.1 × 190.1 × 190 mm\nEST. FILAMENT\n~248 grams\nEST. PRINT TIME\n~8.9 hours\nRecommended Slicer Instructions:\nPrint with 0% infill and 3-4 perimeter walls for translucent diffusion.\nNo supports needed: overhangs and collar spokes are self-supporting.\nRecommended layer height 0.16mm - 0.20mm for smooth slope transitions.\n📷 High-Res PNG\nDownload .3MF Archive\nDownload Print-Ready .STL\n© 2026 PrivKnife. Open Source under MIT License.\n🛡️\nZero Server Storage • Zero Telemetry • Zero Cookies\nPrivacy\nTerms\nUI Kit\nGitHub\nContact & Issues",
+    "buttons": [
+      "🇺🇸\nEN\n▼",
+      "🌙 Dark",
+      "Nordic Flute",
+      "Origami Lantern",
+      "tools.parametricLampDesigner.presets.empire",
+      "tools.parametricLampDesigner.presets.ripple",
+      "tools.parametricLampDesigner.presets.vase",
+      "↺ Reset Defaults",
+      "Watertight Hollow Shell",
+      "Spiralize Vase Mode",
+      "Warm White PLA",
+      "Translucent Natural PETG",
+      "Amber Glow PETG",
+      "Terracotta Matte PLA",
+      "Sage Green Silk PLA",
+      "💡 Bulb ON",
+      "Mesh",
+      "Reset View",
+      "📷 High-Res PNG",
+      "Download .3MF Archive",
+      "Download Print-Ready .STL"
+    ],
+    "elapsedMs": 1694,
+    "pendingRequests": []
+  },
+  {
+    "route": "tools/parametric-lamp-designer",
+    "lang": "es",
+    "width": 390,
+    "errors": [],
+    "failed": [],
+    "h1": "Diseñador Paramétrico 3D de Lámparas y Pantallas",
+    "documentLang": "es",
+    "title": "3D Parametric Lamp & Lampshade Designer — PrivKnife",
+    "overflow": false,
+    "ads": [],
+    "canvases": [
+      {
+        "width": 324,
+        "height": 380,
+        "rect": {
+          "x": 33,
+          "y": 685.921875,
+          "width": 324,
+          "height": 380,
+          "top": 685.921875,
+          "right": 357,
+          "bottom": 1065.921875,
+          "left": 33
+        }
+      }
+    ],
+    "text": "🇨🇭\nPrivKnife\n🇪🇸\nES\n▼\n🌙 Oscuro\n🛡️ 100% en el Navegador • Nunca Sale de tu Dispositivo\nDiseñador Paramétrico 3D de Lámparas y Pantallas\n\nDiseñe pantallas de lámpara espirales, acanaladas, estriadas y Voronoi con adaptadores E27, E14 o IKEA y soporte de modo jarrón.\n\nPreajustes Seleccionados:\nFlauta Nórdica\nFarol Origami\ntools.parametricLampDesigner.presets.empire\ntools.parametricLampDesigner.presets.ripple\ntools.parametricLampDesigner.presets.vase\n↺ Restablecer Valores\n1. Silueta y Proporciones\nPerfil de Silueta:\nSpline (Bézier Orgánico)\nCónico (Campana en Dos Fases)\nReloj de Arena (Cintura Ceñida)\nBulboso (Farol Redondeado)\nCurva en S (Campana Acampanada)\nAltura Total:\n190 mm\nRadio Superior:\n52 mm\nRadio Inferior:\n70 mm\nRadio Central / Cintura:\n88 mm\nPosición de Altura de Cintura:\n45%\nResolución Radial:\n180 segmentos\n2. Costillas, Acanalado y Textura de Superficie\nForma de Onda de Costillas:\nOndas Sinusoidales Suaves\nPliegues Origami Afilados\nArcos Festoneados Redondeados\nRanuras Estriadas Planas\nRelieve Celular Voronoi\nNúmero de Costillas:\n28\nProfundidad de Costillas:\n6.5 mm\nÁngulo de Torsión Espiral:\n110°\nOndas Verticales:\n0\nAmplitud de Onda:\n0 mm\n3. Impresión 3D y Soporte de Casquillo\nModo de Impresión:\nCarcasa Hueca Estanca\nModo Vaso Espiralizado\nGrosor de Pared:\n1.6 mm\nPreajuste de Casquillo:\nE27 (41,0 mm)\nE14 (28,0 mm)\nIKEA Stråla (34,0 mm)\nDiámetro Personalizado\nNinguno (Solo Pantalla)\nPosición de Montaje:\nInferior (Mesa / Suelo)\nSuperior (Colgante)\nNúmero de Radios:\n4\nAnchura de Radios:\n6 mm\n4. Simulación de Filamento (Solo Vista Previa)\nPLA Blanco Cálido\nPETG Natural Translúcido\nPETG Resplandor Ámbar\nPLA Mate Terracota\nPLA Seda Verde Salvia\nCama: 256×256 mm\nTriángulos: 70,392\n💡 Bombilla ENCENDIDA\nMalla\nRestablecer Vista\nTelemetría de Fabricación y Ajustes de Laminador\nDIMENSIONES\n190.1 × 190.1 × 190 mm\nFILAMENTO EST.\n~248 gramos\nTIEMPO DE IMPRESIÓN EST.\n~8.9 horas\nInstrucciones Recomendadas para el Laminador:\nImprima con 0% de relleno y 3-4 paredes perimetrales para una difusión translúcida.\nSin soportes necesarios: los voladizos y radios del casquillo son autosoportados.\nAltura de capa recomendada: 0,16 mm - 0,20 mm para transiciones suaves.\n📷 PNG de Alta Resolución\nDescargar Archivo .3MF\nDescargar .STL Listo para Imprimir\n© 2026 PrivKnife. Código abierto bajo Licencia MIT.\n🛡️\nCero Almacenamiento en Servidor • Cero Telemetría • Cero Cookies\nPrivacidad\nTérminos\nKit de UI\nGitHub\nContacto & Problemas",
+    "buttons": [
+      "🇪🇸\nES\n▼",
+      "🌙 Oscuro",
+      "Flauta Nórdica",
+      "Farol Origami",
+      "tools.parametricLampDesigner.presets.empire",
+      "tools.parametricLampDesigner.presets.ripple",
+      "tools.parametricLampDesigner.presets.vase",
+      "↺ Restablecer Valores",
+      "Carcasa Hueca Estanca",
+      "Modo Vaso Espiralizado",
+      "PLA Blanco Cálido",
+      "PETG Natural Translúcido",
+      "PETG Resplandor Ámbar",
+      "PLA Mate Terracota",
+      "PLA Seda Verde Salvia",
+      "💡 Bombilla ENCENDIDA",
+      "Malla",
+      "Restablecer Vista",
+      "📷 PNG de Alta Resolución",
+      "Descargar Archivo .3MF",
+      "Descargar .STL Listo para Imprimir"
+    ],
+    "elapsedMs": 1497,
+    "pendingRequests": []
+  },
+  {
+    "route": "tools/parametric-lamp-designer",
+    "lang": "es",
+    "width": 1440,
+    "errors": [],
+    "failed": [],
+    "h1": "Diseñador Paramétrico 3D de Lámparas y Pantallas",
+    "documentLang": "es",
+    "title": "3D Parametric Lamp & Lampshade Designer — PrivKnife",
+    "overflow": false,
+    "ads": [],
+    "canvases": [
+      {
+        "width": 693,
+        "height": 520,
+        "rect": {
+          "x": 633.671875,
+          "y": 450.75,
+          "width": 693,
+          "height": 520,
+          "top": 450.75,
+          "right": 1326.671875,
+          "bottom": 970.75,
+          "left": 633.671875
+        }
+      }
+    ],
+    "text": "🇨🇭\nPrivKnife\nCaja de Herramientas Privada en el Navegador\n100% en el Navegador\n🇪🇸\nES\n▼\n🌙 Oscuro\n🛡️ 100% en el Navegador • Nunca Sale de tu Dispositivo\nDiseñador Paramétrico 3D de Lámparas y Pantallas\n\nDiseñe pantallas de lámpara espirales, acanaladas, estriadas y Voronoi con adaptadores E27, E14 o IKEA y soporte de modo jarrón.\n\nPreajustes Seleccionados:\nFlauta Nórdica\nFarol Origami\ntools.parametricLampDesigner.presets.empire\ntools.parametricLampDesigner.presets.ripple\ntools.parametricLampDesigner.presets.vase\n↺ Restablecer Valores\n1. Silueta y Proporciones\nPerfil de Silueta:\nSpline (Bézier Orgánico)\nCónico (Campana en Dos Fases)\nReloj de Arena (Cintura Ceñida)\nBulboso (Farol Redondeado)\nCurva en S (Campana Acampanada)\nAltura Total:\n190 mm\nRadio Superior:\n52 mm\nRadio Inferior:\n70 mm\nRadio Central / Cintura:\n88 mm\nPosición de Altura de Cintura:\n45%\nResolución Radial:\n180 segmentos\n2. Costillas, Acanalado y Textura de Superficie\nForma de Onda de Costillas:\nOndas Sinusoidales Suaves\nPliegues Origami Afilados\nArcos Festoneados Redondeados\nRanuras Estriadas Planas\nRelieve Celular Voronoi\nNúmero de Costillas:\n28\nProfundidad de Costillas:\n6.5 mm\nÁngulo de Torsión Espiral:\n110°\nOndas Verticales:\n0\nAmplitud de Onda:\n0 mm\n3. Impresión 3D y Soporte de Casquillo\nModo de Impresión:\nCarcasa Hueca Estanca\nModo Vaso Espiralizado\nGrosor de Pared:\n1.6 mm\nPreajuste de Casquillo:\nE27 (41,0 mm)\nE14 (28,0 mm)\nIKEA Stråla (34,0 mm)\nDiámetro Personalizado\nNinguno (Solo Pantalla)\nPosición de Montaje:\nInferior (Mesa / Suelo)\nSuperior (Colgante)\nNúmero de Radios:\n4\nAnchura de Radios:\n6 mm\n4. Simulación de Filamento (Solo Vista Previa)\nPLA Blanco Cálido\nPETG Natural Translúcido\nPETG Resplandor Ámbar\nPLA Mate Terracota\nPLA Seda Verde Salvia\nCama: 256×256 mm\nTriángulos: 70,392\n💡 Bombilla ENCENDIDA\nMalla\nRestablecer Vista\nTelemetría de Fabricación y Ajustes de Laminador\nDIMENSIONES\n190.1 × 190.1 × 190 mm\nFILAMENTO EST.\n~248 gramos\nTIEMPO DE IMPRESIÓN EST.\n~8.9 horas\nInstrucciones Recomendadas para el Laminador:\nImprima con 0% de relleno y 3-4 paredes perimetrales para una difusión translúcida.\nSin soportes necesarios: los voladizos y radios del casquillo son autosoportados.\nAltura de capa recomendada: 0,16 mm - 0,20 mm para transiciones suaves.\n📷 PNG de Alta Resolución\nDescargar Archivo .3MF\nDescargar .STL Listo para Imprimir\n© 2026 PrivKnife. Código abierto bajo Licencia MIT.\n🛡️\nCero Almacenamiento en Servidor • Cero Telemetría • Cero Cookies\nPrivacidad\nTérminos\nKit de UI\nGitHub\nContacto & Problemas",
+    "buttons": [
+      "🇪🇸\nES\n▼",
+      "🌙 Oscuro",
+      "Flauta Nórdica",
+      "Farol Origami",
+      "tools.parametricLampDesigner.presets.empire",
+      "tools.parametricLampDesigner.presets.ripple",
+      "tools.parametricLampDesigner.presets.vase",
+      "↺ Restablecer Valores",
+      "Carcasa Hueca Estanca",
+      "Modo Vaso Espiralizado",
+      "PLA Blanco Cálido",
+      "PETG Natural Translúcido",
+      "PETG Resplandor Ámbar",
+      "PLA Mate Terracota",
+      "PLA Seda Verde Salvia",
+      "💡 Bombilla ENCENDIDA",
+      "Malla",
+      "Restablecer Vista",
+      "📷 PNG de Alta Resolución",
+      "Descargar Archivo .3MF",
+      "Descargar .STL Listo para Imprimir"
+    ],
+    "elapsedMs": 1681,
+    "pendingRequests": []
+  }
+]

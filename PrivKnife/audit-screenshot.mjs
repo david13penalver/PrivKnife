@@ -1,0 +1,2 @@
+import puppeteer from 'puppeteer-core';
+const b=await puppeteer.launch({executablePath:'/usr/bin/chromium',headless:true,args:['--no-sandbox']});const p=await b.newPage();await p.setViewport({width:390,height:844,isMobile:true,hasTouch:true});await p.evaluateOnNewDocument(()=>{try{localStorage.setItem('privknife_lang','es')}catch{}});await p.goto('http://localhost:4200/tools/invoice-maker',{waitUntil:'networkidle0'});await p.screenshot({path:'../audit-evidence/invoice-es-mobile.png',fullPage:true});await b.close();

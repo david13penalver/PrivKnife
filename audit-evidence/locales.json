@@ -1,0 +1,23 @@
+{
+  "englishKeys": 479,
+  "spanishKeys": 479,
+  "missing": [],
+  "identical": [
+    {
+      "key": "common.brandName",
+      "text": "PrivKnife"
+    },
+    {
+      "key": "common.error",
+      "text": "Error"
+    },
+    {
+      "key": "header.title",
+      "text": "PrivKnife"
+    },
+    {
+      "key": "footer.githubLink",
+      "text": "GitHub"
+    }
+  ]
+}

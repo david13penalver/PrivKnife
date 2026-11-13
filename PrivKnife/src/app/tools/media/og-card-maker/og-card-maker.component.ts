@@ -51,18 +51,9 @@ export type MockupTab = 'studio' | 'twitter' | 'linkedin' | 'meta';
         </p>
       </div>
 
-      <!-- Top Leaderboard Ad Slot (728x90) -->
-      <div class="l-columns__area g--margin-bottom-6 g--text-center print-hidden">
-        <div
-          class="ad-slot ad-slot--leaderboard"
-          style="max-width: 728px; height: 90px; margin: 0 auto; background: var(--color-bg-subtle); border: 1px dashed var(--color-border-subtle); border-radius: var(--radius-md); display: flex; align-items: center; justify-content: center; color: var(--color-text-muted); font-size: 0.75rem;">
-          <span>Responsive Ad Placement (728x90 Top Leaderboard)</span>
-        </div>
-      </div>
-
       <!-- Main Studio 2-Column Grid -->
       <div class="l-columns l-columns--2 og-workspace g--margin-bottom-6" style="gap: 24px; align-items: start;">
-        
+
         <!-- Left: Controls Panel -->
         <div class="l-columns__area" style="display: flex; flex-direction: column; gap: 20px;">
           <!-- 1. Templates Selection -->
@@ -475,12 +466,6 @@ export type MockupTab = 'studio' | 'twitter' | 'linkedin' | 'meta';
             </div>
           </app-card>
 
-          <!-- Sidebar Ad Slot (300x250) -->
-          <div
-            class="ad-slot ad-slot--sidebar print-hidden"
-            style="height: 250px; background: var(--color-bg-subtle); border: 1px dashed var(--color-border-subtle); border-radius: var(--radius-md); display: flex; align-items: center; justify-content: center; color: var(--color-text-muted); font-size: 0.75rem;">
-            <span>Responsive Ad Placement (300x250 Sidebar)</span>
-          </div>
         </div>
 
         <!-- Right: Studio Canvas & Live Social Previews -->
@@ -719,13 +704,6 @@ export type MockupTab = 'studio' | 'twitter' | 'linkedin' | 'meta';
                 <strong>Include the HTML meta tags</strong> in the <code>&lt;head&gt;</code> of your page to ensure Twitter, LinkedIn, and Facebook display your card.
               </li>
             </ol>
-
-            <!-- Modal Ad Placement (300x250) -->
-            <div
-              class="ad-slot ad-slot--modal print-hidden"
-              style="height: 160px; background: var(--color-bg-subtle); border: 1px dashed var(--color-border-subtle); border-radius: var(--radius-md); display: flex; align-items: center; justify-content: center; color: var(--color-text-muted); font-size: 0.75rem; margin-bottom: 20px;">
-              <span>Responsive Ad Placement (Export Complete)</span>
-            </div>
 
             <div style="display: flex; justify-content: flex-end; gap: 10px;">
               <app-button variant="primary" (clicked)="closeExportModal()">

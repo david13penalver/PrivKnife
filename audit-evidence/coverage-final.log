@@ -1,0 +1,1668 @@
+npm notice run priv-knife@0.0.0 test
+npm notice run ng test --watch=false --coverage --runner-config=audit-vitest.config.mjs
+Using Vitest configuration file: /home/deivision/Projects/Programming/PrivKnife/PrivKnife/audit-vitest.config.mjs
+❯ Building...
+✔ Building...
+Application bundle generation complete. [5.921 seconds] - 2026-11-13T17:59:59.994Z
+
+
+ RUN  v4.0.8 /home/deivision/Projects/Programming/PrivKnife/PrivKnife
+      Coverage enabled with v8
+
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+stderr | src/app/tools/3d/lithophane-maker/lithophane-maker.component.spec.ts > LithophaneMakerComponent (Seam 2 & 4) > Initialization & Reactive State > should create the component
+THREE.WebGLRenderer: THREE.WebGLRenderer: Error creating WebGL context.
+
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+stderr | src/app/tools/3d/under-desk-clamp-generator/under-desk-clamp-generator.component.spec.ts > UnderDeskClampGeneratorComponent (Seam 2 & 4) > Initialization & Reactive State > should create the component
+THREE.WebGLRenderer: THREE.WebGLRenderer: Error creating WebGL context.
+
+stderr | src/app/tools/3d/lithophane-maker/lithophane-maker.component.spec.ts > LithophaneMakerComponent (Seam 2 & 4) > Initialization & Reactive State > should initialize with default lithophane options
+THREE.WebGLRenderer: THREE.WebGLRenderer: Error creating WebGL context.
+
+stderr | src/app/tools/3d/geometric-plant-pot/geometric-plant-pot.component.spec.ts > GeometricPlantPotComponent (Seam 2 & 4) > Initialization & Reactive State > should create the component
+THREE.WebGLRenderer: THREE.WebGLRenderer: Error creating WebGL context.
+
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+stderr | src/app/tools/3d/lithophane-maker/lithophane-maker.component.spec.ts > LithophaneMakerComponent (Seam 2 & 4) > Initialization & Reactive State > should apply preset and update configuration signals
+THREE.WebGLRenderer: THREE.WebGLRenderer: Error creating WebGL context.
+
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+(node:166547) ExperimentalWarning: localStorage is not available because --localstorage-file was not provided.
+(Use `node --trace-warnings ...` to show where the warning was created)
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+stderr | src/app/tools/3d/under-desk-clamp-generator/under-desk-clamp-generator.component.spec.ts > UnderDeskClampGeneratorComponent (Seam 2 & 4) > Initialization & Reactive State > should initialize with default clamp options
+THREE.WebGLRenderer: THREE.WebGLRenderer: Error creating WebGL context.
+
+stderr | src/app/tools/3d/geometric-plant-pot/geometric-plant-pot.component.spec.ts > GeometricPlantPotComponent (Seam 2 & 4) > Initialization & Reactive State > should initialize with default planter options
+THREE.WebGLRenderer: THREE.WebGLRenderer: Error creating WebGL context.
+
+(node:166554) ExperimentalWarning: localStorage is not available because --localstorage-file was not provided.
+(Use `node --trace-warnings ...` to show where the warning was created)
+stderr | src/app/tools/3d/lithophane-maker/lithophane-maker.component.spec.ts > LithophaneMakerComponent (Seam 2 & 4) > Initialization & Reactive State > should update contrast factor and invert luminance reactively
+THREE.WebGLRenderer: THREE.WebGLRenderer: Error creating WebGL context.
+
+ ✓ |PrivKnife| src/app/tools/dev/bank-statement-converter/bank-statement-converter.component.spec.ts (15 tests) 948ms
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+stderr | src/app/tools/3d/geometric-plant-pot/geometric-plant-pot.component.spec.ts > GeometricPlantPotComponent (Seam 2 & 4) > Initialization & Reactive State > should apply preset and update configuration signals
+THREE.WebGLRenderer: THREE.WebGLRenderer: Error creating WebGL context.
+
+stderr | src/app/tools/3d/parametric-lamp-designer/parametric-lamp-designer.component.spec.ts > ParametricLampDesignerComponent (Seam 2: Angular UI & Privacy) > should create the component with default signals and metrics
+THREE.WebGLRenderer: THREE.WebGLRenderer: Error creating WebGL context.
+
+stderr | src/app/tools/3d/under-desk-clamp-generator/under-desk-clamp-generator.component.spec.ts > UnderDeskClampGeneratorComponent (Seam 2 & 4) > Initialization & Reactive State > should apply preset and update configuration signals
+THREE.WebGLRenderer: THREE.WebGLRenderer: Error creating WebGL context.
+
+stderr | src/app/tools/3d/lithophane-maker/lithophane-maker.component.spec.ts > LithophaneMakerComponent (Seam 2 & 4) > Initialization & Reactive State > should toggle backlight simulator state
+THREE.WebGLRenderer: THREE.WebGLRenderer: Error creating WebGL context.
+
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+stderr | src/app/tools/3d/lithophane-maker/lithophane-maker.component.spec.ts > LithophaneMakerComponent (Seam 2 & 4) > Export & Download Actions > should generate and trigger STL download without throwing
+THREE.WebGLRenderer: THREE.WebGLRenderer: Error creating WebGL context.
+
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+stderr | src/app/tools/3d/geometric-plant-pot/geometric-plant-pot.component.spec.ts > GeometricPlantPotComponent (Seam 2 & 4) > Initialization & Reactive State > should toggle aesthetic style and planter type
+THREE.WebGLRenderer: THREE.WebGLRenderer: Error creating WebGL context.
+
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+stderr | src/app/tools/3d/under-desk-clamp-generator/under-desk-clamp-generator.component.spec.ts > UnderDeskClampGeneratorComponent (Seam 2 & 4) > Initialization & Reactive State > should toggle exploded view mode
+THREE.WebGLRenderer: THREE.WebGLRenderer: Error creating WebGL context.
+
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+stderr | src/app/tools/3d/lithophane-maker/lithophane-maker.component.spec.ts > LithophaneMakerComponent (Seam 2 & 4) > Export & Download Actions > should generate and trigger 3MF download without throwing
+THREE.WebGLRenderer: THREE.WebGLRenderer: Error creating WebGL context.
+
+stderr | src/app/tools/3d/geometric-plant-pot/geometric-plant-pot.component.spec.ts > GeometricPlantPotComponent (Seam 2 & 4) > Initialization & Reactive State > should toggle exploded view mode
+THREE.WebGLRenderer: THREE.WebGLRenderer: Error creating WebGL context.
+
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+(node:166597) ExperimentalWarning: localStorage is not available because --localstorage-file was not provided.
+(Use `node --trace-warnings ...` to show where the warning was created)
+Not implemented: navigation to another Document
+stderr | src/app/tools/3d/under-desk-clamp-generator/under-desk-clamp-generator.component.spec.ts > UnderDeskClampGeneratorComponent (Seam 2 & 4) > Initialization & Reactive State > should update accessory type and feature toggles
+THREE.WebGLRenderer: THREE.WebGLRenderer: Error creating WebGL context.
+
+(node:166583) ExperimentalWarning: localStorage is not available because --localstorage-file was not provided.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ ✓ |PrivKnife| src/app/tools/documents/grid-paper/engine.spec.ts (12 tests) 2066ms
+       ✓ should generate a valid vector PDF blob for dot grid paper  1841ms
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+stderr | src/app/tools/3d/geometric-plant-pot/geometric-plant-pot.component.spec.ts > GeometricPlantPotComponent (Seam 2 & 4) > Export & Download Actions > should generate and trigger STL download without throwing
+THREE.WebGLRenderer: THREE.WebGLRenderer: Error creating WebGL context.
+
+stderr | src/app/tools/3d/parametric-lamp-designer/parametric-lamp-designer.component.spec.ts > ParametricLampDesignerComponent (Seam 2: Angular UI & Privacy) > should load preset configurations cleanly
+THREE.WebGLRenderer: THREE.WebGLRenderer: Error creating WebGL context.
+
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+stderr | src/app/tools/3d/under-desk-clamp-generator/under-desk-clamp-generator.component.spec.ts > UnderDeskClampGeneratorComponent (Seam 2 & 4) > Export & Download Actions > should generate and trigger STL download without throwing
+THREE.WebGLRenderer: THREE.WebGLRenderer: Error creating WebGL context.
+
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+stderr | src/app/tools/3d/geometric-plant-pot/geometric-plant-pot.component.spec.ts > GeometricPlantPotComponent (Seam 2 & 4) > Export & Download Actions > should generate and trigger 3MF download without throwing
+THREE.WebGLRenderer: THREE.WebGLRenderer: Error creating WebGL context.
+
+(node:166581) ExperimentalWarning: localStorage is not available because --localstorage-file was not provided.
+(Use `node --trace-warnings ...` to show where the warning was created)
+Not implemented: navigation to another Document
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+stderr | src/app/tools/3d/under-desk-clamp-generator/under-desk-clamp-generator.component.spec.ts > UnderDeskClampGeneratorComponent (Seam 2 & 4) > Export & Download Actions > should generate and trigger 3MF download without throwing
+THREE.WebGLRenderer: THREE.WebGLRenderer: Error creating WebGL context.
+
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+(node:166561) ExperimentalWarning: localStorage is not available because --localstorage-file was not provided.
+(Use `node --trace-warnings ...` to show where the warning was created)
+Not implemented: navigation to another Document
+Not implemented: navigation to another Document
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+stderr | src/app/tools/3d/geometric-plant-pot/geometric-plant-pot.component.spec.ts > GeometricPlantPotComponent (Seam 2 & 4) > Reset & Memory Hygiene > should reset configuration back to defaults on resetToDefaults()
+THREE.WebGLRenderer: THREE.WebGLRenderer: Error creating WebGL context.
+
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+stderr | src/app/tools/3d/parametric-lamp-designer/parametric-lamp-designer.component.spec.ts > ParametricLampDesignerComponent (Seam 2: Angular UI & Privacy) > should reactively update config parameters and recalculate metrics with a single geometry generation pass
+THREE.WebGLRenderer: THREE.WebGLRenderer: Error creating WebGL context.
+
+Not implemented: navigation to another Document
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+stderr | src/app/tools/3d/geometric-plant-pot/geometric-plant-pot.component.spec.ts > GeometricPlantPotComponent (Seam 2 & 4) > Reset & Memory Hygiene > should revoke created object URLs upon destruction
+THREE.WebGLRenderer: THREE.WebGLRenderer: Error creating WebGL context.
+
+stderr | src/app/tools/3d/under-desk-clamp-generator/under-desk-clamp-generator.component.spec.ts > UnderDeskClampGeneratorComponent (Seam 2 & 4) > Reset & Memory Hygiene > should reset configuration back to defaults on resetToDefaults()
+THREE.WebGLRenderer: THREE.WebGLRenderer: Error creating WebGL context.
+
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+ ✓ |PrivKnife| src/app/pages/home/home.spec.ts (10 tests) 2921ms
+     ✓ should create the home component  720ms
+     ✓ should reset filters when resetFilters() is called  377ms
+stderr | src/app/tools/3d/geometric-plant-pot/geometric-plant-pot.component.spec.ts > GeometricPlantPotComponent (Seam 2 & 4) > Reset & Memory Hygiene > should update metrics and scene meshes during single-pass rebuildMesh
+THREE.WebGLRenderer: THREE.WebGLRenderer: Error creating WebGL context.
+
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+stderr | src/app/tools/3d/under-desk-clamp-generator/under-desk-clamp-generator.component.spec.ts > UnderDeskClampGeneratorComponent (Seam 2 & 4) > Reset & Memory Hygiene > should revoke created object URLs upon destruction
+THREE.WebGLRenderer: THREE.WebGLRenderer: Error creating WebGL context.
+
+stderr | src/app/tools/3d/geometric-plant-pot/geometric-plant-pot.component.spec.ts > GeometricPlantPotComponent (Seam 2 & 4) > Touch Viewport Navigation (DEFECT-37-05) > should orbit camera on touchstart and touchmove events
+THREE.WebGLRenderer: THREE.WebGLRenderer: Error creating WebGL context.
+
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+stderr | src/app/tools/3d/geometric-plant-pot/geometric-plant-pot.component.spec.ts > GeometricPlantPotComponent (Seam 2 & 4) > Mobile Responsive & BEM Styling (DEFECT-37-01, DEFECT-37-04) > should use .c-input__slider on all range slider inputs
+THREE.WebGLRenderer: THREE.WebGLRenderer: Error creating WebGL context.
+
+stderr | src/app/tools/3d/under-desk-clamp-generator/under-desk-clamp-generator.component.spec.ts > UnderDeskClampGeneratorComponent (Seam 2 & 4) > Reset & Memory Hygiene > should update metrics and scene meshes during single-pass rebuildMesh
+THREE.WebGLRenderer: THREE.WebGLRenderer: Error creating WebGL context.
+
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+stderr | src/app/tools/3d/qr-stand-keychain/qr-stand-keychain.component.spec.ts > QrStandKeychainComponent (UI & Privacy Boundary) > initializes with default 3D QR stand configuration and signals
+THREE.WebGLRenderer: THREE.WebGLRenderer: Error creating WebGL context.
+
+stderr | src/app/tools/3d/geometric-plant-pot/geometric-plant-pot.component.spec.ts > GeometricPlantPotComponent (Seam 2 & 4) > Mobile Responsive & BEM Styling (DEFECT-37-01, DEFECT-37-04) > should not contain hardcoded #f3f4f6 or #cbd5e1 in styles
+THREE.WebGLRenderer: THREE.WebGLRenderer: Error creating WebGL context.
+
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+stderr | src/app/tools/3d/qr-stand-keychain/qr-stand-keychain.component.spec.ts > QrStandKeychainComponent (UI & Privacy Boundary) > updates text payload and error correction level
+THREE.WebGLRenderer: THREE.WebGLRenderer: Error creating WebGL context.
+
+stderr | src/app/tools/3d/geometric-plant-pot/geometric-plant-pot.component.spec.ts > GeometricPlantPotComponent (Seam 2 & 4) > Privacy & Zero Exfiltration (Directive 1 & 2) > should assert strictly 0 network requests during operations
+THREE.WebGLRenderer: THREE.WebGLRenderer: Error creating WebGL context.
+
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+stderr | src/app/tools/3d/parametric-lamp-designer/parametric-lamp-designer.component.spec.ts > ParametricLampDesignerComponent (Seam 2: Angular UI & Privacy) > should dispose old material when selecting a different filament
+THREE.WebGLRenderer: THREE.WebGLRenderer: Error creating WebGL context.
+
+Not implemented: navigation to another Document
+Not implemented: navigation to another Document
+stderr | src/app/tools/3d/under-desk-clamp-generator/under-desk-clamp-generator.component.spec.ts > UnderDeskClampGeneratorComponent (Seam 2 & 4) > Reset & Memory Hygiene > should dispose deskPreviewMesh geometry and material on destroy
+THREE.WebGLRenderer: THREE.WebGLRenderer: Error creating WebGL context.
+
+Not implemented: navigation to another Document
+stderr | src/app/tools/3d/lithophane-maker/lithophane-maker.component.spec.ts > LithophaneMakerComponent (Seam 2 & 4) > Export & Download Actions > should update isGenerating and progressPercent during downloadFormat
+THREE.WebGLRenderer: THREE.WebGLRenderer: Error creating WebGL context.
+
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+stderr | src/app/tools/3d/qr-stand-keychain/qr-stand-keychain.component.spec.ts > QrStandKeychainComponent (UI & Privacy Boundary) > toggles and updates subtext extrusion
+THREE.WebGLRenderer: THREE.WebGLRenderer: Error creating WebGL context.
+
+ ✓ |PrivKnife| src/app/tools/3d/geometric-plant-pot/geometric-plant-pot.component.spec.ts (14 tests) 3753ms
+       ✓ should create the component  585ms
+       ✓ should toggle exploded view mode  364ms
+       ✓ should generate and trigger 3MF download without throwing  508ms
+ ✓ |PrivKnife| src/app/tools/privacy/emergency-recovery-kit/emergency-recovery-kit.component.spec.ts (13 tests) 2732ms
+     ✓ should trigger PDF download and immediately revoke Object URL  306ms
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+stderr | src/app/tools/3d/qr-stand-keychain/qr-stand-keychain.component.spec.ts > QrStandKeychainComponent (UI & Privacy Boundary) > updates base shape and dimensional sliders
+THREE.WebGLRenderer: THREE.WebGLRenderer: Error creating WebGL context.
+
+stderr | src/app/tools/3d/under-desk-clamp-generator/under-desk-clamp-generator.component.spec.ts > UnderDeskClampGeneratorComponent (Seam 2 & 4) > Touch Viewport Navigation (DEFECT-35-05) > should orbit camera on touchstart and touchmove events
+THREE.WebGLRenderer: THREE.WebGLRenderer: Error creating WebGL context.
+
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+stderr | src/app/tools/3d/lithophane-maker/lithophane-maker.component.spec.ts > LithophaneMakerComponent (Seam 2 & 4) > Export & Download Actions > should download PNG snapshot and immediately revoke object URL
+THREE.WebGLRenderer: THREE.WebGLRenderer: Error creating WebGL context.
+
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+stderr | src/app/tools/3d/qr-stand-keychain/qr-stand-keychain.component.spec.ts > QrStandKeychainComponent (UI & Privacy Boundary) > applies color presets and custom color choices
+THREE.WebGLRenderer: THREE.WebGLRenderer: Error creating WebGL context.
+
+stderr | src/app/tools/3d/lithophane-maker/lithophane-maker.component.spec.ts > LithophaneMakerComponent (Seam 2 & 4) > Viewport Orbit & Zoom Controls > should zoom camera on wheel event within limits
+THREE.WebGLRenderer: THREE.WebGLRenderer: Error creating WebGL context.
+
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+stderr | src/app/tools/3d/under-desk-clamp-generator/under-desk-clamp-generator.component.spec.ts > UnderDeskClampGeneratorComponent (Seam 2 & 4) > Mobile Responsive & BEM Styling (DEFECT-35-03, DEFECT-35-04, DEFECT-35-05) > should use .c-input__slider on all range slider inputs
+THREE.WebGLRenderer: THREE.WebGLRenderer: Error creating WebGL context.
+
+stderr | src/app/tools/3d/lithophane-maker/lithophane-maker.component.spec.ts > LithophaneMakerComponent (Seam 2 & 4) > Viewport Orbit & Zoom Controls > should rotate mesh on touch events
+THREE.WebGLRenderer: THREE.WebGLRenderer: Error creating WebGL context.
+
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+stderr | src/app/tools/3d/qr-stand-keychain/qr-stand-keychain.component.spec.ts > QrStandKeychainComponent (UI & Privacy Boundary) > loads sample presets and updates active model signals
+THREE.WebGLRenderer: THREE.WebGLRenderer: Error creating WebGL context.
+
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+stderr | src/app/tools/3d/lithophane-maker/lithophane-maker.component.spec.ts > LithophaneMakerComponent (Seam 2 & 4) > File Handling & Memory Hygiene > should revoke object URL immediately on image load or error in onFileDropped
+THREE.WebGLRenderer: THREE.WebGLRenderer: Error creating WebGL context.
+
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+stderr | src/app/tools/3d/pet-id-tag-generator/pet-id-tag-generator.component.spec.ts > PetIdTagGeneratorComponent (Seam 2 & 4) > Initialization & Reactive State > should create the component
+THREE.WebGLRenderer: THREE.WebGLRenderer: Error creating WebGL context.
+
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+stderr | src/app/tools/3d/pet-id-tag-generator/pet-id-tag-generator.component.spec.ts > PetIdTagGeneratorComponent (Seam 2 & 4) > Initialization & Reactive State > should initialize with default pet tag options
+THREE.WebGLRenderer: THREE.WebGLRenderer: Error creating WebGL context.
+
+stderr | src/app/tools/3d/lithophane-maker/lithophane-maker.component.spec.ts > LithophaneMakerComponent (Seam 2 & 4) > File Handling & Memory Hygiene > should terminate active worker on ngOnDestroy
+THREE.WebGLRenderer: THREE.WebGLRenderer: Error creating WebGL context.
+
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+stderr | src/app/tools/3d/pet-id-tag-generator/pet-id-tag-generator.component.spec.ts > PetIdTagGeneratorComponent (Seam 2 & 4) > Initialization & Reactive State > should apply preset and update configuration signals
+THREE.WebGLRenderer: THREE.WebGLRenderer: Error creating WebGL context.
+
+stderr | src/app/tools/3d/under-desk-clamp-generator/under-desk-clamp-generator.component.spec.ts > UnderDeskClampGeneratorComponent (Seam 2 & 4) > Mobile Responsive & BEM Styling (DEFECT-35-03, DEFECT-35-04, DEFECT-35-05) > should not contain hardcoded #f3f4f6 or #cbd5e1 in styles
+THREE.WebGLRenderer: THREE.WebGLRenderer: Error creating WebGL context.
+
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+stderr | src/app/tools/3d/pet-id-tag-generator/pet-id-tag-generator.component.spec.ts > PetIdTagGeneratorComponent (Seam 2 & 4) > Initialization & Reactive State > should toggle tag format between hanging charm and collar slide-on
+THREE.WebGLRenderer: THREE.WebGLRenderer: Error creating WebGL context.
+
+stderr | src/app/tools/3d/lithophane-maker/lithophane-maker.component.spec.ts > LithophaneMakerComponent (Seam 2 & 4) > DOM Styling & Accessibility > should use .c-input__slider on all range inputs and not .c-input--slider
+THREE.WebGLRenderer: THREE.WebGLRenderer: Error creating WebGL context.
+
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+stderr | src/app/tools/3d/parametric-lamp-designer/parametric-lamp-designer.component.spec.ts > ParametricLampDesignerComponent (Seam 2: Angular UI & Privacy) > should dispose bulbMesh and gridHelper resources on ngOnDestroy
+THREE.WebGLRenderer: THREE.WebGLRenderer: Error creating WebGL context.
+
+stderr | src/app/tools/3d/pet-id-tag-generator/pet-id-tag-generator.component.spec.ts > PetIdTagGeneratorComponent (Seam 2 & 4) > Initialization & Reactive State > should update charm shape and emergency icon
+THREE.WebGLRenderer: THREE.WebGLRenderer: Error creating WebGL context.
+
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+stderr | src/app/tools/3d/qr-stand-keychain/qr-stand-keychain.component.spec.ts > QrStandKeychainComponent (UI & Privacy Boundary) > toggles view orientation and auto-rotation
+THREE.WebGLRenderer: THREE.WebGLRenderer: Error creating WebGL context.
+
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: navigation to another Document
+stderr | src/app/tools/3d/pet-id-tag-generator/pet-id-tag-generator.component.spec.ts > PetIdTagGeneratorComponent (Seam 2 & 4) > Initialization & Reactive State > should update pet name and phone numbers
+THREE.WebGLRenderer: THREE.WebGLRenderer: Error creating WebGL context.
+
+Not implemented: navigation to another Document
+stderr | src/app/tools/3d/lithophane-maker/lithophane-maker.component.spec.ts > LithophaneMakerComponent (Seam 2 & 4) > Reset & Memory Hygiene > should reset configuration back to defaults on resetToDefaults()
+THREE.WebGLRenderer: THREE.WebGLRenderer: Error creating WebGL context.
+
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+stderr | src/app/tools/3d/pet-id-tag-generator/pet-id-tag-generator.component.spec.ts > PetIdTagGeneratorComponent (Seam 2 & 4) > Export & Download Actions > should generate and trigger 3MF download without throwing
+THREE.WebGLRenderer: THREE.WebGLRenderer: Error creating WebGL context.
+
+stderr | src/app/tools/3d/under-desk-clamp-generator/under-desk-clamp-generator.component.spec.ts > UnderDeskClampGeneratorComponent (Seam 2 & 4) > Privacy & Zero Exfiltration (Directive 1 & 2) > should assert strictly 0 network requests during operations
+THREE.WebGLRenderer: THREE.WebGLRenderer: Error creating WebGL context.
+
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+stderr | src/app/tools/3d/qr-stand-keychain/qr-stand-keychain.component.spec.ts > QrStandKeychainComponent (UI & Privacy Boundary) > resets studio back to default state
+THREE.WebGLRenderer: THREE.WebGLRenderer: Error creating WebGL context.
+
+stderr | src/app/tools/3d/lithophane-maker/lithophane-maker.component.spec.ts > LithophaneMakerComponent (Seam 2 & 4) > Reset & Memory Hygiene > should revoke created object URLs upon destruction
+THREE.WebGLRenderer: THREE.WebGLRenderer: Error creating WebGL context.
+
+(node:166603) ExperimentalWarning: localStorage is not available because --localstorage-file was not provided.
+(Use `node --trace-warnings ...` to show where the warning was created)
+Not implemented: navigation to another Document
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+stderr | src/app/tools/3d/qr-stand-keychain/qr-stand-keychain.component.spec.ts > QrStandKeychainComponent (UI & Privacy Boundary) > triggers download and ensures prompt URL revocation (Memory Hygiene)
+THREE.WebGLRenderer: THREE.WebGLRenderer: Error creating WebGL context.
+
+ ✓ |PrivKnife| src/app/tools/documents/barcode-labels/barcode-labels.component.spec.ts (13 tests) 2612ms
+     ✓ should initialize with default Avery 5160 template and Code128 symbology  512ms
+     ✓ should download PDF, revoke object URL, and show confirmation modal  390ms
+     ✓ should execute processing with ZERO network requests (Privacy Verification)  365ms
+Not implemented: navigation to another Document
+stderr | src/app/tools/3d/lithophane-maker/lithophane-maker.component.spec.ts > LithophaneMakerComponent (Seam 2 & 4) > Privacy & Zero Exfiltration (Directive 1 & 2) > should assert strictly 0 network requests during operations
+THREE.WebGLRenderer: THREE.WebGLRenderer: Error creating WebGL context.
+
+Not implemented: navigation to another Document
+Not implemented: navigation to another Document
+ ✓ |PrivKnife| src/app/tools/3d/braille-ada-sign-generator/braille-ada-sign-generator.component.spec.ts (21 tests) 4799ms
+       ✓ should create the component  530ms
+       ✓ should update pictogram and braille standard  310ms
+       ✓ should generate and trigger 3MF download without throwing  594ms
+       ✓ should assert strictly 0 network requests during operations  444ms
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+stderr | src/app/tools/3d/qr-stand-keychain/qr-stand-keychain.component.spec.ts > QrStandKeychainComponent (UI & Privacy Boundary) > exports 3MF, STL, and Zip without throwing errors
+THREE.WebGLRenderer: THREE.WebGLRenderer: Error creating WebGL context.
+
+(node:166590) ExperimentalWarning: localStorage is not available because --localstorage-file was not provided.
+(Use `node --trace-warnings ...` to show where the warning was created)
+Not implemented: navigation to another Document
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+ ✓ |PrivKnife| src/app/tools/3d/under-desk-clamp-generator/under-desk-clamp-generator.component.spec.ts (15 tests) 4863ms
+       ✓ should create the component  545ms
+       ✓ should toggle exploded view mode  336ms
+       ✓ should update accessory type and feature toggles  352ms
+       ✓ should generate and trigger STL download without throwing  300ms
+       ✓ should generate and trigger 3MF download without throwing  625ms
+       ✓ should reset configuration back to defaults on resetToDefaults()  318ms
+       ✓ should assert strictly 0 network requests during operations  419ms
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: navigation to another Document
+Not implemented: navigation to another Document
+Not implemented: navigation to another Document
+Not implemented: navigation to another Document
+stderr | src/app/tools/3d/pet-id-tag-generator/pet-id-tag-generator.component.spec.ts > PetIdTagGeneratorComponent (Seam 2 & 4) > Export & Download Actions > should generate and trigger STL download without throwing
+THREE.WebGLRenderer: THREE.WebGLRenderer: Error creating WebGL context.
+
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+stderr | src/app/tools/3d/pet-id-tag-generator/pet-id-tag-generator.component.spec.ts > PetIdTagGeneratorComponent (Seam 2 & 4) > Reset & Memory Hygiene > should reset configuration back to defaults on resetToDefaults()
+THREE.WebGLRenderer: THREE.WebGLRenderer: Error creating WebGL context.
+
+ ✓ |PrivKnife| src/app/tools/3d/lithophane-maker/lithophane-maker.component.spec.ts (17 tests) 5024ms
+       ✓ should create the component  437ms
+       ✓ should generate and trigger 3MF download without throwing  2383ms
+       ✓ should assert strictly 0 network requests during operations  322ms
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+stderr | src/app/tools/3d/pet-id-tag-generator/pet-id-tag-generator.component.spec.ts > PetIdTagGeneratorComponent (Seam 2 & 4) > Reset & Memory Hygiene > should revoke created object URLs upon destruction
+THREE.WebGLRenderer: THREE.WebGLRenderer: Error creating WebGL context.
+
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+stderr | src/app/tools/3d/qr-stand-keychain/qr-stand-keychain.component.spec.ts > QrStandKeychainComponent (UI & Privacy Boundary) > guarantees zero network calls during preset loading, customizing, and exports (Privacy Guard)
+THREE.WebGLRenderer: THREE.WebGLRenderer: Error creating WebGL context.
+
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+stderr | src/app/tools/3d/pet-id-tag-generator/pet-id-tag-generator.component.spec.ts > PetIdTagGeneratorComponent (Seam 2 & 4) > Reset & Memory Hygiene > should remove mouseup listener on window when component is destroyed (DEFECT-41-05)
+THREE.WebGLRenderer: THREE.WebGLRenderer: Error creating WebGL context.
+
+stderr | src/app/tools/3d/parametric-lamp-designer/parametric-lamp-designer.component.spec.ts > ParametricLampDesignerComponent (Seam 2: Angular UI & Privacy) > should use .c-input__control on select elements and .c-input__slider on range inputs
+THREE.WebGLRenderer: THREE.WebGLRenderer: Error creating WebGL context.
+
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+stderr | src/app/tools/3d/pet-id-tag-generator/pet-id-tag-generator.component.spec.ts > PetIdTagGeneratorComponent (Seam 2 & 4) > Touch Orbit Controls & Dual-Sided UI (DEFECT-41-03 & DEFECT-41-05) > should support touch rotation events on canvas
+THREE.WebGLRenderer: THREE.WebGLRenderer: Error creating WebGL context.
+
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+stderr | src/app/tools/3d/pet-id-tag-generator/pet-id-tag-generator.component.spec.ts > PetIdTagGeneratorComponent (Seam 2 & 4) > Touch Orbit Controls & Dual-Sided UI (DEFECT-41-03 & DEFECT-41-05) > should toggle dualSided signal and update preview
+THREE.WebGLRenderer: THREE.WebGLRenderer: Error creating WebGL context.
+
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+stderr | src/app/tools/3d/pet-id-tag-generator/pet-id-tag-generator.component.spec.ts > PetIdTagGeneratorComponent (Seam 2 & 4) > Touch Orbit Controls & Dual-Sided UI (DEFECT-41-03 & DEFECT-41-05) > should render dual-sided checkbox in DOM
+THREE.WebGLRenderer: THREE.WebGLRenderer: Error creating WebGL context.
+
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+stderr | src/app/tools/3d/pet-id-tag-generator/pet-id-tag-generator.component.spec.ts > PetIdTagGeneratorComponent (Seam 2 & 4) > Touch Orbit Controls & Dual-Sided UI (DEFECT-41-03 & DEFECT-41-05) > should render export buttons with dedicated action classes
+THREE.WebGLRenderer: THREE.WebGLRenderer: Error creating WebGL context.
+
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+stderr | src/app/tools/3d/pet-id-tag-generator/pet-id-tag-generator.component.spec.ts > PetIdTagGeneratorComponent (Seam 2 & 4) > Privacy & Zero Exfiltration (Directive 1 & 2) > should assert strictly 0 network requests during operations
+THREE.WebGLRenderer: THREE.WebGLRenderer: Error creating WebGL context.
+
+ ✓ |PrivKnife| src/app/tools/3d/qr-stand-keychain/qr-stand-keychain.component.spec.ts (11 tests) 2242ms
+     ✓ initializes with default 3D QR stand configuration and signals  323ms
+     ✓ guarantees zero network calls during preset loading, customizing, and exports (Privacy Guard)  391ms
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+stderr | src/app/tools/3d/desk-wedge-nameplate/desk-wedge-nameplate.component.spec.ts > DeskWedgeNameplateComponent > creates the component successfully with default state and computed metrics
+THREE.WebGLRenderer: THREE.WebGLRenderer: Error creating WebGL context.
+
+Not implemented: navigation to another Document
+Not implemented: navigation to another Document
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+stderr | src/app/tools/3d/desk-wedge-nameplate/desk-wedge-nameplate.component.spec.ts > DeskWedgeNameplateComponent > updates configuration when switching between style presets
+THREE.WebGLRenderer: THREE.WebGLRenderer: Error creating WebGL context.
+
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+stderr | src/app/tools/3d/desk-wedge-nameplate/desk-wedge-nameplate.component.spec.ts > DeskWedgeNameplateComponent > resets parameters to default configuration
+THREE.WebGLRenderer: THREE.WebGLRenderer: Error creating WebGL context.
+
+Not implemented: navigation to another Document
+Not implemented: navigation to another Document
+Not implemented: navigation to another Document
+ ✓ |PrivKnife| src/app/tools/documents/invoice-maker/invoice-maker.component.spec.ts (13 tests) 1729ms
+ ✓ |PrivKnife| src/app/tools/3d/pet-id-tag-generator/pet-id-tag-generator.component.spec.ts (16 tests) 1624ms
+       ✓ should generate and trigger 3MF download without throwing  436ms
+       ✓ should assert strictly 0 network requests during operations  411ms
+Not implemented: navigation to another Document
+Not implemented: navigation to another Document
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+stderr | src/app/tools/3d/desk-wedge-nameplate/desk-wedge-nameplate.component.spec.ts > DeskWedgeNameplateComponent > toggles secondary text subtitle on and off
+THREE.WebGLRenderer: THREE.WebGLRenderer: Error creating WebGL context.
+
+stderr | src/app/tools/3d/parametric-lamp-designer/parametric-lamp-designer.component.spec.ts > ParametricLampDesignerComponent (Seam 2: Angular UI & Privacy) > should use non-colliding .c-lamp-designer__viewport-hud for viewport overlay
+THREE.WebGLRenderer: THREE.WebGLRenderer: Error creating WebGL context.
+
+ ✓ |PrivKnife| src/app/tools/documents/grid-paper/grid-paper.component.spec.ts (9 tests) 6032ms
+     ✓ should create the component with initial options and live SVG preview  597ms
+     ✓ should change grid style and update SVG preview reactively  316ms
+     ✓ should download PDF, revoke object URL, and show post-download modal  2002ms
+     ✓ should execute processing with ZERO network requests (Privacy Verification)  1990ms
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+stderr | src/app/tools/3d/desk-wedge-nameplate/desk-wedge-nameplate.component.spec.ts > DeskWedgeNameplateComponent > switches text lettering mode between embossed and debossed
+THREE.WebGLRenderer: THREE.WebGLRenderer: Error creating WebGL context.
+
+Not implemented: navigation to another Document
+Not implemented: navigation to another Document
+Not implemented: navigation to another Document
+Not implemented: navigation to another Document
+ ✓ |PrivKnife| src/app/tools/dev/diff-checker/diff-checker.component.spec.ts (15 tests) 707ms
+stderr | src/app/tools/3d/desk-wedge-nameplate/desk-wedge-nameplate.component.spec.ts > DeskWedgeNameplateComponent > switches text lettering mode between embossed and debossed
+BVH: "maxLeafSize" option has been deprecated. Use "targetLeafSize", instead.
+BVH: "maxLeafSize" option has been deprecated. Use "targetLeafSize", instead.
+
+Not implemented: navigation to another Document
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+stderr | src/app/tools/3d/desk-wedge-nameplate/desk-wedge-nameplate.component.spec.ts > DeskWedgeNameplateComponent > applies filament color palettes and updates geometry colors
+THREE.WebGLRenderer: THREE.WebGLRenderer: Error creating WebGL context.
+
+Not implemented: navigation to another Document
+ ✓ |PrivKnife| src/app/tools/dev/color-palette-extractor/color-palette-extractor.component.spec.ts (8 tests) 1494ms
+     ✓ should initialize with sample palette, contrast matrix, and active selection  310ms
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+stderr | src/app/tools/3d/desk-wedge-nameplate/desk-wedge-nameplate.component.spec.ts > DeskWedgeNameplateComponent > triggers client-side downloads for dual-color 3MF, STLs, and ZIP bundles with URL revocation
+THREE.WebGLRenderer: THREE.WebGLRenderer: Error creating WebGL context.
+
+stderr | src/app/tools/3d/parametric-lamp-designer/parametric-lamp-designer.component.spec.ts > ParametricLampDesignerComponent (Seam 2: Angular UI & Privacy) > should toggle viewport lighting and wireframe signals
+THREE.WebGLRenderer: THREE.WebGLRenderer: Error creating WebGL context.
+
+Not implemented: navigation to another Document
+Not implemented: navigation to another Document
+Not implemented: navigation to another Document
+Not implemented: navigation to another Document
+Not implemented: navigation to another Document
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+stderr | src/app/tools/3d/desk-wedge-nameplate/desk-wedge-nameplate.component.spec.ts > DeskWedgeNameplateComponent > verifies 100% client-side privacy with zero telemetry or network calls
+THREE.WebGLRenderer: THREE.WebGLRenderer: Error creating WebGL context.
+
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+ ✓ |PrivKnife| src/app/tools/audio-video/audio-trimmer-booster/engine.spec.ts (17 tests) 2216ms
+       ✓ should boost volume and apply soft-knee saturation to prevent harsh clipping  777ms
+       ✓ should encode boosted audio to MP3 format  941ms
+       ✓ should export iPhone M4R ringtone with max duration cap and ftypM4A box container header (DEFECT-51-03)  407ms
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+stderr | src/app/tools/3d/desk-wedge-nameplate/desk-wedge-nameplate.component.spec.ts > DeskWedgeNameplateComponent > cleans up resources and animation frames on destroy
+THREE.WebGLRenderer: THREE.WebGLRenderer: Error creating WebGL context.
+
+Not implemented: navigation to another Document
+ ✓ |PrivKnife| src/app/tools/3d/under-desk-clamp-generator/engine.spec.ts (21 tests) 2071ms
+       ✓ should handle all 4 accessory types without error  385ms
+       ✓ should export multi-object 3MF zip blob  372ms
+       ✓ should execute full pipeline and return valid 3MF result  308ms
+ ✓ |PrivKnife| src/app/tools/3d/desk-wedge-nameplate/desk-wedge-nameplate.component.spec.ts (9 tests) 2070ms
+     ✓ creates the component successfully with default state and computed metrics  363ms
+     ✓ switches text lettering mode between embossed and debossed  321ms
+     ✓ triggers client-side downloads for dual-color 3MF, STLs, and ZIP bundles with URL revocation  412ms
+stderr | src/app/core/i18n/tools-detail-i18n.spec.ts > Tools Detail Pages Localization (Batch 2: Tools 31–60) > should render Parametric Lamp Designer detail page in English and reactively update to Spanish and French
+THREE.WebGLRenderer: THREE.WebGLRenderer: Error creating WebGL context.
+
+stderr | src/app/tools/3d/parametric-lamp-designer/parametric-lamp-designer.component.spec.ts > ParametricLampDesignerComponent (Seam 2: Angular UI & Privacy) > should select filament material cleanly
+THREE.WebGLRenderer: THREE.WebGLRenderer: Error creating WebGL context.
+
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+ ❯ |PrivKnife| src/app/tools/3d/braille-ada-sign-generator/engine.spec.ts (22 tests | 1 failed) 7825ms
+       ✓ should validate default options successfully 3ms
+       ✓ should reject null or undefined options 1ms
+       ✓ should reject empty or whitespace-only room title 1ms
+       ✓ should reject overly long room title (> 40 chars) 1ms
+       ✓ should enforce plaque width boundaries [80mm, 350mm] 0ms
+       ✓ should enforce plaque height boundaries [80mm, 350mm] 0ms
+       ✓ should enforce plaque thickness boundaries [1.5mm, 10mm] 0ms
+       ✓ should enforce tactile raise boundaries [0.5mm, 4.0mm] 0ms
+       ✓ should transliterate basic alphabet characters to Braille cells 2ms
+       ✓ should transliterate numbers with number prefix sign 1ms
+       ✓ should convert Braille cells to valid Unicode Braille Patterns 0ms
+       ✓ should handle Grade 2 contractions for common words like RESTROOM or AND 0ms
+       ✓ should generate base, tactile, and braille geometries for default sign 169ms
+       ✓ should calculate estimated weight and print time in reasonable range 73ms
+       ✓ should support minimal options without crashing 16ms
+       ✓ should support maximum options with California Title 24 spacing 150ms
+       ✓ should support all standard pictograms  400ms
+       × should produce zero NaN vertices across all characters and presets (DEFECT-38-01 Red test) 5832ms
+       ✓ should encode a geometry into valid binary STL buffer with 80-byte header 65ms
+       ✓ should package sign parts into a valid multi-object 3MF zip file  534ms
+       ✓ should execute end-to-end processSign for 3MF export  505ms
+       ✓ should execute end-to-end processSign for STL export 66ms
+stderr | src/app/core/i18n/tools-detail-i18n.spec.ts > Tools Detail Pages Localization (Batch 2: Tools 31–60) > should render Lithophane Maker detail page in Spanish with localized controls and titles
+THREE.WebGLRenderer: THREE.WebGLRenderer: Error creating WebGL context.
+
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: navigation to another Document
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+stderr | src/app/core/i18n/tools-detail-i18n.spec.ts > Tools Detail Pages Localization (Batch 2: Tools 31–60) > should render Gridfinity Bin Generator detail page in Spanish with localized controls and titles
+THREE.WebGLRenderer: THREE.WebGLRenderer: Error creating WebGL context.
+
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+ ✓ |PrivKnife| src/app/tools/3d/pet-id-tag-generator/engine.spec.ts (21 tests) 1852ms
+       ✓ should package multi-color 3MF archive with 3D model XML and rels  331ms
+       ✓ should execute end-to-end processPetTag for 3MF export  328ms
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+ ✓ |PrivKnife| src/app/tools/3d/lithophane-maker/engine.spec.ts (20 tests) 1537ms
+       ✓ should generate a valid 3MF blob package containing model xml  627ms
+       ✓ should process curved arc options into 3MF deliverable  546ms
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+ ✓ |PrivKnife| src/app/tools/audio-video/audio-trimmer-booster/audio-trimmer-booster.component.spec.ts (12 tests) 1574ms
+     ✓ should process audio to MP3 format when selected  425ms
+     ✓ should process audio to iPhone M4R ringtone format when selected  412ms
+stderr | src/app/tools/3d/parametric-lamp-designer/parametric-lamp-designer.component.spec.ts > ParametricLampDesignerComponent (Seam 2: Angular UI & Privacy) > should trigger binary STL download and manage object URLs
+THREE.WebGLRenderer: THREE.WebGLRenderer: Error creating WebGL context.
+
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+ ✓ |PrivKnife| src/app/core/i18n/tools-detail-i18n.spec.ts (10 tests) 1647ms
+     ✓ should render Parametric Lamp Designer detail page in English and reactively update to Spanish and French  975ms
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: navigation to another Document
+Not implemented: navigation to another Document
+Not implemented: navigation to another Document
+ ✓ |PrivKnife| src/app/tools/3d/qr-stand-keychain/engine.spec.ts (12 tests) 996ms
+     ✓ handles all sample presets accurately  368ms
+ ✓ |PrivKnife| src/app/tools/media/background-remover/background-remover.component.spec.ts (10 tests) 1002ms
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: navigation to another Document
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: navigation to another Document
+Not implemented: navigation to another Document
+Not implemented: navigation to another Document
+Not implemented: navigation to another Document
+Not implemented: navigation to another Document
+Not implemented: navigation to another Document
+Not implemented: navigation to another Document
+(node:166573) ExperimentalWarning: localStorage is not available because --localstorage-file was not provided.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ ✓ |PrivKnife| src/app/tools/privacy/crypto-hash-uuid/crypto-hash-uuid.component.spec.ts (10 tests) 511ms
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+ ✓ |PrivKnife| src/app/tools/documents/nutrition-label-maker/nutrition-label-maker.component.spec.ts (11 tests) 798ms
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+ ✓ |PrivKnife| src/app/tools/documents/floor-plan-furniture-scaler/floor-plan-furniture-scaler.component.spec.ts (16 tests) 1556ms
+Not implemented: navigation to another Document
+Not implemented: navigation to another Document
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+ ✓ |PrivKnife| src/app/tools/documents/markdown-cheatsheet/markdown-cheatsheet.component.spec.ts (9 tests) 987ms
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: navigation to another Document
+Not implemented: navigation to another Document
+stderr | src/app/tools/3d/parametric-lamp-designer/parametric-lamp-designer.component.spec.ts > ParametricLampDesignerComponent (Seam 2: Angular UI & Privacy) > should trigger 3MF download and manage object URLs
+THREE.WebGLRenderer: THREE.WebGLRenderer: Error creating WebGL context.
+
+ ✓ |PrivKnife| src/app/tools/dev/email-signature-generator/email-signature-generator.component.spec.ts (11 tests) 909ms
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: navigation to another Document
+ ✓ |PrivKnife| src/app/tools/dev/mesh-gradient-maker/mesh-gradient-maker.component.spec.ts (10 tests) 709ms
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+stderr | src/app/tools/3d/hsw-insert-adapter/hsw-insert-adapter.component.spec.ts > HswInsertAdapterComponent (Seam 2 & 4) > Initialization & Reactive State > should create the component
+THREE.WebGLRenderer: THREE.WebGLRenderer: Error creating WebGL context.
+
+ ✓ |PrivKnife| src/app/tools/3d/geometric-plant-pot/engine.spec.ts (20 tests) 1132ms
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+stderr | src/app/tools/3d/hsw-insert-adapter/hsw-insert-adapter.component.spec.ts > HswInsertAdapterComponent (Seam 2 & 4) > Initialization & Reactive State > should initialize with default HSW insert parameters
+THREE.WebGLRenderer: THREE.WebGLRenderer: Error creating WebGL context.
+
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+stderr | src/app/tools/3d/keycap-switch-tester-maker/keycap-switch-tester-maker.component.spec.ts > KeycapSwitchTesterMakerComponent (Seam 2 & 4) > Initialization & Reactive State > should create the component
+THREE.WebGLRenderer: THREE.WebGLRenderer: Error creating WebGL context.
+
+(node:166541) ExperimentalWarning: localStorage is not available because --localstorage-file was not provided.
+(Use `node --trace-warnings ...` to show where the warning was created)
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: navigation to another Document
+Not implemented: navigation to another Document
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+stderr | src/app/tools/3d/hsw-insert-adapter/hsw-insert-adapter.component.spec.ts > HswInsertAdapterComponent (Seam 2 & 4) > Initialization & Reactive State > should apply preset and update configuration signals
+THREE.WebGLRenderer: THREE.WebGLRenderer: Error creating WebGL context.
+
+stderr | src/app/tools/3d/keycap-switch-tester-maker/keycap-switch-tester-maker.component.spec.ts > KeycapSwitchTesterMakerComponent (Seam 2 & 4) > Initialization & Reactive State > should initialize with default keycap options
+THREE.WebGLRenderer: THREE.WebGLRenderer: Error creating WebGL context.
+
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: navigation to another Document
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+ ✓ |PrivKnife| src/app/tools/media/passport-biometric-photo/passport-biometric-photo.component.spec.ts (21 tests) 1716ms
+       ✓ should create the component  355ms
+Not implemented: navigation to another Document
+Not implemented: navigation to another Document
+Not implemented: navigation to another Document
+Not implemented: navigation to another Document
+Not implemented: navigation to another Document
+stderr | src/app/tools/3d/keycap-switch-tester-maker/keycap-switch-tester-maker.component.spec.ts > KeycapSwitchTesterMakerComponent (Seam 2 & 4) > Initialization & Reactive State > should apply preset and update configuration signals
+THREE.WebGLRenderer: THREE.WebGLRenderer: Error creating WebGL context.
+
+ ✓ |PrivKnife| src/app/tools/media/og-card-maker/og-card-maker.component.spec.ts (8 tests) 545ms
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+stderr | src/app/tools/3d/hsw-insert-adapter/hsw-insert-adapter.component.spec.ts > HswInsertAdapterComponent (Seam 2 & 4) > Initialization & Reactive State > should update insert type and attachment parameters
+THREE.WebGLRenderer: THREE.WebGLRenderer: Error creating WebGL context.
+
+ ✓ |PrivKnife| src/app/tools/dev/csv-converter/csv-converter.component.spec.ts (11 tests) 771ms
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+ ✓ |PrivKnife| src/app/tools/dev/font-subsetter-converter/font-subsetter-converter.component.spec.ts (14 tests) 705ms
+stderr | src/app/tools/3d/hsw-insert-adapter/hsw-insert-adapter.component.spec.ts > HswInsertAdapterComponent (Seam 2 & 4) > Initialization & Reactive State > should update tolerance and dimensions
+THREE.WebGLRenderer: THREE.WebGLRenderer: Error creating WebGL context.
+
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+stderr | src/app/tools/3d/keycap-switch-tester-maker/keycap-switch-tester-maker.component.spec.ts > KeycapSwitchTesterMakerComponent (Seam 2 & 4) > Initialization & Reactive State > should toggle item type between keycap and switch tester tray
+THREE.WebGLRenderer: THREE.WebGLRenderer: Error creating WebGL context.
+
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+stderr | src/app/tools/3d/hsw-insert-adapter/hsw-insert-adapter.component.spec.ts > HswInsertAdapterComponent (Seam 2 & 4) > Export & Download Actions > should generate and trigger STL download without throwing
+THREE.WebGLRenderer: THREE.WebGLRenderer: Error creating WebGL context.
+
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+stderr | src/app/tools/3d/gridfinity-bin-generator/gridfinity-bin-generator.component.spec.ts > GridfinityBinGeneratorComponent (Seam 2 & 4) > Initialization & Reactive State > should create the component
+THREE.WebGLRenderer: THREE.WebGLRenderer: Error creating WebGL context.
+
+stderr | src/app/tools/3d/hsw-insert-adapter/hsw-insert-adapter.component.spec.ts > HswInsertAdapterComponent (Seam 2 & 4) > Export & Download Actions > should generate and trigger 3MF download without throwing
+THREE.WebGLRenderer: THREE.WebGLRenderer: Error creating WebGL context.
+
+Not implemented: navigation to another Document
+stderr | src/app/tools/3d/keycap-switch-tester-maker/keycap-switch-tester-maker.component.spec.ts > KeycapSwitchTesterMakerComponent (Seam 2 & 4) > Initialization & Reactive State > should update keycap profile, unit size, and legend style
+THREE.WebGLRenderer: THREE.WebGLRenderer: Error creating WebGL context.
+
+Not implemented: navigation to another Document
+Not implemented: navigation to another Document
+Not implemented: navigation to another Document
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+stderr | src/app/tools/3d/gridfinity-bin-generator/gridfinity-bin-generator.component.spec.ts > GridfinityBinGeneratorComponent (Seam 2 & 4) > Initialization & Reactive State > should initialize with default 1x1 3U options
+THREE.WebGLRenderer: THREE.WebGLRenderer: Error creating WebGL context.
+
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+(node:166540) ExperimentalWarning: localStorage is not available because --localstorage-file was not provided.
+(Use `node --trace-warnings ...` to show where the warning was created)
+Not implemented: navigation to another Document
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+stderr | src/app/tools/3d/hsw-insert-adapter/hsw-insert-adapter.component.spec.ts > HswInsertAdapterComponent (Seam 2 & 4) > Reset & Memory Hygiene > should reset configuration back to defaults on resetToDefaults()
+THREE.WebGLRenderer: THREE.WebGLRenderer: Error creating WebGL context.
+
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+stderr | src/app/tools/3d/keycap-switch-tester-maker/keycap-switch-tester-maker.component.spec.ts > KeycapSwitchTesterMakerComponent (Seam 2 & 4) > Export & Download Actions > should generate and trigger 3MF download without throwing
+THREE.WebGLRenderer: THREE.WebGLRenderer: Error creating WebGL context.
+
+stderr | src/app/tools/3d/gridfinity-bin-generator/gridfinity-bin-generator.component.spec.ts > GridfinityBinGeneratorComponent (Seam 2 & 4) > Initialization & Reactive State > should apply preset and update configuration signals
+THREE.WebGLRenderer: THREE.WebGLRenderer: Error creating WebGL context.
+
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+stderr | src/app/tools/3d/hsw-insert-adapter/hsw-insert-adapter.component.spec.ts > HswInsertAdapterComponent (Seam 2 & 4) > Reset & Memory Hygiene > should revoke created object URLs upon destruction
+THREE.WebGLRenderer: THREE.WebGLRenderer: Error creating WebGL context.
+
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+stderr | src/app/tools/3d/gridfinity-bin-generator/gridfinity-bin-generator.component.spec.ts > GridfinityBinGeneratorComponent (Seam 2 & 4) > Initialization & Reactive State > should update subdivisions and lip styles
+THREE.WebGLRenderer: THREE.WebGLRenderer: Error creating WebGL context.
+
+stderr | src/app/tools/3d/cappuccino-stencil-maker/cappuccino-stencil-maker.component.spec.ts > CappuccinoStencilMakerComponent (Seam 2 & 4) > Initialization & Reactive State > should create the component
+THREE.WebGLRenderer: THREE.WebGLRenderer: Error creating WebGL context.
+
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+stderr | src/app/tools/3d/hsw-insert-adapter/hsw-insert-adapter.component.spec.ts > HswInsertAdapterComponent (Seam 2 & 4) > Reset & Memory Hygiene > should remove mouseup listener on window when component is destroyed (DEFECT-42-05)
+THREE.WebGLRenderer: THREE.WebGLRenderer: Error creating WebGL context.
+
+ ✓ |PrivKnife| src/app/tools/media/seamless-texture-generator/seamless-texture-generator.component.spec.ts (16 tests) 10107ms
+       ✓ should load sample surface and trigger texture generation  729ms
+       ✓ should update blendMode and recompute texture  1784ms
+       ✓ should update output resolution and resample texture dimensions (DEFECT-57-04)  1044ms
+       ✓ should toggle normal map generation and invertNormalY  1407ms
+       ✓ should download ZIP archive and revoke object URL immediately  670ms
+       ✓ should download diffuse PNG and revoke object URL immediately  602ms
+       ✓ should download normal PNG and revoke object URL immediately  581ms
+       ✓ should copy CSS snippet to clipboard with feedback  633ms
+       ✓ should reset inputs and revoke cached URLs upon reset  609ms
+       ✓ should cleanly dispose and revoke resources on ngOnDestroy  738ms
+       ✓ should execute texture generation and download with 0 network calls  620ms
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+stderr | src/app/tools/3d/cappuccino-stencil-maker/cappuccino-stencil-maker.component.spec.ts > CappuccinoStencilMakerComponent (Seam 2 & 4) > Initialization & Reactive State > should initialize with default stencil parameters
+THREE.WebGLRenderer: THREE.WebGLRenderer: Error creating WebGL context.
+
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+stderr | src/app/tools/3d/hsw-insert-adapter/hsw-insert-adapter.component.spec.ts > HswInsertAdapterComponent (Seam 2 & 4) > Reset & Memory Hygiene > should reset all signals including hook and magnet options on resetToDefaults() (DEFECT-42-03)
+THREE.WebGLRenderer: THREE.WebGLRenderer: Error creating WebGL context.
+
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+stderr | src/app/tools/3d/gridfinity-bin-generator/gridfinity-bin-generator.component.spec.ts > GridfinityBinGeneratorComponent (Seam 2 & 4) > Initialization & Reactive State > should toggle finger scoop and label tab
+THREE.WebGLRenderer: THREE.WebGLRenderer: Error creating WebGL context.
+
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+stderr | src/app/tools/3d/keycap-switch-tester-maker/keycap-switch-tester-maker.component.spec.ts > KeycapSwitchTesterMakerComponent (Seam 2 & 4) > Export & Download Actions > should generate and trigger STL download without throwing
+THREE.WebGLRenderer: THREE.WebGLRenderer: Error creating WebGL context.
+
+stderr | src/app/tools/3d/cappuccino-stencil-maker/cappuccino-stencil-maker.component.spec.ts > CappuccinoStencilMakerComponent (Seam 2 & 4) > Initialization & Reactive State > should apply preset and update configuration signals
+THREE.WebGLRenderer: THREE.WebGLRenderer: Error creating WebGL context.
+
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+stderr | src/app/tools/3d/hsw-insert-adapter/hsw-insert-adapter.component.spec.ts > HswInsertAdapterComponent (Seam 2 & 4) > Touch Orbit Controls & UI Grid (DEFECT-42-03 & DEFECT-42-05) > should support touch rotation events on canvas
+THREE.WebGLRenderer: THREE.WebGLRenderer: Error creating WebGL context.
+
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+stderr | src/app/tools/3d/gridfinity-bin-generator/gridfinity-bin-generator.component.spec.ts > GridfinityBinGeneratorComponent (Seam 2 & 4) > Export & Download Actions > should generate and trigger STL download without throwing
+THREE.WebGLRenderer: THREE.WebGLRenderer: Error creating WebGL context.
+
+Not implemented: navigation to another Document
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+stderr | src/app/tools/3d/cappuccino-stencil-maker/cappuccino-stencil-maker.component.spec.ts > CappuccinoStencilMakerComponent (Seam 2 & 4) > Initialization & Reactive State > should update motif and custom text
+THREE.WebGLRenderer: THREE.WebGLRenderer: Error creating WebGL context.
+
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+stderr | src/app/tools/3d/hsw-insert-adapter/hsw-insert-adapter.component.spec.ts > HswInsertAdapterComponent (Seam 2 & 4) > Touch Orbit Controls & UI Grid (DEFECT-42-03 & DEFECT-42-05) > should render multi-cell ganging selector in DOM
+THREE.WebGLRenderer: THREE.WebGLRenderer: Error creating WebGL context.
+
+stderr | src/app/tools/3d/keycap-switch-tester-maker/keycap-switch-tester-maker.component.spec.ts > KeycapSwitchTesterMakerComponent (Seam 2 & 4) > Reset & Memory Hygiene > should reset configuration back to defaults on resetToDefaults()
+THREE.WebGLRenderer: THREE.WebGLRenderer: Error creating WebGL context.
+
+stderr | src/app/tools/3d/gridfinity-bin-generator/gridfinity-bin-generator.component.spec.ts > GridfinityBinGeneratorComponent (Seam 2 & 4) > Export & Download Actions > should generate and trigger 3MF download without throwing
+THREE.WebGLRenderer: THREE.WebGLRenderer: Error creating WebGL context.
+
+Not implemented: navigation to another Document
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+stderr | src/app/tools/3d/cappuccino-stencil-maker/cappuccino-stencil-maker.component.spec.ts > CappuccinoStencilMakerComponent (Seam 2 & 4) > Initialization & Reactive State > should update handle configuration
+THREE.WebGLRenderer: THREE.WebGLRenderer: Error creating WebGL context.
+
+stderr | src/app/tools/3d/hsw-insert-adapter/hsw-insert-adapter.component.spec.ts > HswInsertAdapterComponent (Seam 2 & 4) > Touch Orbit Controls & UI Grid (DEFECT-42-03 & DEFECT-42-05) > should render export buttons with dedicated action classes
+THREE.WebGLRenderer: THREE.WebGLRenderer: Error creating WebGL context.
+
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+ ✓ |PrivKnife| src/app/tools/dev/calendar-linker/calendar-linker.component.spec.ts (9 tests) 500ms
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: navigation to another Document
+Not implemented: navigation to another Document
+Not implemented: navigation to another Document
+Not implemented: navigation to another Document
+Not implemented: navigation to another Document
+Not implemented: navigation to another Document
+Not implemented: navigation to another Document
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+stderr | src/app/tools/3d/keycap-switch-tester-maker/keycap-switch-tester-maker.component.spec.ts > KeycapSwitchTesterMakerComponent (Seam 2 & 4) > Reset & Memory Hygiene > should revoke created object URLs upon destruction
+THREE.WebGLRenderer: THREE.WebGLRenderer: Error creating WebGL context.
+
+stderr | src/app/tools/3d/cappuccino-stencil-maker/cappuccino-stencil-maker.component.spec.ts > CappuccinoStencilMakerComponent (Seam 2 & 4) > Export & Download Actions > should generate and trigger STL download without throwing
+THREE.WebGLRenderer: THREE.WebGLRenderer: Error creating WebGL context.
+
+stderr | src/app/tools/3d/hsw-insert-adapter/hsw-insert-adapter.component.spec.ts > HswInsertAdapterComponent (Seam 2 & 4) > Privacy & Zero Exfiltration (Directive 1 & 2) > should assert strictly 0 network requests during operations
+THREE.WebGLRenderer: THREE.WebGLRenderer: Error creating WebGL context.
+
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+stderr | src/app/tools/3d/gridfinity-bin-generator/gridfinity-bin-generator.component.spec.ts > GridfinityBinGeneratorComponent (Seam 2 & 4) > Export & Download Actions > should revoke object URL immediately after download trigger (Directive 4 & DEFECT-33-05)
+THREE.WebGLRenderer: THREE.WebGLRenderer: Error creating WebGL context.
+
+Not implemented: navigation to another Document
+Not implemented: navigation to another Document
+Not implemented: navigation to another Document
+ ✓ |PrivKnife| src/app/tools/dev/csv-vector-chart-builder/csv-vector-chart-builder.component.spec.ts (13 tests) 1288ms
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+stderr | src/app/tools/3d/gridfinity-bin-generator/gridfinity-bin-generator.component.spec.ts > GridfinityBinGeneratorComponent (Seam 2 & 4) > Reset & Memory Hygiene > should reset configuration back to defaults on resetToDefaults()
+THREE.WebGLRenderer: THREE.WebGLRenderer: Error creating WebGL context.
+
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+stderr | src/app/tools/3d/cappuccino-stencil-maker/cappuccino-stencil-maker.component.spec.ts > CappuccinoStencilMakerComponent (Seam 2 & 4) > Export & Download Actions > should generate and trigger SVG download without throwing
+THREE.WebGLRenderer: THREE.WebGLRenderer: Error creating WebGL context.
+
+stderr | src/app/tools/3d/keycap-switch-tester-maker/keycap-switch-tester-maker.component.spec.ts > KeycapSwitchTesterMakerComponent (Seam 2 & 4) > Reset & Memory Hygiene > should remove window mouseup listener on ngOnDestroy (DEFECT-39-06)
+THREE.WebGLRenderer: THREE.WebGLRenderer: Error creating WebGL context.
+
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+stderr | src/app/tools/3d/gridfinity-bin-generator/gridfinity-bin-generator.component.spec.ts > GridfinityBinGeneratorComponent (Seam 2 & 4) > Reset & Memory Hygiene > should revoke created object URLs upon destruction
+THREE.WebGLRenderer: THREE.WebGLRenderer: Error creating WebGL context.
+
+ ✓ |PrivKnife| src/app/tools/3d/hsw-insert-adapter/hsw-insert-adapter.component.spec.ts (15 tests) 831ms
+stderr | src/app/tools/3d/keycap-switch-tester-maker/keycap-switch-tester-maker.component.spec.ts > KeycapSwitchTesterMakerComponent (Seam 2 & 4) > Touch Viewport Navigation (DEFECT-39-06) > should orbit camera on touchstart and touchmove events
+THREE.WebGLRenderer: THREE.WebGLRenderer: Error creating WebGL context.
+
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+stderr | src/app/tools/3d/cappuccino-stencil-maker/cappuccino-stencil-maker.component.spec.ts > CappuccinoStencilMakerComponent (Seam 2 & 4) > Reset & Memory Hygiene > should reset configuration back to defaults on resetToDefaults()
+THREE.WebGLRenderer: THREE.WebGLRenderer: Error creating WebGL context.
+
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+stderr | src/app/tools/3d/gridfinity-bin-generator/gridfinity-bin-generator.component.spec.ts > GridfinityBinGeneratorComponent (Seam 2 & 4) > Secondary Controls & Configuration (DEFECT-33-01 & DEFECT-33-05) > should render and toggle baseScrewHoles checkbox
+THREE.WebGLRenderer: THREE.WebGLRenderer: Error creating WebGL context.
+
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: navigation to another Document
+Not implemented: navigation to another Document
+stderr | src/app/tools/3d/keycap-switch-tester-maker/keycap-switch-tester-maker.component.spec.ts > KeycapSwitchTesterMakerComponent (Seam 2 & 4) > Mobile Responsive & BEM Styling (DEFECT-39-01, DEFECT-39-05) > should use .c-input__slider on all range slider inputs
+THREE.WebGLRenderer: THREE.WebGLRenderer: Error creating WebGL context.
+
+stderr | src/app/tools/3d/cappuccino-stencil-maker/cappuccino-stencil-maker.component.spec.ts > CappuccinoStencilMakerComponent (Seam 2 & 4) > Reset & Memory Hygiene > should revoke created object URLs upon destruction
+THREE.WebGLRenderer: THREE.WebGLRenderer: Error creating WebGL context.
+
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+stderr | src/app/tools/3d/gridfinity-bin-generator/gridfinity-bin-generator.component.spec.ts > GridfinityBinGeneratorComponent (Seam 2 & 4) > Secondary Controls & Configuration (DEFECT-33-01 & DEFECT-33-05) > should render fingerScoopRadiusMm slider when fingerScoop is enabled
+THREE.WebGLRenderer: THREE.WebGLRenderer: Error creating WebGL context.
+
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+stderr | src/app/tools/3d/cappuccino-stencil-maker/cappuccino-stencil-maker.component.spec.ts > CappuccinoStencilMakerComponent (Seam 2 & 4) > Reset & Memory Hygiene > should remove window mouseup listener on ngOnDestroy (DEFECT-40-05)
+THREE.WebGLRenderer: THREE.WebGLRenderer: Error creating WebGL context.
+
+Not implemented: navigation to another Document
+Not implemented: navigation to another Document
+Not implemented: navigation to another Document
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+stderr | src/app/tools/3d/gridfinity-bin-generator/gridfinity-bin-generator.component.spec.ts > GridfinityBinGeneratorComponent (Seam 2 & 4) > Secondary Controls & Configuration (DEFECT-33-01 & DEFECT-33-05) > should render labelTabWidthMm and labelAngleDeg sliders when labelTab is enabled
+THREE.WebGLRenderer: THREE.WebGLRenderer: Error creating WebGL context.
+
+ ✓ |PrivKnife| src/app/tools/documents/pdf-signer-stamper/pdf-signer-stamper.component.spec.ts (18 tests) 1532ms
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+stderr | src/app/tools/3d/keycap-switch-tester-maker/keycap-switch-tester-maker.component.spec.ts > KeycapSwitchTesterMakerComponent (Seam 2 & 4) > Mobile Responsive & BEM Styling (DEFECT-39-01, DEFECT-39-05) > should not contain hardcoded #e2e8f0 or #cbd5e1 in styles
+THREE.WebGLRenderer: THREE.WebGLRenderer: Error creating WebGL context.
+
+stderr | src/app/tools/3d/cappuccino-stencil-maker/cappuccino-stencil-maker.component.spec.ts > CappuccinoStencilMakerComponent (Seam 2 & 4) > Touch Viewport Navigation (DEFECT-40-05) > should orbit camera on touchstart and touchmove events
+THREE.WebGLRenderer: THREE.WebGLRenderer: Error creating WebGL context.
+
+stderr | src/app/tools/3d/skadis-pegboard-maker/skadis-pegboard-maker.component.spec.ts > SkadisPegboardMakerComponent (Seam 2 & 4) > Initialization & Reactive State > should create the component
+THREE.WebGLRenderer: THREE.WebGLRenderer: Error creating WebGL context.
+
+ ✓ |PrivKnife| src/app/tools/dev/robots-sitemap-builder/robots-sitemap-builder.component.spec.ts (9 tests) 525ms
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+stderr | src/app/tools/3d/gridfinity-bin-generator/gridfinity-bin-generator.component.spec.ts > GridfinityBinGeneratorComponent (Seam 2 & 4) > 3D Viewport Interaction: Touch Orbit & Wheel Zoom (DEFECT-33-04) > should handle wheel zoom on viewport
+THREE.WebGLRenderer: THREE.WebGLRenderer: Error creating WebGL context.
+
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+stderr | src/app/tools/3d/cappuccino-stencil-maker/cappuccino-stencil-maker.component.spec.ts > CappuccinoStencilMakerComponent (Seam 2 & 4) > Mobile Responsive & BEM Styling (DEFECT-40-02, DEFECT-40-04) > should use .c-input__slider on all range slider inputs
+THREE.WebGLRenderer: THREE.WebGLRenderer: Error creating WebGL context.
+
+stderr | src/app/tools/3d/skadis-pegboard-maker/skadis-pegboard-maker.component.spec.ts > SkadisPegboardMakerComponent (Seam 2 & 4) > Initialization & Reactive State > should initialize with default skadis options
+THREE.WebGLRenderer: THREE.WebGLRenderer: Error creating WebGL context.
+
+stderr | src/app/tools/3d/keycap-switch-tester-maker/keycap-switch-tester-maker.component.spec.ts > KeycapSwitchTesterMakerComponent (Seam 2 & 4) > Privacy & Zero Exfiltration (Directive 1 & 2) > should assert strictly 0 network requests during operations
+THREE.WebGLRenderer: THREE.WebGLRenderer: Error creating WebGL context.
+
+Not implemented: navigation to another Document
+Not implemented: navigation to another Document
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+stderr | src/app/tools/3d/gridfinity-bin-generator/gridfinity-bin-generator.component.spec.ts > GridfinityBinGeneratorComponent (Seam 2 & 4) > 3D Viewport Interaction: Touch Orbit & Wheel Zoom (DEFECT-33-04) > should handle touch drag rotation on viewport
+THREE.WebGLRenderer: THREE.WebGLRenderer: Error creating WebGL context.
+
+stderr | src/app/tools/3d/skadis-pegboard-maker/skadis-pegboard-maker.component.spec.ts > SkadisPegboardMakerComponent (Seam 2 & 4) > Initialization & Reactive State > should apply preset and update configuration signals
+THREE.WebGLRenderer: THREE.WebGLRenderer: Error creating WebGL context.
+
+stderr | src/app/tools/3d/cappuccino-stencil-maker/cappuccino-stencil-maker.component.spec.ts > CappuccinoStencilMakerComponent (Seam 2 & 4) > Mobile Responsive & BEM Styling (DEFECT-40-02, DEFECT-40-04) > should not contain hardcoded #e2e8f0 or #cbd5e1 in styles
+THREE.WebGLRenderer: THREE.WebGLRenderer: Error creating WebGL context.
+
+Not implemented: navigation to another Document
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+stderr | src/app/tools/3d/gridfinity-bin-generator/gridfinity-bin-generator.component.spec.ts > GridfinityBinGeneratorComponent (Seam 2 & 4) > Responsive Layout & Touch Target BEM Classes (DEFECT-33-02, DEFECT-33-03, DEFECT-33-05) > should use .c-input__slider on range inputs for touch target compliance
+THREE.WebGLRenderer: THREE.WebGLRenderer: Error creating WebGL context.
+
+stderr | src/app/tools/3d/skadis-pegboard-maker/skadis-pegboard-maker.component.spec.ts > SkadisPegboardMakerComponent (Seam 2 & 4) > Initialization & Reactive State > should toggle pegboard system and holder style
+THREE.WebGLRenderer: THREE.WebGLRenderer: Error creating WebGL context.
+
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+stderr | src/app/tools/3d/desk-wedge-nameplate/engine.spec.ts > Parametric Desk Wedge & Nameplate Maker Engine > constructs debossed assembly with CSG subtraction or cavity carving
+BVH: "maxLeafSize" option has been deprecated. Use "targetLeafSize", instead.
+BVH: "maxLeafSize" option has been deprecated. Use "targetLeafSize", instead.
+
+stderr | src/app/tools/3d/cappuccino-stencil-maker/cappuccino-stencil-maker.component.spec.ts > CappuccinoStencilMakerComponent (Seam 2 & 4) > Privacy & Zero Exfiltration (Directive 1 & 2) > should assert strictly 0 network requests during operations
+THREE.WebGLRenderer: THREE.WebGLRenderer: Error creating WebGL context.
+
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+stderr | src/app/tools/3d/gridfinity-bin-generator/gridfinity-bin-generator.component.spec.ts > GridfinityBinGeneratorComponent (Seam 2 & 4) > Responsive Layout & Touch Target BEM Classes (DEFECT-33-02, DEFECT-33-03, DEFECT-33-05) > should have unit-btn-row with 6 unit buttons styled for mobile wrapping
+THREE.WebGLRenderer: THREE.WebGLRenderer: Error creating WebGL context.
+
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+stderr | src/app/tools/3d/skadis-pegboard-maker/skadis-pegboard-maker.component.spec.ts > SkadisPegboardMakerComponent (Seam 2 & 4) > Initialization & Reactive State > should toggle locking wedge and reinforce rib
+THREE.WebGLRenderer: THREE.WebGLRenderer: Error creating WebGL context.
+
+ ✓ |PrivKnife| src/app/tools/3d/keycap-switch-tester-maker/keycap-switch-tester-maker.component.spec.ts (14 tests) 1198ms
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+stderr | src/app/tools/3d/gridfinity-bin-generator/gridfinity-bin-generator.component.spec.ts > GridfinityBinGeneratorComponent (Seam 2 & 4) > Privacy & Zero Exfiltration (Directive 1 & 2) > should assert strictly 0 network requests during operations
+THREE.WebGLRenderer: THREE.WebGLRenderer: Error creating WebGL context.
+
+Not implemented: navigation to another Document
+Not implemented: navigation to another Document
+Not implemented: navigation to another Document
+Not implemented: navigation to another Document
+Not implemented: navigation to another Document
+Not implemented: navigation to another Document
+Not implemented: navigation to another Document
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+stderr | src/app/tools/3d/skadis-pegboard-maker/skadis-pegboard-maker.component.spec.ts > SkadisPegboardMakerComponent (Seam 2 & 4) > Export & Download Actions > should generate and trigger STL download without throwing
+THREE.WebGLRenderer: THREE.WebGLRenderer: Error creating WebGL context.
+
+ ✓ |PrivKnife| src/app/tools/3d/cappuccino-stencil-maker/cappuccino-stencil-maker.component.spec.ts (14 tests) 757ms
+ ✓ |PrivKnife| src/app/tools/3d/gridfinity-bin-generator/gridfinity-bin-generator.component.spec.ts (18 tests) 959ms
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+stderr | src/app/tools/3d/skadis-pegboard-maker/skadis-pegboard-maker.component.spec.ts > SkadisPegboardMakerComponent (Seam 2 & 4) > Export & Download Actions > should generate and trigger 3MF download without throwing
+THREE.WebGLRenderer: THREE.WebGLRenderer: Error creating WebGL context.
+
+Not implemented: navigation to another Document
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+stderr | src/app/tools/3d/skadis-pegboard-maker/skadis-pegboard-maker.component.spec.ts > SkadisPegboardMakerComponent (Seam 2 & 4) > Reset & Memory Hygiene > should reset configuration back to defaults on resetToDefaults()
+THREE.WebGLRenderer: THREE.WebGLRenderer: Error creating WebGL context.
+
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+stderr | src/app/tools/3d/skadis-pegboard-maker/skadis-pegboard-maker.component.spec.ts > SkadisPegboardMakerComponent (Seam 2 & 4) > Reset & Memory Hygiene > should revoke created object URLs upon destruction
+THREE.WebGLRenderer: THREE.WebGLRenderer: Error creating WebGL context.
+
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+stderr | src/app/tools/3d/skadis-pegboard-maker/skadis-pegboard-maker.component.spec.ts > SkadisPegboardMakerComponent (Seam 2 & 4) > Reset & Memory Hygiene > should update metrics and scene meshes during single-pass rebuildMesh
+THREE.WebGLRenderer: THREE.WebGLRenderer: Error creating WebGL context.
+
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+stderr | src/app/tools/3d/skadis-pegboard-maker/skadis-pegboard-maker.component.spec.ts > SkadisPegboardMakerComponent (Seam 2 & 4) > Reset & Memory Hygiene > should dispose pegboardMesh geometry and material on destroy
+THREE.WebGLRenderer: THREE.WebGLRenderer: Error creating WebGL context.
+
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+stderr | src/app/tools/3d/skadis-pegboard-maker/skadis-pegboard-maker.component.spec.ts > SkadisPegboardMakerComponent (Seam 2 & 4) > Touch Viewport Navigation (DEFECT-36-05) > should orbit camera on touchstart and touchmove events
+THREE.WebGLRenderer: THREE.WebGLRenderer: Error creating WebGL context.
+
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: navigation to another Document
+Not implemented: navigation to another Document
+stderr | src/app/tools/3d/skadis-pegboard-maker/skadis-pegboard-maker.component.spec.ts > SkadisPegboardMakerComponent (Seam 2 & 4) > Mobile Responsive & BEM Styling (DEFECT-36-03, DEFECT-36-04, DEFECT-36-05) > should use .c-input__slider on all range slider inputs
+THREE.WebGLRenderer: THREE.WebGLRenderer: Error creating WebGL context.
+
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+stderr | src/app/tools/3d/skadis-pegboard-maker/skadis-pegboard-maker.component.spec.ts > SkadisPegboardMakerComponent (Seam 2 & 4) > Mobile Responsive & BEM Styling (DEFECT-36-03, DEFECT-36-04, DEFECT-36-05) > should not contain hardcoded #f3f4f6 or #cbd5e1 in styles
+THREE.WebGLRenderer: THREE.WebGLRenderer: Error creating WebGL context.
+
+stderr | src/app/tools/documents/pdf-merger/pdf-merger.component.spec.ts
+Warning: Please use the `legacy` build in Node.js environments.
+
+ ✓ |PrivKnife| src/app/tools/dev/web-vitals/web-vitals.component.spec.ts (8 tests) 405ms
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+stderr | src/app/tools/3d/skadis-pegboard-maker/skadis-pegboard-maker.component.spec.ts > SkadisPegboardMakerComponent (Seam 2 & 4) > Privacy & Zero Exfiltration (Directive 1 & 2) > should assert strictly 0 network requests during operations
+THREE.WebGLRenderer: THREE.WebGLRenderer: Error creating WebGL context.
+
+ ✓ |PrivKnife| src/app/tools/privacy/face-plate-blur/face-plate-blur.component.spec.ts (21 tests) 898ms
+Not implemented: navigation to another Document
+Not implemented: navigation to another Document
+ ✓ |PrivKnife| src/app/tools/3d/desk-wedge-nameplate/engine.spec.ts (10 tests) 732ms
+ ✓ |PrivKnife| src/app/tools/privacy/pii-scrubber-anonymizer/pii-scrubber-anonymizer.component.spec.ts (16 tests) 521ms
+ ✓ |PrivKnife| src/app/tools/3d/skadis-pegboard-maker/skadis-pegboard-maker.component.spec.ts (15 tests) 756ms
+Not implemented: navigation to another Document
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+stderr | src/app/tools/3d/electronics-box-enclosure/electronics-box-enclosure.component.spec.ts > ElectronicsBoxEnclosureComponent (Seam 2 & 4) > Initialization & Reactive State > should create the component
+THREE.WebGLRenderer: THREE.WebGLRenderer: Error creating WebGL context.
+
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+stderr | src/app/tools/3d/cookie-cutter/cookie-cutter.component.spec.ts > CookieCutterComponent (UI & Privacy Boundary) > initializes with default cookie cutter configuration and signals
+THREE.WebGLRenderer: THREE.WebGLRenderer: Error creating WebGL context.
+
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: navigation to another Document
+Not implemented: navigation to another Document
+Not implemented: navigation to another Document
+stderr | src/app/tools/3d/electronics-box-enclosure/electronics-box-enclosure.component.spec.ts > ElectronicsBoxEnclosureComponent (Seam 2 & 4) > Initialization & Reactive State > should initialize with default enclosure options
+THREE.WebGLRenderer: THREE.WebGLRenderer: Error creating WebGL context.
+
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+stderr | src/app/tools/3d/cookie-cutter/cookie-cutter.component.spec.ts > CookieCutterComponent (UI & Privacy Boundary) > loads sample shape presets and updates active model signals
+THREE.WebGLRenderer: THREE.WebGLRenderer: Error creating WebGL context.
+
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+ ✓ |PrivKnife| src/app/tools/media/favicon-generator/favicon-generator.component.spec.ts (7 tests) 597ms
+stderr | src/app/tools/3d/electronics-box-enclosure/electronics-box-enclosure.component.spec.ts > ElectronicsBoxEnclosureComponent (Seam 2 & 4) > Initialization & Reactive State > should apply preset and update configuration signals
+THREE.WebGLRenderer: THREE.WebGLRenderer: Error creating WebGL context.
+
+Not implemented: navigation to another Document
+Not implemented: navigation to another Document
+ ✓ |PrivKnife| src/app/tools/dev/dns-checker/dns-checker.component.spec.ts (8 tests) 673ms
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+stderr | src/app/tools/3d/cookie-cutter/cookie-cutter.component.spec.ts > CookieCutterComponent (UI & Privacy Boundary) > updates dimensional sliders and toggles
+THREE.WebGLRenderer: THREE.WebGLRenderer: Error creating WebGL context.
+
+stderr | src/app/tools/3d/electronics-box-enclosure/electronics-box-enclosure.component.spec.ts > ElectronicsBoxEnclosureComponent (Seam 2 & 4) > Initialization & Reactive State > should toggle exploded view mode
+THREE.WebGLRenderer: THREE.WebGLRenderer: Error creating WebGL context.
+
+ ✓ |PrivKnife| src/app/tools/documents/pdf-merger/pdf-merger.component.spec.ts (11 tests) 359ms
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+stderr | src/app/tools/3d/electronics-box-enclosure/electronics-box-enclosure.component.spec.ts > ElectronicsBoxEnclosureComponent (Seam 2 & 4) > Initialization & Reactive State > should update closure type and feature toggles
+THREE.WebGLRenderer: THREE.WebGLRenderer: Error creating WebGL context.
+
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+stderr | src/app/tools/3d/cookie-cutter/cookie-cutter.component.spec.ts > CookieCutterComponent (UI & Privacy Boundary) > updates PLA material colors
+THREE.WebGLRenderer: THREE.WebGLRenderer: Error creating WebGL context.
+
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+stderr | src/app/tools/3d/cookie-cutter/cookie-cutter.component.spec.ts > CookieCutterComponent (UI & Privacy Boundary) > switches view modes and toggles auto-spin
+THREE.WebGLRenderer: THREE.WebGLRenderer: Error creating WebGL context.
+
+stderr | src/app/tools/3d/electronics-box-enclosure/electronics-box-enclosure.component.spec.ts > ElectronicsBoxEnclosureComponent (Seam 2 & 4) > Export & Download Actions > should generate and trigger STL download without throwing
+THREE.WebGLRenderer: THREE.WebGLRenderer: Error creating WebGL context.
+
+ ✓ |PrivKnife| src/app/tools/3d/parametric-lamp-designer/engine.spec.ts (18 tests) 826ms
+       ✓ should generate valid watertight BufferGeometry for voronoi cellular rib profile  445ms
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+stderr | src/app/tools/3d/electronics-box-enclosure/electronics-box-enclosure.component.spec.ts > ElectronicsBoxEnclosureComponent (Seam 2 & 4) > Export & Download Actions > should generate and trigger 3MF download without throwing
+THREE.WebGLRenderer: THREE.WebGLRenderer: Error creating WebGL context.
+
+Not implemented: navigation to another Document
+Not implemented: navigation to another Document
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+stderr | src/app/tools/3d/cookie-cutter/cookie-cutter.component.spec.ts > CookieCutterComponent (UI & Privacy Boundary) > resets studio back to default state
+THREE.WebGLRenderer: THREE.WebGLRenderer: Error creating WebGL context.
+
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+stderr | src/app/tools/3d/cookie-cutter/cookie-cutter.component.spec.ts > CookieCutterComponent (UI & Privacy Boundary) > triggers download and ensures prompt URL revocation (Memory Hygiene)
+THREE.WebGLRenderer: THREE.WebGLRenderer: Error creating WebGL context.
+
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+stderr | src/app/tools/3d/electronics-box-enclosure/electronics-box-enclosure.component.spec.ts > ElectronicsBoxEnclosureComponent (Seam 2 & 4) > Export & Download Actions > should revoke object URL immediately after download trigger (Directive 4 & DEFECT-34-05)
+THREE.WebGLRenderer: THREE.WebGLRenderer: Error creating WebGL context.
+
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+stderr | src/app/tools/3d/electronics-box-enclosure/electronics-box-enclosure.component.spec.ts > ElectronicsBoxEnclosureComponent (Seam 2 & 4) > Secondary Controls & Configuration (DEFECT-34-01 & DEFECT-34-05) > should render cornerRadiusMm slider and update signal on input
+THREE.WebGLRenderer: THREE.WebGLRenderer: Error creating WebGL context.
+
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+stderr | src/app/tools/3d/cookie-cutter/cookie-cutter.component.spec.ts > CookieCutterComponent (UI & Privacy Boundary) > exports 3MF, STL, and Zip bundle without throwing errors
+THREE.WebGLRenderer: THREE.WebGLRenderer: Error creating WebGL context.
+
+Not implemented: navigation to another Document
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+ ✓ |PrivKnife| src/app/tools/documents/barcode-labels/engine.spec.ts (12 tests) 608ms
+       ✓ should compile a valid vector PDF sheet for Avery 5160  305ms
+stderr | src/app/tools/3d/electronics-box-enclosure/electronics-box-enclosure.component.spec.ts > ElectronicsBoxEnclosureComponent (Seam 2 & 4) > 3D Viewport Interaction: Touch Orbit & Wheel Zoom (DEFECT-34-04) > should handle wheel zoom on viewport
+THREE.WebGLRenderer: THREE.WebGLRenderer: Error creating WebGL context.
+
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+stderr | src/app/tools/3d/electronics-box-enclosure/electronics-box-enclosure.component.spec.ts > ElectronicsBoxEnclosureComponent (Seam 2 & 4) > 3D Viewport Interaction: Touch Orbit & Wheel Zoom (DEFECT-34-04) > should handle touch drag rotation on viewport
+THREE.WebGLRenderer: THREE.WebGLRenderer: Error creating WebGL context.
+
+ ✓ |PrivKnife| src/app/tools/3d/cappuccino-stencil-maker/engine.spec.ts (20 tests) 516ms
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+stderr | src/app/tools/3d/cookie-cutter/cookie-cutter.component.spec.ts > CookieCutterComponent (UI & Privacy Boundary) > guarantees zero network calls during preset loading, tweaking, and exporting (Privacy Guard)
+THREE.WebGLRenderer: THREE.WebGLRenderer: Error creating WebGL context.
+
+stderr | src/app/tools/3d/electronics-box-enclosure/electronics-box-enclosure.component.spec.ts > ElectronicsBoxEnclosureComponent (Seam 2 & 4) > Responsive Layout & Touch Target BEM Classes (DEFECT-34-02, DEFECT-34-03, DEFECT-34-05) > should use .c-input__slider on all range inputs for touch target compliance
+THREE.WebGLRenderer: THREE.WebGLRenderer: Error creating WebGL context.
+
+Not implemented: navigation to another Document
+Not implemented: navigation to another Document
+Not implemented: navigation to another Document
+Not implemented: navigation to another Document
+Not implemented: navigation to another Document
+Not implemented: navigation to another Document
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+stderr | src/app/tools/3d/electronics-box-enclosure/electronics-box-enclosure.component.spec.ts > ElectronicsBoxEnclosureComponent (Seam 2 & 4) > Reset & Memory Hygiene > should reset configuration back to defaults on resetToDefaults()
+THREE.WebGLRenderer: THREE.WebGLRenderer: Error creating WebGL context.
+
+ ✓ |PrivKnife| src/app/tools/3d/cookie-cutter/cookie-cutter.component.spec.ts (9 tests) 558ms
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+ ✓ |PrivKnife| src/app/tools/audio-video/soundwave-art-maker/soundwave-art-maker.component.spec.ts (7 tests) 555ms
+stderr | src/app/tools/3d/electronics-box-enclosure/electronics-box-enclosure.component.spec.ts > ElectronicsBoxEnclosureComponent (Seam 2 & 4) > Reset & Memory Hygiene > should revoke created object URLs upon destruction
+THREE.WebGLRenderer: THREE.WebGLRenderer: Error creating WebGL context.
+
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+stderr | src/app/tools/3d/electronics-box-enclosure/electronics-box-enclosure.component.spec.ts > ElectronicsBoxEnclosureComponent (Seam 2 & 4) > Privacy & Zero Exfiltration (Directive 1 & 2) > should assert strictly 0 network requests during operations
+THREE.WebGLRenderer: THREE.WebGLRenderer: Error creating WebGL context.
+
+Not implemented: navigation to another Document
+Not implemented: navigation to another Document
+Not implemented: navigation to another Document
+ ✓ |PrivKnife| src/app/tools/3d/electronics-box-enclosure/electronics-box-enclosure.component.spec.ts (15 tests) 686ms
+ ✓ |PrivKnife| src/app/tools/3d/skadis-pegboard-maker/engine.spec.ts (20 tests) 373ms
+ ✓ |PrivKnife| src/app/tools/audio-video/video-compressor-resizer/video-compressor-resizer.component.spec.ts (13 tests) 462ms
+stderr | src/app/tools/privacy/pdf-redaction/pdf-redaction.component.spec.ts
+Warning: Please use the `legacy` build in Node.js environments.
+
+ ✓ |PrivKnife| src/app/tools/documents/local-ocr-text-extractor/local-ocr-text-extractor.component.spec.ts (16 tests) 557ms
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: navigation to another Document
+Not implemented: navigation to another Document
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+ ✓ |PrivKnife| src/app/tools/media/heic-avif-converter/heic-avif-converter.component.spec.ts (17 tests) 602ms
+Not implemented: navigation to another Document
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+ ✓ |PrivKnife| src/app/tools/media/subtitles-shifter/subtitles-shifter.component.spec.ts (10 tests) 429ms
+ ✓ |PrivKnife| src/app/tools/3d/keycap-switch-tester-maker/engine.spec.ts (23 tests) 297ms
+ ✓ |PrivKnife| src/app/tools/3d/hsw-insert-adapter/engine.spec.ts (24 tests) 207ms
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: navigation to another Document
+Not implemented: navigation to another Document
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+ ✓ |PrivKnife| src/app/tools/dev/svg-optimizer-cleaner/svg-optimizer-cleaner.component.spec.ts (11 tests) 537ms
+Not implemented: navigation to another Document
+Not implemented: navigation to another Document
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+ ✓ |PrivKnife| src/app/tools/privacy/pdf-redaction/pdf-redaction.component.spec.ts (14 tests) 279ms
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+ ✓ |PrivKnife| src/app/core/i18n/i18n.service.spec.ts (16 tests) 164ms
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: navigation to another Document
+Not implemented: navigation to another Document
+ ✓ |PrivKnife| src/app/tools/media/screenshot-mockup/screenshot-mockup.component.spec.ts (8 tests) 362ms
+Not implemented: navigation to another Document
+Not implemented: navigation to another Document
+Not implemented: navigation to another Document
+ ✓ |PrivKnife| src/app/tools/documents/table-tent-maker/table-tent-maker.component.spec.ts (10 tests) 791ms
+ ✓ |PrivKnife| src/app/tools/privacy/file-encryptor-vault/file-encryptor-vault.component.spec.ts (15 tests) 394ms
+ ✓ |PrivKnife| src/app/tools/audio-video/bpm-tap-detector/engine.spec.ts (14 tests) 222ms
+ ✓ |PrivKnife| src/app/tools/privacy/exif-stripper/exif-stripper.component.spec.ts (7 tests) 162ms
+ ✓ |PrivKnife| src/app/tools/documents/table-tent-maker/engine.spec.ts (8 tests) 163ms
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+ ✓ |PrivKnife| src/app/tools/dev/csv-vector-chart-builder/engine.spec.ts (14 tests) 61ms
+ ✓ |PrivKnife| src/app/tools/audio-video/bpm-tap-detector/bpm-tap-detector.component.spec.ts (8 tests) 308ms
+Not implemented: navigation to another Document
+ ✓ |PrivKnife| src/app/tools/media/batch-compressor/batch-compressor.component.spec.ts (10 tests) 297ms
+ ✓ |PrivKnife| src/app/tools/dev/svg-optimizer-cleaner/engine.spec.ts (18 tests) 154ms
+ ✓ |PrivKnife| src/app/tools/documents/markdown-cheatsheet/engine.spec.ts (8 tests) 148ms
+ ✓ |PrivKnife| src/app/tools/documents/invoice-maker/engine.spec.ts (13 tests) 92ms
+ ✓ |PrivKnife| src/app/tools/documents/pdf-signer-stamper/engine.spec.ts (13 tests) 290ms
+ ✓ |PrivKnife| src/app/components/lang-selector/lang-selector.spec.ts (8 tests) 403ms
+ ✓ |PrivKnife| src/app/tools/media/seamless-texture-generator/engine.spec.ts (13 tests) 159ms
+ ✓ |PrivKnife| src/app/components/header/header.spec.ts (5 tests) 57ms
+ ✓ |PrivKnife| src/app/tools/privacy/emergency-recovery-kit/engine.spec.ts (9 tests) 287ms
+ ✓ |PrivKnife| src/app/tools/3d/gridfinity-bin-generator/engine.spec.ts (17 tests) 94ms
+ ✓ |PrivKnife| src/app/components/footer/footer.spec.ts (3 tests) 34ms
+ ✓ |PrivKnife| src/app/tools/3d/electronics-box-enclosure/engine.spec.ts (16 tests) 106ms
+ ✓ |PrivKnife| src/app/pages/privacy/privacy.spec.ts (2 tests) 43ms
+ ✓ |PrivKnife| src/app/tools/dev/font-subsetter-converter/engine.spec.ts (16 tests) 76ms
+ ✓ |PrivKnife| src/app/tools/media/favicon-generator/engine.spec.ts (5 tests) 23ms
+ ✓ |PrivKnife| src/app/tools/3d/cookie-cutter/engine.spec.ts (11 tests) 79ms
+Not implemented: navigation to another Document
+Not implemented: navigation to another Document
+ ✓ |PrivKnife| src/app/components/button/button.spec.ts (5 tests) 27ms
+ ✓ |PrivKnife| src/app/tools/dev/csv-converter/engine.spec.ts (16 tests) 53ms
+ ✓ |PrivKnife| src/app/tools/audio-video/video-gif-trimmer/video-gif-trimmer.component.spec.ts (7 tests) 89ms
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+ ✓ |PrivKnife| src/app/tools/documents/nutrition-label-maker/engine.spec.ts (17 tests) 29ms
+ ✓ |PrivKnife| src/app/tools/dev/email-signature-generator/engine.spec.ts (12 tests) 27ms
+ ✓ |PrivKnife| src/app/tools/privacy/pii-scrubber-anonymizer/engine.spec.ts (15 tests) 14ms
+ ✓ |PrivKnife| src/app/components/card/card.spec.ts (5 tests) 23ms
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+ ✓ |PrivKnife| src/app/app.spec.ts (2 tests) 44ms
+ ✓ |PrivKnife| src/app/tools/dev/bank-statement-converter/engine.spec.ts (17 tests) 29ms
+ ✓ |PrivKnife| src/app/pages/not-found/not-found.spec.ts (2 tests) 37ms
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+ ✓ |PrivKnife| src/app/tools/media/heic-avif-converter/engine.spec.ts (20 tests) 44ms
+ ✓ |PrivKnife| src/app/pages/terms/terms.spec.ts (2 tests) 33ms
+ ✓ |PrivKnife| src/app/tools/dev/dns-checker/engine.spec.ts (12 tests) 8ms
+ ✓ |PrivKnife| src/app/core/seo/seo.service.spec.ts (5 tests) 29ms
+ ✓ |PrivKnife| src/app/tools/privacy/file-encryptor-vault/engine.spec.ts (12 tests) 34ms
+ ✓ |PrivKnife| src/app/tools/dev/diff-checker/engine.spec.ts (12 tests) 17ms
+ ✓ |PrivKnife| src/app/tools/dev/color-palette-extractor/engine.spec.ts (11 tests) 13ms
+ ✓ |PrivKnife| src/app/components/dropzone/dropzone.spec.ts (3 tests) 18ms
+stderr | src/app/tools/privacy/pdf-redaction/engine.spec.ts
+Warning: Please use the `legacy` build in Node.js environments.
+
+ ✓ |PrivKnife| src/app/tools/documents/floor-plan-furniture-scaler/engine.spec.ts (16 tests) 11ms
+ ✓ |PrivKnife| src/app/components/split-preview/split-preview.spec.ts (3 tests) 16ms
+ ✓ |PrivKnife| src/app/tools/privacy/exif-stripper/engine.spec.ts (8 tests) 10ms
+ ✓ |PrivKnife| src/app/components/progress-bar/progress-bar.spec.ts (3 tests) 21ms
+ ✓ |PrivKnife| src/app/tools/audio-video/bpm-tap-detector/metronome.spec.ts (6 tests) 10ms
+ ✓ |PrivKnife| src/app/tools/audio-video/soundwave-art-maker/engine.spec.ts (12 tests) 21ms
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+ ✓ |PrivKnife| src/app/tools/audio-video/video-gif-trimmer/engine.spec.ts (7 tests) 7ms
+ ✓ |PrivKnife| src/app/tools/privacy/face-plate-blur/engine.spec.ts (18 tests) 14ms
+ ✓ |PrivKnife| src/app/tools/media/passport-biometric-photo/engine.spec.ts (22 tests) 12ms
+ ✓ |PrivKnife| src/app/tools/media/background-remover/engine.spec.ts (12 tests) 7ms
+ ✓ |PrivKnife| src/app/tools/privacy/crypto-hash-uuid/engine.spec.ts (13 tests) 10ms
+ ✓ |PrivKnife| src/app/tools/dev/web-vitals/engine.spec.ts (9 tests) 7ms
+ ✓ |PrivKnife| src/app/components/badge/badge.spec.ts (3 tests) 18ms
+ ✓ |PrivKnife| src/app/tools/privacy/pdf-redaction/engine.spec.ts (5 tests) 107ms
+ ✓ |PrivKnife| src/app/tools/documents/local-ocr-text-extractor/engine.spec.ts (18 tests) 10ms
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+ ✓ |PrivKnife| src/app/core/i18n/translate.pipe.spec.ts (5 tests) 12ms
+ ✓ |PrivKnife| src/app/tools/dev/robots-sitemap-builder/engine.spec.ts (13 tests) 14ms
+ ✓ |PrivKnife| src/app/tools/audio-video/video-compressor-resizer/engine.spec.ts (20 tests) 15ms
+ ✓ |PrivKnife| src/app/tools/media/og-card-maker/engine.spec.ts (9 tests) 4ms
+ ✓ |PrivKnife| src/app/tools/media/subtitles-shifter/engine.spec.ts (15 tests) 5ms
+ ✓ |PrivKnife| src/app/tools/dev/calendar-linker/engine.spec.ts (13 tests) 5ms
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+ ✓ |PrivKnife| src/app/tools/media/screenshot-mockup/engine.spec.ts (13 tests) 5ms
+ ✓ |PrivKnife| src/app/tools/media/batch-compressor/engine.spec.ts (10 tests) 9ms
+ ✓ |PrivKnife| src/app/tools/dev/mesh-gradient-maker/engine.spec.ts (6 tests) 4ms
+stderr | src/app/tools/documents/pdf-merger/engine.spec.ts
+Warning: Please use the `legacy` build in Node.js environments.
+
+stderr | src/app/tools/tool-registry.spec.ts
+Warning: Please use the `legacy` build in Node.js environments.
+
+ ✓ |PrivKnife| src/app/tools/documents/pdf-merger/engine.spec.ts (7 tests) 111ms
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+ ✓ |PrivKnife| src/app/tools/tool-registry.spec.ts (65 tests) 14ms
+stderr | src/app/tools/3d/parametric-lamp-designer/parametric-lamp-designer.component.spec.ts > ParametricLampDesignerComponent (Seam 2: Angular UI & Privacy) > should clean up Three.js resources and object URLs on ngOnDestroy
+THREE.WebGLRenderer: THREE.WebGLRenderer: Error creating WebGL context.
+
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+stderr | src/app/tools/3d/parametric-lamp-designer/parametric-lamp-designer.component.spec.ts > ParametricLampDesignerComponent (Seam 2: Angular UI & Privacy) > Privacy & Zero-Exfiltration Guard (Directive 1 & 2) > should perform full 3D generation and export with ZERO network requests
+THREE.WebGLRenderer: THREE.WebGLRenderer: Error creating WebGL context.
+
+Not implemented: navigation to another Document
+ ❯ |PrivKnife| src/app/tools/3d/parametric-lamp-designer/parametric-lamp-designer.component.spec.ts (13 tests | 1 failed) 15088ms
+     ✓ should create the component with default signals and metrics  1149ms
+     ✓ should load preset configurations cleanly  808ms
+     ✓ should reactively update config parameters and recalculate metrics with a single geometry generation pass  1121ms
+     ✓ should dispose old material when selecting a different filament  804ms
+     ✓ should dispose bulbMesh and gridHelper resources on ngOnDestroy  744ms
+     ✓ should use .c-input__control on select elements and .c-input__slider on range inputs  795ms
+     ✓ should use non-colliding .c-lamp-designer__viewport-hud for viewport overlay  720ms
+     ✓ should toggle viewport lighting and wireframe signals  757ms
+     ✓ should select filament material cleanly  717ms
+     ✓ should trigger binary STL download and manage object URLs  1004ms
+     × should trigger 3MF download and manage object URLs 5734ms
+     ✓ should clean up Three.js resources and object URLs on ngOnDestroy  369ms
+       ✓ should perform full 3D generation and export with ZERO network requests  364ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 2 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  |PrivKnife| src/app/tools/3d/braille-ada-sign-generator/engine.spec.ts > Braille & ADA Tactile Door Sign Generator Engine (Seam 1) > 3D Procedural Sign Mesh Generation > should produce zero NaN vertices across all characters and presets (DEFECT-38-01 Red test)
+Error: Test timed out in 5000ms.
+If this is a long-running test, pass a timeout value as the last argument or configure it globally with "testTimeout".
+ ❯ src/app/tools/3d/braille-ada-sign-generator/engine.spec.ts:158:5
+    156|     });
+    157|
+    158|     it('should produce zero NaN vertices across all characters and pre…
+       |     ^
+    159|       for (const preset of SIGN_PRESETS) {
+    160|         const options: BrailleAdaSignGeneratorOptions = {
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/2]⎯
+
+ FAIL  |PrivKnife| src/app/tools/3d/parametric-lamp-designer/parametric-lamp-designer.component.spec.ts > ParametricLampDesignerComponent (Seam 2: Angular UI & Privacy) > should trigger 3MF download and manage object URLs
+Error: Test timed out in 5000ms.
+If this is a long-running test, pass a timeout value as the last argument or configure it globally with "testTimeout".
+ ❯ src/app/tools/3d/parametric-lamp-designer/parametric-lamp-designer.component.spec.ts:140:3
+    138|   });
+    139|
+    140|   it('should trigger 3MF download and manage object URLs', async () =>…
+       |   ^
+    141|     const createUrlSpy = vi.spyOn(URL, 'createObjectURL').mockReturnVa…
+    142|     const revokeUrlSpy = vi.spyOn(URL, 'revokeObjectURL').mockImplemen…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/2]⎯
+
+
+ Test Files  2 failed | 136 passed (138)
+      Tests  2 failed | 1732 passed (1734)
+   Start at  19:00:00
+   Duration  20.55s (transform 8.83s, setup 9.16s, collect 23.41s, tests 127.91s, environment 147.74s, prepare 1.20s)
+
+ % Coverage report from v8
+
+=============================== Coverage summary ===============================
+Statements   : 0% ( 0/25348 )
+Branches     : 0% ( 0/10419 )
+Functions    : 0% ( 0/2968 )
+Lines        : 0% ( 0/23468 )
+================================================================================

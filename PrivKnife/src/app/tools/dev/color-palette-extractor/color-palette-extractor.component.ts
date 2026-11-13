@@ -51,18 +51,9 @@ import {
         </p>
       </div>
 
-      <!-- Top Leaderboard Ad Slot (728x90) -->
-      <div class="l-columns__area g--margin-bottom-6 g--text-center print-hidden">
-        <div
-          class="ad-slot ad-slot--leaderboard"
-          style="max-width: 728px; height: 90px; margin: 0 auto; background: var(--color-bg-subtle); border: 1px dashed var(--color-border-subtle); border-radius: var(--radius-md); display: flex; align-items: center; justify-content: center; color: var(--color-text-muted); font-size: 0.75rem;">
-          <span>Responsive Ad Placement (728x90 Top Leaderboard)</span>
-        </div>
-      </div>
-
       <!-- 2-Column Main Workspace -->
       <div class="l-columns l-columns--2 palette-workspace g--margin-bottom-6" style="gap: 24px; align-items: start;">
-        
+
         <!-- Left: Image Ingestion & Eyedropper Workspace -->
         <div class="l-columns__area" style="display: flex; flex-direction: column; gap: 20px;">
           <!-- 1. Image Uploader -->
@@ -185,12 +176,6 @@ import {
             </div>
           </app-card>
 
-          <!-- Sidebar Ad Slot (300x250) -->
-          <div
-            class="ad-slot ad-slot--sidebar print-hidden"
-            style="height: 250px; background: var(--color-bg-subtle); border: 1px dashed var(--color-border-subtle); border-radius: var(--radius-md); display: flex; align-items: center; justify-content: center; color: var(--color-text-muted); font-size: 0.75rem;">
-            <span>Responsive Ad Placement (300x250 Sidebar)</span>
-          </div>
         </div>
 
         <!-- Right: WCAG 2.1 Contrast Matrix & Readability Inspector -->
@@ -383,13 +368,6 @@ import {
               <li><strong>JSON Tokens:</strong> Standardized tokens compatible with Tailwind CSS and Style Dictionary.</li>
               <li><strong>PDF Audit:</strong> Official compliance report for client handoff and accessibility audits.</li>
             </ul>
-
-            <!-- Modal Ad Placement (300x250) -->
-            <div
-              class="ad-slot ad-slot--modal print-hidden"
-              style="height: 160px; background: var(--color-bg-subtle); border: 1px dashed var(--color-border-subtle); border-radius: var(--radius-md); display: flex; align-items: center; justify-content: center; color: var(--color-text-muted); font-size: 0.75rem; margin-bottom: 20px;">
-              <span>Responsive Ad Placement (Palette Download)</span>
-            </div>
 
             <div style="display: flex; justify-content: flex-end; gap: 10px;">
               <app-button variant="primary" (clicked)="closeExportModal()">

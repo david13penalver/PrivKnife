@@ -44,15 +44,6 @@ export type PreviewTab = 'all' | 'chrome' | 'iphone' | 'android' | 'google';
         </p>
       </div>
 
-      <!-- Top Leaderboard Ad Slot (728x90) -->
-      <div class="l-columns__area g--margin-bottom-6 g--text-center print-hidden">
-        <div
-          class="ad-slot ad-slot--leaderboard"
-          style="max-width: 728px; height: 90px; margin: 0 auto; background: var(--color-bg-subtle); border: 1px dashed var(--color-border-subtle); border-radius: var(--radius-md); display: flex; align-items: center; justify-content: center; color: var(--color-text-muted); font-size: 0.75rem;">
-          <span>Responsive Ad Placement (728x90 Top Leaderboard)</span>
-        </div>
-      </div>
-
       <!-- Main Step 1: File Dropzone -->
       <div class="g--margin-bottom-6">
         <app-card title="1. Select or Drop Source Image">
@@ -214,25 +205,6 @@ export type PreviewTab = 'all' | 'chrome' | 'iphone' | 'android' | 'google';
           </app-card>
         </div>
 
-        <!-- Right: Sidebar Ad Slot + Summary -->
-        <div class="l-columns__area">
-          <div
-            class="ad-slot ad-slot--sidebar print-hidden g--margin-bottom-4"
-            style="height: 250px; background: var(--color-bg-subtle); border: 1px dashed var(--color-border-subtle); border-radius: var(--radius-md); display: flex; align-items: center; justify-content: center; color: var(--color-text-muted); font-size: 0.75rem;">
-            <span>Responsive Ad Placement (300x250 Medium Rectangle)</span>
-          </div>
-
-          <app-card title="Package Contents">
-            <ul style="margin: 0; padding-left: 20px; font-size: 0.875rem; line-height: 1.8; color: var(--color-text-muted);">
-              <li><strong>favicon.ico</strong> &mdash; 16x16, 32x32, 48x48 combined binary</li>
-              <li><strong>apple-touch-icon.png</strong> &mdash; 180x180 for iOS Home Screen</li>
-              <li><strong>android-chrome-192x192.png</strong> &mdash; PWA standard size</li>
-              <li><strong>android-chrome-512x512.png</strong> &mdash; PWA high-res splash</li>
-              <li><strong>favicon-16x16.png &amp; 32x32.png</strong> &mdash; Modern web PNGs</li>
-              <li><strong>site.webmanifest</strong> &mdash; Web application manifest</li>
-            </ul>
-          </app-card>
-        </div>
       </div>
 
       <!-- Step 3: Live Multi-Platform Mockup Previews -->
@@ -499,13 +471,6 @@ export type PreviewTab = 'all' | 'chrome' | 'iphone' | 'android' | 'google';
                 <strong>Paste snippet</strong> into the <code>&lt;head&gt;</code> tag of your <code>index.html</code> template.
               </li>
             </ol>
-
-            <!-- Modal Ad Placement (300x250) -->
-            <div
-              class="ad-slot ad-slot--modal print-hidden"
-              style="height: 160px; background: var(--color-bg-subtle); border: 1px dashed var(--color-border-subtle); border-radius: var(--radius-md); display: flex; align-items: center; justify-content: center; color: var(--color-text-muted); font-size: 0.75rem; margin-bottom: 20px;">
-              <span>Responsive Ad Placement (Modal Placement)</span>
-            </div>
 
             <div style="display: flex; justify-content: flex-end; gap: 10px;">
               <app-button variant="primary" (clicked)="closeDownloadModal()">

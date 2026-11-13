@@ -1,0 +1,4 @@
+npm notice run priv-knife@0.0.0 start
+npm notice run ng serve --port 4200
+An unhandled exception occurred: Port 4200 is already in use. Use '--port' to specify a different port.
+See "/tmp/ng-E1OyA1/angular-errors.log" for further details.

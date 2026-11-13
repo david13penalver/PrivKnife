@@ -50,15 +50,6 @@ const STORAGE_KEY = 'privknife_grid_paper_settings';
         </p>
       </div>
 
-      <!-- Top Leaderboard Ad Container (728x90) -->
-      <div class="l-columns__area g--margin-bottom-6 g--text-center print-hidden">
-        <div
-          class="ad-slot ad-slot--leaderboard"
-          style="max-width: 728px; height: 90px; margin: 0 auto; background: var(--color-bg-subtle); border: 1px dashed var(--color-border-subtle); border-radius: var(--radius-md); display: flex; align-items: center; justify-content: center; color: var(--color-text-muted); font-size: 0.75rem;">
-          <span>Responsive Ad Placement (728x90 Top Leaderboard)</span>
-        </div>
-      </div>
-
       <!-- Mobile Tab Switcher (Visible on small screens) -->
       <div class="l-columns__area mobile-tab-bar g--margin-bottom-4 print-hidden">
         <div class="g--flex-center" style="gap: 8px;">
@@ -85,7 +76,7 @@ const STORAGE_KEY = 'privknife_grid_paper_settings';
 
       <!-- Main Two-Column Split Layout -->
       <div class="l-columns l-columns--2 paper-workspace" style="gap: 28px; align-items: start;">
-        
+
         <!-- LEFT COLUMN: Settings & Control Sidebar -->
         <div
           class="l-columns__area controls-pane print-hidden"
@@ -477,19 +468,13 @@ const STORAGE_KEY = 'privknife_grid_paper_settings';
             }
           </div>
 
-          <!-- Sidebar Sticky Ad Unit (300x250) -->
-          <div
-            class="ad-slot ad-slot--sidebar g--margin-top-6 print-hidden"
-            style="max-width: 300px; height: 250px; margin: 24px auto 0; background: var(--color-bg-subtle); border: 1px dashed var(--color-border-subtle); border-radius: var(--radius-md); display: flex; align-items: center; justify-content: center; color: var(--color-text-muted); font-size: 0.75rem; text-align: center; padding: 12px;">
-            <span>Responsive Ad Placement<br />(300x250 Sticky Sidebar Unit)</span>
-          </div>
         </div>
 
         <!-- RIGHT COLUMN: Sticky Real-Time Live Preview & Actions -->
         <div
           class="l-columns__area preview-pane"
           [class.mobile-hidden]="activeMobileTab() === 'controls'">
-          
+
           <div style="position: sticky; top: 20px;">
             <!-- Primary Action Bar -->
             <div class="c-card g--margin-bottom-4 print-hidden" style="padding: 16px;">
@@ -535,7 +520,7 @@ const STORAGE_KEY = 'privknife_grid_paper_settings';
             <div
               class="paper-sheet-container"
               style="background: #64748b; padding: 24px; border-radius: var(--radius-md); overflow-x: auto; display: flex; justify-content: center; align-items: center; min-height: 540px;">
-              
+
               <div
                 class="paper-sheet"
                 [style.aspect-ratio]="paperAspectRatio()"
@@ -577,12 +562,6 @@ const STORAGE_KEY = 'privknife_grid_paper_settings';
           </app-badge>
               </div>
 
-              <!-- Post-Download Modal Ad Unit -->
-              <div
-                class="ad-slot ad-slot--modal"
-                style="max-width: 300px; height: 250px; margin: 0 auto; background: var(--color-bg-subtle); border: 1px dashed var(--color-border-subtle); border-radius: var(--radius-md); display: flex; align-items: center; justify-content: center; color: var(--color-text-muted); font-size: 0.75rem;">
-                <span>Responsive Ad Placement (300x250 Modal Unit)</span>
-              </div>
             </div>
             <div class="c-modal__footer">
               <button
@@ -626,7 +605,6 @@ const STORAGE_KEY = 'privknife_grid_paper_settings';
 
       @media print {
         .print-hidden,
-        .ad-slot,
         .c-header,
         .c-footer {
           display: none !important;

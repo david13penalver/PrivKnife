@@ -56,15 +56,6 @@ const DRAFT_STORAGE_KEY = 'privknife_invoice_draft';
         </p>
       </div>
 
-      <!-- Top Leaderboard Ad Container (728x90) -->
-      <div class="l-columns__area g--margin-bottom-6 g--text-center">
-        <div
-          class="ad-slot ad-slot--leaderboard"
-          style="max-width: 728px; height: 90px; margin: 0 auto; background: var(--color-bg-subtle); border: 1px dashed var(--color-border-subtle); border-radius: var(--radius-md); display: flex; align-items: center; justify-content: center; color: var(--color-text-muted); font-size: 0.75rem;">
-          <span>Responsive Ad Placement (728x90 Top Leaderboard)</span>
-        </div>
-      </div>
-
       <!-- Mobile Tab Switcher (Visible on small screens) -->
       <div class="l-columns__area mobile-tab-bar g--margin-bottom-4">
         <div class="g--flex-center" style="gap: 8px;">
@@ -91,12 +82,12 @@ const DRAFT_STORAGE_KEY = 'privknife_invoice_draft';
 
       <!-- Main Two-Column Split Layout -->
       <div class="l-columns l-columns--2 invoice-workspace" style="gap: 28px; align-items: start;">
-        
+
         <!-- LEFT COLUMN: Live Form Editor -->
         <div
           class="l-columns__area editor-pane"
           [class.mobile-hidden]="activeMobileTab() === 'preview'">
-          
+
           <!-- Document Settings & Style Card -->
           <div class="g--margin-bottom-5">
             <app-card title="Document Configuration">
@@ -600,7 +591,7 @@ const DRAFT_STORAGE_KEY = 'privknife_invoice_draft';
         <div
           class="l-columns__area preview-pane"
           [class.mobile-hidden]="activeMobileTab() === 'edit'">
-          
+
           <div style="position: sticky; top: 20px;">
             <!-- Primary Action Bar -->
             <div class="c-card g--margin-bottom-4" style="padding: 16px;">
@@ -691,12 +682,6 @@ const DRAFT_STORAGE_KEY = 'privknife_invoice_draft';
               </div>
             </div>
 
-            <!-- Sidebar Sticky Ad Container (300x250) -->
-            <div
-              class="ad-slot ad-slot--sidebar g--margin-top-4"
-              style="max-width: 300px; height: 250px; margin: 16px auto 0; background: var(--color-bg-subtle); border: 1px dashed var(--color-border-subtle); border-radius: var(--radius-md); display: flex; align-items: center; justify-content: center; color: var(--color-text-muted); font-size: 0.75rem; text-align: center; padding: 12px;">
-              <span>Responsive Ad Placement<br />(300x250 Sticky Unit)</span>
-            </div>
           </div>
         </div>
       </div>
@@ -729,12 +714,6 @@ const DRAFT_STORAGE_KEY = 'privknife_invoice_draft';
           </app-badge>
               </div>
 
-              <!-- Post-Download Modal Ad Unit -->
-              <div
-                class="ad-slot ad-slot--modal"
-                style="max-width: 300px; height: 250px; margin: 0 auto; background: var(--color-bg-subtle); border: 1px dashed var(--color-border-subtle); border-radius: var(--radius-md); display: flex; align-items: center; justify-content: center; color: var(--color-text-muted); font-size: 0.75rem;">
-                <span>Responsive Ad Placement (300x250 Modal Unit)</span>
-              </div>
             </div>
             <div class="c-modal__footer">
               <button

@@ -1,3 +1,5 @@
+> **Current audit remediation:** [Specs 92–102 and execution order](AUDIT_REMEDIATION_ROADMAP.md). Start with **92 — Reliable Test and Browser Infrastructure**.
+
 # PrivKnife Specifications & Roadmap Index
 
 > **Directory Purpose**: This directory contains the complete technical specifications and blueprints for all tools planned in **PrivKnife**, structured in their exact recommended implementation order.

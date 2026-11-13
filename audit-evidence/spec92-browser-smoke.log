@@ -1,0 +1,3 @@
+KNOWN LOCALIZATION DEFECT parametric-lamp-designer: tools.parametricLampDesigner.presets.empire, tools.parametricLampDesigner.presets.ripple, tools.parametricLampDesigner.presets.vase
+PASS parametric-lamp-designer en 390px export=stl 3519684B
+Passed 1/1 tool route(s).

@@ -42,15 +42,6 @@ import { CalendarEvent, EmbedSnippetType, RecurrenceFreq } from './types';
         </p>
       </div>
 
-      <!-- Top Leaderboard Ad Slot (728x90) -->
-      <div class="l-columns__area g--margin-bottom-6 g--text-center print-hidden">
-        <div
-          class="ad-slot ad-slot--leaderboard"
-          style="max-width: 728px; height: 90px; margin: 0 auto; background: var(--color-bg-subtle); border: 1px dashed var(--color-border-subtle); border-radius: var(--radius-md); display: flex; align-items: center; justify-content: center; color: var(--color-text-muted); font-size: 0.75rem;">
-          <span>SPONSOR ADVERTISEMENT (728&times;90 LEADERBOARD)</span>
-        </div>
-      </div>
-
       <!-- Main Studio Layout -->
       <div class="l-columns__area">
         <div class="cal-studio-grid">
@@ -148,14 +139,6 @@ import { CalendarEvent, EmbedSnippetType, RecurrenceFreq } from './types';
               </div>
             </app-card>
 
-            <!-- Sidebar Ad Slot (300x250) -->
-            <div class="g--margin-bottom-4 g--text-center print-hidden">
-              <div
-                class="ad-slot ad-slot--sidebar"
-                style="max-width: 300px; height: 250px; margin: 0 auto; background: var(--color-bg-subtle); border: 1px dashed var(--color-border-subtle); border-radius: var(--radius-md); display: flex; align-items: center; justify-content: center; color: var(--color-text-muted); font-size: 0.75rem;">
-                <span>SPONSOR (300&times;250)</span>
-              </div>
-            </div>
           </div>
 
           <!-- Right Column: Live Previews & Code Exporter -->
@@ -334,7 +317,7 @@ import { CalendarEvent, EmbedSnippetType, RecurrenceFreq } from './types';
         </div>
       </div>
 
-      <!-- Export Success Ad Modal -->
+      <!-- Export Success Modal -->
       @if (showExportModal()) {
         <div class="c-modal" (click)="closeExportModal()">
           <div class="c-modal__backdrop"></div>
@@ -354,13 +337,6 @@ import { CalendarEvent, EmbedSnippetType, RecurrenceFreq } from './types';
               <p style="color: var(--color-text-muted); font-size: 0.9375rem; margin-bottom: 16px;">
                 Your universal .ics file was generated completely in-browser and downloaded to your device with 0 network calls.
               </p>
-
-              <!-- Modal Ad Slot (300x250) -->
-              <div
-                class="ad-slot ad-slot--modal"
-                style="max-width: 300px; height: 250px; margin: 0 auto 16px; background: var(--color-bg-subtle); border: 1px dashed var(--color-border-subtle); border-radius: var(--radius-md); display: flex; align-items: center; justify-content: center; color: var(--color-text-muted); font-size: 0.75rem;">
-                <span>SPONSOR (300&times;250)</span>
-              </div>
 
               <app-button
                 variant="primary"

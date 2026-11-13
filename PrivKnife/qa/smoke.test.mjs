@@ -11,6 +11,10 @@ describe('QA harness catches seeded failures', () => {
     assert.throws(() => assertManifest([{ id: 'one', route: '/tools/one' }], 2), /expected 2/);
     assert.throws(() => assertManifest([{ id: 'one', route: '/tools/one' }, { id: 'two', route: '/tools/one' }], 2), /Duplicate/);
   });
+  it('detects advertising containers and placeholder copy', () => {
+    assert.throws(() => assertBrowserHealthy({ httpStatus: 200, pageErrors: [], failedRequests: [], adSlots: 1 }), /advertising slot/);
+    assert.throws(() => assertBrowserHealthy({ httpStatus: 200, pageErrors: [], failedRequests: [], advertisingCopy: true }), /advertising placeholder/);
+  });
   it('detects a browser exception and network failure', () => {
     assert.throws(() => assertBrowserHealthy({ httpStatus: 200, pageErrors: ['seeded exception'], failedRequests: [] }), /seeded exception/);
     assert.throws(() => assertBrowserHealthy({ httpStatus: 200, pageErrors: [], failedRequests: [{ url: '/broken', error: 'seeded' }] }), /request failed/);

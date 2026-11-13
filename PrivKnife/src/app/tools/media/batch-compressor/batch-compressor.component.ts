@@ -47,15 +47,6 @@ import {
         </p>
       </div>
 
-      <!-- Top Leaderboard Ad Slot (728x90) -->
-      <div class="l-columns__area g--margin-bottom-6 g--text-center print-hidden">
-        <div
-          class="ad-slot ad-slot--leaderboard"
-          style="max-width: 728px; height: 90px; margin: 0 auto; background: var(--color-bg-subtle); border: 1px dashed var(--color-border-subtle); border-radius: var(--radius-md); display: flex; align-items: center; justify-content: center; color: var(--color-text-muted); font-size: 0.75rem;">
-          <span>Responsive Ad Placement (728x90 Top Leaderboard)</span>
-        </div>
-      </div>
-
       <!-- Main Ingestion & Controls Section -->
       <div class="g--margin-bottom-6">
         <app-card title="1. Select or Drop Images">
@@ -72,7 +63,7 @@ import {
       <div class="g--margin-bottom-6">
         <app-card title="2. Compression &amp; Format Settings">
           <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 20px; align-items: start;">
-            
+
             <!-- Output Format -->
             <div>
               <label class="c-input__label" style="display: block; font-size: 0.8125rem; font-weight: 600; margin-bottom: 6px;">
@@ -222,7 +213,7 @@ import {
               @for (item of queue(); track item.id) {
                 <div
                   style="display: flex; align-items: center; justify-content: space-between; padding: 12px; background: var(--color-bg-subtle, #f8fafc); border: 1px solid var(--color-border-subtle, #e2e8f0); border-radius: var(--radius-sm); gap: 14px; flex-wrap: wrap;">
-                  
+
                   <!-- Left: Thumbnail & Name -->
                   <div style="display: flex; align-items: center; gap: 12px; min-width: 220px; flex: 1;">
                     <img
@@ -305,7 +296,7 @@ import {
           <div
             class="modal-card"
             style="background: #ffffff; border-radius: var(--radius-lg, 12px); max-width: 820px; width: 100%; padding: 24px; box-shadow: 0 10px 30px rgba(0,0,0,0.3); max-height: 90vh; overflow-y: auto;">
-            
+
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
               <div>
                 <h3 style="margin: 0; font-size: 1.25rem; font-weight: 700;">
@@ -328,13 +319,13 @@ import {
               <app-split-preview
                 [beforeLabel]="'Original (' + formatBytes(selectedPreviewItem()?.originalSize || 0) + ')'"
                 [afterLabel]="'Compressed (' + formatBytes(selectedPreviewItem()?.compressedSize || 0) + ')'">
-                
+
                 <img
                   before
                   [src]="selectedPreviewItem()?.originalPreviewUrl"
                   alt="Original Image"
                   style="max-height: 480px; width: 100%; object-fit: contain;" />
-                
+
                 <img
                   after
                   [src]="selectedPreviewItem()?.compressedPreviewUrl || selectedPreviewItem()?.originalPreviewUrl"
@@ -354,14 +345,6 @@ import {
         </div>
       }
 
-      <!-- Bottom / Sidebar Ad Slot (300x250) -->
-      <div class="g--margin-bottom-6 g--text-center">
-        <div
-          class="ad-slot ad-slot--sidebar"
-          style="width: 300px; height: 250px; margin: 0 auto; background: var(--color-bg-subtle); border: 1px dashed var(--color-border-subtle); border-radius: var(--radius-md); display: flex; align-items: center; justify-content: center; color: var(--color-text-muted); font-size: 0.75rem;">
-          <span>Responsive Ad Placement (300x250 Medium Rectangle)</span>
-        </div>
-      </div>
     </div>
 
     <!-- Post-Download Confirmation Modal -->
@@ -372,7 +355,7 @@ import {
         <div
           class="modal-card"
           style="background: #ffffff; border-radius: var(--radius-lg, 12px); max-width: 480px; width: 100%; padding: 24px; box-shadow: 0 10px 30px rgba(0,0,0,0.25);">
-          
+
           <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 16px;">
             <div style="font-size: 2rem;">📦</div>
             <div>
@@ -381,13 +364,6 @@ import {
                 All {{ stats().processedFiles }} optimized images were packed in-browser.
               </p>
             </div>
-          </div>
-
-          <!-- Modal Ad Slot -->
-          <div
-            class="ad-slot ad-slot--modal"
-            style="width: 100%; height: 120px; background: var(--color-bg-subtle, #f8fafc); border: 1px dashed var(--color-border-subtle, #cbd5e1); border-radius: 6px; display: flex; align-items: center; justify-content: center; color: var(--color-text-muted, #94a3b8); font-size: 0.75rem; margin-bottom: 16px;">
-            <span>Responsive Ad Placement</span>
           </div>
 
           <div style="display: flex; justify-content: flex-end;">

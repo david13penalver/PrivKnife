@@ -1,0 +1,5 @@
+npm notice run priv-knife@0.0.0 test
+npm notice run ng test --watch=false --coverage
+The following packages are required but were not found:
+  - Code coverage requires either "@vitest/coverage-v8" or "@vitest/coverage-istanbul" to be installed.
+Please install the missing packages and rerun the test command.

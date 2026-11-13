@@ -54,15 +54,6 @@ import {
         </p>
       </div>
 
-      <!-- Top Leaderboard Ad Slot (728x90) -->
-      <div class="l-columns__area g--margin-bottom-6 g--text-center print-hidden">
-        <div
-          class="ad-slot ad-slot--leaderboard"
-          style="max-width: 728px; height: 90px; margin: 0 auto; background: var(--color-bg-subtle); border: 1px dashed var(--color-border-subtle); border-radius: var(--radius-md); display: flex; align-items: center; justify-content: center; color: var(--color-text-muted); font-size: 0.75rem;">
-          <span>SPONSOR ADVERTISEMENT (728&times;90 LEADERBOARD)</span>
-        </div>
-      </div>
-
       <!-- Mode Switcher Nav -->
       <div class="l-columns__area g--margin-bottom-4 g--flex-center">
         <div class="mode-switcher-container">
@@ -379,14 +370,6 @@ import {
                 </div>
               }
 
-              <!-- Ad Slot 2 (Medium Rectangle 300x250) -->
-              <div class="g--margin-top-4 g--text-center print-hidden">
-                <div
-                  class="ad-slot ad-slot--rectangle"
-                  style="width: 300px; height: 250px; margin: 0 auto; background: var(--color-bg-subtle); border: 1px dashed var(--color-border-subtle); border-radius: var(--radius-md); display: flex; align-items: center; justify-content: center; color: var(--color-text-muted); font-size: 0.75rem;">
-                  <span>SPONSOR ADVERTISEMENT (300&times;250)</span>
-                </div>
-              </div>
             </app-card>
 
             <!-- SEO Deployment Guide Card -->

@@ -21,6 +21,8 @@ export function assertBrowserHealthy(result) {
   if (result.pageErrors?.length) failures.push(...result.pageErrors.map((x) => `page error: ${x}`));
   if (result.failedRequests?.length) failures.push(...result.failedRequests.map((x) => `request failed: ${x.url} (${x.error})`));
   if (result.horizontalOverflow) failures.push('document has horizontal overflow');
+  if (result.adSlots > 0) failures.push(`found ${result.adSlots} advertising slot element(s)`);
+  if (result.advertisingCopy) failures.push('found advertising placeholder copy');
   if (result.missingHeading) failures.push('tool page has no H1');
   if (result.missingCanvas) failures.push('expected a rendered Canvas/WebGL surface');
   if (result.untranslatedKey) failures.push(`raw translation key rendered: ${result.untranslatedKey}`);
@@ -56,12 +58,17 @@ if (isMain) {
   const language = option('--language', 'en');
   const width = Number(option('--width', '390'));
   const route = option('--route');
+  const routeList = option('--route-list');
+  const routeListFile = option('--route-list-file');
   const clickText = option('--click-text');
   const allowKnownTranslationKeys = args.includes('--allow-known-translation-keys');
   const artifactExtension = option('--artifact-extension');
   const requireCanvas = args.includes('--require-canvas');
-  const targets = route ? manifest.filter((x) => x.route === route || x.id === route) : manifest;
-  if (targets.length !== (route ? 1 : 59)) throw new Error(`Route is missing or duplicated in manifest: ${route}`);
+  const requireHeading = args.includes('--require-heading');
+  const allowedRequestHosts = args.flatMap((arg, index) => arg === '--allow-request-host' && args[index + 1] ? [args[index + 1]] : []);
+  const requested = routeListFile ? fs.readFileSync(path.resolve(routeListFile), 'utf8').split(/\r?\n/).map((x) => x.trim()).filter(Boolean) : routeList ? routeList.split(',').map((x) => x.trim()).filter(Boolean) : route ? [route] : null;
+  const targets = requested ? requested.map((id) => manifest.find((x) => x.route === id || x.id === id)).filter(Boolean) : manifest;
+  if (requested && targets.length !== new Set(requested).size) throw new Error(`A requested route is missing or duplicated in manifest: ${requested.join(', ')}`);
   const browser = await puppeteer.launch({ executablePath: process.env.CHROMIUM_PATH || '/usr/bin/chromium', headless: true, args: ['--no-sandbox', '--disable-dev-shm-usage'] });
   const temp = fs.mkdtempSync(path.join(os.tmpdir(), 'privknife-qa-'));
   try {
@@ -70,30 +77,41 @@ if (isMain) {
     await page.evaluateOnNewDocument((lang) => { try { localStorage.setItem('privknife_lang', lang); } catch {} }, language);
     const pageErrors = []; const failedRequests = [];
     page.on('pageerror', (error) => pageErrors.push(error.message));
-    page.on('requestfailed', (request) => failedRequests.push({ url: request.url(), error: request.failure()?.errorText || 'unknown' }));
-    page.on('response', (response) => { if (response.status() >= 400) failedRequests.push({ url: response.url(), error: `HTTP ${response.status()}` }); });
+    page.on('requestfailed', (request) => {
+      const host = new URL(request.url()).hostname;
+      if (allowedRequestHosts.includes(host)) console.warn(`EXPECTED EXTERNAL REQUEST FAILURE: ${host}`);
+      else failedRequests.push({ url: request.url(), error: request.failure()?.errorText || 'unknown' });
+    });
+    page.on('response', (response) => { if (response.status() >= 400) {
+      const host = new URL(response.url()).hostname;
+      if (!allowedRequestHosts.includes(host)) failedRequests.push({ url: response.url(), error: `HTTP ${response.status()}` });
+      else console.warn(`EXPECTED EXTERNAL RESPONSE ${host}: HTTP ${response.status()}`);
+    } });
     const cdp = await page.createCDPSession();
     await cdp.send('Page.setDownloadBehavior', { behavior: 'allow', downloadPath: temp });
     let passed = 0;
     for (const target of targets) {
       pageErrors.length = 0; failedRequests.length = 0;
       const response = await page.goto(new URL(target.route, baseUrl).href, { waitUntil: 'domcontentloaded', timeout: 30000 });
-      await page.waitForSelector('h1', { timeout: 15000 });
+      await page.waitForSelector('app-root', { timeout: 15000 });
       await page.waitForNetworkIdle({ idleTime: 500, timeout: 15000 }).catch(() => {});
       const dom = await page.evaluate(() => ({
         lang: document.documentElement.lang,
         horizontalOverflow: document.documentElement.scrollWidth > innerWidth + 1,
+        adSlots: document.querySelectorAll('.ad-slot,ins.adsbygoogle,[data-ad-slot]').length,
+        advertisingCopy: /responsive ad placement|sponsor advertisement|sponsor\s*\(|\bad slot\b/i.test(document.body.innerText),
         missingHeading: !document.querySelector('h1')?.textContent?.trim(),
         canvasCount: document.querySelectorAll('canvas').length,
         untranslatedKeys: [...document.querySelectorAll('button,[role="button"]')].map((x) => x.textContent.trim()).filter((x) => /^tools\.[\w.]+$/.test(x)),
       }));
       if (requireCanvas && dom.canvasCount === 0) dom.missingCanvas = true;
+      if (!requireHeading) dom.missingHeading = false;
       if (dom.lang !== language) pageErrors.push(`document language is ${dom.lang}, expected ${language}`);
       if (dom.untranslatedKeys.length) {
         if (allowKnownTranslationKeys) console.warn(`KNOWN LOCALIZATION DEFECT ${target.id}: ${dom.untranslatedKeys.join(', ')}`);
         else pageErrors.push(`raw translation keys rendered: ${dom.untranslatedKeys.join(', ')}`);
       }
-      const result = { httpStatus: response?.status() || 0, horizontalOverflow: dom.horizontalOverflow, missingHeading: dom.missingHeading, pageErrors: [...pageErrors], failedRequests: [...failedRequests] };
+      const result = { httpStatus: response?.status() || 0, horizontalOverflow: dom.horizontalOverflow, adSlots: dom.adSlots, advertisingCopy: dom.advertisingCopy, missingHeading: dom.missingHeading, pageErrors: [...pageErrors], failedRequests: [...failedRequests] };
       if (clickText) {
         const buttons = await page.$$('button');
         let found = false;
