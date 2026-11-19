@@ -669,6 +669,22 @@ export const en = {
       previewTitle: 'Live Page Preview & Download',
       downloadBtn: 'Download Stamped PDF',
     },
+    pdfImageConverter: {
+      name: 'PDF to Images & Images to PDF Studio',
+      description: 'Turn PDF pages into 300 DPI PNG, JPG, or WebP images—or combine and reorder photos into a clean PDF locally.',
+      modePdfToImages: 'PDF to Images',
+      modeImagesToPdf: 'Images to PDF',
+      uploadPdfTitle: 'Select PDF Document',
+      uploadImagesTitle: 'Add Images or Scans',
+      loadSamplePdf: 'Load Sample PDF',
+      loadSampleImages: 'Load Sample Images',
+      settingsTitle: 'Conversion & Layout Settings',
+      outputTitle: 'Queue & Export Output',
+      convertToImagesBtn: 'Convert to Images',
+      compilePdfBtn: 'Create PDF',
+      downloadBtn: 'Download Output',
+      resetBtn: 'Reset',
+    },
   },
 };
 

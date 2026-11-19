@@ -258,6 +258,12 @@
     "source": "PrivKnife/src/app/tools/documents/pdf-compressor"
   },
   {
+    "id": "pdf-image-converter",
+    "route": "/tools/pdf-image-converter",
+    "category": "documents",
+    "source": "PrivKnife/src/app/tools/documents/pdf-image-converter"
+  },
+  {
     "id": "pdf-merger",
     "route": "/tools/pdf-merger-splitter",
     "category": "documents",

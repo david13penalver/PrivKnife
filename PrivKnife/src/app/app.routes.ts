@@ -122,6 +122,27 @@ export const routes: Routes = [
       ),
   },
   {
+    path: 'tools/pdf-image-converter',
+    title: 'PDF to Images & Images to PDF Studio — PrivKnife',
+    data: {
+      description:
+        'Convert PDF pages to high-DPI PNG, JPG, or WebP images—or combine and reorder photos into a PDF—100% locally in your browser.',
+      keywords: [
+        'pdf to jpg',
+        'pdf to png',
+        'pdf to webp',
+        'images to pdf',
+        'jpg to pdf',
+        'scan to pdf',
+      ],
+      url: '/tools/pdf-image-converter',
+    },
+    loadComponent: () =>
+      import('./tools/documents/pdf-image-converter/pdf-image-converter.component').then(
+        (m) => m.PdfImageConverterComponent
+      ),
+  },
+  {
     path: 'tools/pdf-merger-splitter',
     title: 'PDF Merger, Splitter & Page Organizer — PrivKnife',
     data: {

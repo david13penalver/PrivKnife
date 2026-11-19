@@ -90,6 +90,20 @@ const CATALOG_TOOLS: CatalogTool[] = [
     icon: '🏷️',
   },
   {
+    id: 'pdf-image-converter',
+    i18nKey: 'pdfImageConverter',
+    name: 'PDF to Images & Images to PDF Studio',
+    category: 'documents',
+    categoryLabel: 'Documents',
+    description:
+      'Convert PDF pages into 300 DPI PNG/JPG/WebP images, or combine and enhance scanned photos into a PDF.',
+    keywords: ['pdf to jpg', 'pdf to png', 'images to pdf', 'scan', 'documents'],
+    status: 'ready',
+    route: '/tools/pdf-image-converter',
+    techStack: 'PDF.js • pdf-lib • JSZip',
+    icon: '🖼️',
+  },
+  {
     id: 'pdf-merger-splitter',
     i18nKey: 'pdfMerger',
     name: 'PDF Merger, Splitter & Page Organizer',
