@@ -38,6 +38,7 @@ import { invoiceMakerTool } from './documents/invoice-maker';
 import { localOcrTextExtractorTool } from './documents/local-ocr-text-extractor';
 import { markdownCheatsheetTool } from './documents/markdown-cheatsheet';
 import { nutritionLabelMakerTool } from './documents/nutrition-label-maker';
+import { pdfCompressorTool } from './documents/pdf-compressor';
 import { pdfMergerTool } from './documents/pdf-merger';
 import { pdfSignerStamperTool } from './documents/pdf-signer-stamper';
 import { tableTentMakerTool } from './documents/table-tent-maker';
@@ -117,6 +118,7 @@ export const TOOL_REGISTRY: ToolDefinition[] = [
   csvVectorChartBuilderTool,
   backgroundRemoverTool,
   dnsCheckerTool,
+  pdfCompressorTool,
 ];
 
 export function getToolById(id: string): ToolDefinition | undefined {
@@ -241,6 +243,7 @@ export const TOOL_I18N_MAP: Record<string, string> = {
   'backgroundRemover': 'backgroundRemover',
   'background-remover': 'backgroundRemover',
   'dns-checker': 'dnsChecker',
+  'pdf-compressor': 'pdfCompressor',
 };
 
 export function getToolI18nKey(id: string): string | undefined {

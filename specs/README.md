@@ -206,6 +206,42 @@ gantt
 
 ---
 
+### 🚀 Batch 3 Specifications Catalog — PDF & Developer Suites (Specs 103–122)
+
+> Based on [`PROPOSED_NEW_TOOLS.md`](../PROPOSED_NEW_TOOLS.md), Specs **103–113** complete the client-side PDF suite (inspired by iLovePDF) and Specs **114–122** complete the zero-telemetry Developer utilities suite (inspired by Coddy.tech).
+
+#### 📄 Batch 3A — Client-Side PDF Suite (Specs 103–113)
+
+| # | Spec Folder | Category | Deliverable | Client-Side Tech Stack | Status |
+|---|---|---|---|---|:---:|
+| **103** | [103 - Client-Side PDF Compressor & Image Downsampler](103%20-%20Client-Side%20PDF%20Compressor%20%26%20Image%20Downsampler/spec.md) | Documents / PDF | Size-reduced `.pdf` (or batch `.zip`) with before/after visual split | `pdf-lib`, `pdfjs-dist`, `OffscreenCanvas`, `JSZip`, Web Workers | [x] |
+| **104** | [104 - PDF Watermark, Page Numbers & Bates Stamper](104%20-%20PDF%20Watermark%2C%20Page%20Numbers%20%26%20Bates%20Stamper/spec.md) | Documents / PDF | Vector-stamped `.pdf` (watermarks, page numbers, legal Bates codes) | `pdf-lib`, `pdfjs-dist`, HTML5 Canvas, Web Workers | [ ] |
+| **105** | [105 - PDF to Images & Images to PDF Studio](105%20-%20PDF%20to%20Images%20%26%20Images%20to%20PDF%20Studio/spec.md) | Documents / PDF | 72–300 DPI `.png`/`.jpg`/`.webp` (or `.zip`) and multi-page `.pdf` | `pdfjs-dist`, `pdf-lib`, `JSZip`, `OffscreenCanvas` | [ ] |
+| **106** | [106 - PDF Password Protector & Unlocker](106%20-%20PDF%20Password%20Protector%20%26%20Unlocker/spec.md) | Documents / PDF | AES-256 encrypted `.pdf` or decrypted unrestricted `.pdf` | Self-hosted `qpdf-wasm` (`/assets/wasm/`), `pdfjs-dist`, Web Workers | [ ] |
+| **107** | [107 - PDF Margin Cropper, Resizer & N-Up Booklet Maker](107%20-%20PDF%20Margin%20Cropper%2C%20Resizer%20%26%20N-Up%20Booklet%20Maker/spec.md) | Documents / PDF | Auto-trimmed, resized, 2-up/4-up, or saddle-stitch booklet `.pdf` | `pdf-lib`, `pdfjs-dist`, HTML5 Canvas, Web Workers | [ ] |
+| **108** | [108 - Interactive PDF Form Filler, Creator & Flattener](108%20-%20Interactive%20PDF%20Form%20Filler%2C%20Creator%20%26%20Flattener/spec.md) | Documents / PDF | Editable or flattened AcroForm `.pdf` + reusable `.json` form snapshot | `pdf-lib` (`PDFForm`), `pdfjs-dist`, Angular Signals | [ ] |
+| **109** | [109 - Visual PDF Comparison & Overlay Diff Tool](109%20-%20Visual%20PDF%20Comparison%20%26%20Overlay%20Diff%20Tool/spec.md) | Documents / PDF | Visual overlay/curtain diff, semantic text diff, exportable `.pdf`/`.html` report | `pdfjs-dist`, YIQ pixel diff + Myers text diff in Web Worker, `jsPDF` | [ ] |
+| **110** | [110 - PDF to Excel, CSV & JSON Table Extractor](110%20-%20PDF%20to%20Excel%2C%20CSV%20%26%20JSON%20Table%20Extractor/spec.md) | Documents / PDF | Multi-sheet `.xlsx`, RFC-4180 `.csv`, `.json`, and clipboard TSV | `pdfjs-dist`, spatial X/Y clustering in Web Worker, `xlsx`, `PapaParse` | [ ] |
+| **111** | [111 - PDF to Word (DOCX) & Markdown Layout Converter](111%20-%20PDF%20to%20Word%20%28DOCX%29%20%26%20Markdown%20Layout%20Converter/spec.md) | Documents / PDF | Editable OOXML `.docx`, GFM `.md`, and `.txt` | `pdfjs-dist`, Pure-TS OOXML + `JSZip`, `DOMPurify`, Web Workers | [ ] |
+| **112** | [112 - Office & HTML to PDF Local Converter](112%20-%20Office%20%26%20HTML%20to%20PDF%20Local%20Converter/spec.md) | Documents / PDF | Searchable print-ready `.pdf` from `.docx`, `.xlsx`, `.csv`, `.html`, `.md` | `JSZip`, `xlsx`, `marked`, `DOMPurify` (zero-network sandbox), `jsPDF` | [ ] |
+| **113** | [113 - PDF Structural Repair, Metadata Editor & PDF-A Archiver](113%20-%20PDF%20Structural%20Repair%2C%20Metadata%20Editor%20%26%20PDF-A%20Archiver/spec.md) | Documents / PDF | Repaired/linearized `.pdf`, metadata-scrubbed `.pdf`, and PDF/A-2b archival `.pdf` | Self-hosted `qpdf-wasm`, `pdf-lib`, `pdfjs-dist`, bundled sRGB ICC | [ ] |
+
+#### 💻 Batch 3B — Client-Side Developer Suite (Specs 114–122)
+
+| # | Spec Folder | Category | Deliverable | Client-Side Tech Stack | Status |
+|---|---|---|---|---|:---:|
+| **114** | [114 - JSON, SQL & YAML Formatter, Validator & Type Generator](114%20-%20JSON%2C%20SQL%20%26%20YAML%20Formatter%2C%20Validator%20%26%20Type%20Generator/spec.md) | Dev / Data | Formatted `.json`/`.sql`/`.yaml`, JSONPath results, TypeScript & Zod schemas | Pure TS / `sql-formatter` / `yaml`, JSONPath engine, Web Workers | [ ] |
+| **115** | [115 - Interactive Regex Tester, Debugger & Explainer](115%20-%20Interactive%20Regex%20Tester%2C%20Debugger%20%26%20Explainer/spec.md) | Dev / Data | Highlighted matches, AST explanation, `.json`/`.csv` extraction, multi-lang code | Watchdog-guarded `RegExp` Web Worker (ReDoS-safe), Pure TS AST Explainer | [ ] |
+| **116** | [116 - JWT Debugger, Signature Verifier & Token Minting Studio](116%20-%20JWT%20Debugger%2C%20Signature%20Verifier%20%26%20Token%20Minting%20Studio/spec.md) | Dev / Security | Decoded/verified JWT, claim audit, ephemeral keypair & minted dev JWT | Native Web Crypto API (`crypto.subtle`), Pure TS Base64Url & PEM/JWK | [ ] |
+| **117** | [117 - Universal Encoder - Decoder Workbench](117%20-%20Universal%20Encoder%20-%20Decoder%20Workbench/spec.md) | Dev / Data | Base64/File Data-URI, URL query table, HTML/Hex/Binary, Morse CW `.wav` | Native `TextEncoder`/`URL`, Magic-Byte Sniffer, Web Audio CW Synth, Workers | [ ] |
+| **118** | [118 - Cron Expression Builder, Human Explainer & Schedule Simulator](118%20-%20Cron%20Expression%20Builder%2C%20Human%20Explainer%20%26%20Schedule%20Simulator/spec.md) | Dev / DevOps | Verified 5/6-field cron, EN/ES summary, IANA TZ run timeline, K8s/GHA snippets | Pure TS POSIX Cron Parser & Explainer, Native `Intl.DateTimeFormat` | [ ] |
+| **119** | [119 - Unix Epoch, ISO-8601 & Multi-Timezone Timestamp Converter](119%20-%20Unix%20Epoch%2C%20ISO-8601%20%26%20Multi-Timezone%20Timestamp%20Converter/spec.md) | Dev / Data | Exact `BigInt` s/ms/μs/ns conversions, TZ matrix, deltas, Discord tags, batch `.csv` | Native `BigInt`, `Intl.DateTimeFormat`, `Intl.RelativeTimeFormat` | [ ] |
+| **120** | [120 - Cryptographic Password, Passphrase & API Key Generator](120%20-%20Cryptographic%20Password%2C%20Passphrase%20%26%20API%20Key%20Generator/spec.md) | Dev / Security | Unbiased passwords, EFF Diceware passphrases, `.env` API keys, entropy audit | Native `crypto.getRandomValues` (rejection sampling), local EFF wordlist | [ ] |
+| **121** | [121 - String Case, Text Transform & Unicode Typography Studio](121%20-%20String%20Case%2C%20Text%20Transform%20%26%20Unicode%20Typography%20Studio/spec.md) | Dev / Text | 13 identifier cases (batch), 14 hole-free Unicode styles, Zalgo, 150+ Kaomojis | Pure TS Acronym Tokenizer, Unicode Codepoint Tables, Diacritic Engine | [ ] |
+| **122** | [122 - ASCII Art Banner, Image-to-ASCII & 2D QR-Barcode Studio](122%20-%20ASCII%20Art%20Banner%2C%20Image-to-ASCII%20%26%202D%20QR-Barcode%20Studio/spec.md) | Dev / Media | CLI ASCII banners, Braille/ASCII image art, static SVG/PNG QR & 1D barcodes | `qrcode`, `jsbarcode`, bundled ASCII fonts, Canvas Luminance/Braille engine | [ ] |
+
+---
+
 ## 📖 How to Use These Specs
 
 When implementing any tool:

@@ -4,7 +4,7 @@ import path from 'node:path';
 import { pathToFileURL } from 'node:url';
 import puppeteer from 'puppeteer-core';
 
-export function assertManifest(manifest, expectedCount = 58) {
+export function assertManifest(manifest, expectedCount = 59) {
   if (manifest.length !== expectedCount) throw new Error(`Tool manifest has ${manifest.length} entries; expected ${expectedCount}`);
   const ids = new Set();
   const routes = new Set();

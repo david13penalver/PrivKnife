@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import { assertManifest } from './smoke.mjs';
 
-it('keeps the 58-tool browser manifest in sync with canonical lazy routes', () => {
+it('keeps the browser manifest in sync with canonical lazy routes', () => {
   const root = new URL('../src/app/app.routes.ts', import.meta.url);
   const source = fs.readFileSync(root, 'utf8');
   const canonical = [...source.matchAll(/path: '(tools\/[^']+)'([\s\S]*?)(?=\n  \},)/g)]

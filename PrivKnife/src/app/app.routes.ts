@@ -102,6 +102,26 @@ export const routes: Routes = [
       import('./tools/dev/csv-converter').then((m) => m.CsvConverterComponent),
   },
   {
+    path: 'tools/pdf-compressor',
+    title: 'Client-Side PDF Compressor & Image Downsampler — PrivKnife',
+    data: {
+      description:
+        'Shrink bloated PDF files by up to 80% directly in your browser while preserving selectable vector text. 100% client-side with zero uploads.',
+      keywords: [
+        'compress pdf',
+        'reduce pdf file size',
+        'pdf compressor no upload',
+        'downsample pdf images',
+        'client side pdf compressor',
+      ],
+      url: '/tools/pdf-compressor',
+    },
+    loadComponent: () =>
+      import('./tools/documents/pdf-compressor/pdf-compressor.component').then(
+        (m) => m.PdfCompressorComponent
+      ),
+  },
+  {
     path: 'tools/pdf-merger-splitter',
     title: 'PDF Merger, Splitter & Page Organizer — PrivKnife',
     data: {

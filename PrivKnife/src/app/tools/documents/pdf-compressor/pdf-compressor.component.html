@@ -1,0 +1,330 @@
+<div class="l-page">
+  <header class="l-page__header c-header">
+    <div class="c-header__title-group">
+      <h1 class="c-header__title">{{ 'tools.pdfCompressor.name' | translate }}</h1>
+      <p class="c-header__subtitle">{{ 'tools.pdfCompressor.description' | translate }}</p>
+    </div>
+    <div class="c-badge c-badge--privacy">
+      {{ 'common.privacyBadge' | translate }}
+    </div>
+  </header>
+
+  @if (largeFileWarning()) {
+    <div class="c-pdf-compressor__alert c-pdf-compressor__alert--warn g--margin-bottom-4" role="status" aria-live="polite">
+      {{ 'tools.pdfCompressor.largeFileWarning' | translate }}
+    </div>
+  }
+
+  @if (errorMessage()) {
+    <div class="c-pdf-compressor__alert c-pdf-compressor__alert--error g--margin-bottom-4" role="alert" aria-live="polite">
+      {{ errorMessage() }}
+    </div>
+  }
+
+  <div class="l-columns l-columns--2">
+    <!-- Left Column: Upload & Compression Controls -->
+    <div class="l-columns__area">
+      <app-card [title]="'tools.pdfCompressor.uploadTitle' | translate" class="g--margin-bottom-4">
+        <app-dropzone
+          [title]="'tools.pdfCompressor.uploadTitle' | translate"
+          subtitle="Drop one or multiple .pdf files (100% offline processing)"
+          accept=".pdf,application/pdf"
+          [multiple]="true"
+          [maxSizeMb]="500"
+          (filesSelected)="onFilesDropped($event)"
+        />
+
+        <div class="c-pdf-compressor__toolbar g--margin-top-3">
+          <button
+            type="button"
+            class="c-button c-button--small c-button--outline"
+            (click)="loadSamplePdf()"
+          >
+            {{ 'tools.pdfCompressor.loadSample' | translate }}
+          </button>
+        </div>
+
+        @if (queuedFiles().length > 0) {
+          <ul class="c-pdf-compressor__queue g--margin-top-3">
+            @for (file of queuedFiles(); track file.fileName + '-' + $index) {
+              <li class="c-pdf-compressor__queue-item">
+                <span class="c-pdf-compressor__queue-name">
+                  {{ file.fileName }}
+                  <small class="c-pdf-compressor__queue-size">({{ formatBytes(file.sizeBytes) }})</small>
+                </span>
+                <button
+                  type="button"
+                  class="c-button c-button--small c-button--outline"
+                  (click)="removeQueuedFile($index)"
+                  [attr.aria-label]="'Remove ' + file.fileName"
+                >
+                  ✕
+                </button>
+              </li>
+            }
+          </ul>
+        }
+      </app-card>
+
+      <app-card [title]="'tools.pdfCompressor.presetTitle' | translate" class="g--margin-bottom-4">
+        <div
+          class="c-pdf-compressor__presets g--margin-bottom-4"
+          role="radiogroup"
+          [attr.aria-label]="'tools.pdfCompressor.presetTitle' | translate"
+        >
+          <button
+            type="button"
+            role="radio"
+            class="c-pdf-compressor__preset-btn"
+            [class.is-active]="preset() === 'extreme'"
+            [attr.aria-checked]="preset() === 'extreme'"
+            (click)="selectPreset('extreme')"
+          >
+            <strong>Extreme</strong>
+            <span>96 DPI · 50%</span>
+          </button>
+          <button
+            type="button"
+            role="radio"
+            class="c-pdf-compressor__preset-btn"
+            [class.is-active]="preset() === 'recommended'"
+            [attr.aria-checked]="preset() === 'recommended'"
+            (click)="selectPreset('recommended')"
+          >
+            <strong>Recommended</strong>
+            <span>150 DPI · 72%</span>
+          </button>
+          <button
+            type="button"
+            role="radio"
+            class="c-pdf-compressor__preset-btn"
+            [class.is-active]="preset() === 'high_quality'"
+            [attr.aria-checked]="preset() === 'high_quality'"
+            (click)="selectPreset('high_quality')"
+          >
+            <strong>High Quality</strong>
+            <span>240 DPI · 86%</span>
+          </button>
+        </div>
+
+        <h4 class="c-pdf-compressor__section-heading">{{ 'tools.pdfCompressor.settingsTitle' | translate }}</h4>
+
+        <div class="c-input g--margin-bottom-3">
+          <span class="c-input__label">Compression Engine</span>
+          <div class="c-pdf-compressor__mode-row">
+            <button
+              type="button"
+              class="c-button c-button--small"
+              [class.c-button--primary]="mode() === 'smart_stream'"
+              [class.c-button--outline]="mode() !== 'smart_stream'"
+              (click)="setMode('smart_stream')"
+            >
+              Smart Stream (Keep Text)
+            </button>
+            <button
+              type="button"
+              class="c-button c-button--small"
+              [class.c-button--primary]="mode() === 'rasterize_pages'"
+              [class.c-button--outline]="mode() !== 'rasterize_pages'"
+              (click)="setMode('rasterize_pages')"
+            >
+              Full Rasterize
+            </button>
+          </div>
+          @if (mode() === 'rasterize_pages') {
+            <p class="c-pdf-compressor__hint">
+              Rasterize mode converts pages to compact JPEG images (text becomes non-selectable).
+            </p>
+          }
+        </div>
+
+        <div class="c-input g--margin-bottom-3">
+          <label class="c-input__label" for="pdf-comp-dpi">
+            Target DPI: <strong>{{ targetDpi() }} DPI</strong>
+          </label>
+          <input
+            id="pdf-comp-dpi"
+            type="range"
+            class="c-input__slider"
+            min="72"
+            max="300"
+            step="6"
+            [ngModel]="targetDpi()"
+            (ngModelChange)="setTargetDpi($event)"
+            [attr.aria-valuetext]="targetDpi() + ' DPI'"
+          />
+        </div>
+
+        <div class="c-input g--margin-bottom-3">
+          <label class="c-input__label" for="pdf-comp-quality">
+            JPEG Quality: <strong>{{ (jpegQuality() * 100).toFixed(0) }}%</strong>
+          </label>
+          <input
+            id="pdf-comp-quality"
+            type="range"
+            class="c-input__slider"
+            min="0.25"
+            max="0.95"
+            step="0.01"
+            [ngModel]="jpegQuality()"
+            (ngModelChange)="setJpegQuality($event)"
+            [attr.aria-valuetext]="(jpegQuality() * 100).toFixed(0) + '% JPEG quality'"
+          />
+        </div>
+
+        <div class="c-input g--margin-bottom-3">
+          <label class="c-input__label" for="pdf-comp-maxdim">
+            Max Image Edge: <strong>{{ maxImageDimensionPx() }} px</strong>
+          </label>
+          <input
+            id="pdf-comp-maxdim"
+            type="range"
+            class="c-input__slider"
+            min="800"
+            max="4000"
+            step="100"
+            [ngModel]="maxImageDimensionPx()"
+            (ngModelChange)="setMaxImageDimensionPx($event)"
+            [attr.aria-valuetext]="maxImageDimensionPx() + ' px'"
+          />
+        </div>
+
+        <div class="c-pdf-compressor__toggles">
+          <label class="c-pdf-compressor__check">
+            <input type="checkbox" [checked]="convertToGrayscale()" (change)="toggleGrayscale()" />
+            <span>Convert images to Grayscale</span>
+          </label>
+          <label class="c-pdf-compressor__check">
+            <input type="checkbox" [checked]="stripMetadata()" (change)="toggleStripMetadata()" />
+            <span>Strip Info & XMP metadata</span>
+          </label>
+          <label class="c-pdf-compressor__check">
+            <input type="checkbox" [checked]="removeThumbnails()" (change)="toggleRemoveThumbnails()" />
+            <span>Remove embedded page thumbnails</span>
+          </label>
+        </div>
+
+        @if (isProcessing()) {
+          <div class="g--margin-top-4" aria-live="polite">
+            <app-progress-bar [value]="progressPercent()" [label]="progressStage()" />
+          </div>
+        }
+
+        <div card-footer class="l-extremo">
+          <button
+            type="button"
+            class="l-extremo__area-izquierda c-button c-button--outline"
+            (click)="reset()"
+          >
+            {{ 'tools.pdfCompressor.resetBtn' | translate }}
+          </button>
+          <button
+            type="button"
+            class="l-extremo__area-derecha c-button c-button--primary"
+            [disabled]="!canCompress()"
+            (click)="compressAll()"
+          >
+            {{ 'tools.pdfCompressor.compressBtn' | translate }}
+          </button>
+        </div>
+      </app-card>
+    </div>
+
+    <!-- Right Column: Savings Metrics & Split Visual Preview -->
+    <div class="l-columns__area">
+      <app-card [title]="'tools.pdfCompressor.previewTitle' | translate">
+        @if (results().length > 0) {
+          <div class="c-pdf-compressor__savings g--margin-bottom-4" aria-live="polite">
+            <div class="c-pdf-compressor__savings-stat">
+              <span>Original</span>
+              <strong>{{ formatBytes(totalOriginalBytes()) }}</strong>
+            </div>
+            <div class="c-pdf-compressor__savings-stat">
+              <span>Compressed</span>
+              <strong>{{ formatBytes(totalCompressedBytes()) }}</strong>
+            </div>
+            <div class="c-pdf-compressor__savings-stat c-pdf-compressor__savings-stat--highlight">
+              <span>Saved</span>
+              <strong>-{{ totalSavingsPercent() }}% ({{ formatBytes(totalSavedBytes()) }})</strong>
+            </div>
+          </div>
+
+          <ul class="c-pdf-compressor__results g--margin-bottom-4">
+            @for (res of results(); track res.outputFileName + '-' + $index) {
+              <li
+                class="c-pdf-compressor__result-row"
+                [class.is-selected]="selectedPreviewIndex() === $index"
+              >
+                <button
+                  type="button"
+                  class="c-pdf-compressor__result-info"
+                  (click)="selectPreviewFile($index)"
+                >
+                  <strong>{{ res.outputFileName }}</strong>
+                  <span>
+                    {{ formatBytes(res.metrics.originalBytes) }} → {{ formatBytes(res.metrics.compressedBytes) }}
+                    (-{{ res.metrics.savingsPercent }}% · {{ res.metrics.imagesOptimized }} img)
+                  </span>
+                  @if (res.metrics.usedOriginalFallback) {
+                    <small class="c-pdf-compressor__hint">Already optimal — kept smallest copy</small>
+                  }
+                </button>
+                <button
+                  type="button"
+                  class="c-button c-button--small c-button--primary"
+                  (click)="downloadFile($index)"
+                >
+                  {{ 'tools.pdfCompressor.downloadPdf' | translate }}
+                </button>
+              </li>
+            }
+          </ul>
+
+          @if (activeResult(); as active) {
+            <div class="c-pdf-compressor__preview-box" [class.is-hidden]="!previewAvailable()">
+              <div class="l-extremo g--margin-bottom-2">
+                <button
+                  type="button"
+                  class="l-extremo__area-izquierda c-button c-button--small c-button--outline"
+                  [disabled]="previewPageNumber() <= 1"
+                  (click)="changePreviewPage(-1)"
+                >
+                  ← Prev
+                </button>
+                <span>Page {{ previewPageNumber() }} / {{ active.metrics.pageCount }}</span>
+                <button
+                  type="button"
+                  class="l-extremo__area-derecha c-button c-button--small c-button--outline"
+                  [disabled]="previewPageNumber() >= active.metrics.pageCount"
+                  (click)="changePreviewPage(1)"
+                >
+                  Next →
+                </button>
+              </div>
+              <app-split-preview beforeLabel="Original" afterLabel="Compressed">
+                <canvas #beforeCanvas before class="c-pdf-compressor__canvas"></canvas>
+                <canvas #afterCanvas after class="c-pdf-compressor__canvas"></canvas>
+              </app-split-preview>
+            </div>
+          }
+
+          @if (bundleZipBlob()) {
+            <div card-footer class="l-extremo">
+              <button
+                type="button"
+                class="l-extremo__area-derecha c-button c-button--primary"
+                (click)="downloadZipBundle()"
+              >
+                {{ 'tools.pdfCompressor.downloadZip' | translate }}
+              </button>
+            </div>
+          }
+        } @else {
+          <div class="c-pdf-compressor__empty">
+            <p>Drop a PDF or load the sample brochure on the left, then click Compress to inspect file size savings and quality.</p>
+          </div>
+        }
+      </app-card>
+    </div>
+  </div>
+</div>

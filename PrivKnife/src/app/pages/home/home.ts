@@ -62,6 +62,20 @@ const CATALOG_TOOLS: CatalogTool[] = [
     icon: '📊',
   },
   {
+    id: 'pdf-compressor',
+    i18nKey: 'pdfCompressor',
+    name: 'Client-Side PDF Compressor & Image Downsampler',
+    category: 'documents',
+    categoryLabel: 'Documents',
+    description:
+      'Shrink bloated PDF files up to 80% locally in browser RAM while keeping crisp vector text.',
+    keywords: ['pdf', 'compress', 'reduce size', 'downsample', 'shrink', 'documents'],
+    status: 'ready',
+    route: '/tools/pdf-compressor',
+    techStack: 'pdf-lib • OffscreenCanvas • Worker',
+    icon: '🗜️',
+  },
+  {
     id: 'pdf-merger-splitter',
     i18nKey: 'pdfMerger',
     name: 'PDF Merger, Splitter & Page Organizer',

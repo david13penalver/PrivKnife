@@ -252,6 +252,12 @@
     "source": "PrivKnife/src/app/tools/media/passport-biometric-photo"
   },
   {
+    "id": "pdf-compressor",
+    "route": "/tools/pdf-compressor",
+    "category": "documents",
+    "source": "PrivKnife/src/app/tools/documents/pdf-compressor"
+  },
+  {
     "id": "pdf-merger",
     "route": "/tools/pdf-merger-splitter",
     "category": "documents",

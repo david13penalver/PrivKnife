@@ -642,6 +642,20 @@ export const en = {
       downloadPng: 'Download High-Res PNG',
       copySvg: 'Copy Embed SVG',
     },
+    pdfCompressor: {
+      name: 'Client-Side PDF Compressor & Image Downsampler',
+      description: 'Shrink bloated PDFs by up to 80% directly in your browser while preserving crisp vector text and zero uploads.',
+      uploadTitle: 'Drop PDF Document(s)',
+      presetTitle: 'Compression Preset',
+      settingsTitle: 'Downsampling & Metadata Settings',
+      previewTitle: 'Size Savings & Quality Preview',
+      compressBtn: 'Compress PDF',
+      downloadPdf: 'Download PDF',
+      downloadZip: 'Download All (.zip)',
+      resetBtn: 'Reset',
+      loadSample: 'Load Sample PDF',
+      largeFileWarning: 'File exceeds 100 MB. Compression runs locally in your browser memory and may take a moment.',
+    },
   },
 };
 
