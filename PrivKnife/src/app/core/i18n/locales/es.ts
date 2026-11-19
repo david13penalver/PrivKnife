@@ -811,5 +811,18 @@ export const es: TranslationSchema = {
       downloadBtn: 'Descargar .pdf',
       resetBtn: 'Restablecer',
     },
+    jsonSqlFormatter: {
+      name: 'Formateador JSON, SQL y YAML y Generador de Tipos',
+      description:
+        'Formatea, minifica y valida JSON, SQL multidialecto y YAML; ejecuta consultas JSONPath e infiere interfaces TypeScript y esquemas Zod localmente.',
+      inputTitle: 'Código de Entrada',
+      outputTitle: 'Resultado e Inspector de Esquemas',
+      formatBtn: 'Formatear',
+      minifyBtn: 'Minificar',
+      loadSample: 'Ejemplo',
+      downloadBtn: 'Descargar',
+      copyBtn: 'Copiar Salida',
+      resetBtn: 'Restablecer',
+    },
   },
 };

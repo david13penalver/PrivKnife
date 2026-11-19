@@ -27,6 +27,7 @@ import { csvVectorChartBuilderTool } from './dev/csv-vector-chart-builder';
 import { diffCheckerTool } from './dev/diff-checker';
 import { dnsCheckerTool } from './dev/dns-checker';
 import { fontSubsetterConverterTool } from './dev/font-subsetter-converter';
+import { jsonSqlFormatterTool } from './dev/json-sql-formatter';
 import { emailSignatureGeneratorTool } from './dev/email-signature-generator';
 import { cssMeshGradientMakerTool } from './dev/mesh-gradient-maker';
 import { robotsSitemapBuilderTool } from './dev/robots-sitemap-builder';
@@ -139,6 +140,7 @@ export const TOOL_REGISTRY: ToolDefinition[] = [
   pdfToWordMarkdownTool,
   officeHtmlToPdfTool,
   pdfRepairMetadataTool,
+  jsonSqlFormatterTool,
 ];
 
 export function getToolById(id: string): ToolDefinition | undefined {
@@ -274,6 +276,7 @@ export const TOOL_I18N_MAP: Record<string, string> = {
   'pdf-to-word-markdown': 'pdfToWordMarkdown',
   'office-html-to-pdf': 'officeHtmlToPdf',
   'pdf-repair-metadata': 'pdfRepairMetadata',
+  'json-sql-formatter': 'jsonSqlFormatter',
 };
 
 export function getToolI18nKey(id: string): string | undefined {

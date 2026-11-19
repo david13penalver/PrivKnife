@@ -811,5 +811,18 @@ export const ar: TranslationSchema = {
       downloadBtn: 'تنزيل .pdf',
       resetBtn: 'إعادة ضبط',
     },
+    jsonSqlFormatter: {
+      name: 'منسّق ومدقق JSON وSQL وYAML ومولّد أنواع TypeScript وZod',
+      description:
+        'تنسيق وضغط والتحقق من صحة JSON وSQL وYAML محلياً، مع استعلام JSONPath واستنتاج واجهات TypeScript ومخططات Zod داخل المتصفح.',
+      inputTitle: 'إدخال الشيفرة',
+      outputTitle: 'المخرجات المنسّقة والمخططات',
+      formatBtn: 'تنسيق',
+      minifyBtn: 'ضغط',
+      loadSample: 'مثال',
+      downloadBtn: 'تنزيل',
+      copyBtn: 'نسخ المخرجات',
+      resetBtn: 'إعادة ضبط',
+    },
   },
 };

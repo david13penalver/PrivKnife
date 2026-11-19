@@ -2107,6 +2107,23 @@ export const routes: Routes = [
     pathMatch: 'full',
   },
   {
+    path: 'tools/json-sql-formatter',
+    title: 'JSON, SQL & YAML Formatter, Validator & Type Generator - PrivKnife',
+    data: {
+      seo: {
+        title: 'JSON Formatter, SQL Beautifier, YAML & TypeScript/Zod Generator | PrivKnife',
+        description:
+          'Format, minify, and validate JSON, SQL, and YAML 100% locally in your browser with JSONPath queries and instant TypeScript & Zod schema inference.',
+        keywords:
+          'json formatter validator, sql beautifier client side, yaml converter, json to typescript, json to zod, jsonpath evaluator',
+      },
+    },
+    loadComponent: () =>
+      import('./tools/dev/json-sql-formatter/json-sql-formatter.component').then(
+        (m) => m.JsonSqlFormatterComponent
+      ),
+  },
+  {
     path: '**',
     title: 'Page Not Found — PrivKnife',
     data: {

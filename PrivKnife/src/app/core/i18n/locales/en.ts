@@ -809,6 +809,19 @@ export const en = {
       downloadBtn: 'Download .pdf',
       resetBtn: 'Reset',
     },
+    jsonSqlFormatter: {
+      name: 'JSON, SQL & YAML Formatter, Validator & Type Generator',
+      description:
+        'Beautify, minify, validate, query via JSONPath, convert JSON/YAML, format multi-dialect SQL, and infer TypeScript & Zod schemas offline.',
+      inputTitle: 'Raw Code Input',
+      outputTitle: 'Formatted Output & Schema Inspector',
+      formatBtn: 'Format',
+      minifyBtn: 'Minify',
+      loadSample: 'Sample',
+      downloadBtn: 'Download',
+      copyBtn: 'Copy Output',
+      resetBtn: 'Reset',
+    },
   },
 };
 

@@ -1,0 +1,319 @@
+<div class="l-page c-json-sql">
+  <header class="l-page__header c-header">
+    <div class="c-header__title-group">
+      <h1 class="c-header__title">{{ 'tools.jsonSqlFormatter.name' | translate }}</h1>
+      <p class="c-header__subtitle">{{ 'tools.jsonSqlFormatter.description' | translate }}</p>
+    </div>
+    <app-badge variant="privacy" [dot]="true">
+      {{ 'common.privacyBadge' | translate }}
+    </app-badge>
+  </header>
+
+  @if (errorMessage()) {
+    <div class="c-json-sql__alert c-json-sql__alert--error g--margin-bottom-4" role="alert">
+      {{ errorMessage() }}
+    </div>
+  }
+
+  <section class="c-json-sql__toolbar g--margin-bottom-4">
+    <div class="c-json-sql__tabs" role="tablist">
+      <button
+        type="button"
+        role="tab"
+        [attr.aria-selected]="language() === 'json'"
+        [class]="'c-button c-button--small ' + (language() === 'json' ? 'c-button--primary' : 'c-button--outline')"
+        (click)="setLanguage('json')"
+      >
+        JSON
+      </button>
+      <button
+        type="button"
+        role="tab"
+        [attr.aria-selected]="language() === 'sql'"
+        [class]="'c-button c-button--small ' + (language() === 'sql' ? 'c-button--primary' : 'c-button--outline')"
+        (click)="setLanguage('sql')"
+      >
+        SQL
+      </button>
+      <button
+        type="button"
+        role="tab"
+        [attr.aria-selected]="language() === 'yaml'"
+        [class]="'c-button c-button--small ' + (language() === 'yaml' ? 'c-button--primary' : 'c-button--outline')"
+        (click)="setLanguage('yaml')"
+      >
+        YAML
+      </button>
+    </div>
+
+    <div class="c-json-sql__actions">
+      <app-button variant="primary" size="small" [loading]="isProcessing()" (clicked)="format()">
+        {{ 'tools.jsonSqlFormatter.formatBtn' | translate }}
+      </app-button>
+      <app-button variant="secondary" size="small" (clicked)="minifyQuick()">
+        {{ 'tools.jsonSqlFormatter.minifyBtn' | translate }}
+      </app-button>
+      <app-button variant="outline" size="small" (clicked)="loadSample()">
+        {{ 'tools.jsonSqlFormatter.loadSample' | translate }}
+      </app-button>
+      <label class="c-button c-button--small c-button--outline c-json-sql__file-btn">
+        Open File
+        <input
+          type="file"
+          class="c-json-sql__hidden-file"
+          accept=".json,.sql,.yaml,.yml,.txt"
+          (change)="onFileInputChange($event)"
+        />
+      </label>
+      <app-button variant="outline" size="small" (clicked)="reset()">
+        {{ 'tools.jsonSqlFormatter.resetBtn' | translate }}
+      </app-button>
+    </div>
+  </section>
+
+  @if (isProcessing()) {
+    <div class="g--margin-bottom-4">
+      <app-progress-bar
+        [value]="progressPercent()"
+        [label]="progressStage()"
+        [showPercentage]="true"
+      />
+    </div>
+  }
+
+  <div class="l-columns l-columns--2">
+    <div class="l-columns__area">
+      <app-card [title]="'tools.jsonSqlFormatter.inputTitle' | translate" class="g--margin-bottom-4">
+        <div class="c-json-sql__controls g--margin-bottom-3">
+          <div class="c-input__group">
+            <label class="c-input__label" for="indent-select">Indentation</label>
+            <select
+              id="indent-select"
+              class="c-input"
+              [ngModel]="indentType()"
+              (ngModelChange)="indentType.set($event); format()"
+            >
+              <option value="2spaces">2 Spaces</option>
+              <option value="4spaces">4 Spaces</option>
+              <option value="tab">Tab</option>
+            </select>
+          </div>
+
+          @switch (language()) {
+            @case ('json') {
+              <label class="c-json-sql__check">
+                <input
+                  type="checkbox"
+                  [ngModel]="sortJsonKeys()"
+                  (ngModelChange)="sortJsonKeys.set($event); format()"
+                />
+                Sort Keys A→Z
+              </label>
+              <div class="c-input__group">
+                <label class="c-input__label" for="root-type-input">Root Type / Schema</label>
+                <input
+                  id="root-type-input"
+                  type="text"
+                  class="c-input"
+                  [ngModel]="rootTypeName()"
+                  (ngModelChange)="rootTypeName.set($event)"
+                />
+              </div>
+            }
+            @case ('sql') {
+              <div class="c-input__group">
+                <label class="c-input__label" for="sql-dialect">Dialect</label>
+                <select
+                  id="sql-dialect"
+                  class="c-input"
+                  [ngModel]="sqlDialect()"
+                  (ngModelChange)="sqlDialect.set($event); format()"
+                >
+                  <option value="postgresql">PostgreSQL</option>
+                  <option value="mysql">MySQL</option>
+                  <option value="sqlite">SQLite</option>
+                  <option value="tsql">T-SQL (SQL Server)</option>
+                  <option value="bigquery">BigQuery</option>
+                  <option value="sql">Standard SQL</option>
+                </select>
+              </div>
+              <div class="c-input__group">
+                <label class="c-input__label" for="sql-case">Keyword Case</label>
+                <select
+                  id="sql-case"
+                  class="c-input"
+                  [ngModel]="sqlKeywordCase()"
+                  (ngModelChange)="sqlKeywordCase.set($event); format()"
+                >
+                  <option value="upper">UPPERCASE</option>
+                  <option value="lower">lowercase</option>
+                  <option value="preserve">Preserve</option>
+                </select>
+              </div>
+              <label class="c-json-sql__check">
+                <input
+                  type="checkbox"
+                  [ngModel]="sqlMinify()"
+                  (ngModelChange)="sqlMinify.set($event); format()"
+                />
+                Minify SQL
+              </label>
+            }
+            @case ('yaml') {
+              <div class="c-input__group">
+                <label class="c-input__label" for="yaml-out">YAML Export Mode</label>
+                <select
+                  id="yaml-out"
+                  class="c-input"
+                  [ngModel]="yamlOutputMode()"
+                  (ngModelChange)="yamlOutputMode.set($event); format()"
+                >
+                  <option value="yaml">Formatted YAML</option>
+                  <option value="json">Convert YAML → JSON</option>
+                </select>
+              </div>
+            }
+          }
+        </div>
+
+        <textarea
+          class="c-input c-json-sql__editor"
+          rows="16"
+          aria-label="Raw JSON, SQL, or YAML input"
+          placeholder="Paste raw JSON, SQL, or YAML payload here — processed 100% locally..."
+          [ngModel]="inputText()"
+          (ngModelChange)="updateInput($event)"
+        ></textarea>
+      </app-card>
+    </div>
+
+    <div class="l-columns__area">
+      <app-card [title]="'tools.jsonSqlFormatter.outputTitle' | translate" class="g--margin-bottom-4">
+        @if (language() === 'json') {
+          <div class="c-json-sql__views g--margin-bottom-3">
+            @for (view of ['formatted', 'minified', 'tree', 'typescript', 'zod', 'yaml']; track view) {
+              <button
+                type="button"
+                [class]="'c-button c-button--small ' + (jsonOutputView() === view ? 'c-button--primary' : 'c-button--outline')"
+                (click)="setJsonOutputView($any(view))"
+              >
+                {{
+                  view === 'typescript'
+                    ? 'TypeScript'
+                    : view === 'zod'
+                      ? 'Zod'
+                      : view === 'yaml'
+                        ? 'YAML'
+                        : view === 'tree'
+                          ? 'Tree'
+                          : view === 'minified'
+                            ? 'Minify'
+                            : 'Formatted'
+                }}
+              </button>
+            }
+          </div>
+
+          <div class="c-json-sql__jsonpath g--margin-bottom-3">
+            <label class="c-input__label" for="jsonpath-input">JSONPath Filter</label>
+            <div class="c-json-sql__row">
+              <input
+                id="jsonpath-input"
+                type="text"
+                class="c-input c-json-sql__path-input"
+                placeholder="e.g., $.users[*].email or $..id"
+                [ngModel]="jsonPathQuery()"
+                (ngModelChange)="updateJsonPath($event)"
+              />
+            </div>
+          </div>
+        }
+
+        @if (result(); as res) {
+          @if (!res.diagnostic.valid) {
+            <div class="c-json-sql__alert c-json-sql__alert--error g--margin-bottom-3" role="alert">
+              <div>
+                <strong>
+                  Syntax Error
+                  @if (res.diagnostic.line) {
+                    at Line {{ res.diagnostic.line }}, Column {{ res.diagnostic.column || 1 }}
+                  }
+                </strong>
+                <div>{{ res.diagnostic.message }}</div>
+              </div>
+              @if (res.diagnostic.snippet) {
+                <pre class="c-json-sql__caret">{{ res.diagnostic.snippet }}</pre>
+              }
+            </div>
+          } @else {
+            <div class="c-json-sql__stats g--margin-bottom-3">
+              <span class="c-badge c-badge--success">Valid {{ language().toUpperCase() }}</span>
+              <span class="c-badge">In: {{ formattedInputBytes() }}</span>
+              <span class="c-badge">Out: {{ formattedOutputBytes() }}</span>
+              <span class="c-badge">{{ res.stats.lineCount }} lines • {{ res.stats.durationMs }} ms</span>
+            </div>
+
+            <div class="c-json-sql__actions g--margin-bottom-3">
+              <app-button variant="primary" size="small" [disabled]="!hasValidOutput()" (clicked)="downloadOutput()">
+                {{ 'tools.jsonSqlFormatter.downloadBtn' | translate }}
+              </app-button>
+              <app-button variant="secondary" size="small" [disabled]="!hasValidOutput()" (clicked)="copyOutput()">
+                {{ copiedOutput() ? 'Copied!' : ('tools.jsonSqlFormatter.copyBtn' | translate) }}
+              </app-button>
+            </div>
+
+            @if (language() === 'json' && jsonOutputView() === 'tree') {
+              <div class="c-json-sql__tree" role="tree">
+                @for (row of treeRows(); track row.path) {
+                  <div class="c-json-sql__tree-row" [style.padding-left.px]="row.depth * 16 + 8">
+                    @if (row.hasChildren) {
+                      <button
+                        type="button"
+                        class="c-json-sql__tree-toggle"
+                        (click)="toggleTreeNode(row.path)"
+                      >
+                        {{ row.expanded ? '▾' : '▸' }}
+                      </button>
+                    } @else {
+                      <span class="c-json-sql__tree-leaf">•</span>
+                    }
+                    <span class="c-json-sql__tree-key">{{ row.key }}</span>:
+                    <span [class]="'c-json-sql__tree-val c-json-sql__tree-val--' + row.kind">
+                      {{ row.previewValue }}
+                    </span>
+
+                    @if (
+                      row.kind === 'array' &&
+                      row.expanded &&
+                      (row.totalArrayItems ?? 0) > (row.renderedArrayLimit ?? 100)
+                    ) {
+                      <button
+                        type="button"
+                        class="c-button c-button--small c-button--outline"
+                        (click)="showMoreArrayItems(row.path)"
+                      >
+                        Show next 100 items ({{ row.renderedArrayLimit }}/{{ row.totalArrayItems }})
+                      </button>
+                    }
+                  </div>
+                }
+              </div>
+            } @else {
+              <textarea
+                class="c-input c-json-sql__editor"
+                rows="16"
+                readonly
+                aria-label="Formatted output"
+                [value]="res.outputText"
+              ></textarea>
+            }
+          }
+        } @else {
+          <p class="c-json-sql__meta">
+            Paste JSON, SQL, or YAML (or click Sample) to validate, inspect schemas, filter via JSONPath, or generate TypeScript &amp; Zod types offline.
+          </p>
+        }
+      </app-card>
+    </div>
+  </div>
+</div>

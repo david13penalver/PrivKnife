@@ -811,5 +811,18 @@ export const zh: TranslationSchema = {
       downloadBtn: '下载 .pdf',
       resetBtn: '重置',
     },
+    jsonSqlFormatter: {
+      name: 'JSON、SQL 与 YAML 格式化、校验及类型生成器',
+      description:
+        '在本地格式化、压缩与校验 JSON、多方言 SQL 和 YAML；支持 JSONPath 查询，并一键推断 TypeScript 接口与 Zod 验证模式。',
+      inputTitle: '输入源码',
+      outputTitle: '格式化结果与结构预览',
+      formatBtn: '格式化',
+      minifyBtn: '压缩',
+      loadSample: '示例',
+      downloadBtn: '下载',
+      copyBtn: '复制结果',
+      resetBtn: '重置',
+    },
   },
 };

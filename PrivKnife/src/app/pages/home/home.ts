@@ -930,6 +930,20 @@ const CATALOG_TOOLS: CatalogTool[] = [
     techStack: 'PapaParse • Vector SVG Math • Canvas Exporter',
     icon: '📈',
   },
+  {
+    id: 'json-sql-formatter',
+    i18nKey: 'jsonSqlFormatter',
+    name: 'JSON, SQL & YAML Formatter, Validator & Type Generator',
+    category: 'dev',
+    categoryLabel: 'Dev / Data',
+    description:
+      'Beautify, minify, validate, query via JSONPath, convert JSON/YAML, format multi-dialect SQL, and infer TypeScript & Zod schemas offline.',
+    keywords: ['json formatter', 'sql formatter', 'yaml converter', 'typescript generator', 'zod schema'],
+    status: 'ready',
+    route: '/tools/json-sql-formatter',
+    techStack: 'Pure TS AST • JSONPath • Multi-Dialect SQL • YAML',
+    icon: '{ }',
+  },
 ];
 
 @Component({

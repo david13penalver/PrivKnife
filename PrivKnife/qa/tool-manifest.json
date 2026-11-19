@@ -204,6 +204,12 @@
     "source": "PrivKnife/src/app/tools/documents/invoice-maker"
   },
   {
+    "id": "json-sql-formatter",
+    "route": "/tools/json-sql-formatter",
+    "category": "dev",
+    "source": "PrivKnife/src/app/tools/dev/json-sql-formatter"
+  },
+  {
     "id": "keycap-switch-tester-maker",
     "route": "/tools/keycap-switch-tester-maker",
     "category": "3d",

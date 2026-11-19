@@ -811,5 +811,18 @@ export const ja: TranslationSchema = {
       downloadBtn: '.pdf を保存',
       resetBtn: 'リセット',
     },
+    jsonSqlFormatter: {
+      name: 'JSON・SQL・YAML 整形・検証・TypeScript/Zod 生成',
+      description:
+        'JSON・複数方言 SQL・YAML の整形・圧縮・構文検証をブラウザ内で実行。JSONPath 抽出や TypeScript 型・Zod スキーマ推論にも対応。',
+      inputTitle: '入力コード',
+      outputTitle: '整形出力とスキーマ検証',
+      formatBtn: '整形',
+      minifyBtn: '圧縮',
+      loadSample: 'サンプル',
+      downloadBtn: '保存',
+      copyBtn: 'コピー',
+      resetBtn: 'リセット',
+    },
   },
 };

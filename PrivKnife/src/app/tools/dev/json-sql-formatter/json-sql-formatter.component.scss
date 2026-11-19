@@ -1,0 +1,125 @@
+.c-json-sql {
+  &__toolbar,
+  &__tabs,
+  &__actions,
+  &__controls,
+  &__views,
+  &__row,
+  &__stats {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.6rem;
+  }
+
+  &__toolbar {
+    justify-content: space-between;
+  }
+
+  &__file-btn {
+    position: relative;
+    overflow: hidden;
+    cursor: pointer;
+  }
+
+  &__hidden-file {
+    position: absolute;
+    inset: 0;
+    opacity: 0;
+    cursor: pointer;
+  }
+
+  &__check {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.45rem;
+    min-height: 40px;
+    font-size: 0.875rem;
+    cursor: pointer;
+  }
+
+  &__path-input {
+    flex: 1;
+    font-family: ui-monospace, monospace;
+  }
+
+  &__editor {
+    width: 100%;
+    font-family: ui-monospace, monospace;
+    font-size: 0.85rem;
+    line-height: 1.5;
+  }
+
+  &__alert {
+    padding: 0.75rem 1rem;
+    border-radius: 8px;
+    border: 1px solid #ef4444;
+    background: rgba(239, 68, 68, 0.08);
+    color: #b91c1c;
+    font-size: 0.875rem;
+  }
+
+  &__caret {
+    margin: 0.5rem 0 0;
+    padding: 0.5rem;
+    border-radius: 4px;
+    background: #1e293b;
+    color: #f8fafc;
+    font-family: ui-monospace, monospace;
+    font-size: 0.8rem;
+    overflow-x: auto;
+  }
+
+  &__tree {
+    border: 1px solid var(--border-subtle, #cbd5e1);
+    border-radius: 8px;
+    padding: 0.5rem;
+    max-height: 440px;
+    overflow: auto;
+    font-family: ui-monospace, monospace;
+    font-size: 0.82rem;
+  }
+
+  &__tree-row {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.35rem;
+    padding-top: 0.2rem;
+    padding-bottom: 0.2rem;
+    border-bottom: 1px solid rgba(148, 163, 184, 0.14);
+  }
+
+  &__tree-toggle {
+    border: none;
+    background: transparent;
+    cursor: pointer;
+    padding: 0 0.2rem;
+    font-size: 0.9rem;
+    color: inherit;
+  }
+
+  &__tree-key {
+    font-weight: 600;
+  }
+
+  &__tree-val {
+    &--string {
+      color: #047857;
+    }
+    &--number {
+      color: #1d4ed8;
+    }
+    &--boolean {
+      color: #7c3aed;
+    }
+    &--null {
+      color: #64748b;
+    }
+  }
+
+  &__meta {
+    font-size: 0.875rem;
+    color: var(--text-secondary, #64748b);
+  }
+}
