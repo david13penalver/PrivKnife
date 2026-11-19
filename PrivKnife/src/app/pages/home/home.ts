@@ -174,6 +174,20 @@ const CATALOG_TOOLS: CatalogTool[] = [
     icon: '📊',
   },
   {
+    id: 'pdf-to-word-markdown',
+    i18nKey: 'pdfToWordMarkdown',
+    name: 'PDF to Word (DOCX) & Markdown Layout Converter',
+    category: 'documents',
+    categoryLabel: 'Documents',
+    description:
+      'Convert digital PDFs into editable Word (.docx) documents, structured Markdown (.md), and text locally with paragraph reflow.',
+    keywords: ['pdf to word', 'pdf to docx', 'pdf to markdown', 'obsidian'],
+    status: 'ready',
+    route: '/tools/pdf-to-word-markdown',
+    techStack: 'PDF.js • Pure OOXML (JSZip) • DOMPurify',
+    icon: '📄',
+  },
+  {
     id: 'pdf-merger-splitter',
     i18nKey: 'pdfMerger',
     name: 'PDF Merger, Splitter & Page Organizer',

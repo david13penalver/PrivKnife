@@ -241,6 +241,25 @@ export const routes: Routes = [
       ),
   },
   {
+    path: 'tools/pdf-to-word-markdown',
+    title: 'PDF to Word (DOCX) & Markdown Layout Converter — PrivKnife',
+    data: {
+      description:
+        'Convert digital PDFs into editable Word (.docx) files, clean Markdown (.md), and text with paragraph reflow and 2-column reading order 100% offline.',
+      keywords: [
+        'pdf to word',
+        'pdf to docx',
+        'pdf to markdown',
+        'offline word converter',
+      ],
+      url: '/tools/pdf-to-word-markdown',
+    },
+    loadComponent: () =>
+      import('./tools/documents/pdf-to-word-markdown/pdf-to-word-markdown.component').then(
+        (m) => m.PdfToWordMarkdownComponent
+      ),
+  },
+  {
     path: 'tools/pdf-merger-splitter',
     title: 'PDF Merger, Splitter & Page Organizer — PrivKnife',
     data: {

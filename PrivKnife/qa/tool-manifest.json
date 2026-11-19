@@ -294,6 +294,12 @@
     "source": "PrivKnife/src/app/tools/documents/pdf-table-extractor"
   },
   {
+    "id": "pdf-to-word-markdown",
+    "route": "/tools/pdf-to-word-markdown",
+    "category": "documents",
+    "source": "PrivKnife/src/app/tools/documents/pdf-to-word-markdown"
+  },
+  {
     "id": "pdf-merger",
     "route": "/tools/pdf-merger-splitter",
     "category": "documents",

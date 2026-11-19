@@ -762,5 +762,20 @@ export const ja: TranslationSchema = {
       scannedNotice: '選択可能なテキストがありません（スキャン PDF の可能性があります）。',
       resetBtn: 'リセット',
     },
+    pdfToWordMarkdown: {
+      name: 'PDF to Word (DOCX)・Markdown レイアウト変換',
+      description:
+        '見出し・箇条書き・2段組み・ハイフネーションをブラウザ内だけで再構成し、編集可能な Word (.docx) と Markdown へ変換します。',
+      uploadTitle: 'PDF をアップロード',
+      loadSample: 'サンプルレポート読込',
+      settingsTitle: 'レイアウト再構成設定',
+      tabWord: 'Word (.docx) プレビュー',
+      tabMarkdown: 'Markdown (.md)',
+      tabText: 'プレーンテキスト',
+      downloadDocxBtn: '.docx を保存',
+      downloadMdBtn: '.md を保存',
+      copyMdBtn: 'Markdown コピー',
+      resetBtn: 'リセット',
+    },
   },
 };

@@ -762,5 +762,20 @@ export const zh: TranslationSchema = {
       scannedNotice: '未检测到可选中文本，此文件可能是扫描版 PDF。',
       resetBtn: '重置',
     },
+    pdfToWordMarkdown: {
+      name: 'PDF 转 Word (DOCX) 与 Markdown 排版转换器',
+      description:
+        '在浏览器本地智能识别标题级别、列表与双栏顺序，一键无损重排导出可编辑 Word (.docx) 与 GitHub Markdown。',
+      uploadTitle: '上传数字版 PDF',
+      loadSample: '加载示例报告 PDF',
+      settingsTitle: '排版与文档重组选项',
+      tabWord: 'Word (.docx) 预览',
+      tabMarkdown: 'Markdown (.md)',
+      tabText: '纯文本 (.txt)',
+      downloadDocxBtn: '下载 .docx',
+      downloadMdBtn: '下载 .md',
+      copyMdBtn: '复制 Markdown',
+      resetBtn: '重置',
+    },
   },
 };

@@ -762,5 +762,20 @@ export const de: TranslationSchema = {
       scannedNotice: 'Kein auswählbarer Text gefunden (Scan-PDF erkannt).',
       resetBtn: 'Zurücksetzen',
     },
+    pdfToWordMarkdown: {
+      name: 'PDF zu Word (DOCX) & Markdown Konverter',
+      description:
+        'Digitale PDFs offline im Browser in bearbeitbare Word (.docx)-Dokumente und strukturiertes Markdown umwandeln.',
+      uploadTitle: 'Digitales PDF Laden',
+      loadSample: 'Beispielbericht Laden',
+      settingsTitle: 'Layout-Optionen',
+      tabWord: 'Word (.docx) Vorschau',
+      tabMarkdown: 'Markdown (.md)',
+      tabText: 'Klartext (.txt)',
+      downloadDocxBtn: '.docx Laden',
+      downloadMdBtn: '.md Laden',
+      copyMdBtn: 'Markdown Kopieren',
+      resetBtn: 'Zurücksetzen',
+    },
   },
 };

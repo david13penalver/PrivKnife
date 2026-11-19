@@ -762,5 +762,20 @@ export const it: TranslationSchema = {
       scannedNotice: 'Nessun testo selezionabile trovato (PDF scansionato).',
       resetBtn: 'Ripristina',
     },
+    pdfToWordMarkdown: {
+      name: 'Convertitore PDF in Word (DOCX) e Markdown',
+      description:
+        'Converti PDF in documenti Word (.docx) modificabili e Markdown strutturato offline direttamente nel browser.',
+      uploadTitle: 'Carica Documento PDF',
+      loadSample: 'Carica Rapporto di Esempio',
+      settingsTitle: 'Impostazioni Struttura',
+      tabWord: 'Anteprima Word (.docx)',
+      tabMarkdown: 'Markdown (.md)',
+      tabText: 'Testo Semplice (.txt)',
+      downloadDocxBtn: 'Scarica .docx',
+      downloadMdBtn: 'Scarica .md',
+      copyMdBtn: 'Copia Markdown',
+      resetBtn: 'Ripristina',
+    },
   },
 };

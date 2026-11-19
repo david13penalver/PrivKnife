@@ -705,6 +705,14 @@ describe('ToolRegistry (Seam 3: Catalog & Architecture Verification)', () => {
     expect(TOOL_I18N_MAP['pdf-table-extractor']).toBe('pdfTableExtractor');
   });
 
+  it('should find pdf-to-word-markdown tool by id', () => {
+    const tool = getToolById('pdf-to-word-markdown');
+    expect(tool).toBeDefined();
+    expect(tool?.category).toBe('documents');
+    expect(tool?.isFullyClientSide).toBe(true);
+    expect(TOOL_I18N_MAP['pdf-to-word-markdown']).toBe('pdfToWordMarkdown');
+  });
+
   describe('Tool Registry Localization (i18n)', () => {
     it('should have an i18n key mapping for every registered tool', () => {
       for (const tool of TOOL_REGISTRY) {

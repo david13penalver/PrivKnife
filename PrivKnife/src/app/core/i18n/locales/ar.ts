@@ -762,5 +762,20 @@ export const ar: TranslationSchema = {
       scannedNotice: 'لم يتم العثور على نص قابل للتحديد (ملف PDF ممسوح ضوئيًا).',
       resetBtn: 'إعادة ضبط',
     },
+    pdfToWordMarkdown: {
+      name: 'محول PDF إلى Word (DOCX) وMarkdown',
+      description:
+        'تحويل ملفات PDF إلى مستندات Word (.docx) قابلة للتعديل ونصوص Markdown منظمة محليًا مع حفظ العناوين والقوائم.',
+      uploadTitle: 'رفع ملف PDF رقمي',
+      loadSample: 'تحميل تقرير تجريبي',
+      settingsTitle: 'إعدادات إعادة بناء التخطيط',
+      tabWord: 'معاينة Word (.docx)',
+      tabMarkdown: 'Markdown (.md)',
+      tabText: 'نص عادي (.txt)',
+      downloadDocxBtn: 'تنزيل .docx',
+      downloadMdBtn: 'تنزيل .md',
+      copyMdBtn: 'نسخ Markdown',
+      resetBtn: 'إعادة ضبط',
+    },
   },
 };

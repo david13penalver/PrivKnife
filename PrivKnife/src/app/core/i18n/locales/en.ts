@@ -760,6 +760,21 @@ export const en = {
       scannedNotice: 'No selectable text found. This appears to be a scanned PDF.',
       resetBtn: 'Reset',
     },
+    pdfToWordMarkdown: {
+      name: 'PDF to Word (DOCX) & Markdown Converter',
+      description:
+        'Convert digital PDFs into editable Microsoft Word (.docx) documents and structured Markdown (.md) locally with paragraph reflow.',
+      uploadTitle: 'Upload Digital PDF',
+      loadSample: 'Load Sample Report PDF',
+      settingsTitle: 'Layout Reconstruction Settings',
+      tabWord: 'Word (.docx) Preview',
+      tabMarkdown: 'Markdown (.md)',
+      tabText: 'Plain Text (.txt)',
+      downloadDocxBtn: 'Download .docx',
+      downloadMdBtn: 'Download .md',
+      copyMdBtn: 'Copy Markdown',
+      resetBtn: 'Reset',
+    },
   },
 };
 

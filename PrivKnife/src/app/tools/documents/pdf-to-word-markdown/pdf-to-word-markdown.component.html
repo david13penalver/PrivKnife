@@ -1,0 +1,243 @@
+<div class="l-page">
+  <header class="l-page__header c-header">
+    <div class="c-header__title-group">
+      <h1 class="c-header__title">{{ 'tools.pdfToWordMarkdown.name' | translate }}</h1>
+      <p class="c-header__subtitle">{{ 'tools.pdfToWordMarkdown.description' | translate }}</p>
+    </div>
+    <div class="c-badge c-badge--privacy">
+      {{ 'common.privacyBadge' | translate }}
+    </div>
+  </header>
+
+  @if (errorMessage()) {
+    <div class="c-pdf-word-md__alert c-pdf-word-md__alert--error g--margin-bottom-4" role="alert" aria-live="polite">
+      {{ errorMessage() }}
+    </div>
+  }
+
+  @if (largeFileWarning()) {
+    <div class="c-pdf-word-md__alert c-pdf-word-md__alert--warn g--margin-bottom-4">
+      Large PDF (&gt;100 MB) loaded. All layout reconstruction and OOXML packaging stay strictly offline.
+    </div>
+  }
+
+  @if (isScannedFallbackNeeded()) {
+    <div class="c-pdf-word-md__alert c-pdf-word-md__alert--warn g--margin-bottom-4">
+      No selectable text found (image-only scanned PDF).
+      <a class="c-pdf-word-md__link" routerLink="/tools/local-ocr-text-extractor">
+        Open Local OCR Text Extractor →
+      </a>
+    </div>
+  }
+
+  <div class="l-columns l-columns--2">
+    <div class="l-columns__area">
+      <app-card [title]="'tools.pdfToWordMarkdown.uploadTitle' | translate" class="g--margin-bottom-4">
+        <app-dropzone
+          [title]="'tools.pdfToWordMarkdown.uploadTitle' | translate"
+          subtitle="Convert PDF manuscripts, briefs, or notes into .docx &amp; .md offline"
+          accept=".pdf,application/pdf"
+          [multiple]="false"
+          [maxSizeMb]="250"
+          (filesSelected)="onFileDropped($event)"
+        />
+        <div class="c-pdf-word-md__row g--margin-top-3">
+          <button
+            type="button"
+            class="c-button c-button--small c-button--outline"
+            (click)="loadSamplePdf()"
+          >
+            {{ 'tools.pdfToWordMarkdown.loadSample' | translate }}
+          </button>
+          @if (pdfBytes()) {
+            <span class="c-pdf-word-md__meta">
+              {{ pdfFileName() }} ({{ formattedInputSize() }} • {{ pageCount() }} pages)
+            </span>
+          }
+        </div>
+      </app-card>
+
+      <app-card [title]="'tools.pdfToWordMarkdown.settingsTitle' | translate" class="g--margin-bottom-4">
+        <div class="c-pdf-word-md__checks g--margin-bottom-4">
+          <label class="c-pdf-word-md__check">
+            <input
+              type="checkbox"
+              [ngModel]="detectMultiColumn()"
+              (ngModelChange)="toggleOptionAndReconvert('detectMultiColumn', $event)"
+            />
+            Auto-Detect 2-Column Reading Order
+          </label>
+          <label class="c-pdf-word-md__check">
+            <input
+              type="checkbox"
+              [ngModel]="stripHeadersFooters()"
+              (ngModelChange)="toggleOptionAndReconvert('stripHeadersFooters', $event)"
+            />
+            Strip Repeated Headers &amp; Footers
+          </label>
+          <label class="c-pdf-word-md__check">
+            <input
+              type="checkbox"
+              [ngModel]="dehyphenateWords()"
+              (ngModelChange)="toggleOptionAndReconvert('dehyphenateWords', $event)"
+            />
+            Dehyphenate Wrapped Line Breaks
+          </label>
+          <label class="c-pdf-word-md__check">
+            <input
+              type="checkbox"
+              [ngModel]="preserveInlineStyles()"
+              (ngModelChange)="toggleOptionAndReconvert('preserveInlineStyles', $event)"
+            />
+            Preserve Bold &amp; Italic Emphasis
+          </label>
+          <label class="c-pdf-word-md__check">
+            <input
+              type="checkbox"
+              [ngModel]="includePageBreaks()"
+              (ngModelChange)="toggleOptionAndReconvert('includePageBreaks', $event)"
+            />
+            Insert Page Break Dividers
+          </label>
+        </div>
+
+        <button type="button" class="c-button c-button--outline" (click)="reset()">
+          {{ 'tools.pdfToWordMarkdown.resetBtn' | translate }}
+        </button>
+      </app-card>
+    </div>
+
+    <div class="l-columns__area">
+      @if (isProcessing()) {
+        <app-card class="g--margin-bottom-4">
+          <app-progress-bar [value]="progressPercent()" [label]="progressStage()" />
+        </app-card>
+      }
+
+      <div class="c-pdf-word-md__tabs g--margin-bottom-3" role="tablist">
+        <button
+          type="button"
+          role="tab"
+          class="c-button c-button--small"
+          [class.c-button--primary]="activeTab() === 'word'"
+          [class.c-button--outline]="activeTab() !== 'word'"
+          [attr.aria-selected]="activeTab() === 'word'"
+          (click)="setActiveTab('word')"
+        >
+          {{ 'tools.pdfToWordMarkdown.tabWord' | translate }}
+        </button>
+        <button
+          type="button"
+          role="tab"
+          class="c-button c-button--small"
+          [class.c-button--primary]="activeTab() === 'markdown'"
+          [class.c-button--outline]="activeTab() !== 'markdown'"
+          [attr.aria-selected]="activeTab() === 'markdown'"
+          (click)="setActiveTab('markdown')"
+        >
+          {{ 'tools.pdfToWordMarkdown.tabMarkdown' | translate }}
+        </button>
+        <button
+          type="button"
+          role="tab"
+          class="c-button c-button--small"
+          [class.c-button--primary]="activeTab() === 'plaintext'"
+          [class.c-button--outline]="activeTab() !== 'plaintext'"
+          [attr.aria-selected]="activeTab() === 'plaintext'"
+          (click)="setActiveTab('plaintext')"
+        >
+          {{ 'tools.pdfToWordMarkdown.tabText' | translate }}
+        </button>
+      </div>
+
+      <app-card>
+        @if (blocks().length > 0) {
+          <p class="c-pdf-word-md__meta g--margin-bottom-3">
+            {{ headingCount() }} headings • {{ wordCount() }} words reconstructed
+          </p>
+
+          <div class="c-pdf-word-md__actions g--margin-bottom-4">
+            <button type="button" class="c-button c-button--primary" (click)="downloadDocx()">
+              {{ 'tools.pdfToWordMarkdown.downloadDocxBtn' | translate }}
+            </button>
+            <button type="button" class="c-button c-button--outline" (click)="downloadMarkdown()">
+              {{ 'tools.pdfToWordMarkdown.downloadMdBtn' | translate }}
+            </button>
+            <button type="button" class="c-button c-button--outline" (click)="downloadPlainText()">
+              Download .txt
+            </button>
+            <button type="button" class="c-button c-button--outline" (click)="copyMarkdown()">
+              {{ copiedMarkdown() ? 'Copied Markdown!' : ('tools.pdfToWordMarkdown.copyMdBtn' | translate) }}
+            </button>
+          </div>
+
+          @if (activeTab() === 'word') {
+            <div class="c-pdf-word-md__paper">
+              @for (b of blocks(); track $index) {
+                @switch (b.type) {
+                  @case ('heading') {
+                    @if (b.level === 1) {
+                      <h1>@for (r of b.runs; track $index) {<span>{{ r.text }}</span>}</h1>
+                    } @else if (b.level === 2) {
+                      <h2>@for (r of b.runs; track $index) {<span>{{ r.text }}</span>}</h2>
+                    } @else {
+                      <h3>@for (r of b.runs; track $index) {<span>{{ r.text }}</span>}</h3>
+                    }
+                  }
+                  @case ('list_item') {
+                    <p class="c-pdf-word-md__list-line">
+                      <span class="c-pdf-word-md__marker">{{ b.ordered ? b.marker : '•' }}</span>
+                      @for (r of b.runs; track $index) {
+                        @if (r.bold && r.italic) {
+                          <strong><em>{{ r.text }}</em></strong>
+                        } @else if (r.bold) {
+                          <strong>{{ r.text }}</strong>
+                        } @else if (r.italic) {
+                          <em>{{ r.text }}</em>
+                        } @else {
+                          <span>{{ r.text }}</span>
+                        }
+                      }
+                    </p>
+                  }
+                  @case ('page_break') {
+                    <hr class="c-pdf-word-md__break" />
+                  }
+                  @default {
+                    <p>
+                      @for (r of b.runs; track $index) {
+                        @if (r.bold && r.italic) {
+                          <strong><em>{{ r.text }}</em></strong>
+                        } @else if (r.bold) {
+                          <strong>{{ r.text }}</strong>
+                        } @else if (r.italic) {
+                          <em>{{ r.text }}</em>
+                        } @else {
+                          <span>{{ r.text }}</span>
+                        }
+                      }
+                    </p>
+                  }
+                }
+              }
+            </div>
+          } @else if (activeTab() === 'markdown') {
+            <textarea
+              rows="16"
+              class="c-input__control c-pdf-word-md__editor"
+              [ngModel]="markdownContent()"
+              (ngModelChange)="markdownContent.set($event)"
+              aria-label="Editable Markdown output"
+            ></textarea>
+          } @else {
+            <pre class="c-pdf-word-md__plain">{{ plainTextContent() }}</pre>
+          }
+        } @else {
+          <p class="c-pdf-word-md__meta">
+            Drop a digital PDF or click "Load Sample Report PDF" to preview reconstructed Word &amp; Markdown layout.
+          </p>
+        }
+      </app-card>
+    </div>
+  </div>
+</div>
