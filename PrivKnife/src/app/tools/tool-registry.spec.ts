@@ -665,6 +665,14 @@ describe('ToolRegistry (Seam 3: Catalog & Architecture Verification)', () => {
     expect(TOOL_I18N_MAP['pdf-image-converter']).toBe('pdfImageConverter');
   });
 
+  it('should find pdf-password-security tool by id', () => {
+    const tool = getToolById('pdf-password-security');
+    expect(tool).toBeDefined();
+    expect(tool?.category).toBe('documents');
+    expect(tool?.isFullyClientSide).toBe(true);
+    expect(TOOL_I18N_MAP['pdf-password-security']).toBe('pdfPasswordSecurity');
+  });
+
   describe('Tool Registry Localization (i18n)', () => {
     it('should have an i18n key mapping for every registered tool', () => {
       for (const tool of TOOL_REGISTRY) {

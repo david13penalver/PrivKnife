@@ -687,5 +687,20 @@ export const ar: TranslationSchema = {
       downloadBtn: 'تنزيل النتيجة',
       resetBtn: 'إعادة ضبط',
     },
+    pdfPasswordSecurity: {
+      name: 'حماية وفك تشفير ملفات PDF',
+      description:
+        'تشفير ملفات PDF بمعيار AES-256 مع صلاحيات دقيقة أو إزالة الحماية محليًا دون اتصال عبر QPDF WASM.',
+      modeProtect: 'حماية PDF (تشفير)',
+      modeUnlock: 'فك قفل PDF (إزالة التشفير)',
+      uploadTitle: 'رفع ملف PDF',
+      loadSample: 'تحميل ملف تجريبي',
+      inspectionTitle: 'فحص التشفير',
+      settingsTitle: 'إعدادات التشفير وكلمة المرور',
+      protectBtn: 'تشفير PDF (AES)',
+      unlockBtn: 'فك قفل PDF',
+      downloadBtn: 'تنزيل ملف PDF الناتج',
+      resetBtn: 'مسح كلمات المرور وإعادة الضبط',
+    },
   },
 };

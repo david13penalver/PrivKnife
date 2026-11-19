@@ -687,5 +687,20 @@ export const it: TranslationSchema = {
       downloadBtn: 'Scarica Risultato',
       resetBtn: 'Ripristina',
     },
+    pdfPasswordSecurity: {
+      name: 'Proteggi e Sblocca PDF (AES-256)',
+      description:
+        'Crittografa PDF con AES-256 e permessi granulari, oppure sblocca i tuoi PDF offline tramite QPDF WebAssembly.',
+      modeProtect: 'Proteggi PDF (Blocca)',
+      modeUnlock: 'Sblocca PDF (Decifra)',
+      uploadTitle: 'Carica Documento PDF',
+      loadSample: 'Carica PDF di Esempio',
+      inspectionTitle: 'Ispezione Sicurezza',
+      settingsTitle: 'Impostazioni Crittografia',
+      protectBtn: 'Proteggi PDF (AES)',
+      unlockBtn: 'Sblocca PDF',
+      downloadBtn: 'Scarica PDF Risultante',
+      resetBtn: 'Cancella Segreti e Ripristina',
+    },
   },
 };

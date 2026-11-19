@@ -687,5 +687,20 @@ export const zh: TranslationSchema = {
       downloadBtn: '下载输出文件',
       resetBtn: '重置',
     },
+    pdfPasswordSecurity: {
+      name: 'PDF 密码保护与解锁工具',
+      description:
+        '通过本地 QPDF WebAssembly 使用 AES-256 加密并限制打印/复制权限，或离线解锁自有 PDF。',
+      modeProtect: '保护 PDF（加密锁定）',
+      modeUnlock: '解锁 PDF（解密移除）',
+      uploadTitle: '上传 PDF 文档',
+      loadSample: '加载示例 PDF',
+      inspectionTitle: '安全状态检测',
+      settingsTitle: '加密与密码配置',
+      protectBtn: '执行 AES 加密',
+      unlockBtn: '解锁 PDF',
+      downloadBtn: '下载处理后的 PDF',
+      resetBtn: '清除密码并重置',
+    },
   },
 };

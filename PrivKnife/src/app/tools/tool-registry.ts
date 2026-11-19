@@ -40,6 +40,7 @@ import { markdownCheatsheetTool } from './documents/markdown-cheatsheet';
 import { nutritionLabelMakerTool } from './documents/nutrition-label-maker';
 import { pdfCompressorTool } from './documents/pdf-compressor';
 import { pdfImageConverterTool } from './documents/pdf-image-converter';
+import { pdfPasswordSecurityTool } from './documents/pdf-password-security';
 import { pdfMergerTool } from './documents/pdf-merger';
 import { pdfSignerStamperTool } from './documents/pdf-signer-stamper';
 import { pdfWatermarkNumberingTool } from './documents/pdf-watermark-numbering';
@@ -123,6 +124,7 @@ export const TOOL_REGISTRY: ToolDefinition[] = [
   pdfCompressorTool,
   pdfWatermarkNumberingTool,
   pdfImageConverterTool,
+  pdfPasswordSecurityTool,
 ];
 
 export function getToolById(id: string): ToolDefinition | undefined {
@@ -250,6 +252,7 @@ export const TOOL_I18N_MAP: Record<string, string> = {
   'pdf-compressor': 'pdfCompressor',
   'pdf-watermark-numbering': 'pdfWatermarkNumbering',
   'pdf-image-converter': 'pdfImageConverter',
+  'pdf-password-security': 'pdfPasswordSecurity',
 };
 
 export function getToolI18nKey(id: string): string | undefined {

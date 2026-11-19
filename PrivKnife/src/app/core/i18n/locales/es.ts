@@ -687,5 +687,20 @@ export const es: TranslationSchema = {
       downloadBtn: 'Descargar Resultado',
       resetBtn: 'Restablecer',
     },
+    pdfPasswordSecurity: {
+      name: 'Protector y Desbloqueador PDF (AES-256)',
+      description:
+        'Cifra documentos PDF con AES-256 y permisos granulares, o desbloquea tus propios PDFs 100% offline con QPDF WASM.',
+      modeProtect: 'Proteger PDF (Cifrar)',
+      modeUnlock: 'Desbloquear PDF (Descifrar)',
+      uploadTitle: 'Subir Documento PDF',
+      loadSample: 'Cargar PDF de Ejemplo',
+      inspectionTitle: 'Inspección de Seguridad',
+      settingsTitle: 'Ajustes de Cifrado y Contraseña',
+      protectBtn: 'Proteger PDF (AES)',
+      unlockBtn: 'Desbloquear PDF',
+      downloadBtn: 'Descargar PDF Resultante',
+      resetBtn: 'Limpiar Secretos y Reiniciar',
+    },
   },
 };

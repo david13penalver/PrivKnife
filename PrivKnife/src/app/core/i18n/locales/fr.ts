@@ -687,5 +687,20 @@ export const fr: TranslationSchema = {
       downloadBtn: 'Télécharger le Fichier',
       resetBtn: 'Réinitialiser',
     },
+    pdfPasswordSecurity: {
+      name: 'Protecteur et Déverrouilleur PDF',
+      description:
+        'Chiffrez vos PDF en AES-256 avec permissions ou déverrouillez vos propres fichiers hors ligne via QPDF WASM.',
+      modeProtect: 'Protéger le PDF (Verrouiller)',
+      modeUnlock: 'Déverrouiller le PDF',
+      uploadTitle: 'Importer un PDF',
+      loadSample: 'Charger un PDF Exemple',
+      inspectionTitle: 'Inspection de Sécurité',
+      settingsTitle: 'Paramètres de Chiffrement',
+      protectBtn: 'Protéger le PDF (AES)',
+      unlockBtn: 'Déverrouiller le PDF',
+      downloadBtn: 'Télécharger le PDF',
+      resetBtn: 'Effacer Secrets & Réinitialiser',
+    },
   },
 };

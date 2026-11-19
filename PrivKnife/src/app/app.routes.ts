@@ -143,6 +143,26 @@ export const routes: Routes = [
       ),
   },
   {
+    path: 'tools/pdf-password-security',
+    title: 'PDF Password Protector & Unlocker (AES-256) — PrivKnife',
+    data: {
+      description:
+        'Encrypt PDFs with AES-256 and print/copy permission locks, or unlock your own password-protected PDFs 100% offline via QPDF WebAssembly.',
+      keywords: [
+        'protect pdf',
+        'encrypt pdf aes 256',
+        'unlock pdf offline',
+        'remove pdf password client side',
+        'qpdf wasm',
+      ],
+      url: '/tools/pdf-password-security',
+    },
+    loadComponent: () =>
+      import('./tools/documents/pdf-password-security/pdf-password-security.component').then(
+        (m) => m.PdfPasswordSecurityComponent
+      ),
+  },
+  {
     path: 'tools/pdf-merger-splitter',
     title: 'PDF Merger, Splitter & Page Organizer — PrivKnife',
     data: {

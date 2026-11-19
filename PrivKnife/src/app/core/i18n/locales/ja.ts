@@ -687,5 +687,20 @@ export const ja: TranslationSchema = {
       downloadBtn: '結果をダウンロード',
       resetBtn: 'リセット',
     },
+    pdfPasswordSecurity: {
+      name: 'PDF パスワード保護・解除ツール',
+      description:
+        'ローカル QPDF WebAssembly で PDF に AES-256 暗号化と権限制限を設定、または所有 PDF をオフライン解除。',
+      modeProtect: 'PDF を保護（暗号化）',
+      modeUnlock: 'PDF ロック解除（復号）',
+      uploadTitle: 'PDF をアップロード',
+      loadSample: 'サンプル PDF を読込',
+      inspectionTitle: 'セキュリティ検査',
+      settingsTitle: '暗号化・パスワード設定',
+      protectBtn: 'PDF を保護 (AES)',
+      unlockBtn: 'PDF を解除',
+      downloadBtn: '処理済み PDF を保存',
+      resetBtn: '秘密情報を消去・リセット',
+    },
   },
 };

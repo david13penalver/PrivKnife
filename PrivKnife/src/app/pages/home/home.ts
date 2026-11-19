@@ -104,6 +104,20 @@ const CATALOG_TOOLS: CatalogTool[] = [
     icon: '🖼️',
   },
   {
+    id: 'pdf-password-security',
+    i18nKey: 'pdfPasswordSecurity',
+    name: 'PDF Password Protector & Unlocker',
+    category: 'documents',
+    categoryLabel: 'Documents',
+    description:
+      'Encrypt PDFs with AES-256 and permission locks, or unlock your own PDFs offline via QPDF WebAssembly.',
+    keywords: ['protect pdf', 'encrypt pdf', 'unlock pdf', 'aes-256', 'password'],
+    status: 'ready',
+    route: '/tools/pdf-password-security',
+    techStack: 'QPDF WASM • AES-256 • Web Worker',
+    icon: '🔐',
+  },
+  {
     id: 'pdf-merger-splitter',
     i18nKey: 'pdfMerger',
     name: 'PDF Merger, Splitter & Page Organizer',

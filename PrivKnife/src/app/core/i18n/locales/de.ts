@@ -687,5 +687,20 @@ export const de: TranslationSchema = {
       downloadBtn: 'Ergebnis laden',
       resetBtn: 'Zurücksetzen',
     },
+    pdfPasswordSecurity: {
+      name: 'PDF Passwortschutz & Entsperrer',
+      description:
+        'PDFs mit AES-256 und Berechtigungen verschlüsseln oder eigene PDFs offline per QPDF WebAssembly entsperren.',
+      modeProtect: 'PDF Schützen (Sperren)',
+      modeUnlock: 'PDF Entsperren',
+      uploadTitle: 'PDF-Dokument laden',
+      loadSample: 'Beispiel-PDF laden',
+      inspectionTitle: 'Sicherheitsprüfung',
+      settingsTitle: 'Verschlüsselungs-Optionen',
+      protectBtn: 'PDF Schützen (AES)',
+      unlockBtn: 'PDF Entsperren',
+      downloadBtn: 'PDF Herunterladen',
+      resetBtn: 'Passwörter löschen & Reset',
+    },
   },
 };

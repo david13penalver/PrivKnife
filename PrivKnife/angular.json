@@ -32,10 +32,22 @@
               {
                 "glob": "**/*",
                 "input": "public"
+              },
+              {
+                "glob": "qpdf.wasm",
+                "input": "node_modules/@neslinesli93/qpdf-wasm/dist",
+                "output": "/assets/wasm"
               }
             ],
             "styles": [
               "src/styles.scss"
+            ],
+            "externalDependencies": [
+              "fs",
+              "path"
+            ],
+            "allowedCommonJsDependencies": [
+              "@neslinesli93/qpdf-wasm"
             ]
           },
           "configurations": {

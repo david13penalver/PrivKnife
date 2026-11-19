@@ -264,6 +264,12 @@
     "source": "PrivKnife/src/app/tools/documents/pdf-image-converter"
   },
   {
+    "id": "pdf-password-security",
+    "route": "/tools/pdf-password-security",
+    "category": "documents",
+    "source": "PrivKnife/src/app/tools/documents/pdf-password-security"
+  },
+  {
     "id": "pdf-merger",
     "route": "/tools/pdf-merger-splitter",
     "category": "documents",
