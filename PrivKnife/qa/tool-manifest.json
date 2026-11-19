@@ -426,6 +426,12 @@
     "source": "PrivKnife/src/app/tools/documents/table-tent-maker"
   },
   {
+    "id": "timestamp-timezone-converter",
+    "route": "/tools/timestamp-timezone-converter",
+    "category": "dev",
+    "source": "PrivKnife/src/app/tools/dev/timestamp-timezone-converter"
+  },
+  {
     "id": "under-desk-clamp-generator",
     "route": "/tools/under-desk-clamp-generator",
     "category": "3d",

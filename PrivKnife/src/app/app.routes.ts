@@ -2162,6 +2162,13 @@ export const routes: Routes = [
       ),
   },
   {
+    path: 'tools/timestamp-timezone-converter',
+    loadComponent: () =>
+      import('./tools/dev/timestamp-timezone-converter/timestamp-timezone-converter.component').then(
+        (m) => m.TimestampTimezoneConverterComponent
+      ),
+  },
+  {
     path: '**',
     title: 'Page Not Found — PrivKnife',
     data: {

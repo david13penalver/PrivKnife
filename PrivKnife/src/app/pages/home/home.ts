@@ -1000,6 +1000,20 @@ const CATALOG_TOOLS: CatalogTool[] = [
     techStack: 'Pure TS POSIX/6-Field AST • EN/ES Explainer • Intl IANA DST Walker',
     icon: '⏰',
   },
+  {
+    id: 'timestamp-timezone-converter',
+    i18nKey: 'timestampTimezoneConverter',
+    name: 'Unix Epoch, ISO-8601 & Multi-Timezone Timestamp Converter',
+    category: 'dev',
+    categoryLabel: 'Dev / Data',
+    description:
+      'Auto-detect and convert Unix s/ms/μs/ns (BigInt precision), ISO-8601, Discord tags, multi-timezone clocks, and batch logs offline.',
+    keywords: ['unix epoch', 'timestamp converter', 'iso 8601', 'nanoseconds', 'timezone', 'discord timestamp'],
+    status: 'ready',
+    route: '/tools/timestamp-timezone-converter',
+    techStack: 'Native BigInt • Intl Timezone Matrix • O(1) Duration Delta • Batch CSV/JSON',
+    icon: '🕒',
+  },
 ];
 
 @Component({

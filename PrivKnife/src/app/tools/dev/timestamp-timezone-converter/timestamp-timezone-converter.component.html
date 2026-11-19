@@ -1,0 +1,309 @@
+<div class="l-page c-timestamp-studio">
+  <header class="l-page__header c-header">
+    <div class="c-header__title-group">
+      <h1 class="c-header__title">{{ 'tools.timestampTimezoneConverter.name' | translate }}</h1>
+      <p class="c-header__subtitle">{{ 'tools.timestampTimezoneConverter.description' | translate }}</p>
+    </div>
+    <app-badge variant="privacy" [dot]="true">
+      {{ 'common.privacyBadge' | translate }}
+    </app-badge>
+  </header>
+
+  <section class="c-timestamp-studio__clock-bar g--margin-bottom-4">
+    <div class="c-timestamp-studio__row">
+      <span class="c-timestamp-studio__muted">{{ 'tools.timestampTimezoneConverter.liveNowLabel' | translate }}</span>
+      <code class="c-timestamp-studio__live-epoch">{{ nowEpochSeconds() }}</code>
+      <app-button variant="outline" size="small" (clicked)="copyText(nowEpochSeconds().toString(), 's')">
+        {{ 'tools.timestampTimezoneConverter.copySecondsBtn' | translate }}
+      </app-button>
+      <app-button variant="outline" size="small" (clicked)="copyText(nowEpochMilliseconds().toString(), 'ms')">
+        {{ 'tools.timestampTimezoneConverter.copyMillisBtn' | translate }}
+      </app-button>
+      <app-button variant="outline" size="small" (clicked)="toggleClockPause()">
+        {{ (isClockPaused() ? 'tools.timestampTimezoneConverter.resumeBtn' : 'tools.timestampTimezoneConverter.pauseBtn') | translate }}
+      </app-button>
+      <app-button variant="primary" size="small" (clicked)="useNowInConverter()">
+        {{ 'tools.timestampTimezoneConverter.useNowBtn' | translate }}
+      </app-button>
+    </div>
+  </section>
+
+  @if (copyFeedback(); as fb) {
+    <p class="c-timestamp-studio__feedback g--margin-bottom-3" role="status">Copied {{ fb }}.</p>
+  }
+
+  <div class="c-timestamp-studio__row g--margin-bottom-4" role="tablist">
+    <button
+      type="button"
+      role="tab"
+      [attr.aria-selected]="activeTab() === 'converter'"
+      [class]="'c-button c-button--small ' + (activeTab() === 'converter' ? 'c-button--primary' : 'c-button--outline')"
+      (click)="setActiveTab('converter')"
+    >
+      {{ 'tools.timestampTimezoneConverter.tabConverter' | translate }}
+    </button>
+    <button
+      type="button"
+      role="tab"
+      [attr.aria-selected]="activeTab() === 'delta'"
+      [class]="'c-button c-button--small ' + (activeTab() === 'delta' ? 'c-button--primary' : 'c-button--outline')"
+      (click)="setActiveTab('delta')"
+    >
+      {{ 'tools.timestampTimezoneConverter.tabDelta' | translate }}
+    </button>
+    <button
+      type="button"
+      role="tab"
+      [attr.aria-selected]="activeTab() === 'batch'"
+      [class]="'c-button c-button--small ' + (activeTab() === 'batch' ? 'c-button--primary' : 'c-button--outline')"
+      (click)="setActiveTab('batch')"
+    >
+      {{ 'tools.timestampTimezoneConverter.tabBatch' | translate }}
+    </button>
+  </div>
+
+  @if (activeTab() === 'converter') {
+    <app-card [title]="'tools.timestampTimezoneConverter.inputCardTitle' | translate" class="g--margin-bottom-4">
+      <div class="c-timestamp-studio__row g--margin-bottom-3">
+        <input
+          type="text"
+          class="c-input c-timestamp-studio__main-input"
+          spellcheck="false"
+          aria-label="Epoch or date timestamp input"
+          [placeholder]="'tools.timestampTimezoneConverter.inputPlaceholder' | translate"
+          [ngModel]="inputText()"
+          (ngModelChange)="inputText.set($event)"
+        />
+        <label class="c-input__label" for="ts-unit-select">
+          {{ 'tools.timestampTimezoneConverter.unitLabel' | translate }}
+        </label>
+        <select
+          id="ts-unit-select"
+          class="c-input"
+          [ngModel]="unitOverride()"
+          (ngModelChange)="unitOverride.set($event)"
+        >
+          <option value="auto">Auto-Detect</option>
+          <option value="seconds">Seconds (s)</option>
+          <option value="milliseconds">Milliseconds (ms)</option>
+          <option value="microseconds">Microseconds (μs)</option>
+          <option value="nanoseconds">Nanoseconds (ns)</option>
+        </select>
+        <app-button variant="outline" size="small" (clicked)="reset()">
+          {{ 'tools.timestampTimezoneConverter.resetBtn' | translate }}
+        </app-button>
+      </div>
+
+      @if (!parsedResult().valid) {
+        <div class="c-timestamp-studio__alert" role="alert">{{ parsedResult().error }}</div>
+      } @else {
+        <div class="c-timestamp-studio__row">
+          <span class="c-badge c-badge--success">{{ parsedResult().detectedUnit }}</span>
+          <span class="c-badge">{{ parsedResult().relativeTime }}</span>
+          <span class="c-badge">ISO Week {{ parsedResult().isoWeekNumber }}</span>
+          <span class="c-badge">Day {{ parsedResult().dayOfYear }}</span>
+          @if (parsedResult().isLeapYear) {
+            <span class="c-badge">Leap Year</span>
+          }
+        </div>
+      }
+    </app-card>
+
+    @if (parsedResult().valid) {
+      <div class="l-columns l-columns--2">
+        <div class="l-columns__area">
+          <app-card [title]="'tools.timestampTimezoneConverter.formatsCardTitle' | translate" class="g--margin-bottom-4">
+            <div class="c-timestamp-studio__table-wrap">
+              <table class="c-timestamp-studio__table">
+                <tbody>
+                  <tr>
+                    <th>ISO-8601 (UTC)</th>
+                    <td><code>{{ parsedResult().isoUtc }}</code></td>
+                    <td><app-button variant="outline" size="small" (clicked)="copyText(parsedResult().isoUtc, 'ISO')">Copy</app-button></td>
+                  </tr>
+                  <tr>
+                    <th>Unix Seconds</th>
+                    <td><code>{{ parsedResult().epochSeconds }}</code></td>
+                    <td><app-button variant="outline" size="small" (clicked)="copyText(parsedResult().epochSeconds, 's')">Copy</app-button></td>
+                  </tr>
+                  <tr>
+                    <th>Unix Milliseconds</th>
+                    <td><code>{{ parsedResult().epochMilliseconds }}</code></td>
+                    <td><app-button variant="outline" size="small" (clicked)="copyText(parsedResult().epochMilliseconds, 'ms')">Copy</app-button></td>
+                  </tr>
+                  <tr>
+                    <th>Unix Microseconds</th>
+                    <td><code>{{ parsedResult().epochMicroseconds }}</code></td>
+                    <td><app-button variant="outline" size="small" (clicked)="copyText(parsedResult().epochMicroseconds, 'us')">Copy</app-button></td>
+                  </tr>
+                  <tr>
+                    <th>Unix Nanoseconds</th>
+                    <td><code>{{ parsedResult().epochNanoseconds }}</code></td>
+                    <td><app-button variant="outline" size="small" (clicked)="copyText(parsedResult().epochNanoseconds, 'ns')">Copy</app-button></td>
+                  </tr>
+                  <tr>
+                    <th>RFC-2822</th>
+                    <td><code>{{ parsedResult().rfc2822 }}</code></td>
+                    <td><app-button variant="outline" size="small" (clicked)="copyText(parsedResult().rfc2822, 'RFC-2822')">Copy</app-button></td>
+                  </tr>
+                  <tr>
+                    <th>SQL TIMESTAMP</th>
+                    <td><code>{{ parsedResult().sqlTimestampUtc }}</code></td>
+                    <td><app-button variant="outline" size="small" (clicked)="copyText(parsedResult().sqlTimestampUtc, 'SQL')">Copy</app-button></td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </app-card>
+
+          <app-card [title]="'tools.timestampTimezoneConverter.discordCardTitle' | translate">
+            <div class="c-timestamp-studio__table-wrap">
+              <table class="c-timestamp-studio__table">
+                <tbody>
+                  @for (style of discordTagStyles; track style) {
+                    <tr>
+                      <th><code>:{{ style }}</code></th>
+                      <td><code>{{ parsedResult().discordTags[style] }}</code></td>
+                      <td>
+                        <app-button variant="outline" size="small" (clicked)="copyText(parsedResult().discordTags[style], style)">Copy</app-button>
+                      </td>
+                    </tr>
+                  }
+                </tbody>
+              </table>
+            </div>
+          </app-card>
+        </div>
+
+        <div class="l-columns__area">
+          <app-card [title]="'tools.timestampTimezoneConverter.timezonesCardTitle' | translate">
+            <div class="c-timestamp-studio__row g--margin-bottom-3">
+              <select class="c-input c-timestamp-studio__select" aria-label="Add IANA timezone" [ngModel]="zoneToAdd()" (ngModelChange)="zoneToAdd.set($event)">
+                @for (tz of supportedTimezones; track tz) {
+                  <option [value]="tz">{{ tz }}</option>
+                }
+              </select>
+              <app-button variant="secondary" size="small" (clicked)="pinTimezone(zoneToAdd())">
+                {{ 'tools.timestampTimezoneConverter.addTimezoneBtn' | translate }}
+              </app-button>
+            </div>
+
+            <div class="c-timestamp-studio__table-wrap">
+              <table class="c-timestamp-studio__table">
+                <tbody>
+                  @for (view of parsedResult().timezoneViews; track view.timezone) {
+                    <tr>
+                      <th>
+                        {{ view.timezone }}
+                        <span class="c-timestamp-studio__tz-offset">{{ view.offsetLabel }}</span>
+                      </th>
+                      <td><code>{{ view.formatted }}</code></td>
+                      <td>
+                        <app-button variant="outline" size="small" (clicked)="unpinTimezone(view.timezone)">×</app-button>
+                      </td>
+                    </tr>
+                  }
+                </tbody>
+              </table>
+            </div>
+          </app-card>
+        </div>
+      </div>
+    }
+  }
+
+  @if (activeTab() === 'delta') {
+    <app-card [title]="'tools.timestampTimezoneConverter.deltaCardTitle' | translate">
+      <div class="l-columns l-columns--2 g--margin-bottom-3">
+        <div class="l-columns__area">
+          <label class="c-input__label" for="delta-start">{{ 'tools.timestampTimezoneConverter.deltaStartLabel' | translate }}</label>
+          <input id="delta-start" type="text" class="c-input c-timestamp-studio__main-input" [ngModel]="deltaStartInput()" (ngModelChange)="deltaStartInput.set($event)" />
+        </div>
+        <div class="l-columns__area">
+          <label class="c-input__label" for="delta-end">{{ 'tools.timestampTimezoneConverter.deltaEndLabel' | translate }}</label>
+          <input id="delta-end" type="text" class="c-input c-timestamp-studio__main-input" [ngModel]="deltaEndInput()" (ngModelChange)="deltaEndInput.set($event)" />
+        </div>
+      </div>
+
+      <div class="c-timestamp-studio__row g--margin-bottom-3">
+        <label class="c-timestamp-studio__num-wrap">
+          {{ 'tools.timestampTimezoneConverter.offsetDaysLabel' | translate }}
+          <input type="number" class="c-input c-timestamp-studio__num" [ngModel]="offsetDays()" (ngModelChange)="offsetDays.set(+$event)" />
+        </label>
+        <label class="c-timestamp-studio__num-wrap">
+          {{ 'tools.timestampTimezoneConverter.offsetHoursLabel' | translate }}
+          <input type="number" class="c-input c-timestamp-studio__num" [ngModel]="offsetHours()" (ngModelChange)="offsetHours.set(+$event)" />
+        </label>
+        <app-button variant="secondary" size="small" (clicked)="applyOffsetToEnd()">
+          {{ 'tools.timestampTimezoneConverter.applyOffsetBtn' | translate }}
+        </app-button>
+      </div>
+
+      @if (deltaResult(); as delta) {
+        <div class="c-timestamp-studio__delta-box">
+          <strong>
+            {{ delta.sign === -1 ? '-' : '' }}{{ delta.breakdown.days }}d {{ delta.breakdown.hours }}h {{ delta.breakdown.minutes }}m {{ delta.breakdown.seconds }}s {{ delta.breakdown.ms }}ms
+          </strong>
+          <div class="c-timestamp-studio__row g--margin-top-2">
+            <span class="c-badge">{{ delta.totalSeconds }} s</span>
+            <span class="c-badge">{{ delta.totalHours.toFixed(2) }} h</span>
+            <span class="c-badge">{{ delta.weekdaysCount }} weekdays</span>
+          </div>
+        </div>
+      }
+    </app-card>
+  }
+
+  @if (activeTab() === 'batch') {
+    <app-card [title]="'tools.timestampTimezoneConverter.batchCardTitle' | translate">
+      <div class="c-timestamp-studio__row g--margin-bottom-3">
+        <label class="c-input__label" for="batch-tz">{{ 'tools.timestampTimezoneConverter.batchTimezoneLabel' | translate }}</label>
+        <select id="batch-tz" class="c-input c-timestamp-studio__select" [ngModel]="batchTimezone()" (ngModelChange)="batchTimezone.set($event)">
+          @for (tz of supportedTimezones; track tz) {
+            <option [value]="tz">{{ tz }}</option>
+          }
+        </select>
+        <app-button variant="outline" size="small" (clicked)="exportBatchCsv()">
+          {{ 'tools.timestampTimezoneConverter.exportCsvBtn' | translate }}
+        </app-button>
+        <app-button variant="outline" size="small" (clicked)="exportBatchJson()">
+          {{ 'tools.timestampTimezoneConverter.exportJsonBtn' | translate }}
+        </app-button>
+      </div>
+
+      <textarea
+        class="c-input c-timestamp-studio__textarea g--margin-bottom-3"
+        rows="6"
+        spellcheck="false"
+        aria-label="Batch timestamp log lines"
+        [ngModel]="batchInput()"
+        (ngModelChange)="batchInput.set($event)"
+      ></textarea>
+
+      <div class="c-timestamp-studio__table-wrap">
+        <table class="c-timestamp-studio__table">
+          <thead>
+            <tr>
+              <th>Line</th>
+              <th>Input</th>
+              <th>Unit</th>
+              <th>ISO-8601 UTC</th>
+              <th>{{ batchTimezone() }}</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (row of batchRows(); track row.line) {
+              <tr>
+                <td>{{ row.line }}</td>
+                <td><code>{{ row.rawInput }}</code></td>
+                <td>{{ row.valid ? row.detectedUnit : 'Error' }}</td>
+                <td><code>{{ row.valid ? row.isoUtc : row.error }}</code></td>
+                <td><code>{{ row.targetTzFormatted ?? '' }}</code></td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    </app-card>
+  }
+</div>

@@ -769,6 +769,14 @@ describe('ToolRegistry (Seam 3: Catalog & Architecture Verification)', () => {
     expect(TOOL_I18N_MAP['cron-expression-studio']).toBe('cronExpressionStudio');
   });
 
+  it('should find timestamp-timezone-converter tool by id', () => {
+    const tool = getToolById('timestamp-timezone-converter');
+    expect(tool).toBeDefined();
+    expect(tool?.category).toBe('dev');
+    expect(tool?.isFullyClientSide).toBe(true);
+    expect(TOOL_I18N_MAP['timestamp-timezone-converter']).toBe('timestampTimezoneConverter');
+  });
+
   describe('Tool Registry Localization (i18n)', () => {
     it('should have an i18n key mapping for every registered tool', () => {
       for (const tool of TOOL_REGISTRY) {

@@ -32,6 +32,7 @@ import { regexTesterDebuggerTool } from './dev/regex-tester-debugger';
 import { jwtDebuggerStudioTool } from './dev/jwt-debugger-studio';
 import { encoderDecoderWorkbenchTool } from './dev/encoder-decoder-workbench';
 import { cronExpressionStudioTool } from './dev/cron-expression-studio';
+import { timestampTimezoneConverterTool } from './dev/timestamp-timezone-converter';
 import { emailSignatureGeneratorTool } from './dev/email-signature-generator';
 import { cssMeshGradientMakerTool } from './dev/mesh-gradient-maker';
 import { robotsSitemapBuilderTool } from './dev/robots-sitemap-builder';
@@ -149,6 +150,7 @@ export const TOOL_REGISTRY: ToolDefinition[] = [
   jwtDebuggerStudioTool,
   encoderDecoderWorkbenchTool,
   cronExpressionStudioTool,
+  timestampTimezoneConverterTool,
 ];
 
 export function getToolById(id: string): ToolDefinition | undefined {
@@ -289,6 +291,7 @@ export const TOOL_I18N_MAP: Record<string, string> = {
   'jwt-debugger-studio': 'jwtDebuggerStudio',
   'encoder-decoder-workbench': 'encoderDecoderWorkbench',
   'cron-expression-studio': 'cronExpressionStudio',
+  'timestamp-timezone-converter': 'timestampTimezoneConverter',
 };
 
 export function getToolI18nKey(id: string): string | undefined {
