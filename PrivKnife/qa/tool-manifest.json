@@ -132,6 +132,12 @@
     "source": "PrivKnife/src/app/tools/privacy/emergency-recovery-kit"
   },
   {
+    "id": "encoder-decoder-workbench",
+    "route": "/tools/encoder-decoder-workbench",
+    "category": "dev",
+    "source": "PrivKnife/src/app/tools/dev/encoder-decoder-workbench"
+  },
+  {
     "id": "exif-stripper",
     "route": "/tools/exif-stripper",
     "category": "privacy",

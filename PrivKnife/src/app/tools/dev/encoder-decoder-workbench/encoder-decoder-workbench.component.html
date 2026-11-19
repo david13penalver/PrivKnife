@@ -1,0 +1,312 @@
+<div class="l-page c-encoder-studio">
+  <header class="l-page__header c-header">
+    <div class="c-header__title-group">
+      <h1 class="c-header__title">{{ 'tools.encoderDecoderWorkbench.name' | translate }}</h1>
+      <p class="c-header__subtitle">{{ 'tools.encoderDecoderWorkbench.description' | translate }}</p>
+    </div>
+    <app-badge variant="privacy" [dot]="true">
+      {{ 'common.privacyBadge' | translate }}
+    </app-badge>
+  </header>
+
+  <section class="c-encoder-studio__mode-bar g--margin-bottom-3" role="tablist" aria-label="Encoding Modes">
+    @for (m of codecModes; track m.id) {
+      <button
+        type="button"
+        role="tab"
+        [attr.data-codec-mode]="m.id"
+        [attr.aria-selected]="options().mode === m.id"
+        [class]="'c-button c-button--small ' + (options().mode === m.id ? 'c-button--primary' : 'c-button--outline')"
+        (click)="setMode(m.id)"
+      >
+        {{ m.labelKey | translate }}
+      </button>
+    }
+  </section>
+
+  <section class="c-encoder-studio__controls g--margin-bottom-4">
+    <div class="c-encoder-studio__row">
+      <button
+        type="button"
+        [class]="'c-button c-button--small ' + (options().direction === 'encode' ? 'c-button--primary' : 'c-button--outline')"
+        (click)="setDirection('encode')"
+      >
+        {{ 'tools.encoderDecoderWorkbench.directionEncode' | translate }}
+      </button>
+      <button
+        type="button"
+        [class]="'c-button c-button--small ' + (options().direction === 'decode' ? 'c-button--primary' : 'c-button--outline')"
+        (click)="setDirection('decode')"
+      >
+        {{ 'tools.encoderDecoderWorkbench.directionDecode' | translate }}
+      </button>
+      <app-button variant="secondary" size="small" (clicked)="swapInputOutput()" [disabled]="!outputText() || !!detectedBinary()">
+        {{ 'tools.encoderDecoderWorkbench.swapBtn' | translate }}
+      </app-button>
+      <app-button variant="outline" size="small" (clicked)="reset()">
+        {{ 'tools.encoderDecoderWorkbench.resetBtn' | translate }}
+      </app-button>
+    </div>
+
+    <div class="c-encoder-studio__row">
+      @if (options().mode === 'base64') {
+        <label class="c-encoder-studio__check">
+          <input type="checkbox" [ngModel]="options().base64UrlSafe" (ngModelChange)="updateOption('base64UrlSafe', $event)" />
+          {{ 'tools.encoderDecoderWorkbench.urlSafeOption' | translate }}
+        </label>
+        <label class="c-encoder-studio__check">
+          <input type="checkbox" [ngModel]="options().base64OmitPadding" (ngModelChange)="updateOption('base64OmitPadding', $event)" />
+          {{ 'tools.encoderDecoderWorkbench.omitPaddingOption' | translate }}
+        </label>
+        <label class="c-encoder-studio__check">
+          <input type="checkbox" [ngModel]="options().base64Wrap76" (ngModelChange)="updateOption('base64Wrap76', $event)" />
+          {{ 'tools.encoderDecoderWorkbench.wrap76Option' | translate }}
+        </label>
+        <label class="c-encoder-studio__check">
+          <input type="checkbox" [ngModel]="encodeAsDataUri()" (ngModelChange)="encodeAsDataUri.set($event)" />
+          {{ 'tools.encoderDecoderWorkbench.dataUriOption' | translate }}
+        </label>
+      }
+
+      @if (options().mode === 'url') {
+        <select
+          class="c-input c-encoder-studio__select"
+          aria-label="URL Encoding Mode"
+          [ngModel]="options().urlMode"
+          (ngModelChange)="updateOption('urlMode', $event)"
+        >
+          <option value="component">encodeURIComponent</option>
+          <option value="full_uri">encodeURI (Full URL)</option>
+          <option value="form_plus">application/x-www-form-urlencoded (+)</option>
+        </select>
+      }
+
+      @if (options().mode === 'html_unicode') {
+        <select
+          class="c-input c-encoder-studio__select"
+          aria-label="HTML and Unicode Mode"
+          [ngModel]="options().htmlEncodeMode"
+          (ngModelChange)="updateOption('htmlEncodeMode', $event)"
+        >
+          <option value="minimal">Minimal HTML (&amp; &lt; &gt; &quot; &#39;)</option>
+          <option value="all_non_ascii">All Non-ASCII Numeric Entities</option>
+          <option value="js_unicode">JS / JSON Unicode (\uXXXX)</option>
+        </select>
+      }
+
+      @if (options().mode === 'hex') {
+        <select
+          class="c-input c-encoder-studio__select"
+          aria-label="Hex Delimiter"
+          [ngModel]="options().hexDelimiter"
+          (ngModelChange)="updateOption('hexDelimiter', $event)"
+        >
+          <option value="space">Space (48 65)</option>
+          <option value="none">Continuous (4865)</option>
+          <option value="colon">Colon (48:65)</option>
+          <option value="0x">0x Prefix (0x48)</option>
+          <option value="backslash_x">\x Escape (\x48)</option>
+        </select>
+        <label class="c-encoder-studio__check">
+          <input type="checkbox" [ngModel]="options().hexUppercase" (ngModelChange)="updateOption('hexUppercase', $event)" />
+          UPPERCASE
+        </label>
+      }
+
+      @if (options().mode === 'binary') {
+        <select
+          class="c-input c-encoder-studio__select"
+          aria-label="Numeric Radix"
+          [ngModel]="options().binaryRadix"
+          (ngModelChange)="updateOption('binaryRadix', $event)"
+        >
+          <option value="binary">Binary (8-bit)</option>
+          <option value="octal">Octal (Base 8)</option>
+          <option value="decimal">Decimal (ASCII 0–255)</option>
+        </select>
+      }
+
+      @if (options().mode === 'morse') {
+        <label class="c-encoder-studio__check">
+          {{ 'tools.encoderDecoderWorkbench.morseWpmLabel' | translate }}: {{ options().morseWpm }}
+          <input
+            type="range"
+            min="5"
+            max="35"
+            [ngModel]="options().morseWpm"
+            (ngModelChange)="updateOption('morseWpm', +$event)"
+          />
+        </label>
+        <label class="c-encoder-studio__check">
+          {{ 'tools.encoderDecoderWorkbench.morseFreqLabel' | translate }}: {{ options().morseFrequencyHz }} Hz
+          <input
+            type="range"
+            min="400"
+            max="900"
+            step="10"
+            [ngModel]="options().morseFrequencyHz"
+            (ngModelChange)="updateOption('morseFrequencyHz', +$event)"
+          />
+        </label>
+      }
+    </div>
+  </section>
+
+  @if (options().mode === 'base64') {
+    <div class="g--margin-bottom-4">
+      <app-dropzone
+        [title]="'tools.encoderDecoderWorkbench.dropzoneTitle' | translate"
+        [subtitle]="'tools.encoderDecoderWorkbench.dropzoneSubtitle' | translate"
+        [maxSizeMb]="50"
+        (filesSelected)="onFilesSelected($event)"
+      />
+      @if (workerBusy()) {
+        <div class="g--margin-top-3">
+          <app-progress-bar [value]="workerProgress()" label="Processing file in Web Worker..." />
+        </div>
+      }
+    </div>
+  }
+
+  <div class="l-columns l-columns--2">
+    <div class="l-columns__area">
+      <app-card [title]="'tools.encoderDecoderWorkbench.inputTitle' | translate">
+        <div class="c-encoder-studio__meta g--margin-bottom-2">
+          <span class="c-badge">{{ inputBytes() }} B</span>
+        </div>
+        <textarea
+          class="c-input c-encoder-studio__textarea"
+          rows="9"
+          spellcheck="false"
+          aria-label="Workbench input text"
+          [placeholder]="'tools.encoderDecoderWorkbench.inputPlaceholder' | translate"
+          [ngModel]="inputText()"
+          (ngModelChange)="updateInput($event)"
+        ></textarea>
+      </app-card>
+    </div>
+
+    <div class="l-columns__area">
+      <app-card [title]="'tools.encoderDecoderWorkbench.outputTitle' | translate">
+        <div class="c-encoder-studio__meta g--margin-bottom-2">
+          <span class="c-badge">{{ outputBytes() }} B</span>
+          <div class="c-encoder-studio__row">
+            <app-button variant="primary" size="small" (clicked)="copyOutput()" [disabled]="!outputText()">
+              {{ 'tools.encoderDecoderWorkbench.copyOutputBtn' | translate }}
+            </app-button>
+            <app-button variant="outline" size="small" (clicked)="downloadOutputText()" [disabled]="!outputText()">
+              {{ 'tools.encoderDecoderWorkbench.downloadTextBtn' | translate }}
+            </app-button>
+          </div>
+        </div>
+
+        @if (copyFeedback(); as feedback) {
+          <p class="c-encoder-studio__feedback g--margin-bottom-2" role="status">{{ feedback }}</p>
+        }
+
+        @if (errorMessage(); as err) {
+          <div class="c-encoder-studio__alert g--margin-bottom-2" role="alert">{{ err }}</div>
+        }
+
+        @if (outputTruncated()) {
+          <p class="c-encoder-studio__hint g--margin-bottom-2">
+            {{ 'tools.encoderDecoderWorkbench.outputTruncatedNotice' | translate }}
+          </p>
+        }
+
+        <textarea
+          class="c-input c-encoder-studio__textarea"
+          rows="9"
+          readonly
+          aria-label="Workbench output text"
+          [value]="outputPreviewText()"
+        ></textarea>
+
+        @if (options().mode === 'morse') {
+          <div class="c-encoder-studio__morse-bar g--margin-top-3">
+            @if (!isPlayingMorse()) {
+              <app-button variant="primary" size="small" (clicked)="playMorseAudio()">
+                {{ 'tools.encoderDecoderWorkbench.morsePlayBtn' | translate }}
+              </app-button>
+            } @else {
+              <app-button variant="danger" size="small" (clicked)="stopMorsePlayback()">
+                {{ 'tools.encoderDecoderWorkbench.morseStopBtn' | translate }}
+              </app-button>
+            }
+            <app-button variant="outline" size="small" (clicked)="downloadMorseWav()">
+              {{ 'tools.encoderDecoderWorkbench.morseDownloadWavBtn' | translate }}
+            </app-button>
+          </div>
+          @if (isPlayingMorse()) {
+            <div class="g--margin-top-2">
+              <app-progress-bar [value]="morseProgress()" label="CW Playback" />
+            </div>
+          }
+        }
+      </app-card>
+    </div>
+  </div>
+
+  @if (options().mode === 'base64' && detectedBinary(); as bin) {
+    <app-card [title]="'tools.encoderDecoderWorkbench.binaryDetectedTitle' | translate" class="g--margin-top-4">
+      <div class="c-encoder-studio__row g--margin-bottom-3">
+        <span class="c-badge c-badge--success">{{ bin.mimeType }}</span>
+        <span class="c-badge">.{{ bin.extension }} ({{ bin.byteLength }} B)</span>
+        <app-button variant="primary" size="small" (clicked)="downloadDecodedBinary()">
+          {{ 'tools.encoderDecoderWorkbench.downloadBinaryBtn' | translate }}
+        </app-button>
+      </div>
+      @if (binaryPreviewUrl(); as imgUrl) {
+        <img [src]="imgUrl" alt="Decoded image preview" class="c-encoder-studio__preview-img" />
+      }
+    </app-card>
+  }
+
+  @if (options().mode === 'url' && parsedUrl()?.validUrl) {
+    <app-card [title]="'tools.encoderDecoderWorkbench.urlParamsTitle' | translate" class="g--margin-top-4">
+      <div class="g--margin-bottom-3">
+        <app-button variant="outline" size="small" (clicked)="addUrlParam()">
+          {{ 'tools.encoderDecoderWorkbench.addParamBtn' | translate }}
+        </app-button>
+      </div>
+      <div class="c-encoder-studio__table-wrap">
+        <table class="c-encoder-studio__table">
+          <thead>
+            <tr>
+              <th>{{ 'tools.encoderDecoderWorkbench.paramKeyHeader' | translate }}</th>
+              <th>{{ 'tools.encoderDecoderWorkbench.paramValueHeader' | translate }}</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (param of urlParams(); track $index) {
+              <tr>
+                <td>
+                  <input
+                    type="text"
+                    class="c-input"
+                    [ngModel]="param.key"
+                    (ngModelChange)="updateUrlParam($index, 'key', $event)"
+                  />
+                </td>
+                <td>
+                  <input
+                    type="text"
+                    class="c-input"
+                    [ngModel]="param.value"
+                    (ngModelChange)="updateUrlParam($index, 'value', $event)"
+                  />
+                </td>
+                <td>
+                  <app-button variant="danger" size="small" (clicked)="removeUrlParam($index)">
+                    {{ 'tools.encoderDecoderWorkbench.removeParamBtn' | translate }}
+                  </app-button>
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    </app-card>
+  }
+</div>

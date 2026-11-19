@@ -972,6 +972,20 @@ const CATALOG_TOOLS: CatalogTool[] = [
     techStack: 'Native Web Crypto • Pure TS Base64Url & PEM/JWK',
     icon: '🔑',
   },
+  {
+    id: 'encoder-decoder-workbench',
+    i18nKey: 'encoderDecoderWorkbench',
+    name: 'Universal Encoder / Decoder Workbench',
+    category: 'dev',
+    categoryLabel: 'Dev / Data',
+    description:
+      'Encode and decode Base64, files/Data URIs, URL query params, HTML entities, Hex, Binary, and playable ITU Morse locally.',
+    keywords: ['base64', 'url encode', 'html entities', 'hex', 'binary', 'morse audio'],
+    status: 'ready',
+    route: '/tools/encoder-decoder-workbench',
+    techStack: 'Pure TS Codecs • Magic-Byte Sniffer • Web Worker • Web Audio CW Synth',
+    icon: '🔁',
+  },
 ];
 
 @Component({

@@ -2148,6 +2148,13 @@ export const routes: Routes = [
       ),
   },
   {
+    path: 'tools/encoder-decoder-workbench',
+    loadComponent: () =>
+      import('./tools/dev/encoder-decoder-workbench/encoder-decoder-workbench.component').then(
+        (m) => m.EncoderDecoderWorkbenchComponent
+      ),
+  },
+  {
     path: '**',
     title: 'Page Not Found — PrivKnife',
     data: {
