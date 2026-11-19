@@ -1,0 +1,228 @@
+<div class="l-page">
+  <header class="l-page__header c-header">
+    <div class="c-header__title-group">
+      <h1 class="c-header__title">{{ 'tools.pdfTableExtractor.name' | translate }}</h1>
+      <p class="c-header__subtitle">{{ 'tools.pdfTableExtractor.description' | translate }}</p>
+    </div>
+    <div class="c-badge c-badge--privacy">
+      {{ 'common.privacyBadge' | translate }}
+    </div>
+  </header>
+
+  @if (errorMessage()) {
+    <div class="c-pdf-table-extractor__alert c-pdf-table-extractor__alert--error g--margin-bottom-4" role="alert" aria-live="polite">
+      {{ errorMessage() }}
+    </div>
+  }
+
+  @if (largeFileWarning()) {
+    <div class="c-pdf-table-extractor__alert c-pdf-table-extractor__alert--warn g--margin-bottom-4">
+      Large PDF (&gt;100 MB) loaded. Spatial table clustering and export run strictly inside local browser memory.
+    </div>
+  }
+
+  @if (isScannedFallbackNeeded()) {
+    <div class="c-pdf-table-extractor__alert c-pdf-table-extractor__alert--warn g--margin-bottom-4">
+      {{ 'tools.pdfTableExtractor.scannedNotice' | translate }}
+      <a class="c-pdf-table-extractor__link" routerLink="/tools/local-ocr-text-extractor">
+        Open Local OCR Text Extractor →
+      </a>
+    </div>
+  }
+
+  <div class="l-columns l-columns--2">
+    <div class="l-columns__area">
+      <app-card [title]="'tools.pdfTableExtractor.uploadTitle' | translate" class="g--margin-bottom-4">
+        <app-dropzone
+          [title]="'tools.pdfTableExtractor.uploadTitle' | translate"
+          subtitle="Drop a digital PDF ledger, bank statement, or report (zero upload)"
+          accept=".pdf,application/pdf"
+          [multiple]="false"
+          [maxSizeMb]="250"
+          (filesSelected)="onFileDropped($event)"
+        />
+        <div class="c-pdf-table-extractor__row g--margin-top-3">
+          <button
+            type="button"
+            class="c-button c-button--small c-button--outline"
+            (click)="loadSampleLedgerPdf()"
+          >
+            {{ 'tools.pdfTableExtractor.loadSample' | translate }}
+          </button>
+          @if (pdfBytes()) {
+            <span class="c-pdf-table-extractor__meta">
+              {{ pdfFileName() }} ({{ formattedInputSize() }} • {{ pageCount() }} pages)
+            </span>
+          }
+        </div>
+      </app-card>
+
+      @if (pdfBytes()) {
+        <app-card [title]="'tools.pdfTableExtractor.settingsTitle' | translate" class="g--margin-bottom-4">
+          <div class="c-pdf-table-extractor__checks g--margin-bottom-3">
+            <label class="c-pdf-table-extractor__check">
+              <input
+                type="checkbox"
+                [ngModel]="mergeAllPages()"
+                (ngModelChange)="setMergeAllPages($event)"
+              />
+              Merge All Pages into Single Table
+            </label>
+            <label class="c-pdf-table-extractor__check">
+              <input
+                type="checkbox"
+                [ngModel]="stripRepeatedHeaders()"
+                (ngModelChange)="setStripRepeatedHeaders($event)"
+              />
+              Strip Repeated Page Headers
+            </label>
+            <label class="c-pdf-table-extractor__check">
+              <input
+                type="checkbox"
+                [ngModel]="firstRowAsHeader()"
+                (ngModelChange)="setFirstRowAsHeader($event)"
+              />
+              First Row as Column Headers
+            </label>
+            <label class="c-pdf-table-extractor__check">
+              <input
+                type="checkbox"
+                [ngModel]="detectNumericTypes()"
+                (ngModelChange)="setDetectNumericTypes($event)"
+              />
+              Parse Currency, Percentages &amp; Numbers
+            </label>
+            <label class="c-pdf-table-extractor__check">
+              <input
+                type="checkbox"
+                [ngModel]="sanitizeCsvFormulas()"
+                (ngModelChange)="setSanitizeCsvFormulas($event)"
+              />
+              Formula Injection Protection (=, +, @)
+            </label>
+          </div>
+
+          <div class="c-pdf-table-extractor__grid-2 g--margin-bottom-3">
+            <div class="c-input">
+              <label class="c-input__label" for="tbl-gap">Min Column Gap (pt)</label>
+              <input
+                id="tbl-gap"
+                type="number"
+                min="2"
+                max="40"
+                class="c-input__control"
+                [ngModel]="minColumnGapPt()"
+                (ngModelChange)="setMinColumnGapPt($event)"
+              />
+            </div>
+            <div class="c-input">
+              <label class="c-input__label" for="tbl-dec">Decimal Separator</label>
+              <select
+                id="tbl-dec"
+                class="c-input__control"
+                [ngModel]="decimalSeparator()"
+                (ngModelChange)="setDecimalSeparator($event)"
+              >
+                <option value=".">Dot (1,234.56)</option>
+                <option value=",">Comma (1.234,56)</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="c-pdf-table-extractor__row">
+            <button type="button" class="c-button c-button--small c-button--outline" (click)="resetAutoSplits()">
+              Reset Auto Column Dividers
+            </button>
+            <button type="button" class="c-button c-button--small c-button--outline" (click)="reset()">
+              {{ 'tools.pdfTableExtractor.resetBtn' | translate }}
+            </button>
+          </div>
+        </app-card>
+
+        <app-card title="Visual Column Guides (Click page to add split)">
+          <div class="c-pdf-table-extractor__stage" (click)="onPreviewClick($event)">
+            <canvas #previewCanvas class="c-pdf-table-extractor__canvas"></canvas>
+            @if (previewAvailable()) {
+              @for (pct of splitGuidePercents(); track $index) {
+                <div class="c-pdf-table-extractor__divider" [style.left.%]="pct"></div>
+              }
+            }
+          </div>
+
+          @if (activeColumnSplits().length > 0) {
+            <div class="c-pdf-table-extractor__row g--margin-top-3">
+              @for (x of activeColumnSplits(); track $index) {
+                <button
+                  type="button"
+                  class="c-button c-button--small c-button--outline"
+                  (click)="removeColumnSplit($index)"
+                  [title]="'Remove column split at ' + x + ' pt'"
+                >
+                  Split {{ x }}pt ×
+                </button>
+              }
+            </div>
+          }
+        </app-card>
+      }
+    </div>
+
+    <div class="l-columns__area">
+      @if (isProcessing()) {
+        <app-card class="g--margin-bottom-4">
+          <app-progress-bar [value]="progressPercent()" [label]="progressStage()" />
+        </app-card>
+      }
+
+      <app-card [title]="'tools.pdfTableExtractor.previewTitle' | translate" class="g--margin-bottom-4">
+        @if (tables().length > 0) {
+          <p class="c-pdf-table-extractor__meta g--margin-bottom-3">
+            Detected {{ tables().length }} table(s) • {{ totalRows() }} data rows
+          </p>
+
+          <div class="c-pdf-table-extractor__actions g--margin-bottom-4">
+            <button type="button" class="c-button c-button--primary" (click)="exportFile('xlsx')">
+              {{ 'tools.pdfTableExtractor.exportXlsxBtn' | translate }}
+            </button>
+            <button type="button" class="c-button c-button--outline" (click)="exportFile('csv')">
+              {{ 'tools.pdfTableExtractor.exportCsvBtn' | translate }}
+            </button>
+            <button type="button" class="c-button c-button--outline" (click)="exportFile('json')">
+              {{ 'tools.pdfTableExtractor.exportJsonBtn' | translate }}
+            </button>
+            <button type="button" class="c-button c-button--outline" (click)="copyTsv()">
+              {{ copiedTsv() ? 'Copied TSV!' : ('tools.pdfTableExtractor.copyTsvBtn' | translate) }}
+            </button>
+          </div>
+
+          @for (tbl of tables(); track $index) {
+            <div class="c-pdf-table-extractor__table-wrap g--margin-bottom-4">
+              <table class="c-pdf-table-extractor__table">
+                <thead>
+                  <tr>
+                    @for (h of tbl.headers; track $index) {
+                      <th>{{ h }}</th>
+                    }
+                  </tr>
+                </thead>
+                <tbody>
+                  @for (row of tbl.rows; track $index) {
+                    <tr>
+                      @for (cell of row; track $index) {
+                        <td>{{ cell }}</td>
+                      }
+                    </tr>
+                  }
+                </tbody>
+              </table>
+            </div>
+          }
+        } @else {
+          <p class="c-pdf-table-extractor__meta">
+            Upload a digital PDF or click "Load Sample Ledger PDF" to preview extracted rows and export to Excel/CSV/JSON.
+          </p>
+        }
+      </app-card>
+    </div>
+  </div>
+</div>

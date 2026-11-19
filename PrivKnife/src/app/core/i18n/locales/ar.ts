@@ -747,5 +747,20 @@ export const ar: TranslationSchema = {
       downloadReportBtn: 'تصدير تقرير PDF',
       resetBtn: 'إعادة ضبط',
     },
+    pdfTableExtractor: {
+      name: 'مستخرج جداول PDF إلى Excel وCSV وJSON',
+      description:
+        'استخراج الجداول المالية والتقارير من ملفات PDF محليًا وتحويلها إلى Excel (.xlsx) أو CSV أو JSON مع تعديل الأعمدة.',
+      uploadTitle: 'رفع ملف PDF رقمي',
+      loadSample: 'تحميل جدول تجريبي',
+      settingsTitle: 'إعدادات الاستخراج والتنسيق',
+      previewTitle: 'معاينة الجدول المستخرج',
+      exportXlsxBtn: 'تنزيل .xlsx',
+      exportCsvBtn: 'تنزيل .csv',
+      exportJsonBtn: 'تنزيل .json',
+      copyTsvBtn: 'نسخ TSV',
+      scannedNotice: 'لم يتم العثور على نص قابل للتحديد (ملف PDF ممسوح ضوئيًا).',
+      resetBtn: 'إعادة ضبط',
+    },
   },
 };

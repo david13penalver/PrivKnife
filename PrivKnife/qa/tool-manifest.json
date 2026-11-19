@@ -288,6 +288,12 @@
     "source": "PrivKnife/src/app/tools/documents/pdf-visual-compare"
   },
   {
+    "id": "pdf-table-extractor",
+    "route": "/tools/pdf-table-extractor",
+    "category": "documents",
+    "source": "PrivKnife/src/app/tools/documents/pdf-table-extractor"
+  },
+  {
     "id": "pdf-merger",
     "route": "/tools/pdf-merger-splitter",
     "category": "documents",

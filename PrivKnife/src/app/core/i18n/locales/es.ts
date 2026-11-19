@@ -747,5 +747,20 @@ export const es: TranslationSchema = {
       downloadReportBtn: 'Exportar Informe PDF',
       resetBtn: 'Restablecer',
     },
+    pdfTableExtractor: {
+      name: 'Extractor de Tablas PDF a Excel, CSV y JSON',
+      description:
+        'Extrae tablas de balances, extractos e informes PDF hacia Excel (.xlsx), CSV, JSON o TSV sin subir datos privados.',
+      uploadTitle: 'Subir PDF Digital',
+      loadSample: 'Cargar Balance de Ejemplo',
+      settingsTitle: 'Ajustes de Detección y Formato',
+      previewTitle: 'Vista Previa de Tablas',
+      exportXlsxBtn: 'Descargar .xlsx',
+      exportCsvBtn: 'Descargar .csv',
+      exportJsonBtn: 'Descargar .json',
+      copyTsvBtn: 'Copiar TSV',
+      scannedNotice: 'No se detectó texto seleccionable (PDF escaneado).',
+      resetBtn: 'Restablecer',
+    },
   },
 };

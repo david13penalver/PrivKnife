@@ -222,6 +222,25 @@ export const routes: Routes = [
       ),
   },
   {
+    path: 'tools/pdf-table-extractor',
+    title: 'PDF to Excel, CSV & JSON Table Extractor — PrivKnife',
+    data: {
+      description:
+        'Extract tables from PDF statements and reports to Excel (.xlsx), RFC-4180 CSV, JSON, or clipboard TSV with visual column dividers 100% in your browser.',
+      keywords: [
+        'pdf to excel',
+        'pdf to csv',
+        'extract tables from pdf',
+        'xlsx offline converter',
+      ],
+      url: '/tools/pdf-table-extractor',
+    },
+    loadComponent: () =>
+      import('./tools/documents/pdf-table-extractor/pdf-table-extractor.component').then(
+        (m) => m.PdfTableExtractorComponent
+      ),
+  },
+  {
     path: 'tools/pdf-merger-splitter',
     title: 'PDF Merger, Splitter & Page Organizer — PrivKnife',
     data: {

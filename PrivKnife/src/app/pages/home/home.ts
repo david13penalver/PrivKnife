@@ -160,6 +160,20 @@ const CATALOG_TOOLS: CatalogTool[] = [
     icon: '🔍',
   },
   {
+    id: 'pdf-table-extractor',
+    i18nKey: 'pdfTableExtractor',
+    name: 'PDF to Excel, CSV & JSON Table Extractor',
+    category: 'documents',
+    categoryLabel: 'Documents',
+    description:
+      'Extract PDF ledgers and financial statements into multi-sheet .xlsx, .csv, or .json with interactive column dividers.',
+    keywords: ['pdf to excel', 'pdf to csv', 'extract tables', 'xlsx', 'json'],
+    status: 'ready',
+    route: '/tools/pdf-table-extractor',
+    techStack: 'PDF.js • SheetJS (XLSX) • PapaParse',
+    icon: '📊',
+  },
+  {
     id: 'pdf-merger-splitter',
     i18nKey: 'pdfMerger',
     name: 'PDF Merger, Splitter & Page Organizer',

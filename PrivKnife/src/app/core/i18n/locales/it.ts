@@ -747,5 +747,20 @@ export const it: TranslationSchema = {
       downloadReportBtn: 'Esporta Report PDF',
       resetBtn: 'Ripristina',
     },
+    pdfTableExtractor: {
+      name: 'Estrattore Tabelle PDF in Excel, CSV e JSON',
+      description:
+        'Estrai tabelle da PDF finanziari in Excel (.xlsx), CSV o JSON direttamente nel browser senza caricamenti su server.',
+      uploadTitle: 'Carica Documento PDF',
+      loadSample: 'Carica Tabella di Esempio',
+      settingsTitle: 'Opzioni di Rilevamento',
+      previewTitle: 'Anteprima Tabella Estratta',
+      exportXlsxBtn: 'Scarica .xlsx',
+      exportCsvBtn: 'Scarica .csv',
+      exportJsonBtn: 'Scarica .json',
+      copyTsvBtn: 'Copia TSV',
+      scannedNotice: 'Nessun testo selezionabile trovato (PDF scansionato).',
+      resetBtn: 'Ripristina',
+    },
   },
 };

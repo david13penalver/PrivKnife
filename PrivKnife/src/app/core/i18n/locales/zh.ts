@@ -747,5 +747,20 @@ export const zh: TranslationSchema = {
       downloadReportBtn: '导出 PDF 差异报告',
       resetBtn: '重置',
     },
+    pdfTableExtractor: {
+      name: 'PDF 表格识别与 Excel / CSV / JSON 导出器',
+      description:
+        '完全本地识别数字版 PDF 财务报表中的行列结构，支持手动微调列分割线并导出为多工作表 Excel (.xlsx)、CSV 或 JSON。',
+      uploadTitle: '上传数字版 PDF',
+      loadSample: '加载示例财务账本 PDF',
+      settingsTitle: '表格识别与格式选项',
+      previewTitle: '提取结果预览',
+      exportXlsxBtn: '导出 .xlsx',
+      exportCsvBtn: '导出 .csv',
+      exportJsonBtn: '导出 .json',
+      copyTsvBtn: '复制 TSV',
+      scannedNotice: '未检测到可选中文本，此文件可能是扫描版 PDF。',
+      resetBtn: '重置',
+    },
   },
 };

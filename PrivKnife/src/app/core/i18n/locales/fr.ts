@@ -747,5 +747,20 @@ export const fr: TranslationSchema = {
       downloadReportBtn: 'Exporter Rapport PDF',
       resetBtn: 'Réinitialiser',
     },
+    pdfTableExtractor: {
+      name: 'Extracteur de Tableaux PDF vers Excel, CSV & JSON',
+      description:
+        'Extrayez vos tableaux PDF financiers en fichiers Excel (.xlsx), CSV ou JSON localement avec guides de colonnes visuels.',
+      uploadTitle: 'Importer un PDF',
+      loadSample: 'Charger un Exemple',
+      settingsTitle: 'Options d’Extraction',
+      previewTitle: 'Aperçu du Tableau',
+      exportXlsxBtn: 'Télécharger .xlsx',
+      exportCsvBtn: 'Télécharger .csv',
+      exportJsonBtn: 'Télécharger .json',
+      copyTsvBtn: 'Copier TSV',
+      scannedNotice: 'Aucun texte détecté : ce PDF semble scanné.',
+      resetBtn: 'Réinitialiser',
+    },
   },
 };

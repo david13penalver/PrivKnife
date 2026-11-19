@@ -747,5 +747,20 @@ export const de: TranslationSchema = {
       downloadReportBtn: 'PDF-Bericht Exportieren',
       resetBtn: 'Zurücksetzen',
     },
+    pdfTableExtractor: {
+      name: 'PDF zu Excel, CSV & JSON Tabellen-Extraktor',
+      description:
+        'Tabellen aus PDF-Berichten und Kontoauszügen mit Spaltentrennern lokal nach Excel (.xlsx), CSV oder JSON exportieren.',
+      uploadTitle: 'Digitales PDF Laden',
+      loadSample: 'Beispieltabelle Laden',
+      settingsTitle: 'Erkennungsoptionen',
+      previewTitle: 'Tabellenvorschau',
+      exportXlsxBtn: 'Export .xlsx',
+      exportCsvBtn: 'Export .csv',
+      exportJsonBtn: 'Export .json',
+      copyTsvBtn: 'TSV Kopieren',
+      scannedNotice: 'Kein auswählbarer Text gefunden (Scan-PDF erkannt).',
+      resetBtn: 'Zurücksetzen',
+    },
   },
 };

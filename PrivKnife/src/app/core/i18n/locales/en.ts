@@ -745,6 +745,21 @@ export const en = {
       downloadReportBtn: 'Export PDF Diff Report',
       resetBtn: 'Reset',
     },
+    pdfTableExtractor: {
+      name: 'PDF to Excel, CSV & JSON Table Extractor',
+      description:
+        'Extract tables from digital PDF ledgers and financial statements to Excel (.xlsx), RFC-4180 CSV, JSON, or clipboard TSV 100% locally.',
+      uploadTitle: 'Upload Digital PDF',
+      loadSample: 'Load Sample Ledger PDF',
+      settingsTitle: 'Detection & Export Options',
+      previewTitle: 'Extracted Table Preview',
+      exportXlsxBtn: 'Download .xlsx',
+      exportCsvBtn: 'Download .csv',
+      exportJsonBtn: 'Download .json',
+      copyTsvBtn: 'Copy TSV',
+      scannedNotice: 'No selectable text found. This appears to be a scanned PDF.',
+      resetBtn: 'Reset',
+    },
   },
 };
 

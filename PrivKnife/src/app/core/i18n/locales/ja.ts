@@ -747,5 +747,20 @@ export const ja: TranslationSchema = {
       downloadReportBtn: 'PDF レポート出力',
       resetBtn: 'リセット',
     },
+    pdfTableExtractor: {
+      name: 'PDF 表抽出（Excel・CSV・JSON 変換ツール）',
+      description:
+        'PDF の表や明細をローカルで解析し、複数ページ統合や数式インジェクション対策付きで Excel (.xlsx)・CSV・JSON へ変換。',
+      uploadTitle: 'PDF をアップロード',
+      loadSample: 'サンプル明細 PDF 読込',
+      settingsTitle: '列分割・抽出設定',
+      previewTitle: '抽出テーブルプレビュー',
+      exportXlsxBtn: '.xlsx を保存',
+      exportCsvBtn: '.csv を保存',
+      exportJsonBtn: '.json を保存',
+      copyTsvBtn: 'TSV をコピー',
+      scannedNotice: '選択可能なテキストがありません（スキャン PDF の可能性があります）。',
+      resetBtn: 'リセット',
+    },
   },
 };
