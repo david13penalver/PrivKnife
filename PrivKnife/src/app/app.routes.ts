@@ -2124,6 +2124,23 @@ export const routes: Routes = [
       ),
   },
   {
+    path: 'tools/regex-tester-debugger',
+    title: 'Interactive Regex Tester, Debugger & Explainer - PrivKnife',
+    data: {
+      seo: {
+        title: 'ReDoS-Safe Regex Tester, Debugger, AST Explainer & Codegen | PrivKnife',
+        description:
+          'Test, debug, and explain regular expressions locally inside a timeout-protected Web Worker with capture groups, live substitution, and 5-language export.',
+        keywords:
+          'regex tester debugger, regex explainer ast, redos safe regexp worker, regex replace, javascript python go java regex',
+      },
+    },
+    loadComponent: () =>
+      import('./tools/dev/regex-tester-debugger/regex-tester-debugger.component').then(
+        (m) => m.RegexTesterDebuggerComponent
+      ),
+  },
+  {
     path: '**',
     title: 'Page Not Found — PrivKnife',
     data: {

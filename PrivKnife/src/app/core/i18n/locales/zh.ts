@@ -824,5 +824,17 @@ export const zh: TranslationSchema = {
       copyBtn: '复制结果',
       resetBtn: '重置',
     },
+    regexTesterDebugger: {
+      name: '交互式正则表达式测试、调试与解析器',
+      description:
+        '在本地安全测试与日志脱敏匹配，内置防 ReDoS 看门狗超时保护、AST 逐词解释、命名捕获组分析及 5 种语言代码导出。',
+      corpusTitle: '测试文本与实时替换',
+      inspectorTitle: '语法解析、匹配详情与代码生成',
+      tabExplain: 'AST 详解',
+      tabMatches: '匹配与捕获组',
+      tabCodegen: '代码生成',
+      tabLibrary: '常用正则库',
+      resetBtn: '重置',
+    },
   },
 };

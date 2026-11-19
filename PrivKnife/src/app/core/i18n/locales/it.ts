@@ -824,5 +824,17 @@ export const it: TranslationSchema = {
       copyBtn: 'Copia Output',
       resetBtn: 'Ripristina',
     },
+    regexTesterDebugger: {
+      name: 'Tester, Debugger e Spiegazione Regex Locale',
+      description:
+        'Testa espressioni regolari offline su log sensibili con watchdog anti-ReDoS, spiegazione AST, gruppi con nome ed export in 5 linguaggi.',
+      corpusTitle: 'Testo di Prova e Sostituzione',
+      inspectorTitle: 'Spiegazione AST, Match e Codice',
+      tabExplain: 'Spiegazione AST',
+      tabMatches: 'Match e Gruppi',
+      tabCodegen: 'Genera Codice',
+      tabLibrary: 'Libreria Pattern',
+      resetBtn: 'Ripristina',
+    },
   },
 };

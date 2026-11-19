@@ -824,5 +824,17 @@ export const ar: TranslationSchema = {
       copyBtn: 'نسخ المخرجات',
       resetBtn: 'إعادة ضبط',
     },
+    regexTesterDebugger: {
+      name: 'مختبر ومصحح ومفسر التعبيرات النمطية Regex',
+      description:
+        'اختبر التعبيرات النمطية محلياً مع حماية ReDoS، وشرح شجرة AST، وفحص المجموعات وتصدير شيفرة 5 لغات دون أي خوادم.',
+      corpusTitle: 'نص الاختبار والاستبدال المباشر',
+      inspectorTitle: 'تحليل AST والمطابقات وتوليد الشيفرة',
+      tabExplain: 'شرح AST',
+      tabMatches: 'المطابقات والمجموعات',
+      tabCodegen: 'توليد الشيفرة',
+      tabLibrary: 'مكتبة الأنماط',
+      resetBtn: 'إعادة ضبط',
+    },
   },
 };

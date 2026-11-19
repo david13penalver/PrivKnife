@@ -824,5 +824,17 @@ export const fr: TranslationSchema = {
       copyBtn: 'Copier',
       resetBtn: 'Réinitialiser',
     },
+    regexTesterDebugger: {
+      name: 'Testeur, Débogueur et Explicateur Regex Local',
+      description:
+        'Testez des expressions régulières localement avec garde-fou anti-ReDoS, explication AST, groupes nommés et export en 5 langages.',
+      corpusTitle: 'Texte de Test & Remplacement',
+      inspectorTitle: 'Analyseur AST, Correspondances & Code',
+      tabExplain: 'Analyse AST',
+      tabMatches: 'Correspondances',
+      tabCodegen: 'Générateur de Code',
+      tabLibrary: 'Bibliothèque',
+      resetBtn: 'Réinitialiser',
+    },
   },
 };

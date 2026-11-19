@@ -1,0 +1,284 @@
+<div class="l-page c-regex-studio">
+  <header class="l-page__header c-header">
+    <div class="c-header__title-group">
+      <h1 class="c-header__title">{{ 'tools.regexTesterDebugger.name' | translate }}</h1>
+      <p class="c-header__subtitle">{{ 'tools.regexTesterDebugger.description' | translate }}</p>
+    </div>
+    <app-badge variant="privacy" [dot]="true">
+      {{ 'common.privacyBadge' | translate }}
+    </app-badge>
+  </header>
+
+  <section class="c-regex-studio__pattern-bar g--margin-bottom-4">
+    <div class="c-regex-studio__input-shell">
+      <span class="c-regex-studio__slash">/</span>
+      <input
+        type="text"
+        class="c-regex-studio__pattern-input"
+        aria-label="Regular expression pattern"
+        placeholder="Enter regex pattern..."
+        [ngModel]="pattern()"
+        (ngModelChange)="updatePattern($event)"
+      />
+      <span class="c-regex-studio__slash">/{{ flagsDisplay() }}</span>
+    </div>
+
+    <div class="c-regex-studio__flags" role="group" aria-label="RegExp Flags">
+      @for (f of [
+        { key: 'global', label: 'g', title: 'Global match' },
+        { key: 'ignoreCase', label: 'i', title: 'Case-insensitive' },
+        { key: 'multiline', label: 'm', title: 'Multiline anchors (^/$)' },
+        { key: 'dotAll', label: 's', title: 'Dot matches newlines' },
+        { key: 'unicode', label: 'u', title: 'Full Unicode awareness' },
+        { key: 'hasIndices', label: 'd', title: 'Capture group indices' }
+      ]; track f.key) {
+        <button
+          type="button"
+          [title]="f.title"
+          [attr.aria-pressed]="$any(flags())[f.key]"
+          [class]="'c-button c-button--small ' + ($any(flags())[f.key] ? 'c-button--primary' : 'c-button--outline')"
+          (click)="toggleFlag($any(f.key))"
+        >
+          {{ f.label }}
+        </button>
+      }
+    </div>
+
+    <div class="c-regex-studio__status">
+      @if (result(); as res) {
+        @if (res.timedOut) {
+          <span class="c-badge c-badge--danger">ReDoS Timeout Guard</span>
+        } @else if (!res.valid) {
+          <span class="c-badge c-badge--danger">Syntax Error</span>
+        } @else {
+          <span class="c-badge c-badge--success">
+            {{ res.matches.length }} match(es) • {{ res.executionMs }} ms
+          </span>
+        }
+      }
+      <app-button variant="outline" size="small" (clicked)="reset()">
+        {{ 'tools.regexTesterDebugger.resetBtn' | translate }}
+      </app-button>
+    </div>
+  </section>
+
+  @if (result(); as res) {
+    @if (res.timedOut) {
+      <div class="c-regex-studio__alert c-regex-studio__alert--error g--margin-bottom-4" role="alert">
+        🛡️ <strong>Watchdog Protection Triggered:</strong> Pattern execution exceeded {{ timeoutMs() }}ms (suspected catastrophic ReDoS backtracking) and the worker was terminated cleanly to keep your browser responsive.
+      </div>
+    } @else if (!res.valid && res.syntaxError) {
+      <div class="c-regex-studio__alert c-regex-studio__alert--error g--margin-bottom-4" role="alert">
+        <strong>Invalid Regular Expression:</strong> {{ res.syntaxError }}
+      </div>
+    } @else if (res.staticRedosHazard) {
+      <div class="c-regex-studio__alert c-regex-studio__alert--warn g--margin-bottom-4">
+        ⚠️ <strong>Potential ReDoS Hazard:</strong> Nested quantifiers detected (e.g. <code>(a+)+</code>). Watchdog worker timeout protection is active.
+      </div>
+    }
+
+    @if (res.truncated) {
+      <div class="c-regex-studio__alert c-regex-studio__alert--warn g--margin-bottom-4">
+        Match output capped at 10,000 results to preserve browser memory.
+      </div>
+    }
+  }
+
+  <div class="l-columns l-columns--2">
+    <div class="l-columns__area">
+      <app-card [title]="'tools.regexTesterDebugger.corpusTitle' | translate" class="g--margin-bottom-4">
+        <label class="c-input__label g--margin-bottom-2" for="regex-corpus-input">
+          Test Corpus Input (Plaintext — never leaves memory)
+        </label>
+        <textarea
+          id="regex-corpus-input"
+          class="c-input c-regex-studio__textarea g--margin-bottom-3"
+          rows="7"
+          [ngModel]="testString()"
+          (ngModelChange)="updateTestString($event)"
+        ></textarea>
+
+        <div class="c-regex-studio__label g--margin-bottom-2">Live Highlighted Matches</div>
+        <div class="c-regex-studio__highlight" aria-label="Highlighted regex match preview">
+          @for (seg of highlightSegments(); track $index) {
+            @if (seg.matchIndex !== null) {
+              @if (seg.isZeroWidth) {
+                <span class="c-regex-studio__zero-match" [title]="seg.tooltip || ''"></span>
+              } @else {
+                <mark
+                  [class]="'c-regex-studio__match ' + (seg.alternate ? 'c-regex-studio__match--alt' : '')"
+                  [title]="seg.tooltip || ''"
+                >{{ seg.text }}</mark>
+              }
+            } @else {
+              <span>{{ seg.text }}</span>
+            }
+          }
+        </div>
+
+        <div class="c-regex-studio__replace g--margin-top-4">
+          <label class="c-regex-studio__check">
+            <input
+              type="checkbox"
+              [ngModel]="runReplace()"
+              (ngModelChange)="toggleReplaceMode($event)"
+            />
+            Enable Replace / Substitution Preview (supports <code>$1</code>, <code>$&lt;name&gt;</code>, <code>$&amp;</code>)
+          </label>
+          @if (runReplace()) {
+            <input
+              type="text"
+              class="c-input c-regex-studio__mono g--margin-top-2"
+              aria-label="Replacement template"
+              [ngModel]="replacement()"
+              (ngModelChange)="updateReplacement($event)"
+            />
+            <pre class="c-regex-studio__replace-out g--margin-top-2">{{ result()?.replacedText ?? '' }}</pre>
+          }
+        </div>
+      </app-card>
+    </div>
+
+    <div class="l-columns__area">
+      <app-card [title]="'tools.regexTesterDebugger.inspectorTitle' | translate" class="g--margin-bottom-4">
+        <div class="c-regex-studio__tabs g--margin-bottom-3" role="tablist">
+          <button
+            type="button"
+            role="tab"
+            [attr.aria-selected]="activeInspectorTab() === 'ast'"
+            [class]="'c-button c-button--small ' + (activeInspectorTab() === 'ast' ? 'c-button--primary' : 'c-button--outline')"
+            (click)="setInspectorTab('ast')"
+          >
+            {{ 'tools.regexTesterDebugger.tabExplain' | translate }}
+          </button>
+          <button
+            type="button"
+            role="tab"
+            [attr.aria-selected]="activeInspectorTab() === 'matches'"
+            [class]="'c-button c-button--small ' + (activeInspectorTab() === 'matches' ? 'c-button--primary' : 'c-button--outline')"
+            (click)="setInspectorTab('matches')"
+          >
+            {{ 'tools.regexTesterDebugger.tabMatches' | translate }}
+          </button>
+          <button
+            type="button"
+            role="tab"
+            [attr.aria-selected]="activeInspectorTab() === 'codegen'"
+            [class]="'c-button c-button--small ' + (activeInspectorTab() === 'codegen' ? 'c-button--primary' : 'c-button--outline')"
+            (click)="setInspectorTab('codegen')"
+          >
+            {{ 'tools.regexTesterDebugger.tabCodegen' | translate }}
+          </button>
+          <button
+            type="button"
+            role="tab"
+            [attr.aria-selected]="activeInspectorTab() === 'library'"
+            [class]="'c-button c-button--small ' + (activeInspectorTab() === 'library' ? 'c-button--primary' : 'c-button--outline')"
+            (click)="setInspectorTab('library')"
+          >
+            {{ 'tools.regexTesterDebugger.tabLibrary' | translate }}
+          </button>
+        </div>
+
+        @switch (activeInspectorTab()) {
+          @case ('ast') {
+            <div class="c-regex-studio__ast">
+              @for (tok of result()?.explanation ?? []; track $index) {
+                <div class="c-regex-studio__ast-row">
+                  <code class="c-regex-studio__token">{{ tok.raw }}</code>
+                  <span class="c-badge">{{ tok.category }}</span>
+                  <span class="c-regex-studio__ast-desc">{{ tok.description }}</span>
+                  @if (tok.children && tok.children.length > 0) {
+                    <div class="c-regex-studio__ast-children">
+                      @for (child of tok.children; track $index) {
+                        <div class="c-regex-studio__ast-child">
+                          <code class="c-regex-studio__token">{{ child.raw }}</code>
+                          <span>{{ child.description }}</span>
+                        </div>
+                      }
+                    </div>
+                  }
+                </div>
+              }
+            </div>
+          }
+
+          @case ('matches') {
+            <div class="c-regex-studio__row g--margin-bottom-3">
+              <app-button variant="outline" size="small" (clicked)="exportMatches('json')">
+                Download .json
+              </app-button>
+              <app-button variant="outline" size="small" (clicked)="exportMatches('csv')">
+                Download .csv
+              </app-button>
+            </div>
+            <div class="c-regex-studio__table-wrap">
+              <table class="c-regex-studio__table">
+                <thead>
+                  <tr>
+                    <th>#</th>
+                    <th>Span</th>
+                    <th>Full Match</th>
+                    <th>Groups</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  @for (m of result()?.matches ?? []; track m.matchNumber) {
+                    <tr>
+                      <td>{{ m.matchNumber }}</td>
+                      <td>[{{ m.start }}..{{ m.end }}]</td>
+                      <td><code>{{ m.value || '""' }}</code></td>
+                      <td>
+                        @for (entry of getNamedGroupEntries(m); track entry[0]) {
+                          <span class="c-badge">{{ entry[0] }}={{ entry[1] }}</span>
+                        }
+                        @if (getNamedGroupEntries(m).length === 0 && m.groups.length > 0) {
+                          <code>{{ formatGroupList(m) }}</code>
+                        }
+                      </td>
+                    </tr>
+                  }
+                </tbody>
+              </table>
+            </div>
+          }
+
+          @case ('codegen') {
+            <div class="c-regex-studio__row g--margin-bottom-3">
+              @for (lang of ['javascript', 'typescript', 'python', 'go', 'java']; track lang) {
+                <button
+                  type="button"
+                  [class]="'c-button c-button--small ' + (selectedCodeLanguage() === lang ? 'c-button--primary' : 'c-button--outline')"
+                  (click)="setCodeLanguage($any(lang))"
+                >
+                  {{ lang }}
+                </button>
+              }
+              <app-button variant="secondary" size="small" (clicked)="copyCodeSnippet()">
+                {{ copiedCode() ? 'Copied!' : 'Copy Snippet' }}
+              </app-button>
+            </div>
+            <pre class="c-regex-studio__code">{{ generatedCode() }}</pre>
+          }
+
+          @case ('library') {
+            <div class="c-regex-studio__presets">
+              @for (p of presets; track p.id) {
+                <div class="c-regex-studio__preset-card">
+                  <div>
+                    <strong>{{ p.title }}</strong>
+                    <p class="c-regex-studio__meta">{{ p.description }}</p>
+                    <code class="c-regex-studio__token">{{ p.pattern }}</code>
+                  </div>
+                  <app-button variant="outline" size="small" (clicked)="loadPreset(p)">
+                    Load
+                  </app-button>
+                </div>
+              }
+            </div>
+          }
+        }
+      </app-card>
+    </div>
+  </div>
+</div>

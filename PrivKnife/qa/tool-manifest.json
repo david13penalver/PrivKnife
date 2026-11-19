@@ -354,6 +354,12 @@
     "source": "PrivKnife/src/app/tools/privacy/pii-scrubber-anonymizer"
   },
   {
+    "id": "regex-tester-debugger",
+    "route": "/tools/regex-tester-debugger",
+    "category": "dev",
+    "source": "PrivKnife/src/app/tools/dev/regex-tester-debugger"
+  },
+  {
     "id": "robots-sitemap-builder",
     "route": "/tools/robots-sitemap-builder",
     "category": "dev",

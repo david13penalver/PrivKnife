@@ -822,6 +822,18 @@ export const en = {
       copyBtn: 'Copy Output',
       resetBtn: 'Reset',
     },
+    regexTesterDebugger: {
+      name: 'Interactive Regex Tester, Debugger & Explainer',
+      description:
+        'Test regular expressions on sensitive logs offline with ReDoS watchdog protection, AST explanations, named groups, and 5-language code export.',
+      corpusTitle: 'Test String & Live Substitution',
+      inspectorTitle: 'Regex Explainer, Matches & Codegen',
+      tabExplain: 'Explanation AST',
+      tabMatches: 'Matches & Groups',
+      tabCodegen: 'Code Generator',
+      tabLibrary: 'Pattern Library',
+      resetBtn: 'Reset',
+    },
   },
 };
 

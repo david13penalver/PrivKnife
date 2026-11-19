@@ -824,5 +824,17 @@ export const ja: TranslationSchema = {
       copyBtn: 'コピー',
       resetBtn: 'リセット',
     },
+    regexTesterDebugger: {
+      name: '対話型正規表現テスター・デバッガ・AST 解説',
+      description:
+        'ReDoS 監視ワーカーでブラウザ凍結を防ぎながら、機密ログに対する正規表現テスト・AST 解説・置換・5言語コード出力をローカル完結。',
+      corpusTitle: 'テスト文字列とリアルタイム置換',
+      inspectorTitle: 'AST 解説・マッチ一覧・コード生成',
+      tabExplain: 'AST 解説',
+      tabMatches: '一致とグループ',
+      tabCodegen: 'コード生成',
+      tabLibrary: 'よく使うパターン',
+      resetBtn: 'リセット',
+    },
   },
 };

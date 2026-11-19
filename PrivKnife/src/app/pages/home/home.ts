@@ -944,6 +944,20 @@ const CATALOG_TOOLS: CatalogTool[] = [
     techStack: 'Pure TS AST • JSONPath • Multi-Dialect SQL • YAML',
     icon: '{ }',
   },
+  {
+    id: 'regex-tester-debugger',
+    i18nKey: 'regexTesterDebugger',
+    name: 'Interactive Regex Tester, Debugger & Explainer',
+    category: 'dev',
+    categoryLabel: 'Dev / Data',
+    description:
+      'Test regular expressions on sensitive logs offline with ReDoS watchdog protection, AST explanations, named groups, and 5-language code export.',
+    keywords: ['regex tester', 'regex debugger', 'regex explainer', 'redos safe', 'ast'],
+    status: 'ready',
+    route: '/tools/regex-tester-debugger',
+    techStack: 'Watchdog Worker (ReDoS-Safe) • Pure TS Regex AST • 5-Lang Codegen',
+    icon: '.*',
+  },
 ];
 
 @Component({
