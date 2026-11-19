@@ -300,6 +300,12 @@
     "source": "PrivKnife/src/app/tools/documents/pdf-to-word-markdown"
   },
   {
+    "id": "office-html-to-pdf",
+    "route": "/tools/office-html-to-pdf",
+    "category": "documents",
+    "source": "PrivKnife/src/app/tools/documents/office-html-to-pdf"
+  },
+  {
     "id": "pdf-merger",
     "route": "/tools/pdf-merger-splitter",
     "category": "documents",

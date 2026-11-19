@@ -260,6 +260,23 @@ export const routes: Routes = [
       ),
   },
   {
+    path: 'tools/office-html-to-pdf',
+    title: 'Office & HTML to PDF Local Converter - PrivKnife',
+    data: {
+      seo: {
+        title: 'Office (DOCX, XLSX, CSV) & HTML/Markdown to PDF Converter | PrivKnife',
+        description:
+          'Convert Word .docx, Excel .xlsx, CSV, Markdown, and HTML files into searchable print-ready PDFs inside your browser with zero uploads or tracking leaks.',
+        keywords:
+          'word to pdf offline, docx to pdf, excel to pdf, xlsx to pdf, html to pdf zero network, markdown to pdf',
+      },
+    },
+    loadComponent: () =>
+      import('./tools/documents/office-html-to-pdf/office-html-to-pdf.component').then(
+        (m) => m.OfficeHtmlToPdfComponent
+      ),
+  },
+  {
     path: 'tools/pdf-merger-splitter',
     title: 'PDF Merger, Splitter & Page Organizer — PrivKnife',
     data: {

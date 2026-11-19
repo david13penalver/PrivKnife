@@ -46,6 +46,7 @@ import { pdfFormStudioTool } from './documents/pdf-form-studio';
 import { pdfVisualCompareTool } from './documents/pdf-visual-compare';
 import { pdfTableExtractorTool } from './documents/pdf-table-extractor';
 import { pdfToWordMarkdownTool } from './documents/pdf-to-word-markdown';
+import { officeHtmlToPdfTool } from './documents/office-html-to-pdf';
 import { pdfMergerTool } from './documents/pdf-merger';
 import { pdfSignerStamperTool } from './documents/pdf-signer-stamper';
 import { pdfWatermarkNumberingTool } from './documents/pdf-watermark-numbering';
@@ -135,6 +136,7 @@ export const TOOL_REGISTRY: ToolDefinition[] = [
   pdfVisualCompareTool,
   pdfTableExtractorTool,
   pdfToWordMarkdownTool,
+  officeHtmlToPdfTool,
 ];
 
 export function getToolById(id: string): ToolDefinition | undefined {
@@ -268,6 +270,7 @@ export const TOOL_I18N_MAP: Record<string, string> = {
   'pdf-visual-compare': 'pdfVisualCompare',
   'pdf-table-extractor': 'pdfTableExtractor',
   'pdf-to-word-markdown': 'pdfToWordMarkdown',
+  'office-html-to-pdf': 'officeHtmlToPdf',
 };
 
 export function getToolI18nKey(id: string): string | undefined {

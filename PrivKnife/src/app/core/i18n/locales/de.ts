@@ -777,5 +777,21 @@ export const de: TranslationSchema = {
       copyMdBtn: 'Markdown Kopieren',
       resetBtn: 'Zurücksetzen',
     },
+    officeHtmlToPdf: {
+      name: 'Office- & HTML-zu-PDF Konverter',
+      description:
+        'Konvertiert Word (.docx), Excel (.xlsx), CSV, Markdown und HTML lokal in durchsuchbare PDFs ohne Upload oder Tracking.',
+      inputTitle: 'Dokument- oder Tabelleneingabe',
+      tabUpload: 'Datei Hochladen',
+      tabPaste: 'HTML / Markdown Einfügen',
+      dropzoneTitle: 'Office-, HTML-, CSV- oder Markdown-Datei ablegen',
+      sampleDocx: 'Beispiel .docx',
+      sampleXlsx: 'Beispiel .xlsx',
+      settingsTitle: 'Seiten- & Tabelleneinstellungen',
+      previewTitle: 'Seitenweise Vorschau',
+      convertBtn: 'In PDF umwandeln',
+      downloadPdfBtn: '.pdf Laden',
+      resetBtn: 'Zurücksetzen',
+    },
   },
 };

@@ -777,5 +777,21 @@ export const zh: TranslationSchema = {
       copyMdBtn: '复制 Markdown',
       resetBtn: '重置',
     },
+    officeHtmlToPdf: {
+      name: 'Office 与 HTML 本地转 PDF',
+      description:
+        '在浏览器本地将 Word (.docx)、Excel (.xlsx)、CSV、Markdown 和 HTML 转为矢量 PDF，零上传且阻断外链跟踪。',
+      inputTitle: '文档或表格输入',
+      tabUpload: '上传文件',
+      tabPaste: '粘贴 HTML / Markdown',
+      dropzoneTitle: '拖放 Office、HTML、CSV 或 Markdown 文件',
+      sampleDocx: '示例 .docx',
+      sampleXlsx: '示例 .xlsx',
+      settingsTitle: '页面与表格设置',
+      previewTitle: '分页文档预览',
+      convertBtn: '转换为 PDF',
+      downloadPdfBtn: '下载 .pdf',
+      resetBtn: '重置',
+    },
   },
 };

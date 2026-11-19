@@ -188,6 +188,20 @@ const CATALOG_TOOLS: CatalogTool[] = [
     icon: '📄',
   },
   {
+    id: 'office-html-to-pdf',
+    i18nKey: 'officeHtmlToPdf',
+    name: 'Office & HTML to PDF Local Converter',
+    category: 'documents',
+    categoryLabel: 'Documents',
+    description:
+      'Convert Word (.docx), Excel (.xlsx), CSV, Markdown, and HTML files into searchable print-ready PDFs inside your browser with zero uploads or tracking leaks.',
+    keywords: ['word to pdf', 'docx to pdf', 'excel to pdf', 'xlsx to pdf', 'html to pdf'],
+    status: 'ready',
+    route: '/tools/office-html-to-pdf',
+    techStack: 'JSZip • SheetJS • Marked • DOMPurify • jsPDF',
+    icon: '🖨️',
+  },
+  {
     id: 'pdf-merger-splitter',
     i18nKey: 'pdfMerger',
     name: 'PDF Merger, Splitter & Page Organizer',

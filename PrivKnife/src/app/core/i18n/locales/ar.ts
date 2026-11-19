@@ -777,5 +777,21 @@ export const ar: TranslationSchema = {
       copyMdBtn: 'نسخ Markdown',
       resetBtn: 'إعادة ضبط',
     },
+    officeHtmlToPdf: {
+      name: 'محول Office وHTML إلى PDF محلياً',
+      description:
+        'حوّل ملفات Word (.docx) وExcel (.xlsx) وCSV وMarkdown وHTML إلى PDF داخل المتصفح دون رفع أو تتبع.',
+      inputTitle: 'إدخال المستند أو الجدول',
+      tabUpload: 'رفع ملف',
+      tabPaste: 'لصق HTML / Markdown',
+      dropzoneTitle: 'أسقط ملف Office أو HTML أو CSV أو Markdown',
+      sampleDocx: 'نموذج .docx',
+      sampleXlsx: 'نموذج .xlsx',
+      settingsTitle: 'إعدادات الصفحة والجدول',
+      previewTitle: 'معاينة الصفحات',
+      convertBtn: 'تحويل إلى PDF',
+      downloadPdfBtn: 'تنزيل .pdf',
+      resetBtn: 'إعادة ضبط',
+    },
   },
 };

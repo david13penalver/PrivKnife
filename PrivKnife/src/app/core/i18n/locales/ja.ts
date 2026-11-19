@@ -777,5 +777,21 @@ export const ja: TranslationSchema = {
       copyMdBtn: 'Markdown コピー',
       resetBtn: 'リセット',
     },
+    officeHtmlToPdf: {
+      name: 'Office・HTML ローカル PDF 変換',
+      description:
+        'Word (.docx)・Excel (.xlsx)・CSV・Markdown・HTML をブラウザ内でベクター PDF に変換。外部送信やトラッキングなし。',
+      inputTitle: 'ドキュメント・表データ入力',
+      tabUpload: 'ファイル選択',
+      tabPaste: 'HTML / Markdown 貼付',
+      dropzoneTitle: 'Office・HTML・CSV・Markdown をドロップ',
+      sampleDocx: 'サンプル .docx',
+      sampleXlsx: 'サンプル .xlsx',
+      settingsTitle: 'ページ・表レイアウト設定',
+      previewTitle: 'ページ分割プレビュー',
+      convertBtn: 'PDF に変換',
+      downloadPdfBtn: '.pdf を保存',
+      resetBtn: 'リセット',
+    },
   },
 };

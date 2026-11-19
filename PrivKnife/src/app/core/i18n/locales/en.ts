@@ -775,6 +775,22 @@ export const en = {
       copyMdBtn: 'Copy Markdown',
       resetBtn: 'Reset',
     },
+    officeHtmlToPdf: {
+      name: 'Office & HTML to PDF Converter',
+      description:
+        'Convert Word (.docx), Excel (.xlsx), CSV, Markdown, and HTML files into vector PDFs locally with zero uploads or tracking leaks.',
+      inputTitle: 'Document or Spreadsheet Input',
+      tabUpload: 'Upload File',
+      tabPaste: 'Paste HTML / Markdown',
+      dropzoneTitle: 'Drop Office, HTML, CSV, or Markdown File',
+      sampleDocx: 'Sample .docx',
+      sampleXlsx: 'Sample 2-Sheet .xlsx',
+      settingsTitle: 'Page & Spreadsheet Settings',
+      previewTitle: 'Paginated Document Preview',
+      convertBtn: 'Convert to PDF',
+      downloadPdfBtn: 'Download .pdf',
+      resetBtn: 'Reset',
+    },
   },
 };
 

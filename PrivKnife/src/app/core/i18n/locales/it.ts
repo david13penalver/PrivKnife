@@ -777,5 +777,21 @@ export const it: TranslationSchema = {
       copyMdBtn: 'Copia Markdown',
       resetBtn: 'Ripristina',
     },
+    officeHtmlToPdf: {
+      name: 'Convertitore Office e HTML in PDF',
+      description:
+        'Converti Word (.docx), Excel (.xlsx), CSV, Markdown e HTML in PDF vettoriale nel browser senza upload esterni.',
+      inputTitle: 'Documento o Foglio di Calcolo',
+      tabUpload: 'Carica File',
+      tabPaste: 'Incolla HTML / Markdown',
+      dropzoneTitle: 'Trascina File Office, HTML, CSV o Markdown',
+      sampleDocx: 'Esempio .docx',
+      sampleXlsx: 'Esempio .xlsx',
+      settingsTitle: 'Impostazioni Pagina e Tabella',
+      previewTitle: 'Anteprima Impaginata',
+      convertBtn: 'Converti in PDF',
+      downloadPdfBtn: 'Scarica .pdf',
+      resetBtn: 'Ripristina',
+    },
   },
 };

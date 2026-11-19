@@ -777,5 +777,21 @@ export const es: TranslationSchema = {
       copyMdBtn: 'Copiar Markdown',
       resetBtn: 'Restablecer',
     },
+    officeHtmlToPdf: {
+      name: 'Conversor Local Office y HTML a PDF',
+      description:
+        'Convierte Word (.docx), Excel (.xlsx), CSV, Markdown y HTML a PDF vectorial sin subir archivos ni fugas de rastreo.',
+      inputTitle: 'Entrada de Documento u Hoja',
+      tabUpload: 'Subir Archivo',
+      tabPaste: 'Pegar HTML / Markdown',
+      dropzoneTitle: 'Suelta Archivo Office, HTML, CSV o Markdown',
+      sampleDocx: 'Ejemplo .docx',
+      sampleXlsx: 'Ejemplo .xlsx (2 Hojas)',
+      settingsTitle: 'Ajustes de Página y Tabla',
+      previewTitle: 'Vista Previa Paginada',
+      convertBtn: 'Convertir a PDF',
+      downloadPdfBtn: 'Descargar .pdf',
+      resetBtn: 'Restablecer',
+    },
   },
 };
