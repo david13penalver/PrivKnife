@@ -656,6 +656,19 @@ export const en = {
       loadSample: 'Load Sample PDF',
       largeFileWarning: 'File exceeds 100 MB. Compression runs locally in your browser memory and may take a moment.',
     },
+    pdfWatermarkNumbering: {
+      name: 'PDF Watermark, Page Numbers & Bates Stamper',
+      description: 'Stamp vector watermarks, page numbers, and legal Bates identifiers onto any PDF with live preview and zero uploads.',
+      uploadTitle: 'Select PDF Document',
+      loadSample: 'Load Sample PDF',
+      configTitle: 'Watermark & Numbering Settings',
+      watermarkTab: 'Watermark',
+      numberingTab: 'Page & Bates Numbers',
+      resetBtn: 'Reset',
+      applyBtn: 'Stamp & Generate PDF',
+      previewTitle: 'Live Page Preview & Download',
+      downloadBtn: 'Download Stamped PDF',
+    },
   },
 };
 

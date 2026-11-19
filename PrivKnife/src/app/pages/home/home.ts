@@ -76,6 +76,20 @@ const CATALOG_TOOLS: CatalogTool[] = [
     icon: '🗜️',
   },
   {
+    id: 'pdf-watermark-numbering',
+    i18nKey: 'pdfWatermarkNumbering',
+    name: 'PDF Watermark, Page Numbers & Bates Stamper',
+    category: 'documents',
+    categoryLabel: 'Documents',
+    description:
+      'Stamp diagonal/tiled watermarks, page numbers, and sequential Bates identifiers with live WYSIWYG preview.',
+    keywords: ['pdf', 'watermark', 'page numbers', 'bates', 'stamp', 'documents'],
+    status: 'ready',
+    route: '/tools/pdf-watermark-numbering',
+    techStack: 'pdf-lib • PDF.js • Web Worker',
+    icon: '🏷️',
+  },
+  {
     id: 'pdf-merger-splitter',
     i18nKey: 'pdfMerger',
     name: 'PDF Merger, Splitter & Page Organizer',

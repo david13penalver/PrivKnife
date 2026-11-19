@@ -658,5 +658,18 @@ export const es: TranslationSchema = {
       loadSample: 'Cargar PDF de Ejemplo',
       largeFileWarning: 'El archivo supera los 100 MB. La compresión local en memoria puede tardar unos segundos.',
     },
+    pdfWatermarkNumbering: {
+      name: 'Marca de Agua, Numeración de Páginas y Sellado Bates PDF',
+      description: 'Estampa marcas de agua vectoriales, números de página y códigos legales Bates en tus PDF con vista previa en vivo sin subir archivos.',
+      uploadTitle: 'Seleccionar Documento PDF',
+      loadSample: 'Cargar PDF de Ejemplo',
+      configTitle: 'Ajustes de Marca de Agua y Numeración',
+      watermarkTab: 'Marca de Agua',
+      numberingTab: 'Páginas y Bates',
+      resetBtn: 'Restablecer',
+      applyBtn: 'Estampar y Generar PDF',
+      previewTitle: 'Vista Previa y Descarga',
+      downloadBtn: 'Descargar PDF Estampado',
+    },
   },
 };

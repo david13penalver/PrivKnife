@@ -41,6 +41,7 @@ import { nutritionLabelMakerTool } from './documents/nutrition-label-maker';
 import { pdfCompressorTool } from './documents/pdf-compressor';
 import { pdfMergerTool } from './documents/pdf-merger';
 import { pdfSignerStamperTool } from './documents/pdf-signer-stamper';
+import { pdfWatermarkNumberingTool } from './documents/pdf-watermark-numbering';
 import { tableTentMakerTool } from './documents/table-tent-maker';
 import { backgroundRemoverTool } from './media/background-remover';
 import { batchImageCompressorTool } from './media/batch-compressor';
@@ -119,6 +120,7 @@ export const TOOL_REGISTRY: ToolDefinition[] = [
   backgroundRemoverTool,
   dnsCheckerTool,
   pdfCompressorTool,
+  pdfWatermarkNumberingTool,
 ];
 
 export function getToolById(id: string): ToolDefinition | undefined {
@@ -244,6 +246,7 @@ export const TOOL_I18N_MAP: Record<string, string> = {
   'background-remover': 'backgroundRemover',
   'dns-checker': 'dnsChecker',
   'pdf-compressor': 'pdfCompressor',
+  'pdf-watermark-numbering': 'pdfWatermarkNumbering',
 };
 
 export function getToolI18nKey(id: string): string | undefined {

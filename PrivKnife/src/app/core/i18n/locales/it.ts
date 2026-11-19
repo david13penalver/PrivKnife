@@ -658,5 +658,18 @@ export const it: TranslationSchema = {
       loadSample: 'Carica PDF di Esempio',
       largeFileWarning: 'Il file supera i 100 MB. La compressione locale in memoria potrebbe richiedere qualche istante.',
     },
+    pdfWatermarkNumbering: {
+      name: 'Filigrana PDF, Numeri di Pagina e Timbro Bates',
+      description: 'Applica filigrane vettoriali, numeri di pagina e codici legali Bates sui PDF con anteprima dal vivo e zero caricamenti.',
+      uploadTitle: 'Seleziona Documento PDF',
+      loadSample: 'Carica PDF di Esempio',
+      configTitle: 'Impostazioni Filigrana e Numerazione',
+      watermarkTab: 'Filigrana',
+      numberingTab: 'Pagine e Bates',
+      resetBtn: 'Ripristina',
+      applyBtn: 'Applica e Genera PDF',
+      previewTitle: 'Anteprima e Download',
+      downloadBtn: 'Scarica PDF Timbrato',
+    },
   },
 };

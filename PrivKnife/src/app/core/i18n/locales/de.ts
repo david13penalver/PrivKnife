@@ -658,5 +658,18 @@ export const de: TranslationSchema = {
       loadSample: 'Beispiel-PDF laden',
       largeFileWarning: 'Datei überschreitet 100 MB. Die lokale Verarbeitung im Speicher kann einen Moment dauern.',
     },
+    pdfWatermarkNumbering: {
+      name: 'PDF-Wasserzeichen, Seitenzahlen & Bates-Stempel',
+      description: 'Stempeln Sie Vektor-Wasserzeichen, Seitenzahlen und juristische Bates-Nummern lokal im Browser auf jedes PDF.',
+      uploadTitle: 'PDF-Dokument auswählen',
+      loadSample: 'Beispiel-PDF laden',
+      configTitle: 'Wasserzeichen- & Nummerierungsoptionen',
+      watermarkTab: 'Wasserzeichen',
+      numberingTab: 'Seiten & Bates',
+      resetBtn: 'Zurücksetzen',
+      applyBtn: 'Stempeln & PDF erzeugen',
+      previewTitle: 'Live-Vorschau & Download',
+      downloadBtn: 'Gestempeltes PDF laden',
+    },
   },
 };

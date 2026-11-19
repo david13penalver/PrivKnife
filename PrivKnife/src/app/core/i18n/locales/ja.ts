@@ -658,5 +658,18 @@ export const ja: TranslationSchema = {
       loadSample: 'サンプルPDFを読込',
       largeFileWarning: 'ファイルサイズが100MBを超えています。ローカルメモリでの圧縮に時間がかかる場合があります。',
     },
+    pdfWatermarkNumbering: {
+      name: 'PDF 透かし・ページ番号・ベイツ番号スタンプ',
+      description: '送信ゼロのブラウザ上でベクター透かし、ページ番号、連続ベイツ番号をリアルタイムプレビュー付きでPDFに追加します。',
+      uploadTitle: 'PDFファイルを選択',
+      loadSample: 'サンプルPDFを読込',
+      configTitle: '透かし・番号設定',
+      watermarkTab: '透かし',
+      numberingTab: 'ページ番号・ベイツ',
+      resetBtn: 'リセット',
+      applyBtn: 'スタンプしてPDF生成',
+      previewTitle: 'リアルタイムプレビュー・保存',
+      downloadBtn: 'スタンプ済みPDFをダウンロード',
+    },
   },
 };

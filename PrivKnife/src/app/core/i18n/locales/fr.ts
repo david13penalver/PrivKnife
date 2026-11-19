@@ -658,5 +658,18 @@ export const fr: TranslationSchema = {
       loadSample: 'Charger un Exemple PDF',
       largeFileWarning: 'Le fichier dépasse 100 Mo. La compression locale en mémoire peut prendre quelques instants.',
     },
+    pdfWatermarkNumbering: {
+      name: 'Filigrane PDF, Numéros de Page et Numérotation Bates',
+      description: 'Ajoutez des filigranes vectoriels, numéros de page et identifiants Bates à vos PDF avec aperçu en direct sans aucun envoi.',
+      uploadTitle: 'Sélectionner un Document PDF',
+      loadSample: 'Charger un Exemple PDF',
+      configTitle: 'Paramètres de Filigrane et Numérotation',
+      watermarkTab: 'Filigrane',
+      numberingTab: 'Pages & Bates',
+      resetBtn: 'Réinitialiser',
+      applyBtn: 'Appliquer et Générer PDF',
+      previewTitle: 'Aperçu en Direct et Téléchargement',
+      downloadBtn: 'Télécharger le PDF',
+    },
   },
 };

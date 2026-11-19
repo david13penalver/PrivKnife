@@ -658,5 +658,18 @@ export const ar: TranslationSchema = {
       loadSample: 'تحميل ملف PDF تجريبي',
       largeFileWarning: 'يتجاوز حجم الملف 100 ميجابايت. قد يستغرق الضغط المحلي في الذاكرة بضع لحظات.',
     },
+    pdfWatermarkNumbering: {
+      name: 'ختم العلامة المائية وأرقام الصفحات وترقيم Bates لملفات PDF',
+      description: 'أضف علامات مائية متجهة وأرقام صفحات وأكواد Bates القانونية على ملفات PDF محلياً مع معاينة فورية ودون رفع أي ملف.',
+      uploadTitle: 'اختر مستند PDF',
+      loadSample: 'تحميل ملف PDF تجريبي',
+      configTitle: 'إعدادات العلامة المائية والترقيم',
+      watermarkTab: 'العلامة المائية',
+      numberingTab: 'أرقام الصفحات وBates',
+      resetBtn: 'إعادة ضبط',
+      applyBtn: 'ختم وإنشاء PDF',
+      previewTitle: 'المعاينة المباشرة والتنزيل',
+      downloadBtn: 'تنزيل PDF المختوم',
+    },
   },
 };

@@ -276,6 +276,12 @@
     "source": "PrivKnife/src/app/tools/documents/pdf-signer-stamper"
   },
   {
+    "id": "pdf-watermark-numbering",
+    "route": "/tools/pdf-watermark-numbering",
+    "category": "documents",
+    "source": "PrivKnife/src/app/tools/documents/pdf-watermark-numbering"
+  },
+  {
     "id": "pet-id-tag-generator",
     "route": "/tools/pet-id-tag-generator",
     "category": "3d",

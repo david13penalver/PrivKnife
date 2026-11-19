@@ -649,6 +649,14 @@ describe('ToolRegistry (Seam 3: Catalog & Architecture Verification)', () => {
     expect(TOOL_I18N_MAP['pdf-compressor']).toBe('pdfCompressor');
   });
 
+  it('should find pdf-watermark-numbering tool by id', () => {
+    const tool = getToolById('pdf-watermark-numbering');
+    expect(tool).toBeDefined();
+    expect(tool?.category).toBe('documents');
+    expect(tool?.isFullyClientSide).toBe(true);
+    expect(TOOL_I18N_MAP['pdf-watermark-numbering']).toBe('pdfWatermarkNumbering');
+  });
+
   describe('Tool Registry Localization (i18n)', () => {
     it('should have an i18n key mapping for every registered tool', () => {
       for (const tool of TOOL_REGISTRY) {

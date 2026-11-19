@@ -658,5 +658,18 @@ export const zh: TranslationSchema = {
       loadSample: '加载示例 PDF',
       largeFileWarning: '文件超过 100 MB。本地浏览器内存压缩可能需要片刻时间。',
     },
+    pdfWatermarkNumbering: {
+      name: 'PDF 水印、页码与法律 Bates 编号工具',
+      description: '在浏览器本地为 PDF 添加矢量水印、自定义页码和顺序 Bates 法律编号，支持实时预览且零文件上传。',
+      uploadTitle: '选择 PDF 文档',
+      loadSample: '加载示例 PDF',
+      configTitle: '水印与编号设置',
+      watermarkTab: '水印设置',
+      numberingTab: '页码与 Bates 编号',
+      resetBtn: '重置',
+      applyBtn: '生成盖章 PDF',
+      previewTitle: '实时预览与下载',
+      downloadBtn: '下载已加水印 PDF',
+    },
   },
 };

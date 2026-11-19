@@ -1,0 +1,505 @@
+<div class="l-page">
+  <header class="l-page__header c-header">
+    <div class="c-header__title-group">
+      <h1 class="c-header__title">{{ 'tools.pdfWatermarkNumbering.name' | translate }}</h1>
+      <p class="c-header__subtitle">{{ 'tools.pdfWatermarkNumbering.description' | translate }}</p>
+    </div>
+    <div class="c-badge c-badge--privacy">
+      {{ 'common.privacyBadge' | translate }}
+    </div>
+  </header>
+
+  @if (errorMessage()) {
+    <div class="c-pdf-watermark__error g--margin-bottom-4" role="alert" aria-live="polite">
+      {{ errorMessage() }}
+    </div>
+  }
+
+  <div class="l-columns l-columns--2">
+    <!-- Controls Column -->
+    <div class="l-columns__area">
+      <app-card [title]="'tools.pdfWatermarkNumbering.uploadTitle' | translate" class="g--margin-bottom-4">
+        <app-dropzone
+          [title]="'tools.pdfWatermarkNumbering.uploadTitle' | translate"
+          subtitle="Select or drop a .pdf file (100% client-side vector stamping)"
+          accept=".pdf,application/pdf"
+          [multiple]="false"
+          [maxSizeMb]="200"
+          (filesSelected)="onPdfDropped($event)"
+        />
+        <div class="c-pdf-watermark__toolbar g--margin-top-3">
+          <button
+            type="button"
+            class="c-button c-button--small c-button--outline"
+            (click)="loadSamplePdf()"
+          >
+            {{ 'tools.pdfWatermarkNumbering.loadSample' | translate }}
+          </button>
+          @if (documentLoaded()) {
+            <span class="c-pdf-watermark__meta">{{ fileName() }} ({{ totalPages() }} pages)</span>
+          }
+        </div>
+      </app-card>
+
+      <app-card [title]="'tools.pdfWatermarkNumbering.configTitle' | translate">
+        <div class="c-pdf-watermark__tabs g--margin-bottom-3" role="tablist">
+          <button
+            type="button"
+            role="tab"
+            class="c-button c-button--small"
+            [class.c-button--primary]="activeTab() === 'watermark'"
+            [class.c-button--outline]="activeTab() !== 'watermark'"
+            [attr.aria-selected]="activeTab() === 'watermark'"
+            (click)="setActiveTab('watermark')"
+          >
+            {{ 'tools.pdfWatermarkNumbering.watermarkTab' | translate }}
+          </button>
+          <button
+            type="button"
+            role="tab"
+            class="c-button c-button--small"
+            [class.c-button--primary]="activeTab() === 'numbering'"
+            [class.c-button--outline]="activeTab() !== 'numbering'"
+            [attr.aria-selected]="activeTab() === 'numbering'"
+            (click)="setActiveTab('numbering')"
+          >
+            {{ 'tools.pdfWatermarkNumbering.numberingTab' | translate }}
+          </button>
+        </div>
+
+        <div class="c-input g--margin-bottom-3">
+          <label class="c-input__label" for="wm-page-range">Target Page Range (e.g. all, odd, even, 1-3, 5-end)</label>
+          <input
+            id="wm-page-range"
+            type="text"
+            class="c-input__control"
+            [ngModel]="pageRange()"
+            (ngModelChange)="setPageRange($event)"
+            placeholder="all"
+          />
+          @if (!previewRangeValid()) {
+            <small class="c-pdf-watermark__field-err">Invalid range for {{ totalPages() }} pages.</small>
+          }
+        </div>
+
+        @if (activeTab() === 'watermark') {
+          <label class="c-pdf-watermark__check g--margin-bottom-3">
+            <input
+              type="checkbox"
+              [checked]="watermarkEnabled()"
+              (change)="setWatermarkEnabled($any($event.target).checked)"
+            />
+            <span>Enable Watermark</span>
+          </label>
+
+          @if (watermarkEnabled()) {
+            <div class="c-pdf-watermark__row g--margin-bottom-3">
+              <button
+                type="button"
+                class="c-button c-button--small"
+                [class.c-button--primary]="watermarkKind() === 'text'"
+                [class.c-button--outline]="watermarkKind() !== 'text'"
+                (click)="setWatermarkKind('text')"
+              >
+                Text
+              </button>
+              <button
+                type="button"
+                class="c-button c-button--small"
+                [class.c-button--primary]="watermarkKind() === 'image'"
+                [class.c-button--outline]="watermarkKind() !== 'image'"
+                (click)="setWatermarkKind('image')"
+              >
+                Image Logo
+              </button>
+              <button
+                type="button"
+                class="c-button c-button--small"
+                [class.c-button--primary]="watermarkLayout() === 'single'"
+                [class.c-button--outline]="watermarkLayout() !== 'single'"
+                (click)="setWatermarkLayout('single')"
+              >
+                Single Anchor
+              </button>
+              <button
+                type="button"
+                class="c-button c-button--small"
+                [class.c-button--primary]="watermarkLayout() === 'tiled'"
+                [class.c-button--outline]="watermarkLayout() !== 'tiled'"
+                (click)="setWatermarkLayout('tiled')"
+              >
+                Tiled Mosaic
+              </button>
+            </div>
+
+            @if (watermarkKind() === 'text') {
+              <div class="c-input g--margin-bottom-3">
+                <label class="c-input__label" for="wm-text">Watermark Text</label>
+                <input
+                  id="wm-text"
+                  type="text"
+                  class="c-input__control"
+                  [ngModel]="watermarkText()"
+                  (ngModelChange)="setWatermarkText($event)"
+                />
+              </div>
+
+              <div class="c-pdf-watermark__grid-2 g--margin-bottom-3">
+                <div class="c-input">
+                  <label class="c-input__label" for="wm-font">Font</label>
+                  <select
+                    id="wm-font"
+                    class="c-input__control"
+                    [ngModel]="watermarkFontFamily()"
+                    (ngModelChange)="setWatermarkFontFamily($event)"
+                  >
+                    <option value="helvetica">Helvetica</option>
+                    <option value="times">Times Roman</option>
+                    <option value="courier">Courier</option>
+                  </select>
+                </div>
+                <div class="c-input">
+                  <label class="c-input__label" for="wm-color">Color</label>
+                  <input
+                    id="wm-color"
+                    type="color"
+                    class="c-input__control"
+                    [ngModel]="watermarkColorHex()"
+                    (ngModelChange)="setWatermarkColorHex($event)"
+                  />
+                </div>
+              </div>
+
+              <div class="c-input g--margin-bottom-3">
+                <label class="c-input__label" for="wm-size">Font Size: {{ watermarkFontSizePt() }} pt</label>
+                <input
+                  id="wm-size"
+                  type="range"
+                  class="c-input__slider"
+                  min="10"
+                  max="140"
+                  [ngModel]="watermarkFontSizePt()"
+                  (ngModelChange)="setWatermarkFontSize($event)"
+                />
+              </div>
+            } @else {
+              <div class="g--margin-bottom-3">
+                <app-dropzone
+                  title="Drop PNG or JPEG Logo"
+                  subtitle="Transparent PNG recommended"
+                  accept="image/png,image/jpeg,.png,.jpg,.jpeg"
+                  [multiple]="false"
+                  [maxSizeMb]="10"
+                  (filesSelected)="onLogoImageDropped($event)"
+                />
+                @if (logoFileName()) {
+                  <small class="c-pdf-watermark__meta">Loaded logo: {{ logoFileName() }}</small>
+                }
+              </div>
+
+              <div class="c-input g--margin-bottom-3">
+                <label class="c-input__label" for="wm-img-scale">Logo Width: {{ logoScalePercent() }}% of page</label>
+                <input
+                  id="wm-img-scale"
+                  type="range"
+                  class="c-input__slider"
+                  min="5"
+                  max="90"
+                  [ngModel]="logoScalePercent()"
+                  (ngModelChange)="setLogoScalePercent($event)"
+                />
+              </div>
+            }
+
+            <div class="c-pdf-watermark__grid-2 g--margin-bottom-3">
+              <div class="c-input">
+                <label class="c-input__label" for="wm-opacity">Opacity: {{ (watermarkOpacity() * 100).toFixed(0) }}%</label>
+                <input
+                  id="wm-opacity"
+                  type="range"
+                  class="c-input__slider"
+                  min="0.05"
+                  max="1"
+                  step="0.05"
+                  [ngModel]="watermarkOpacity()"
+                  (ngModelChange)="setWatermarkOpacity($event)"
+                />
+              </div>
+              <div class="c-input">
+                <label class="c-input__label" for="wm-rot">Rotation: {{ watermarkRotationDeg() }}°</label>
+                <input
+                  id="wm-rot"
+                  type="range"
+                  class="c-input__slider"
+                  min="-180"
+                  max="180"
+                  step="5"
+                  [ngModel]="watermarkRotationDeg()"
+                  (ngModelChange)="setWatermarkRotation($event)"
+                />
+              </div>
+            </div>
+
+            @if (watermarkLayout() === 'single') {
+              <div class="c-input g--margin-bottom-3">
+                <span class="c-input__label">Position Anchor (3×3 Grid)</span>
+                <div class="c-pdf-watermark__anchor-grid">
+                  @for (pos of anchorGrid; track pos) {
+                    <button
+                      type="button"
+                      class="c-pdf-watermark__anchor-cell"
+                      [class.is-active]="watermarkAnchor() === pos"
+                      (click)="setWatermarkAnchor(pos)"
+                      [attr.aria-label]="'Anchor ' + pos"
+                    >
+                      {{ pos }}
+                    </button>
+                  }
+                </div>
+              </div>
+            } @else {
+              <div class="c-input g--margin-bottom-3">
+                <label class="c-input__label" for="wm-gap">Tile Spacing: {{ watermarkTileGapPt() }} pt</label>
+                <input
+                  id="wm-gap"
+                  type="range"
+                  class="c-input__slider"
+                  min="60"
+                  max="400"
+                  step="10"
+                  [ngModel]="watermarkTileGapPt()"
+                  (ngModelChange)="setWatermarkTileGap($event)"
+                />
+              </div>
+            }
+
+            <div class="c-pdf-watermark__row g--margin-bottom-3">
+              <button
+                type="button"
+                class="c-button c-button--small"
+                [class.c-button--primary]="watermarkLayer() === 'over'"
+                [class.c-button--outline]="watermarkLayer() !== 'over'"
+                (click)="setWatermarkLayer('over')"
+              >
+                Layer: Over Content
+              </button>
+              <button
+                type="button"
+                class="c-button c-button--small"
+                [class.c-button--primary]="watermarkLayer() === 'under'"
+                [class.c-button--outline]="watermarkLayer() !== 'under'"
+                (click)="setWatermarkLayer('under')"
+              >
+                Layer: Under Content
+              </button>
+            </div>
+          }
+        } @else {
+          <label class="c-pdf-watermark__check g--margin-bottom-3">
+            <input
+              type="checkbox"
+              [checked]="numberingEnabled()"
+              (change)="setNumberingEnabled($any($event.target).checked)"
+            />
+            <span>Enable Page / Bates Numbering</span>
+          </label>
+
+          @if (numberingEnabled()) {
+            <div class="c-pdf-watermark__row g--margin-bottom-3">
+              <button
+                type="button"
+                class="c-button c-button--small"
+                [class.c-button--primary]="numberingMode() === 'page_numbers'"
+                [class.c-button--outline]="numberingMode() !== 'page_numbers'"
+                (click)="applyPageNumberPreset()"
+              >
+                Standard Page Numbers
+              </button>
+              <button
+                type="button"
+                class="c-button c-button--small"
+                [class.c-button--primary]="numberingMode() === 'bates'"
+                [class.c-button--outline]="numberingMode() !== 'bates'"
+                (click)="applyBatesPreset()"
+              >
+                Legal Bates Stamping
+              </button>
+            </div>
+
+            <div class="c-input g--margin-bottom-3">
+              <label class="c-input__label" for="num-tpl">Template (Tokens: &#123;n&#125;, &#123;total&#125;, &#123;bates:6&#125;)</label>
+              <input
+                id="num-tpl"
+                type="text"
+                class="c-input__control"
+                [ngModel]="numberingTemplate()"
+                (ngModelChange)="setNumberingTemplate($event)"
+              />
+            </div>
+
+            <div class="c-pdf-watermark__grid-2 g--margin-bottom-3">
+              <div class="c-input">
+                <label class="c-input__label" for="num-start">Start Number</label>
+                <input
+                  id="num-start"
+                  type="number"
+                  class="c-input__control"
+                  [ngModel]="startNumber()"
+                  (ngModelChange)="setStartNumber($event)"
+                />
+              </div>
+              <div class="c-input">
+                <label class="c-input__label" for="num-skip">Skip First N Pages</label>
+                <input
+                  id="num-skip"
+                  type="number"
+                  min="0"
+                  class="c-input__control"
+                  [ngModel]="skipFirstPages()"
+                  (ngModelChange)="setSkipFirstPages($event)"
+                />
+              </div>
+            </div>
+
+            <div class="c-input g--margin-bottom-3">
+              <label class="c-input__label" for="num-anchor">Placement Position</label>
+              <select
+                id="num-anchor"
+                class="c-input__control"
+                [ngModel]="numberingAnchor()"
+                (ngModelChange)="setNumberingAnchor($event)"
+              >
+                @for (anchor of numberingAnchors; track anchor) {
+                  <option [value]="anchor">{{ anchor }}</option>
+                }
+              </select>
+            </div>
+
+            <label class="c-pdf-watermark__check">
+              <input
+                type="checkbox"
+                [checked]="mirrorFacingPages()"
+                (change)="setMirrorFacingPages($any($event.target).checked)"
+              />
+              <span>Mirror left/right on even pages (Duplex Facing Pages)</span>
+            </label>
+            <label class="c-pdf-watermark__check">
+              <input
+                type="checkbox"
+                [checked]="opaqueBackdrop()"
+                (change)="setOpaqueBackdrop($any($event.target).checked)"
+              />
+              <span>White background pill behind number</span>
+            </label>
+          }
+        }
+
+        @if (isProcessing()) {
+          <div class="g--margin-top-3" aria-live="polite">
+            <app-progress-bar [value]="progressPercent()" [label]="progressStage()" />
+          </div>
+        }
+
+        <div card-footer class="l-extremo">
+          <button
+            type="button"
+            class="l-extremo__area-izquierda c-button c-button--outline"
+            (click)="reset()"
+          >
+            {{ 'tools.pdfWatermarkNumbering.resetBtn' | translate }}
+          </button>
+          <button
+            type="button"
+            class="l-extremo__area-derecha c-button c-button--primary"
+            [disabled]="!canExport()"
+            (click)="applyAndExport()"
+          >
+            {{ 'tools.pdfWatermarkNumbering.applyBtn' | translate }}
+          </button>
+        </div>
+      </app-card>
+    </div>
+
+    <!-- Live Preview & Download Column -->
+    <div class="l-columns__area">
+      <app-card [title]="'tools.pdfWatermarkNumbering.previewTitle' | translate">
+        @if (documentLoaded()) {
+          <div class="l-extremo g--margin-bottom-3">
+            <button
+              type="button"
+              class="l-extremo__area-izquierda c-button c-button--small c-button--outline"
+              [disabled]="currentPreviewPage() <= 1"
+              (click)="prevPage()"
+            >
+              ← Prev
+            </button>
+            <span class="c-pdf-watermark__meta">
+              Page {{ currentPreviewPage() }} of {{ totalPages() }}
+            </span>
+            <button
+              type="button"
+              class="l-extremo__area-derecha c-button c-button--small c-button--outline"
+              [disabled]="currentPreviewPage() >= totalPages()"
+              (click)="nextPage()"
+            >
+              Next →
+            </button>
+          </div>
+
+          <div class="c-pdf-watermark__sheet">
+            <canvas #previewCanvas class="c-pdf-watermark__canvas"></canvas>
+
+            @if (watermarkEnabled() && isPreviewPageInTargetRange()) {
+              <div
+                class="c-pdf-watermark__overlay-wm"
+                [attr.data-anchor]="watermarkLayout() === 'single' ? watermarkAnchor() : 'center'"
+                [style.opacity]="watermarkOpacity()"
+                [style.color]="watermarkColorHex()"
+                [style.transform]="'rotate(' + (-watermarkRotationDeg()) + 'deg)'"
+              >
+                @if (watermarkKind() === 'text') {
+                  <span>{{ watermarkText() }}</span>
+                } @else if (logoPreviewUrl()) {
+                  <img [src]="logoPreviewUrl()" alt="Watermark preview" class="c-pdf-watermark__overlay-img" />
+                }
+              </div>
+            }
+
+            @if (previewNumberingLabel(); as label) {
+              <div
+                class="c-pdf-watermark__overlay-num"
+                [attr.data-anchor]="effectivePreviewNumberingAnchor()"
+                [class.has-backdrop]="opaqueBackdrop()"
+                [style.color]="numberingColorHex()"
+              >
+                {{ label }}
+              </div>
+            }
+          </div>
+
+          @if (lastResult(); as res) {
+            <div class="c-pdf-watermark__result g--margin-top-4" aria-live="polite">
+              <div>
+                <strong>{{ res.fileName }}</strong>
+                <p class="c-pdf-watermark__meta">
+                  Stamped {{ res.pagesStamped }} of {{ res.totalPages }} pages ({{ (res.fileSize / 1024).toFixed(1) }} KB)
+                </p>
+              </div>
+              <button
+                type="button"
+                class="c-button c-button--primary"
+                (click)="downloadResult()"
+              >
+                {{ 'tools.pdfWatermarkNumbering.downloadBtn' | translate }}
+              </button>
+            </div>
+          }
+        } @else {
+          <div class="c-pdf-watermark__empty">
+            <p>Upload a PDF or load the sample agreement on the left to preview watermarks and Bates numbers live.</p>
+          </div>
+        }
+      </app-card>
+    </div>
+  </div>
+</div>

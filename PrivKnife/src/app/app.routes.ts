@@ -141,6 +141,26 @@ export const routes: Routes = [
       import('./tools/documents/pdf-merger').then((m) => m.PdfMergerComponent),
   },
   {
+    path: 'tools/pdf-watermark-numbering',
+    title: 'PDF Watermark, Page Numbers & Bates Stamper — PrivKnife',
+    data: {
+      description:
+        'Stamp diagonal or tiled watermarks, page numbers, and sequential legal Bates identifiers onto PDFs 100% locally in your browser.',
+      keywords: [
+        'watermark pdf',
+        'add page numbers to pdf',
+        'bates numbering pdf',
+        'stamp pdf confidential',
+        'client side pdf watermark',
+      ],
+      url: '/tools/pdf-watermark-numbering',
+    },
+    loadComponent: () =>
+      import('./tools/documents/pdf-watermark-numbering/pdf-watermark-numbering.component').then(
+        (m) => m.PdfWatermarkNumberingComponent
+      ),
+  },
+  {
     path: 'tools/pdf-redaction',
     title: 'PDF Redaction & Anonymizer — PrivKnife',
     data: {
