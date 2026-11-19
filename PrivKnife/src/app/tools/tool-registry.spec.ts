@@ -721,6 +721,14 @@ describe('ToolRegistry (Seam 3: Catalog & Architecture Verification)', () => {
     expect(TOOL_I18N_MAP['office-html-to-pdf']).toBe('officeHtmlToPdf');
   });
 
+  it('should find pdf-repair-metadata tool by id', () => {
+    const tool = getToolById('pdf-repair-metadata');
+    expect(tool).toBeDefined();
+    expect(tool?.category).toBe('documents');
+    expect(tool?.isFullyClientSide).toBe(true);
+    expect(TOOL_I18N_MAP['pdf-repair-metadata']).toBe('pdfRepairMetadata');
+  });
+
   describe('Tool Registry Localization (i18n)', () => {
     it('should have an i18n key mapping for every registered tool', () => {
       for (const tool of TOOL_REGISTRY) {

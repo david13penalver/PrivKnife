@@ -306,6 +306,12 @@
     "source": "PrivKnife/src/app/tools/documents/office-html-to-pdf"
   },
   {
+    "id": "pdf-repair-metadata",
+    "route": "/tools/pdf-repair-metadata",
+    "category": "documents",
+    "source": "PrivKnife/src/app/tools/documents/pdf-repair-metadata"
+  },
+  {
     "id": "pdf-merger",
     "route": "/tools/pdf-merger-splitter",
     "category": "documents",

@@ -1,0 +1,367 @@
+<div class="l-page c-pdf-repair">
+  <header class="l-page__header c-header">
+    <div class="c-header__title-group">
+      <h1 class="c-header__title">{{ 'tools.pdfRepairMetadata.name' | translate }}</h1>
+      <p class="c-header__subtitle">{{ 'tools.pdfRepairMetadata.description' | translate }}</p>
+    </div>
+    <app-badge variant="privacy" [dot]="true">
+      {{ 'common.privacyBadge' | translate }}
+    </app-badge>
+  </header>
+
+  @if (errorMessage()) {
+    <div class="c-pdf-repair__alert c-pdf-repair__alert--error g--margin-bottom-4" role="alert" aria-live="polite">
+      {{ errorMessage() }}
+    </div>
+  }
+
+  @if (largeFileWarning()) {
+    <div class="c-pdf-repair__alert c-pdf-repair__alert--warn g--margin-bottom-4">
+      Large PDF (&gt;40 MB) loaded. QPDF recovery and archival packaging remain 100% offline.
+    </div>
+  }
+
+  @if (healthReport(); as health) {
+    <section class="c-pdf-repair__health-strip g--margin-bottom-4" aria-label="Structural Health Diagnostic Strip">
+      <span
+        [class]="'c-badge ' + (health.healthStatus === 'healthy' ? 'c-badge--success' : health.healthStatus === 'recoverable' ? 'c-badge--warning' : 'c-badge--danger')"
+      >
+        {{
+          health.healthStatus === 'healthy'
+            ? 'Healthy'
+            : health.healthStatus === 'recoverable'
+              ? 'Recoverable Issues Found'
+              : 'Corrupted'
+        }}
+      </span>
+      <span class="c-badge">PDF v{{ health.pdfVersion }}</span>
+      <span class="c-badge">{{ health.pageCount }} page(s)</span>
+      <span class="c-badge">{{ health.isLinearized ? 'Linearized (Fast Web View)' : 'Not Linearized' }}</span>
+      <span [class]="'c-badge ' + (health.hasXrefWarnings || health.leadingGarbageBytes > 0 ? 'c-badge--warning' : 'c-badge--success')">
+        XRef: {{ health.hasXrefWarnings ? 'Warnings Found' : 'Clean' }}
+        @if (health.leadingGarbageBytes > 0) {
+          ({{ health.leadingGarbageBytes }} B Leading Junk)
+        }
+      </span>
+      @if (health.hasJavaScriptOrActions) {
+        <span class="c-badge c-badge--danger">⚠️ Active JavaScript / OpenAction Detected</span>
+      } @else {
+        <span class="c-badge c-badge--success">🛡️ Zero Active Scripts</span>
+      }
+      @if (health.rawXmpBytes > 0) {
+        <span class="c-badge">XMP: {{ health.rawXmpBytes }} B</span>
+      }
+    </section>
+  }
+
+  <div class="l-columns l-columns--2">
+    <div class="l-columns__area">
+      <app-card [title]="'tools.pdfRepairMetadata.uploadTitle' | translate" class="g--margin-bottom-4">
+        <app-dropzone
+          [title]="'tools.pdfRepairMetadata.uploadTitle' | translate"
+          subtitle="Repair broken XRefs, scrub metadata, or archive to PDF/A-2b (max 150 MB)"
+          accept=".pdf,application/pdf"
+          [multiple]="false"
+          [maxSizeMb]="150"
+          (filesSelected)="onFilesDropped($event)"
+          (rejected)="onDropzoneRejected($event)"
+        />
+        <div class="c-pdf-repair__row g--margin-top-3">
+          <app-button variant="outline" size="small" (clicked)="loadCorruptedSample()">
+            {{ 'tools.pdfRepairMetadata.loadSample' | translate }}
+          </app-button>
+          @if (pdfBytes()) {
+            <span class="c-pdf-repair__meta">
+              {{ fileName() }} ({{ formattedInputSize() }})
+            </span>
+          }
+        </div>
+      </app-card>
+
+      <app-card [title]="'tools.pdfRepairMetadata.modeTitle' | translate" class="g--margin-bottom-4">
+        <div class="c-pdf-repair__tabs g--margin-bottom-4" role="tablist">
+          <button
+            type="button"
+            role="tab"
+            [attr.aria-selected]="activeMode() === 'repair'"
+            [class]="'c-button c-button--small ' + (activeMode() === 'repair' ? 'c-button--primary' : 'c-button--outline')"
+            (click)="setMode('repair')"
+          >
+            {{ 'tools.pdfRepairMetadata.tabRepair' | translate }}
+          </button>
+          <button
+            type="button"
+            role="tab"
+            [attr.aria-selected]="activeMode() === 'metadata'"
+            [class]="'c-button c-button--small ' + (activeMode() === 'metadata' ? 'c-button--primary' : 'c-button--outline')"
+            (click)="setMode('metadata')"
+          >
+            {{ 'tools.pdfRepairMetadata.tabMetadata' | translate }}
+          </button>
+          <button
+            type="button"
+            role="tab"
+            [attr.aria-selected]="activeMode() === 'pdfa'"
+            [class]="'c-button c-button--small ' + (activeMode() === 'pdfa' ? 'c-button--primary' : 'c-button--outline')"
+            (click)="setMode('pdfa')"
+          >
+            {{ 'tools.pdfRepairMetadata.tabPdfa' | translate }}
+          </button>
+        </div>
+
+        @switch (activeMode()) {
+          @case ('repair') {
+            <div class="c-pdf-repair__checks g--margin-bottom-3">
+              <label class="c-pdf-repair__check">
+                <input
+                  type="checkbox"
+                  [ngModel]="linearizeFastWebView()"
+                  (ngModelChange)="linearizeFastWebView.set($event)"
+                />
+                Linearize for Fast Web View (--linearize)
+              </label>
+              <label class="c-pdf-repair__check">
+                <input
+                  type="checkbox"
+                  [ngModel]="stripJavaScriptAndActions()"
+                  (ngModelChange)="stripJavaScriptAndActions.set($event)"
+                />
+                Strip Embedded JavaScript, OpenAction &amp; Launch Triggers
+              </label>
+            </div>
+            <div class="c-pdf-repair__row">
+              <app-button
+                variant="primary"
+                [disabled]="!pdfBytes()"
+                [loading]="isProcessing()"
+                (clicked)="runAction()"
+              >
+                {{ 'tools.pdfRepairMetadata.repairBtn' | translate }}
+              </app-button>
+            </div>
+          }
+
+          @case ('metadata') {
+            <div class="c-pdf-repair__row g--margin-bottom-3">
+              <app-button
+                variant="danger"
+                size="small"
+                [disabled]="!pdfBytes()"
+                [loading]="isProcessing()"
+                (clicked)="scrubAllHiddenMetadata()"
+              >
+                {{ 'tools.pdfRepairMetadata.scrubBtn' | translate }}
+              </app-button>
+            </div>
+
+            <div class="c-pdf-repair__form-grid g--margin-bottom-3">
+              <div class="c-input__group">
+                <label class="c-input__label" for="meta-title">Title</label>
+                <input
+                  id="meta-title"
+                  type="text"
+                  class="c-input"
+                  [ngModel]="metadataTitle()"
+                  (ngModelChange)="metadataTitle.set($event); scrubAllMetadata.set(false)"
+                />
+              </div>
+              <div class="c-input__group">
+                <label class="c-input__label" for="meta-author">Author</label>
+                <input
+                  id="meta-author"
+                  type="text"
+                  class="c-input"
+                  [ngModel]="metadataAuthor()"
+                  (ngModelChange)="metadataAuthor.set($event); scrubAllMetadata.set(false)"
+                />
+              </div>
+              <div class="c-input__group">
+                <label class="c-input__label" for="meta-subject">Subject</label>
+                <input
+                  id="meta-subject"
+                  type="text"
+                  class="c-input"
+                  [ngModel]="metadataSubject()"
+                  (ngModelChange)="metadataSubject.set($event); scrubAllMetadata.set(false)"
+                />
+              </div>
+              <div class="c-input__group">
+                <label class="c-input__label" for="meta-keywords">Keywords</label>
+                <input
+                  id="meta-keywords"
+                  type="text"
+                  class="c-input"
+                  [ngModel]="metadataKeywords()"
+                  (ngModelChange)="metadataKeywords.set($event); scrubAllMetadata.set(false)"
+                />
+              </div>
+              <div class="c-input__group">
+                <label class="c-input__label" for="meta-creator">Creator App</label>
+                <input
+                  id="meta-creator"
+                  type="text"
+                  class="c-input"
+                  [ngModel]="metadataCreator()"
+                  (ngModelChange)="metadataCreator.set($event); scrubAllMetadata.set(false)"
+                />
+              </div>
+              <div class="c-input__group">
+                <label class="c-input__label" for="meta-producer">Producer Engine</label>
+                <input
+                  id="meta-producer"
+                  type="text"
+                  class="c-input"
+                  [ngModel]="metadataProducer()"
+                  (ngModelChange)="metadataProducer.set($event); scrubAllMetadata.set(false)"
+                />
+              </div>
+            </div>
+
+            <div class="c-pdf-repair__row">
+              <app-button
+                variant="primary"
+                [disabled]="!pdfBytes()"
+                [loading]="isProcessing()"
+                (clicked)="scrubAllMetadata.set(false); runAction()"
+              >
+                {{ 'tools.pdfRepairMetadata.applyMetaBtn' | translate }}
+              </app-button>
+            </div>
+          }
+
+          @case ('pdfa') {
+            <div class="c-pdf-repair__form-grid g--margin-bottom-3">
+              <div class="c-input__group">
+                <label class="c-input__label" for="pdfa-conformance">Archival Profile</label>
+                <select
+                  id="pdfa-conformance"
+                  class="c-input"
+                  [ngModel]="pdfaConformance()"
+                  (ngModelChange)="pdfaConformance.set($event)"
+                >
+                  <option value="2b_vector">PDF/A-2b Vector (Preserves Text)</option>
+                  <option value="2b_strict_flattened">PDF/A-2b Strict Flattened (Embeds Raster)</option>
+                </select>
+              </div>
+
+              @if (pdfaConformance() === '2b_strict_flattened') {
+                <div class="c-input__group">
+                  <label class="c-input__label" for="pdfa-dpi">Flatten Resolution</label>
+                  <select
+                    id="pdfa-dpi"
+                    class="c-input"
+                    [ngModel]="pdfaFlattenDpi()"
+                    (ngModelChange)="pdfaFlattenDpi.set($event)"
+                  >
+                    <option [ngValue]="200">200 DPI (Compact)</option>
+                    <option [ngValue]="300">300 DPI (High Detail)</option>
+                  </select>
+                </div>
+              }
+            </div>
+
+            <div class="c-pdf-repair__row">
+              <app-button
+                variant="primary"
+                [disabled]="!pdfBytes()"
+                [loading]="isProcessing()"
+                (clicked)="runAction()"
+              >
+                {{ 'tools.pdfRepairMetadata.pdfaBtn' | translate }}
+              </app-button>
+            </div>
+          }
+        }
+      </app-card>
+    </div>
+
+    <div class="l-columns__area">
+      <app-card [title]="'tools.pdfRepairMetadata.outputTitle' | translate" class="g--margin-bottom-4">
+        @if (isInspecting()) {
+          <p class="c-pdf-repair__meta g--margin-bottom-3">
+            Running QPDF structural diagnostic check in worker...
+          </p>
+        }
+
+        @if (isProcessing()) {
+          <div class="g--margin-bottom-4">
+            <app-progress-bar
+              [value]="progressPercent()"
+              [label]="progressStage()"
+              [showPercentage]="true"
+            />
+          </div>
+        }
+
+        @if (result(); as res) {
+          <div class="c-pdf-repair__stats g--margin-bottom-3">
+            <span class="c-badge c-badge--success">Ready: {{ formattedOutputSize() }}</span>
+            <span class="c-badge">{{ res.repairedWarningsCount }} fix(es) applied</span>
+          </div>
+
+          <div class="c-pdf-repair__actions g--margin-bottom-4">
+            <app-button variant="primary" [disabled]="!canDownload()" (clicked)="downloadPdf()">
+              {{ 'tools.pdfRepairMetadata.downloadBtn' | translate }}
+            </app-button>
+            <app-button variant="outline" (clicked)="reset()">
+              {{ 'tools.pdfRepairMetadata.resetBtn' | translate }}
+            </app-button>
+          </div>
+
+          @if (res.archivalChecklist && res.archivalChecklist.length > 0) {
+            <div class="c-pdf-repair__checklist g--margin-bottom-4">
+              <h3 class="c-pdf-repair__subheading">PDF/A-2b Archival Compliance Checklist</h3>
+              @for (item of res.archivalChecklist; track item.id) {
+                <div class="c-pdf-repair__check-row">
+                  <span [class]="'c-badge ' + (item.passed ? 'c-badge--success' : 'c-badge--warning')">
+                    {{ item.passed ? 'Passed' : 'Warning' }}
+                  </span>
+                  <div class="c-pdf-repair__check-copy">
+                    <strong>{{ item.labelKey }}</strong>
+                    @if (item.detail) {
+                      <div class="c-pdf-repair__meta">{{ item.detail }}</div>
+                    }
+                  </div>
+                </div>
+              }
+            </div>
+          }
+
+          @if (res.actionLog && res.actionLog.length > 0) {
+            <div class="c-pdf-repair__log">
+              <h3 class="c-pdf-repair__subheading">Transformation &amp; Repair Log</h3>
+              <ul class="c-pdf-repair__list">
+                @for (entry of res.actionLog; track $index) {
+                  <li>{{ entry }}</li>
+                }
+              </ul>
+            </div>
+          }
+        } @else {
+          @if (healthReport(); as health) {
+            <div class="c-pdf-repair__diagnostics">
+              <h3 class="c-pdf-repair__subheading">Document Inspection Snapshot</h3>
+              <dl class="c-pdf-repair__dl">
+                <dt>Title</dt>
+                <dd>{{ health.metadata.title || '—' }}</dd>
+                <dt>Author</dt>
+                <dd>{{ health.metadata.author || '—' }}</dd>
+                <dt>Creator / Producer</dt>
+                <dd>{{ health.metadata.creator || '—' }} / {{ health.metadata.producer || '—' }}</dd>
+                <dt>Unembedded Fonts</dt>
+                <dd>{{ health.unembeddedFontsCount }}</dd>
+              </dl>
+              @if (health.qpdfDiagnostics.length > 0) {
+                <pre class="c-pdf-repair__console">{{ health.qpdfDiagnostics.join('\n') }}</pre>
+              }
+            </div>
+          } @else {
+            <p class="c-pdf-repair__meta">
+              Drop a damaged, sensitive, or archival PDF to inspect its XRef structure, hidden XMP metadata, active JavaScript actions, and package PDF/A-2b offline.
+            </p>
+          }
+        }
+      </app-card>
+    </div>
+  </div>
+</div>

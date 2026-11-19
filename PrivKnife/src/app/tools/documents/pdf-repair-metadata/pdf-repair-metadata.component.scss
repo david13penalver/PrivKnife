@@ -1,0 +1,119 @@
+.c-pdf-repair {
+  &__health-strip,
+  &__row,
+  &__tabs,
+  &__stats,
+  &__actions {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.65rem;
+  }
+
+  &__health-strip {
+    padding: 0.75rem 1rem;
+    border: 1px solid var(--border-subtle, #cbd5e1);
+    border-radius: 8px;
+    background: var(--bg-subtle, #f8fafc);
+  }
+
+  &__form-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+    gap: 0.75rem;
+  }
+
+  &__checks {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+  }
+
+  &__check {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    min-height: 40px;
+    cursor: pointer;
+    font-size: 0.9rem;
+  }
+
+  &__alert {
+    padding: 0.75rem 1rem;
+    border-radius: 8px;
+    border: 1px solid var(--border-subtle, #cbd5e1);
+    font-size: 0.9rem;
+
+    &--error {
+      border-color: #ef4444;
+      background: rgba(239, 68, 68, 0.08);
+      color: #b91c1c;
+    }
+
+    &--warn {
+      border-color: #f59e0b;
+      background: rgba(245, 158, 11, 0.08);
+    }
+  }
+
+  &__subheading {
+    font-size: 0.95rem;
+    font-weight: 700;
+    margin: 0 0 0.6rem;
+  }
+
+  &__check-row {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.75rem;
+    padding: 0.55rem 0;
+    border-bottom: 1px solid var(--border-subtle, #e2e8f0);
+  }
+
+  &__check-copy {
+    flex: 1;
+    font-size: 0.875rem;
+  }
+
+  &__list {
+    margin: 0;
+    padding-left: 1.25rem;
+    font-size: 0.875rem;
+    line-height: 1.6;
+  }
+
+  &__dl {
+    display: grid;
+    grid-template-columns: 140px 1fr;
+    gap: 0.35rem 0.75rem;
+    font-size: 0.875rem;
+    margin: 0 0 0.75rem;
+
+    dt {
+      font-weight: 600;
+      color: var(--text-secondary, #475569);
+    }
+
+    dd {
+      margin: 0;
+      word-break: break-word;
+    }
+  }
+
+  &__console {
+    margin: 0;
+    padding: 0.75rem;
+    border-radius: 6px;
+    background: #0f172a;
+    color: #e2e8f0;
+    font-family: ui-monospace, monospace;
+    font-size: 0.78rem;
+    max-height: 200px;
+    overflow: auto;
+  }
+
+  &__meta {
+    font-size: 0.85rem;
+    color: var(--text-secondary, #64748b);
+  }
+}

@@ -202,6 +202,20 @@ const CATALOG_TOOLS: CatalogTool[] = [
     icon: '🖨️',
   },
   {
+    id: 'pdf-repair-metadata',
+    i18nKey: 'pdfRepairMetadata',
+    name: 'PDF Structural Repair, Metadata Editor & PDF/A Archiver',
+    category: 'documents',
+    categoryLabel: 'Documents',
+    description:
+      'Repair corrupted PDF XRefs, linearize for Fast Web View, strip JavaScript actions, scrub hidden metadata/XMP, and package PDF/A-2b archives locally.',
+    keywords: ['repair pdf', 'pdf to pdf/a', 'edit pdf metadata', 'scrub xmp', 'linearize pdf'],
+    status: 'ready',
+    route: '/tools/pdf-repair-metadata',
+    techStack: 'QPDF WASM • pdf-lib • PDF.js • sRGB ICC',
+    icon: '🛠️',
+  },
+  {
     id: 'pdf-merger-splitter',
     i18nKey: 'pdfMerger',
     name: 'PDF Merger, Splitter & Page Organizer',

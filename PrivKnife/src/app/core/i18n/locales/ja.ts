@@ -793,5 +793,23 @@ export const ja: TranslationSchema = {
       downloadPdfBtn: '.pdf を保存',
       resetBtn: 'リセット',
     },
+    pdfRepairMetadata: {
+      name: 'PDF 構造修復・メタデータ削除・PDF/A 変換',
+      description:
+        '破損 XRef の修復、Web 最適化リニアライズ、隠し XMP/作者情報の完全消去、JS 削除、PDF/A-2b 変換をローカル完結で実行。',
+      uploadTitle: 'PDF を選択',
+      loadSample: '破損サンプル PDF を読込',
+      modeTitle: '修復・メタデータ・アーカイブ設定',
+      tabRepair: '修復とリニアライズ',
+      tabMetadata: 'メタデータ編集・消去',
+      tabPdfa: 'PDF/A-2b 変換',
+      repairBtn: 'PDF を修復・最適化',
+      scrubBtn: '隠しメタデータを一括消去',
+      applyMetaBtn: 'メタデータを保存',
+      pdfaBtn: 'PDF/A-2b を生成',
+      outputTitle: '診断結果と出力',
+      downloadBtn: '.pdf を保存',
+      resetBtn: 'リセット',
+    },
   },
 };

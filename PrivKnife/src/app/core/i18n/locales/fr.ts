@@ -793,5 +793,23 @@ export const fr: TranslationSchema = {
       downloadPdfBtn: 'Télécharger .pdf',
       resetBtn: 'Réinitialiser',
     },
+    pdfRepairMetadata: {
+      name: 'Réparation PDF, Métadonnées & Archiveur PDF/A',
+      description:
+        'Réparez les tables XRef corrompues, linéarisez, purgez XMP/Info, supprimez le JS caché et archivez en PDF/A-2b localement.',
+      uploadTitle: 'Importer un Document PDF',
+      loadSample: 'Charger un Exemple PDF Corrompu',
+      modeTitle: 'Modes Réparation, Métadonnées & Archive',
+      tabRepair: 'Réparer & Linéariser',
+      tabMetadata: 'Métadonnées & Purge',
+      tabPdfa: 'Archiveur PDF/A-2b',
+      repairBtn: 'Réparer & Linéariser',
+      scrubBtn: 'Purger Toutes les Métadonnées',
+      applyMetaBtn: 'Enregistrer les Métadonnées',
+      pdfaBtn: 'Générer PDF/A-2b',
+      outputTitle: 'Diagnostic & Export',
+      downloadBtn: 'Télécharger .pdf',
+      resetBtn: 'Réinitialiser',
+    },
   },
 };

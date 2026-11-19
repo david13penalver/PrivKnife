@@ -793,5 +793,23 @@ export const zh: TranslationSchema = {
       downloadPdfBtn: '下载 .pdf',
       resetBtn: '重置',
     },
+    pdfRepairMetadata: {
+      name: 'PDF 结构修复、元数据清理与 PDF/A 归档',
+      description:
+        '本地使用 QPDF WASM 修复损坏的 XRef、线性化、清理隐藏 XMP 元数据与脚本动作，并打包合规 PDF/A-2b 文档。',
+      uploadTitle: '上传 PDF 文档',
+      loadSample: '加载损坏示例 PDF',
+      modeTitle: '修复、元数据与归档模式',
+      tabRepair: '修复与线性化',
+      tabMetadata: '元数据与脱敏',
+      tabPdfa: 'PDF/A-2b 归档',
+      repairBtn: '修复并线性化 PDF',
+      scrubBtn: '一键清除全部隐藏元数据',
+      applyMetaBtn: '保存更新后的元数据',
+      pdfaBtn: '打包 PDF/A-2b',
+      outputTitle: '健康检查与导出结果',
+      downloadBtn: '下载 .pdf',
+      resetBtn: '重置',
+    },
   },
 };

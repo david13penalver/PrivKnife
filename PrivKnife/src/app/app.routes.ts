@@ -277,6 +277,23 @@ export const routes: Routes = [
       ),
   },
   {
+    path: 'tools/pdf-repair-metadata',
+    title: 'PDF Structural Repair, Metadata Editor & PDF/A Archiver - PrivKnife',
+    data: {
+      seo: {
+        title: 'Repair Corrupted PDF, Scrub Metadata & Package PDF/A-2b | PrivKnife',
+        description:
+          'Repair broken PDF XRefs, linearize for Fast Web View, strip JavaScript triggers, scrub hidden metadata/XMP, and package PDF/A-2b archives locally.',
+        keywords:
+          'repair corrupted pdf, pdf to pdfa, scrub pdf metadata, remove pdf xmp, linearize pdf offline, qpdf wasm',
+      },
+    },
+    loadComponent: () =>
+      import('./tools/documents/pdf-repair-metadata/pdf-repair-metadata.component').then(
+        (m) => m.PdfRepairMetadataComponent
+      ),
+  },
+  {
     path: 'tools/pdf-merger-splitter',
     title: 'PDF Merger, Splitter & Page Organizer — PrivKnife',
     data: {

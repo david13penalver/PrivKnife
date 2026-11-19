@@ -793,5 +793,23 @@ export const de: TranslationSchema = {
       downloadPdfBtn: '.pdf Laden',
       resetBtn: 'Zurücksetzen',
     },
+    pdfRepairMetadata: {
+      name: 'PDF-Reparatur, Metadaten & PDF/A-Archivierung',
+      description:
+        'Repariert defekte PDF-XRefs, linearisiert, bereinigt XMP/Info-Metadaten, entfernt JS-Aktionen und erzeugt PDF/A-2b lokal.',
+      uploadTitle: 'PDF-Dokument Hochladen',
+      loadSample: 'Defektes Test-PDF Laden',
+      modeTitle: 'Reparatur-, Metadaten- & PDF/A-Modi',
+      tabRepair: 'Reparieren & Linearisieren',
+      tabMetadata: 'Metadaten & Bereinigung',
+      tabPdfa: 'PDF/A-2b Archiv',
+      repairBtn: 'PDF Reparieren & Linearisieren',
+      scrubBtn: 'Alle Versteckten Metadaten Löschen',
+      applyMetaBtn: 'Metadaten Speichern',
+      pdfaBtn: 'PDF/A-2b Erstellen',
+      outputTitle: 'Strukturprüfung & Ergebnis',
+      downloadBtn: '.pdf Laden',
+      resetBtn: 'Zurücksetzen',
+    },
   },
 };

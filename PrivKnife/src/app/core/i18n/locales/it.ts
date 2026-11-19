@@ -793,5 +793,23 @@ export const it: TranslationSchema = {
       downloadPdfBtn: 'Scarica .pdf',
       resetBtn: 'Ripristina',
     },
+    pdfRepairMetadata: {
+      name: 'Riparazione PDF, Metadati e Archivio PDF/A',
+      description:
+        'Ripara XRef danneggiati, linearizza per il web, rimuovi metadati XMP e JavaScript nascosti e crea PDF/A-2b nel browser.',
+      uploadTitle: 'Carica Documento PDF',
+      loadSample: 'Carica PDF di Prova Danneggiato',
+      modeTitle: 'Modalità Riparazione, Metadati e PDF/A',
+      tabRepair: 'Ripara e Linearizza',
+      tabMetadata: 'Metadati e Pulizia',
+      tabPdfa: 'Archivio PDF/A-2b',
+      repairBtn: 'Ripara e Linearizza PDF',
+      scrubBtn: 'Cancella Tutti i Metadati Nascosti',
+      applyMetaBtn: 'Salva Metadati Aggiornati',
+      pdfaBtn: 'Crea PDF/A-2b',
+      outputTitle: 'Diagnostica e Output',
+      downloadBtn: 'Scarica .pdf',
+      resetBtn: 'Ripristina',
+    },
   },
 };

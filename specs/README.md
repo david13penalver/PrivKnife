@@ -224,7 +224,7 @@ gantt
 | **110** | [110 - PDF to Excel, CSV & JSON Table Extractor](110%20-%20PDF%20to%20Excel%2C%20CSV%20%26%20JSON%20Table%20Extractor/spec.md) | Documents / PDF | Multi-sheet `.xlsx`, RFC-4180 `.csv`, `.json`, and clipboard TSV | `pdfjs-dist`, spatial X/Y clustering in Web Worker, `xlsx`, `PapaParse` | [x] |
 | **111** | [111 - PDF to Word (DOCX) & Markdown Layout Converter](111%20-%20PDF%20to%20Word%20%28DOCX%29%20%26%20Markdown%20Layout%20Converter/spec.md) | Documents / PDF | Editable OOXML `.docx`, GFM `.md`, and `.txt` | `pdfjs-dist`, Pure-TS OOXML + `JSZip`, `DOMPurify`, Web Workers | [x] |
 | **112** | [112 - Office & HTML to PDF Local Converter](112%20-%20Office%20%26%20HTML%20to%20PDF%20Local%20Converter/spec.md) | Documents / PDF | Searchable print-ready `.pdf` from `.docx`, `.xlsx`, `.csv`, `.html`, `.md` | `JSZip`, `xlsx`, `marked`, `DOMPurify` (zero-network sandbox), `jsPDF` | [x] |
-| **113** | [113 - PDF Structural Repair, Metadata Editor & PDF-A Archiver](113%20-%20PDF%20Structural%20Repair%2C%20Metadata%20Editor%20%26%20PDF-A%20Archiver/spec.md) | Documents / PDF | Repaired/linearized `.pdf`, metadata-scrubbed `.pdf`, and PDF/A-2b archival `.pdf` | Self-hosted `qpdf-wasm`, `pdf-lib`, `pdfjs-dist`, bundled sRGB ICC | [ ] |
+| **113** | [113 - PDF Structural Repair, Metadata Editor & PDF-A Archiver](113%20-%20PDF%20Structural%20Repair%2C%20Metadata%20Editor%20%26%20PDF-A%20Archiver/spec.md) | Documents / PDF | Repaired/linearized `.pdf`, metadata-scrubbed `.pdf`, and PDF/A-2b archival `.pdf` | Self-hosted `qpdf-wasm`, `pdf-lib`, `pdfjs-dist`, bundled sRGB ICC | [x] |
 
 #### 💻 Batch 3B — Client-Side Developer Suite (Specs 114–122)
 

@@ -793,5 +793,23 @@ export const ar: TranslationSchema = {
       downloadPdfBtn: 'تنزيل .pdf',
       resetBtn: 'إعادة ضبط',
     },
+    pdfRepairMetadata: {
+      name: 'إصلاح PDF والبيانات الوصفية وأرشفة PDF/A',
+      description:
+        'إصلاح جدول XRef المعطوب وتنظيف بيانات XMP المخفية وإزالة JavaScript وإنشاء PDF/A-2b محلياً بالكامل.',
+      uploadTitle: 'رفع مستند PDF',
+      loadSample: 'تحميل نموذج PDF تالف',
+      modeTitle: 'أوضاع الإصلاح والبيانات والأرشفة',
+      tabRepair: 'إصلاح وتحسين الويب',
+      tabMetadata: 'البيانات الوصفية والمسح',
+      tabPdfa: 'أرشفة PDF/A-2b',
+      repairBtn: 'إصلاح وتحسين PDF',
+      scrubBtn: 'مسح جميع البيانات المخفية',
+      applyMetaBtn: 'حفظ البيانات المحدثة',
+      pdfaBtn: 'إنشاء PDF/A-2b',
+      outputTitle: 'الفحص والمخرجات',
+      downloadBtn: 'تنزيل .pdf',
+      resetBtn: 'إعادة ضبط',
+    },
   },
 };
