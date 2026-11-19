@@ -717,5 +717,20 @@ export const ar: TranslationSchema = {
       downloadBtn: 'تنزيل الملف الناتج',
       resetBtn: 'إعادة ضبط',
     },
+    pdfFormStudio: {
+      name: 'محرر ومُعبئ ومُثبت نماذج PDF التفاعلية',
+      description:
+        'تعبئة نماذج AcroForm أو إضافة حقول تفاعلية جديدة لملفات PDF العادية وتثبيت الإجابات محليًا بأمان تام.',
+      modeFill: 'تعبئة الحقول',
+      modeCreate: 'إنشاء حقول جديدة',
+      uploadTitle: 'رفع نموذج PDF',
+      loadSample: 'تحميل نموذج تجريبي',
+      fieldsTitle: 'فاحص حقول النموذج',
+      exportTitle: 'خيارات التصدير والتثبيت',
+      compileBtn: 'تصدير نموذج PDF',
+      downloadBtn: 'تنزيل النموذج الناتج',
+      importJsonBtn: 'استيراد بيانات JSON',
+      resetBtn: 'مسح البيانات وإعادة الضبط',
+    },
   },
 };

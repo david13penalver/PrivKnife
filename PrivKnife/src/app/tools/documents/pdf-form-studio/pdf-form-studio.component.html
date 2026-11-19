@@ -1,0 +1,341 @@
+<div class="l-page">
+  <header class="l-page__header c-header">
+    <div class="c-header__title-group">
+      <h1 class="c-header__title">{{ 'tools.pdfFormStudio.name' | translate }}</h1>
+      <p class="c-header__subtitle">{{ 'tools.pdfFormStudio.description' | translate }}</p>
+    </div>
+    <div class="c-badge c-badge--privacy">
+      {{ 'common.privacyBadge' | translate }}
+    </div>
+  </header>
+
+  <div class="c-pdf-form-studio__tabs g--margin-bottom-4" role="tablist">
+    <button
+      type="button"
+      role="tab"
+      class="c-button"
+      [class.c-button--primary]="mode() === 'fill'"
+      [class.c-button--outline]="mode() !== 'fill'"
+      [attr.aria-selected]="mode() === 'fill'"
+      (click)="setMode('fill')"
+    >
+      {{ 'tools.pdfFormStudio.modeFill' | translate }}
+    </button>
+    <button
+      type="button"
+      role="tab"
+      class="c-button"
+      [class.c-button--primary]="mode() === 'create'"
+      [class.c-button--outline]="mode() !== 'create'"
+      [attr.aria-selected]="mode() === 'create'"
+      (click)="setMode('create')"
+    >
+      {{ 'tools.pdfFormStudio.modeCreate' | translate }}
+    </button>
+  </div>
+
+  @if (errorMessage()) {
+    <div class="c-pdf-form-studio__alert c-pdf-form-studio__alert--error g--margin-bottom-4" role="alert" aria-live="polite">
+      {{ errorMessage() }}
+    </div>
+  }
+
+  @if (hasXfa()) {
+    <div class="c-pdf-form-studio__alert c-pdf-form-studio__alert--warn g--margin-bottom-4">
+      Notice: This PDF contains legacy Adobe XFA form data. Print it to static PDF first for full interactive compatibility.
+    </div>
+  }
+
+  @if (largeFileWarning()) {
+    <div class="c-pdf-form-studio__alert c-pdf-form-studio__alert--warn g--margin-bottom-4">
+      Large file (&gt;100 MB) loaded. All form PII remains strictly in ephemeral browser memory.
+    </div>
+  }
+
+  <div class="l-columns l-columns--2">
+    <div class="l-columns__area">
+      <app-card [title]="'tools.pdfFormStudio.uploadTitle' | translate" class="g--margin-bottom-4">
+        <app-dropzone
+          [title]="'tools.pdfFormStudio.uploadTitle' | translate"
+          subtitle="Drop any AcroForm or flat PDF (zero PII leaves your device)"
+          accept=".pdf,application/pdf"
+          [multiple]="false"
+          [maxSizeMb]="250"
+          (filesSelected)="onFileDropped($event)"
+        />
+        <div class="c-pdf-form-studio__row g--margin-top-3">
+          <button
+            type="button"
+            class="c-button c-button--small c-button--outline"
+            (click)="loadSampleFormPdf()"
+          >
+            {{ 'tools.pdfFormStudio.loadSample' | translate }}
+          </button>
+          @if (pdfBytes()) {
+            <span class="c-pdf-form-studio__meta">
+              {{ pdfFileName() }} ({{ formattedInputSize() }} • {{ pageCount() }} pages)
+            </span>
+          }
+        </div>
+      </app-card>
+
+      <app-card [title]="'tools.pdfFormStudio.fieldsTitle' | translate" class="g--margin-bottom-4">
+        @if (fields().length > 0) {
+          <div class="c-pdf-form-studio__row g--margin-bottom-3">
+            <input
+              type="search"
+              class="c-input__control c-pdf-form-studio__search"
+              [ngModel]="searchQuery()"
+              (ngModelChange)="searchQuery.set($event)"
+              placeholder="Search fields by name..."
+              aria-label="Filter form fields"
+            />
+            <span class="c-pdf-form-studio__meta">
+              {{ filledCount() }} / {{ fields().length }} filled
+            </span>
+          </div>
+        }
+
+        @if (mode() === 'create' && pdfBytes()) {
+          <div class="c-pdf-form-studio__create-bar g--margin-bottom-3">
+            <label class="c-input__label" for="create-kind">New Field Type</label>
+            <div class="c-pdf-form-studio__row">
+              <select
+                id="create-kind"
+                class="c-input__control"
+                [ngModel]="activeCreateKind()"
+                (ngModelChange)="activeCreateKind.set($event)"
+              >
+                <option value="text">Text Field</option>
+                <option value="textarea">Multiline Notes</option>
+                <option value="checkbox">Checkbox</option>
+                <option value="dropdown">Dropdown List</option>
+                <option value="radio">Radio Group</option>
+              </select>
+              <button
+                type="button"
+                class="c-button c-button--small c-button--outline"
+                (click)="addFieldAt(activeCreateKind(), currentPage() - 1, 64, 640)"
+              >
+                + Add to Page {{ currentPage() }}
+              </button>
+            </div>
+          </div>
+        }
+
+        <div class="c-pdf-form-studio__field-list">
+          @for (field of filteredFields(); track field.id) {
+            <div class="c-pdf-form-studio__field-item">
+              <div class="c-pdf-form-studio__field-head">
+                @if (field.isNew) {
+                  <input
+                    type="text"
+                    class="c-input__control c-pdf-form-studio__name-input"
+                    [ngModel]="field.name"
+                    (ngModelChange)="updateFieldName(field.id, $event)"
+                    aria-label="Custom field name"
+                  />
+                  <button
+                    type="button"
+                    class="c-button c-button--small c-button--outline"
+                    (click)="removeNewField(field.id)"
+                  >
+                    Remove
+                  </button>
+                } @else {
+                  <strong>{{ field.name }}</strong>
+                  <span class="c-pdf-form-studio__meta">
+                    {{ field.kind }}@if (field.readOnly) { (Read-only) }
+                  </span>
+                }
+              </div>
+
+              @if (field.kind === 'checkbox') {
+                <label class="c-pdf-form-studio__check">
+                  <input
+                    type="checkbox"
+                    [disabled]="field.readOnly"
+                    [ngModel]="field.value === true || field.value === 'true'"
+                    (ngModelChange)="updateFieldValue(field.id, $event)"
+                  />
+                  Checked
+                </label>
+              } @else if (field.kind === 'dropdown' || field.kind === 'radio') {
+                <select
+                  class="c-input__control"
+                  [disabled]="field.readOnly"
+                  [ngModel]="field.value"
+                  (ngModelChange)="updateFieldValue(field.id, $event)"
+                >
+                  <option value="">-- Select --</option>
+                  @for (opt of field.options ?? []; track opt) {
+                    <option [value]="opt">{{ opt }}</option>
+                  }
+                </select>
+              } @else if (field.kind === 'textarea') {
+                <textarea
+                  rows="3"
+                  class="c-input__control"
+                  [disabled]="field.readOnly"
+                  [ngModel]="field.value"
+                  (ngModelChange)="updateFieldValue(field.id, $event)"
+                ></textarea>
+              } @else {
+                <input
+                  type="text"
+                  class="c-input__control"
+                  [disabled]="field.readOnly"
+                  [maxlength]="field.maxLength ?? null"
+                  [ngModel]="field.value"
+                  (ngModelChange)="updateFieldValue(field.id, $event)"
+                />
+              }
+            </div>
+          } @empty {
+            <p class="c-pdf-form-studio__meta">
+              Upload a PDF form to inspect editable fields, or switch to Create Fields mode to add fillable controls to any flat PDF.
+            </p>
+          }
+        </div>
+      </app-card>
+    </div>
+
+    <div class="l-columns__area">
+      @if (pdfBytes()) {
+        <app-card title="Page Viewer" class="g--margin-bottom-4">
+          <div class="c-pdf-form-studio__row g--margin-bottom-3">
+            <button
+              type="button"
+              class="c-button c-button--small c-button--outline"
+              [disabled]="currentPage() <= 1"
+              (click)="selectPage(currentPage() - 1)"
+            >
+              Prev
+            </button>
+            <span class="c-pdf-form-studio__meta">
+              Page {{ currentPage() }} / {{ pageCount() }}
+            </span>
+            <button
+              type="button"
+              class="c-button c-button--small c-button--outline"
+              [disabled]="currentPage() >= pageCount()"
+              (click)="selectPage(currentPage() + 1)"
+            >
+              Next
+            </button>
+          </div>
+
+          <div class="c-pdf-form-studio__stage" (click)="onStageClick($event)">
+            <canvas #pageCanvas class="c-pdf-form-studio__canvas"></canvas>
+            @if (previewAvailable()) {
+              @for (item of currentPageOverlays(); track item.field.id + '-' + item.placementIndex) {
+                <div
+                  class="c-pdf-form-studio__overlay"
+                  [style.left.%]="item.xPct"
+                  [style.top.%]="item.yPct"
+                  [style.width.%]="item.wPct"
+                  [style.height.%]="item.hPct"
+                  [title]="item.field.name"
+                ></div>
+              }
+            }
+          </div>
+        </app-card>
+      }
+
+      <app-card [title]="'tools.pdfFormStudio.exportTitle' | translate" class="g--margin-bottom-4">
+        <div class="c-input g--margin-bottom-3">
+          <label class="c-input__label" for="form-font">Field Appearance Font</label>
+          <select
+            id="form-font"
+            class="c-input__control"
+            [ngModel]="fontFamily()"
+            (ngModelChange)="fontFamily.set($event)"
+          >
+            <option value="helvetica">Helvetica</option>
+            <option value="times">Times Roman</option>
+            <option value="courier">Courier</option>
+          </select>
+        </div>
+
+        <label class="c-pdf-form-studio__check g--margin-bottom-3">
+          <input
+            type="checkbox"
+            [ngModel]="flattenOutput()"
+            (ngModelChange)="flattenOutput.set($event)"
+          />
+          Flatten Form Fields (Burn into static non-editable PDF text)
+        </label>
+
+        <div class="c-pdf-form-studio__row g--margin-bottom-4">
+          <button
+            type="button"
+            class="c-button c-button--small c-button--outline"
+            [disabled]="fields().length === 0"
+            (click)="downloadJsonSnapshot()"
+          >
+            Export JSON Template
+          </button>
+          <label class="c-button c-button--small c-button--outline c-pdf-form-studio__file-btn">
+            {{ 'tools.pdfFormStudio.importJsonBtn' | translate }}
+            <input
+              type="file"
+              accept=".json,application/json"
+              hidden
+              (change)="onSnapshotFileSelected($event)"
+            />
+          </label>
+        </div>
+
+        <div class="c-pdf-form-studio__actions">
+          <button
+            type="button"
+            class="c-button c-button--primary"
+            [disabled]="!canCompile()"
+            (click)="compileDocument()"
+          >
+            {{ 'tools.pdfFormStudio.compileBtn' | translate }}
+          </button>
+          <button type="button" class="c-button c-button--outline" (click)="reset()">
+            {{ 'tools.pdfFormStudio.resetBtn' | translate }}
+          </button>
+        </div>
+      </app-card>
+
+      @if (warningMessages().length > 0) {
+        <div class="c-pdf-form-studio__alert c-pdf-form-studio__alert--warn g--margin-bottom-4">
+          @for (w of warningMessages(); track $index) {
+            <div>{{ w }}</div>
+          }
+        </div>
+      }
+
+      @if (isProcessing()) {
+        <app-card class="g--margin-bottom-4">
+          <app-progress-bar
+            [value]="progressPercent()"
+            [label]="progressStage()"
+          />
+        </app-card>
+      }
+
+      @if (lastResult(); as res) {
+        @if (res.success) {
+          <app-card title="Output Ready">
+            <p class="c-pdf-form-studio__meta g--margin-bottom-3">
+              {{ res.fileName }} ({{ formattedOutputSize() }}) •
+              {{ res.flattened ? 'Flattened / Locked' : 'Editable AcroForm' }}
+            </p>
+            <button
+              type="button"
+              class="c-button c-button--primary"
+              (click)="downloadResult()"
+            >
+              {{ 'tools.pdfFormStudio.downloadBtn' | translate }}
+            </button>
+          </app-card>
+        }
+      }
+    </div>
+  </div>
+</div>

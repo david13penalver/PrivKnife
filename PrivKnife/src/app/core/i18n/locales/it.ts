@@ -717,5 +717,20 @@ export const it: TranslationSchema = {
       downloadBtn: 'Scarica PDF Risultante',
       resetBtn: 'Ripristina',
     },
+    pdfFormStudio: {
+      name: 'Compilatore, Creatore e Appiattitore Moduli PDF',
+      description:
+        'Compila moduli AcroForm esistenti, aggiungi campi interattivi su PDF statici o appiattisci i dati offline nel browser.',
+      modeFill: 'Compila Campi',
+      modeCreate: 'Crea Campi',
+      uploadTitle: 'Carica Modulo PDF',
+      loadSample: 'Carica Modulo di Esempio',
+      fieldsTitle: 'Elenco Campi Modulo',
+      exportTitle: 'Opzioni di Esportazione',
+      compileBtn: 'Genera PDF Compilato',
+      downloadBtn: 'Scarica PDF Risultante',
+      importJsonBtn: 'Importa JSON',
+      resetBtn: 'Cancella Dati e Ripristina',
+    },
   },
 };

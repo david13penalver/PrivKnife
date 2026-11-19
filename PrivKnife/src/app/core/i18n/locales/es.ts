@@ -717,5 +717,20 @@ export const es: TranslationSchema = {
       downloadBtn: 'Descargar PDF Resultante',
       resetBtn: 'Restablecer',
     },
+    pdfFormStudio: {
+      name: 'Rellenador, Creador y Aplanador de Formularios PDF',
+      description:
+        'Rellena formularios AcroForm, crea nuevos campos interactivos sobre PDFs planos o aplana respuestas localmente sin exponer datos privados.',
+      modeFill: 'Rellenar Campos',
+      modeCreate: 'Crear Campos',
+      uploadTitle: 'Subir Formulario PDF',
+      loadSample: 'Cargar Formulario de Ejemplo',
+      fieldsTitle: 'Inspector de Campos',
+      exportTitle: 'Opciones de Exportación y Aplanado',
+      compileBtn: 'Generar PDF del Formulario',
+      downloadBtn: 'Descargar PDF Resultante',
+      importJsonBtn: 'Importar JSON',
+      resetBtn: 'Borrar Datos y Reiniciar',
+    },
   },
 };

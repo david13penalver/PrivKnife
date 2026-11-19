@@ -717,5 +717,20 @@ export const fr: TranslationSchema = {
       downloadBtn: 'Télécharger le PDF',
       resetBtn: 'Réinitialiser',
     },
+    pdfFormStudio: {
+      name: 'Éditeur, Remplisseur et Aplatisseur de Formulaires PDF',
+      description:
+        'Remplissez des formulaires AcroForm, ajoutez des champs interactifs sur des PDF plats ou aplatissez vos données hors ligne.',
+      modeFill: 'Remplir les Champs',
+      modeCreate: 'Créer des Champs',
+      uploadTitle: 'Importer un Formulaire PDF',
+      loadSample: 'Charger un Exemple',
+      fieldsTitle: 'Liste des Champs',
+      exportTitle: 'Options d’Exportation',
+      compileBtn: 'Générer le Formulaire PDF',
+      downloadBtn: 'Télécharger le PDF',
+      importJsonBtn: 'Importer un JSON',
+      resetBtn: 'Effacer & Réinitialiser',
+    },
   },
 };

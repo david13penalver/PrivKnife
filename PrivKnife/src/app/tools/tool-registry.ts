@@ -42,6 +42,7 @@ import { pdfCompressorTool } from './documents/pdf-compressor';
 import { pdfImageConverterTool } from './documents/pdf-image-converter';
 import { pdfPasswordSecurityTool } from './documents/pdf-password-security';
 import { pdfCropperBookletTool } from './documents/pdf-cropper-booklet';
+import { pdfFormStudioTool } from './documents/pdf-form-studio';
 import { pdfMergerTool } from './documents/pdf-merger';
 import { pdfSignerStamperTool } from './documents/pdf-signer-stamper';
 import { pdfWatermarkNumberingTool } from './documents/pdf-watermark-numbering';
@@ -127,6 +128,7 @@ export const TOOL_REGISTRY: ToolDefinition[] = [
   pdfImageConverterTool,
   pdfPasswordSecurityTool,
   pdfCropperBookletTool,
+  pdfFormStudioTool,
 ];
 
 export function getToolById(id: string): ToolDefinition | undefined {
@@ -256,6 +258,7 @@ export const TOOL_I18N_MAP: Record<string, string> = {
   'pdf-image-converter': 'pdfImageConverter',
   'pdf-password-security': 'pdfPasswordSecurity',
   'pdf-cropper-booklet': 'pdfCropperBooklet',
+  'pdf-form-studio': 'pdfFormStudio',
 };
 
 export function getToolI18nKey(id: string): string | undefined {

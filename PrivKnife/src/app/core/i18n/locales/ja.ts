@@ -717,5 +717,20 @@ export const ja: TranslationSchema = {
       downloadBtn: '変換済み PDF を保存',
       resetBtn: 'リセット',
     },
+    pdfFormStudio: {
+      name: '対話型 PDF フォーム入力・作成＆フラット化ツール',
+      description:
+        '既存の AcroForm 入力、静的 PDF への入力欄追加、または回答の完全フラット化をローカルのみで実行します。',
+      modeFill: 'フォームに入力',
+      modeCreate: '入力欄を作成',
+      uploadTitle: 'PDF フォームを読込',
+      loadSample: 'サンプルフォーム読込',
+      fieldsTitle: 'フォーム項目一覧',
+      exportTitle: '出力・ロック設定',
+      compileBtn: 'フォーム PDF を生成',
+      downloadBtn: 'フォーム PDF を保存',
+      importJsonBtn: 'JSON を読み込む',
+      resetBtn: '入力消去＆リセット',
+    },
   },
 };

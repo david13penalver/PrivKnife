@@ -132,6 +132,20 @@ const CATALOG_TOOLS: CatalogTool[] = [
     icon: '✂️',
   },
   {
+    id: 'pdf-form-studio',
+    i18nKey: 'pdfFormStudio',
+    name: 'Interactive PDF Form Filler, Creator & Flattener',
+    category: 'documents',
+    categoryLabel: 'Documents',
+    description:
+      'Fill AcroForm PDFs, add interactive fields to flat PDFs, or flatten completed forms locally with zero PII upload.',
+    keywords: ['fill pdf form', 'acroform', 'flatten pdf', 'fillable pdf'],
+    status: 'ready',
+    route: '/tools/pdf-form-studio',
+    techStack: 'pdf-lib AcroForm • PDF.js • Signals',
+    icon: '📝',
+  },
+  {
     id: 'pdf-merger-splitter',
     i18nKey: 'pdfMerger',
     name: 'PDF Merger, Splitter & Page Organizer',

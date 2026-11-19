@@ -276,6 +276,12 @@
     "source": "PrivKnife/src/app/tools/documents/pdf-cropper-booklet"
   },
   {
+    "id": "pdf-form-studio",
+    "route": "/tools/pdf-form-studio",
+    "category": "documents",
+    "source": "PrivKnife/src/app/tools/documents/pdf-form-studio"
+  },
+  {
     "id": "pdf-merger",
     "route": "/tools/pdf-merger-splitter",
     "category": "documents",

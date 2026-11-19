@@ -715,6 +715,21 @@ export const en = {
       downloadBtn: 'Download Processed PDF',
       resetBtn: 'Reset',
     },
+    pdfFormStudio: {
+      name: 'Interactive PDF Form Filler, Creator & Flattener',
+      description:
+        'Fill AcroForm PDFs, place new interactive form fields on flat PDFs, or permanently flatten completed forms with zero PII leaving your device.',
+      modeFill: 'Fill Existing Fields',
+      modeCreate: 'Create Fillable Fields',
+      uploadTitle: 'Upload PDF Form',
+      loadSample: 'Load Sample Form PDF',
+      fieldsTitle: 'Form Fields Inspector',
+      exportTitle: 'Export & Security Options',
+      compileBtn: 'Compile & Lock Form PDF',
+      downloadBtn: 'Download Form PDF',
+      importJsonBtn: 'Import JSON Snapshot',
+      resetBtn: 'Clear PII & Reset',
+    },
   },
 };
 

@@ -717,5 +717,20 @@ export const de: TranslationSchema = {
       downloadBtn: 'PDF Herunterladen',
       resetBtn: 'Zurücksetzen',
     },
+    pdfFormStudio: {
+      name: 'PDF-Formular-Ausfüller, Creator & Flattener',
+      description:
+        'Bestehende AcroForm-PDFs ausfüllen, neue Formularfelder auf flachen PDFs platzieren oder Felder lokal dauerhaft einbetten.',
+      modeFill: 'Felder Ausfüllen',
+      modeCreate: 'Felder Erstellen',
+      uploadTitle: 'PDF-Formular hochladen',
+      loadSample: 'Beispielformular laden',
+      fieldsTitle: 'Formularfelder-Liste',
+      exportTitle: 'Export-Optionen',
+      compileBtn: 'PDF-Formular Erzeugen',
+      downloadBtn: 'PDF Herunterladen',
+      importJsonBtn: 'JSON Importieren',
+      resetBtn: 'Daten Löschen & Reset',
+    },
   },
 };

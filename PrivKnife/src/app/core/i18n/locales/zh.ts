@@ -717,5 +717,20 @@ export const zh: TranslationSchema = {
       downloadBtn: '下载结果 PDF',
       resetBtn: '重置',
     },
+    pdfFormStudio: {
+      name: '交互式 PDF 表单填写、创建与栅格固化器',
+      description:
+        '本地填写现有 AcroForm 表单、为静态 PDF 添加可填写表单域，或一键固化锁定内容防止修改，隐私零上传。',
+      modeFill: '填写现有表单',
+      modeCreate: '添加可填字段',
+      uploadTitle: '上传 PDF 表单',
+      loadSample: '加载示例表单',
+      fieldsTitle: '表单字段检查器',
+      exportTitle: '导出与固化设置',
+      compileBtn: '生成并保存表单 PDF',
+      downloadBtn: '下载结果 PDF',
+      importJsonBtn: '导入 JSON 填表快照',
+      resetBtn: '清空隐私数据并重置',
+    },
   },
 };

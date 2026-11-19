@@ -183,6 +183,26 @@ export const routes: Routes = [
       ),
   },
   {
+    path: 'tools/pdf-form-studio',
+    title: 'Interactive PDF Form Filler, Creator & Flattener — PrivKnife',
+    data: {
+      description:
+        'Fill AcroForm PDFs, place new interactive form fields on flat PDFs, or permanently flatten completed forms 100% locally in your browser.',
+      keywords: [
+        'fill pdf form',
+        'create fillable pdf',
+        'flatten pdf form',
+        'acroform editor',
+        'pdf form studio',
+      ],
+      url: '/tools/pdf-form-studio',
+    },
+    loadComponent: () =>
+      import('./tools/documents/pdf-form-studio/pdf-form-studio.component').then(
+        (m) => m.PdfFormStudioComponent
+      ),
+  },
+  {
     path: 'tools/pdf-merger-splitter',
     title: 'PDF Merger, Splitter & Page Organizer — PrivKnife',
     data: {
