@@ -210,6 +210,12 @@
     "source": "PrivKnife/src/app/tools/dev/json-sql-formatter"
   },
   {
+    "id": "jwt-debugger-studio",
+    "route": "/tools/jwt-debugger-studio",
+    "category": "dev",
+    "source": "PrivKnife/src/app/tools/dev/jwt-debugger-studio"
+  },
+  {
     "id": "keycap-switch-tester-maker",
     "route": "/tools/keycap-switch-tester-maker",
     "category": "3d",

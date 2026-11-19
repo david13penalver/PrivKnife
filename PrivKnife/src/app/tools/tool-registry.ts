@@ -29,6 +29,7 @@ import { dnsCheckerTool } from './dev/dns-checker';
 import { fontSubsetterConverterTool } from './dev/font-subsetter-converter';
 import { jsonSqlFormatterTool } from './dev/json-sql-formatter';
 import { regexTesterDebuggerTool } from './dev/regex-tester-debugger';
+import { jwtDebuggerStudioTool } from './dev/jwt-debugger-studio';
 import { emailSignatureGeneratorTool } from './dev/email-signature-generator';
 import { cssMeshGradientMakerTool } from './dev/mesh-gradient-maker';
 import { robotsSitemapBuilderTool } from './dev/robots-sitemap-builder';
@@ -143,6 +144,7 @@ export const TOOL_REGISTRY: ToolDefinition[] = [
   pdfRepairMetadataTool,
   jsonSqlFormatterTool,
   regexTesterDebuggerTool,
+  jwtDebuggerStudioTool,
 ];
 
 export function getToolById(id: string): ToolDefinition | undefined {
@@ -280,6 +282,7 @@ export const TOOL_I18N_MAP: Record<string, string> = {
   'pdf-repair-metadata': 'pdfRepairMetadata',
   'json-sql-formatter': 'jsonSqlFormatter',
   'regex-tester-debugger': 'regexTesterDebugger',
+  'jwt-debugger-studio': 'jwtDebuggerStudio',
 };
 
 export function getToolI18nKey(id: string): string | undefined {

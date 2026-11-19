@@ -2141,6 +2141,13 @@ export const routes: Routes = [
       ),
   },
   {
+    path: 'tools/jwt-debugger-studio',
+    loadComponent: () =>
+      import('./tools/dev/jwt-debugger-studio/jwt-debugger-studio.component').then(
+        (m) => m.JwtDebuggerStudioComponent
+      ),
+  },
+  {
     path: '**',
     title: 'Page Not Found — PrivKnife',
     data: {

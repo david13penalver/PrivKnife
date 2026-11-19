@@ -958,6 +958,20 @@ const CATALOG_TOOLS: CatalogTool[] = [
     techStack: 'Watchdog Worker (ReDoS-Safe) • Pure TS Regex AST • 5-Lang Codegen',
     icon: '.*',
   },
+  {
+    id: 'jwt-debugger-studio',
+    i18nKey: 'jwtDebuggerStudio',
+    name: 'JWT Debugger, Signature Verifier & Token Minting Studio',
+    category: 'dev',
+    categoryLabel: 'Dev / Security',
+    description:
+      'Decode, inspect RFC 7519 claims, verify HS256/RS256/PS256/ES256 signatures, and mint local dev JWTs using Web Crypto.',
+    keywords: ['jwt decoder', 'jwt verifier', 'hs256', 'rs256', 'es256', 'jwk', 'pem'],
+    status: 'ready',
+    route: '/tools/jwt-debugger-studio',
+    techStack: 'Native Web Crypto • Pure TS Base64Url & PEM/JWK',
+    icon: '🔑',
+  },
 ];
 
 @Component({

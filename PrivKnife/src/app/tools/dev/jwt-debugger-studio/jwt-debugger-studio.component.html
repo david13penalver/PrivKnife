@@ -1,0 +1,253 @@
+<div class="l-page c-jwt-studio">
+  <header class="l-page__header c-header">
+    <div class="c-header__title-group">
+      <h1 class="c-header__title">{{ 'tools.jwtDebuggerStudio.name' | translate }}</h1>
+      <p class="c-header__subtitle">{{ 'tools.jwtDebuggerStudio.description' | translate }}</p>
+    </div>
+    <app-badge variant="privacy" [dot]="true">
+      {{ 'common.privacyBadge' | translate }}
+    </app-badge>
+  </header>
+
+  <section class="c-jwt-studio__toolbar g--margin-bottom-4">
+    <div class="c-jwt-studio__presets" role="group" aria-label="Sample JWT presets">
+      <span class="c-jwt-studio__label">{{ 'tools.jwtDebuggerStudio.presetsLabel' | translate }}</span>
+      @for (preset of demoPresets; track preset.id) {
+        <app-button variant="outline" size="small" (clicked)="loadPreset(preset.id)">
+          {{ preset.labelKey | translate }}
+        </app-button>
+      }
+    </div>
+
+    <div class="c-jwt-studio__actions">
+      <app-button variant="outline" size="small" (clicked)="copyToken()" [disabled]="!decodedResult().normalizedToken">
+        {{ 'tools.jwtDebuggerStudio.copyTokenBtn' | translate }}
+      </app-button>
+      <app-button variant="outline" size="small" (clicked)="copyBearerHeader()" [disabled]="!decodedResult().normalizedToken">
+        {{ 'tools.jwtDebuggerStudio.copyBearerBtn' | translate }}
+      </app-button>
+      <app-button variant="outline" size="small" (clicked)="copyCurlSnippet()" [disabled]="!decodedResult().normalizedToken">
+        {{ 'tools.jwtDebuggerStudio.copyCurlBtn' | translate }}
+      </app-button>
+      <app-button variant="outline" size="small" (clicked)="downloadDecodedJson()" [disabled]="!decodedResult().validStructure">
+        {{ 'tools.jwtDebuggerStudio.downloadJsonBtn' | translate }}
+      </app-button>
+      <app-button variant="danger" size="small" (clicked)="clearAllSecrets()">
+        {{ 'tools.jwtDebuggerStudio.clearSecretsBtn' | translate }}
+      </app-button>
+    </div>
+  </section>
+
+  @if (copyFeedback(); as copied) {
+    <p class="c-jwt-studio__feedback g--margin-bottom-3" role="status">
+      Copied {{ copied }} to clipboard.
+    </p>
+  }
+
+  <div class="l-columns l-columns--2 c-jwt-studio__workspace">
+    <!-- Left Column: Encoded JWT & Status -->
+    <div class="l-columns__area">
+      <app-card [title]="'tools.jwtDebuggerStudio.encodedTitle' | translate" class="g--margin-bottom-4">
+        <p class="c-jwt-studio__hint g--margin-bottom-2">
+          {{ 'tools.jwtDebuggerStudio.encodedHint' | translate }}
+        </p>
+
+        @if (statusBanner(); as banner) {
+          <div
+            [class]="'c-jwt-studio__banner c-jwt-studio__banner--' + banner.kind + ' g--margin-bottom-3'"
+            role="status"
+          >
+            <strong>{{ banner.labelKey | translate }}</strong>
+            @if (banner.detail) {
+              <span class="c-jwt-studio__banner-detail">{{ banner.detail }}</span>
+            }
+          </div>
+        }
+
+        <textarea
+          class="c-input c-jwt-studio__token-input"
+          rows="7"
+          spellcheck="false"
+          aria-label="Encoded JWT string"
+          [placeholder]="'tools.jwtDebuggerStudio.tokenPlaceholder' | translate"
+          [ngModel]="tokenInput()"
+          (ngModelChange)="onTokenInputChange($event)"
+        ></textarea>
+
+        @if (decodedResult().normalizedToken) {
+          <div class="c-jwt-studio__segmented g--margin-top-3" aria-label="Color-coded JWT segments">
+            <span class="c-jwt-studio__seg c-jwt-studio__seg--header">{{ decodedResult().headerRaw }}</span><span class="c-jwt-studio__seg-dot">.</span><span class="c-jwt-studio__seg c-jwt-studio__seg--payload">{{ decodedResult().payloadRaw }}</span><span class="c-jwt-studio__seg-dot">.</span><span class="c-jwt-studio__seg c-jwt-studio__seg--sig">{{ decodedResult().signatureRaw }}</span>
+          </div>
+        }
+
+        @if (decodedResult().error; as err) {
+          <div class="c-jwt-studio__alert c-jwt-studio__alert--danger g--margin-top-3" role="alert">
+            {{ err }}
+          </div>
+        }
+
+        @if (decodedResult().securityWarnings.length > 0) {
+          <ul class="c-jwt-studio__warnings g--margin-top-3" aria-label="Security warnings">
+            @for (warn of decodedResult().securityWarnings; track warn) {
+              <li class="c-jwt-studio__warning-item">{{ warn }}</li>
+            }
+          </ul>
+        }
+      </app-card>
+
+      <app-card [title]="'tools.jwtDebuggerStudio.claimsTitle' | translate">
+        @if (decodedResult().claims.length === 0) {
+          <p class="c-jwt-studio__hint">{{ 'tools.jwtDebuggerStudio.claimsEmpty' | translate }}</p>
+        } @else {
+          <div class="c-jwt-studio__table-wrap">
+            <table class="c-jwt-studio__table">
+              <tbody>
+                @for (claim of decodedResult().claims; track claim.claim) {
+                  <tr>
+                    <th scope="row">
+                      <code>{{ claim.claim }}</code>
+                      <span class="c-jwt-studio__claim-name">{{ claim.labelKey | translate }}</span>
+                    </th>
+                    <td>
+                      <span
+                        [class]="'c-badge ' + (claim.status === 'expired' || claim.status === 'warning' ? 'c-badge--danger' : claim.status === 'not_yet_valid' ? 'c-badge--warning' : claim.status === 'valid' ? 'c-badge--success' : '')"
+                      >
+                        {{ claim.formattedValue }}
+                      </span>
+                    </td>
+                  </tr>
+                }
+              </tbody>
+            </table>
+          </div>
+        }
+      </app-card>
+    </div>
+
+    <!-- Right Column: Header, Payload, Verify & Mint -->
+    <div class="l-columns__area">
+      <app-card [title]="'tools.jwtDebuggerStudio.headerTitle' | translate" class="g--margin-bottom-4">
+        <div class="c-jwt-studio__field-row g--margin-bottom-2">
+          <label class="c-input__label" for="jwt-alg-select">
+            {{ 'tools.jwtDebuggerStudio.algorithmLabel' | translate }}
+          </label>
+          <select
+            id="jwt-alg-select"
+            class="c-input c-jwt-studio__select"
+            [ngModel]="selectedAlgorithm()"
+            (ngModelChange)="onAlgorithmChange($event)"
+          >
+            @for (alg of supportedAlgorithms; track alg) {
+              <option [value]="alg">{{ alg }}</option>
+            }
+          </select>
+        </div>
+
+        <textarea
+          class="c-input c-jwt-studio__json-editor c-jwt-studio__json-editor--header"
+          rows="4"
+          spellcheck="false"
+          aria-label="Header JSON editor"
+          [ngModel]="headerEditorText()"
+          (ngModelChange)="headerEditorText.set($event)"
+        ></textarea>
+      </app-card>
+
+      <app-card [title]="'tools.jwtDebuggerStudio.payloadTitle' | translate" class="g--margin-bottom-4">
+        <div class="c-jwt-studio__quick-claims g--margin-bottom-2">
+          <app-button variant="outline" size="small" (clicked)="applyExpOffset(900)">+15m exp</app-button>
+          <app-button variant="outline" size="small" (clicked)="applyExpOffset(3600)">+1h exp</app-button>
+          <app-button variant="outline" size="small" (clicked)="applyExpOffset(86400)">+24h exp</app-button>
+          <app-button variant="outline" size="small" (clicked)="applyIatNow()">iat = now</app-button>
+          <app-button variant="outline" size="small" (clicked)="applyRandomJti()">+ jti UUID</app-button>
+        </div>
+
+        <textarea
+          class="c-input c-jwt-studio__json-editor c-jwt-studio__json-editor--payload"
+          rows="7"
+          spellcheck="false"
+          aria-label="Payload JSON editor"
+          [ngModel]="payloadEditorText()"
+          (ngModelChange)="payloadEditorText.set($event)"
+        ></textarea>
+      </app-card>
+
+      <app-card [title]="'tools.jwtDebuggerStudio.verifyMintTitle' | translate">
+        <div class="c-jwt-studio__field-row g--margin-bottom-3">
+          <label class="c-input__label" for="jwt-key-format">
+            {{ 'tools.jwtDebuggerStudio.keyFormatLabel' | translate }}
+          </label>
+          <select
+            id="jwt-key-format"
+            class="c-input c-jwt-studio__select"
+            [ngModel]="keyFormat()"
+            (ngModelChange)="onKeyFormatChange($event)"
+          >
+            <option value="hmac_utf8">HMAC Secret (UTF-8)</option>
+            <option value="hmac_base64url">HMAC Secret (Base64 / Base64Url)</option>
+            <option value="pem">Asymmetric PEM (SPKI Public / PKCS#8 Private)</option>
+            <option value="jwk">JWK JSON</option>
+          </select>
+        </div>
+
+        <label class="c-input__label g--margin-bottom-1" for="jwt-verify-key">
+          {{ 'tools.jwtDebuggerStudio.verifyKeyLabel' | translate }}
+        </label>
+        <textarea
+          id="jwt-verify-key"
+          class="c-input c-jwt-studio__key-input g--margin-bottom-3"
+          rows="4"
+          spellcheck="false"
+          [ngModel]="verifyKeyInput()"
+          (ngModelChange)="verifyKeyInput.set($event)"
+        ></textarea>
+
+        @if (isAsymmetricAlg() || keyFormat() === 'pem' || keyFormat() === 'jwk') {
+          <label class="c-input__label g--margin-bottom-1" for="jwt-private-key">
+            {{ 'tools.jwtDebuggerStudio.privateKeyLabel' | translate }}
+          </label>
+          <textarea
+            id="jwt-private-key"
+            class="c-input c-jwt-studio__key-input g--margin-bottom-3"
+            rows="4"
+            spellcheck="false"
+            placeholder="-----BEGIN PRIVATE KEY----- ... (optional, needed only when minting asymmetric tokens)"
+            [ngModel]="mintPrivateKeyInput()"
+            (ngModelChange)="mintPrivateKeyInput.set($event)"
+          ></textarea>
+        }
+
+        <div class="c-jwt-studio__actions g--margin-bottom-3">
+          <app-button variant="primary" (clicked)="verifyCurrentToken()" [loading]="isBusy()">
+            {{ 'tools.jwtDebuggerStudio.verifyBtn' | translate }}
+          </app-button>
+          <app-button variant="secondary" (clicked)="mintFromEditors()" [loading]="isBusy()">
+            {{ 'tools.jwtDebuggerStudio.mintBtn' | translate }}
+          </app-button>
+          <app-button variant="outline" (clicked)="generateDevKeyPair()" [loading]="isGeneratingKeyPair()">
+            {{ 'tools.jwtDebuggerStudio.generateKeypairBtn' | translate }}
+          </app-button>
+        </div>
+
+        @if (actionError(); as err) {
+          <div class="c-jwt-studio__alert c-jwt-studio__alert--danger g--margin-bottom-3" role="alert">
+            {{ err }}
+          </div>
+        }
+
+        @if (generatedKeyPair(); as kp) {
+          <div class="c-jwt-studio__keygen-box">
+            <div class="c-jwt-studio__actions g--margin-bottom-2">
+              <strong>Ephemeral {{ kp.algorithm }} Keypair (RAM Only)</strong>
+              <app-button variant="outline" size="small" (clicked)="applyKeyPairFormat('pem')">Use PEM</app-button>
+              <app-button variant="outline" size="small" (clicked)="applyKeyPairFormat('jwk')">Use JWK</app-button>
+              <app-button variant="outline" size="small" (clicked)="downloadPem('public')">.pem Public</app-button>
+              <app-button variant="outline" size="small" (clicked)="downloadPem('private')">.pem Private</app-button>
+            </div>
+            <pre class="c-jwt-studio__kp-preview">{{ kp.publicKeyPem }}</pre>
+          </div>
+        }
+      </app-card>
+    </div>
+  </div>
+</div>
