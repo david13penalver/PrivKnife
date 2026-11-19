@@ -2155,6 +2155,13 @@ export const routes: Routes = [
       ),
   },
   {
+    path: 'tools/cron-expression-studio',
+    loadComponent: () =>
+      import('./tools/dev/cron-expression-studio/cron-expression-studio.component').then(
+        (m) => m.CronExpressionStudioComponent
+      ),
+  },
+  {
     path: '**',
     title: 'Page Not Found — PrivKnife',
     data: {

@@ -72,6 +72,12 @@
     "source": "PrivKnife/src/app/tools/3d/cookie-cutter"
   },
   {
+    "id": "cron-expression-studio",
+    "route": "/tools/cron-expression-studio",
+    "category": "dev",
+    "source": "PrivKnife/src/app/tools/dev/cron-expression-studio"
+  },
+  {
     "id": "crypto-hash-uuid",
     "route": "/tools/crypto-hash-uuid",
     "category": "privacy",

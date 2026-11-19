@@ -1,0 +1,281 @@
+<div class="l-page c-cron-studio">
+  <header class="l-page__header c-header">
+    <div class="c-header__title-group">
+      <h1 class="c-header__title">{{ 'tools.cronExpressionStudio.name' | translate }}</h1>
+      <p class="c-header__subtitle">{{ 'tools.cronExpressionStudio.description' | translate }}</p>
+    </div>
+    <app-badge variant="privacy" [dot]="true">
+      {{ 'common.privacyBadge' | translate }}
+    </app-badge>
+  </header>
+
+  <app-card [title]="'tools.cronExpressionStudio.expressionTitle' | translate" class="g--margin-bottom-4">
+    <div class="c-cron-studio__row g--margin-bottom-3">
+      <button
+        type="button"
+        [class]="'c-button c-button--small ' + (format() === 'standard_5' ? 'c-button--primary' : 'c-button--outline')"
+        (click)="setFormat('standard_5')"
+      >
+        {{ 'tools.cronExpressionStudio.formatStandard' | translate }}
+      </button>
+      <button
+        type="button"
+        [class]="'c-button c-button--small ' + (format() === 'extended_6' ? 'c-button--primary' : 'c-button--outline')"
+        (click)="setFormat('extended_6')"
+      >
+        {{ 'tools.cronExpressionStudio.formatExtended' | translate }}
+      </button>
+      <app-button variant="outline" size="small" (clicked)="copyExpression()">
+        {{ 'tools.cronExpressionStudio.copyExpressionBtn' | translate }}
+      </app-button>
+      <app-button variant="outline" size="small" (clicked)="reset()">
+        {{ 'tools.cronExpressionStudio.resetBtn' | translate }}
+      </app-button>
+
+      <div class="c-cron-studio__lang-toggle">
+        <span class="c-cron-studio__muted">{{ 'tools.cronExpressionStudio.explainerLangLabel' | translate }}</span>
+        <button
+          type="button"
+          [class]="'c-button c-button--small ' + (explainerLocale() === 'en' ? 'c-button--secondary' : 'c-button--outline')"
+          (click)="setExplainerLocale('en')"
+        >
+          EN
+        </button>
+        <button
+          type="button"
+          [class]="'c-button c-button--small ' + (explainerLocale() === 'es' ? 'c-button--secondary' : 'c-button--outline')"
+          (click)="setExplainerLocale('es')"
+        >
+          ES
+        </button>
+      </div>
+    </div>
+
+    <input
+      type="text"
+      class="c-input c-cron-studio__hero-input g--margin-bottom-3"
+      spellcheck="false"
+      aria-label="Cron expression input"
+      [ngModel]="expression()"
+      (ngModelChange)="expression.set($event)"
+    />
+
+    <div class="c-cron-studio__fields g--margin-bottom-3">
+      @for (tok of fieldTokens(); track tok.name) {
+        <button
+          type="button"
+          [class]="'c-cron-studio__field-pill ' + (activeBuilderField() === tok.name ? 'c-cron-studio__field-pill--active' : '')"
+          (click)="setActiveBuilderField(tok.name)"
+        >
+          <span class="c-cron-studio__field-val">{{ tok.value }}</span>
+          <span class="c-cron-studio__field-name">{{ tok.label }}</span>
+        </button>
+      }
+    </div>
+
+    @if (copyFeedback(); as fb) {
+      <p class="c-cron-studio__feedback g--margin-bottom-2" role="status">Copied {{ fb }}.</p>
+    }
+
+    @if (result().valid) {
+      <div class="c-cron-studio__summary g--margin-bottom-2" role="status">
+        {{ result().humanDescription }}
+      </div>
+      @if (result().ast?.usesDomDowUnion) {
+        <p class="c-cron-studio__notice g--margin-bottom-2">
+          {{ 'tools.cronExpressionStudio.domDowUnionNotice' | translate }}
+        </p>
+      }
+      @if (result().impossibleDateWarning) {
+        <div class="c-cron-studio__alert" role="alert">
+          {{ 'tools.cronExpressionStudio.impossibleDateNotice' | translate }}
+        </div>
+      }
+    } @else {
+      <ul class="c-cron-studio__alert" role="alert">
+        @for (err of result().fieldErrors; track err.field + err.message) {
+          <li><strong>{{ err.field }}:</strong> {{ err.message }}</li>
+        }
+      </ul>
+    }
+  </app-card>
+
+  <div class="l-columns l-columns--2">
+    <!-- Left Column: Visual Builder & Presets -->
+    <div class="l-columns__area">
+      <app-card [title]="'tools.cronExpressionStudio.builderTitle' | translate">
+        <div class="c-cron-studio__row g--margin-bottom-3" role="tablist">
+          @for (field of builderFields(); track field.id) {
+            <button
+              type="button"
+              role="tab"
+              [attr.aria-selected]="activeBuilderField() === field.id"
+              [class]="'c-button c-button--small ' + (activeBuilderField() === field.id ? 'c-button--primary' : 'c-button--outline')"
+              (click)="setActiveBuilderField(field.id)"
+            >
+              {{ field.label }}
+            </button>
+          }
+        </div>
+
+        <div class="c-cron-studio__builder-actions g--margin-bottom-3">
+          <app-button variant="outline" size="small" (clicked)="applyFieldEvery()">
+            {{ 'tools.cronExpressionStudio.everyBtn' | translate }} (*)
+          </app-button>
+
+          <div class="c-cron-studio__inline-ctrl">
+            <span>*/</span>
+            <input
+              type="number"
+              class="c-input c-cron-studio__num"
+              min="1"
+              max="59"
+              aria-label="Interval step"
+              [ngModel]="intervalStep()"
+              (ngModelChange)="intervalStep.set(+$event)"
+            />
+            <app-button variant="outline" size="small" (clicked)="applyFieldInterval(intervalStep())">
+              {{ 'tools.cronExpressionStudio.intervalApplyBtn' | translate }}
+            </app-button>
+          </div>
+
+          <div class="c-cron-studio__inline-ctrl">
+            <input
+              type="number"
+              class="c-input c-cron-studio__num"
+              min="0"
+              max="59"
+              aria-label="Range start"
+              [ngModel]="rangeStart()"
+              (ngModelChange)="rangeStart.set(+$event)"
+            />
+            <span>–</span>
+            <input
+              type="number"
+              class="c-input c-cron-studio__num"
+              min="0"
+              max="59"
+              aria-label="Range end"
+              [ngModel]="rangeEnd()"
+              (ngModelChange)="rangeEnd.set(+$event)"
+            />
+            <app-button variant="outline" size="small" (clicked)="applyFieldRange(rangeStart(), rangeEnd())">
+              {{ 'tools.cronExpressionStudio.rangeApplyBtn' | translate }}
+            </app-button>
+          </div>
+        </div>
+
+        <div class="c-cron-studio__chips g--margin-bottom-4">
+          @for (chip of builderChips(); track chip) {
+            <button
+              type="button"
+              [class]="'c-cron-studio__chip ' + (selectedFieldValues().has(chip) ? 'c-cron-studio__chip--selected' : '')"
+              (click)="toggleChipValue(chip)"
+            >
+              {{ chip }}
+            </button>
+          }
+        </div>
+
+        <div class="c-cron-studio__presets">
+          <strong class="c-cron-studio__muted">{{ 'tools.cronExpressionStudio.presetsLabel' | translate }}</strong>
+          <div class="c-cron-studio__row g--margin-top-2">
+            @for (preset of presets; track preset.id) {
+              <app-button variant="outline" size="small" (clicked)="applyPreset(preset.id)">
+                {{ preset.labelKey | translate }}
+              </app-button>
+            }
+          </div>
+        </div>
+      </app-card>
+    </div>
+
+    <!-- Right Column: Simulator & DevOps Snippets -->
+    <div class="l-columns__area">
+      <app-card [title]="'tools.cronExpressionStudio.simulatorTitle' | translate" class="g--margin-bottom-4">
+        <div class="c-cron-studio__row g--margin-bottom-3">
+          <label class="c-input__label" for="cron-tz">
+            {{ 'tools.cronExpressionStudio.timezoneLabel' | translate }}
+          </label>
+          <select
+            id="cron-tz"
+            class="c-input c-cron-studio__select"
+            [ngModel]="timezone()"
+            (ngModelChange)="timezone.set($event)"
+          >
+            @for (tz of availableTimezones(); track tz) {
+              <option [value]="tz">{{ tz }}</option>
+            }
+          </select>
+
+          <label class="c-input__label" for="cron-count">
+            {{ 'tools.cronExpressionStudio.runsCountLabel' | translate }}
+          </label>
+          <select
+            id="cron-count"
+            class="c-input"
+            [ngModel]="simulationCount()"
+            (ngModelChange)="setSimulationCount($event)"
+          >
+            @for (cnt of simulationCounts; track cnt) {
+              <option [value]="cnt">{{ cnt }}</option>
+            }
+          </select>
+
+          <app-button variant="outline" size="small" (clicked)="exportJson()" [disabled]="result().runs.length === 0">
+            {{ 'tools.cronExpressionStudio.exportJsonBtn' | translate }}
+          </app-button>
+          <app-button variant="outline" size="small" (clicked)="exportCsv()" [disabled]="result().runs.length === 0">
+            {{ 'tools.cronExpressionStudio.exportCsvBtn' | translate }}
+          </app-button>
+        </div>
+
+        <div class="c-cron-studio__table-wrap">
+          <table class="c-cron-studio__table">
+            <thead>
+              <tr>
+                <th>#</th>
+                <th>{{ 'tools.cronExpressionStudio.colTargetTz' | translate }}</th>
+                <th>{{ 'tools.cronExpressionStudio.colUtc' | translate }}</th>
+                <th>{{ 'tools.cronExpressionStudio.colDelta' | translate }}</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (run of result().runs; track run.index) {
+                <tr>
+                  <td>{{ run.index }}</td>
+                  <td>
+                    {{ run.formattedTargetTz }}
+                    @if (run.dstWarning) {
+                      <span class="c-badge c-badge--warning">{{ 'tools.cronExpressionStudio.dstWarningBadge' | translate }}</span>
+                    }
+                  </td>
+                  <td><code>{{ run.isoUtc }}</code></td>
+                  <td>{{ run.relativeDelta }}</td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+      </app-card>
+
+      <app-card [title]="'tools.cronExpressionStudio.snippetsTitle' | translate">
+        <div class="c-cron-studio__row g--margin-bottom-2">
+          @for (tab of snippetTabs; track tab.id) {
+            <button
+              type="button"
+              [class]="'c-button c-button--small ' + (activeSnippetTab() === tab.id ? 'c-button--primary' : 'c-button--outline')"
+              (click)="activeSnippetTab.set(tab.id)"
+            >
+              {{ tab.label }}
+            </button>
+          }
+          <app-button variant="secondary" size="small" (clicked)="copySnippet()" [disabled]="!result().valid">
+            {{ 'tools.cronExpressionStudio.copySnippetBtn' | translate }}
+          </app-button>
+        </div>
+        <pre class="c-cron-studio__snippet">{{ activeSnippetCode() }}</pre>
+      </app-card>
+    </div>
+  </div>
+</div>

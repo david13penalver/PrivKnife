@@ -986,6 +986,20 @@ const CATALOG_TOOLS: CatalogTool[] = [
     techStack: 'Pure TS Codecs • Magic-Byte Sniffer • Web Worker • Web Audio CW Synth',
     icon: '🔁',
   },
+  {
+    id: 'cron-expression-studio',
+    i18nKey: 'cronExpressionStudio',
+    name: 'Cron Expression Builder, Human Explainer & Schedule Simulator',
+    category: 'dev',
+    categoryLabel: 'Dev / DevOps',
+    description:
+      'Build, validate, explain in English/Spanish, and simulate 5-field and 6-field cron runs across IANA timezones with DST detection.',
+    keywords: ['cron generator', 'cron parser', 'crontab simulator', 'kubernetes cronjob', 'github actions'],
+    status: 'ready',
+    route: '/tools/cron-expression-studio',
+    techStack: 'Pure TS POSIX/6-Field AST • EN/ES Explainer • Intl IANA DST Walker',
+    icon: '⏰',
+  },
 ];
 
 @Component({
