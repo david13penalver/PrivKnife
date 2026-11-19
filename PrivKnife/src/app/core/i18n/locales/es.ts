@@ -702,5 +702,20 @@ export const es: TranslationSchema = {
       downloadBtn: 'Descargar PDF Resultante',
       resetBtn: 'Limpiar Secretos y Reiniciar',
     },
+    pdfCropperBooklet: {
+      name: 'Recortador de Márgenes, Redimensionador y Folletos PDF',
+      description:
+        'Recorta márgenes con espejo par/impar, estandariza páginas a A4/Carta o genera cuadernillos 2-up/4-up y folletos cosidos al lomo localmente.',
+      modeCrop: 'Recortar Márgenes',
+      modeResize: 'Redimensionar Páginas',
+      modeNup: 'Páginas por Hoja (N-Up)',
+      modeBooklet: 'Folleto / Cuadernillo',
+      uploadTitle: 'Subir Documento PDF',
+      loadSample: 'Cargar PDF de Ejemplo',
+      settingsTitle: 'Ajustes de Geometría y Diseño',
+      processBtn: 'Procesar PDF Localmente',
+      downloadBtn: 'Descargar PDF Resultante',
+      resetBtn: 'Restablecer',
+    },
   },
 };

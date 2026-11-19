@@ -702,5 +702,20 @@ export const ja: TranslationSchema = {
       downloadBtn: '処理済み PDF を保存',
       resetBtn: '秘密情報を消去・リセット',
     },
+    pdfCropperBooklet: {
+      name: 'PDF 余白トリミング・リサイズ＆中綴じ冊子メーカー',
+      description:
+        '見開き奇数/偶数余白の自動トリミング、A4/レター統一、N-Up 割り付けや中綴じ小冊子面付けをブラウザ内で実行。',
+      modeCrop: '余白トリミング',
+      modeResize: '用紙サイズ変更',
+      modeNup: 'N-Up 割り付け',
+      modeBooklet: '中綴じ冊子面付け',
+      uploadTitle: 'PDF をアップロード',
+      loadSample: 'サンプル PDF を読込',
+      settingsTitle: 'レイアウト・余白設定',
+      processBtn: 'ローカルで変換',
+      downloadBtn: '変換済み PDF を保存',
+      resetBtn: 'リセット',
+    },
   },
 };

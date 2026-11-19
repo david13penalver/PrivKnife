@@ -702,5 +702,20 @@ export const ar: TranslationSchema = {
       downloadBtn: 'تنزيل ملف PDF الناتج',
       resetBtn: 'مسح كلمات المرور وإعادة الضبط',
     },
+    pdfCropperBooklet: {
+      name: 'قص هوامش PDF وتوحيد المقاسات وصنع الكتيبات',
+      description:
+        'قص الهوامش البيضاء تلقائيًا، توحيد الأحجام إلى A4/Letter، وتجهيز كتيبات الطباعة المتقابلة محليًا داخل المتصفح.',
+      modeCrop: 'قص الهوامش',
+      modeResize: 'تغيير حجم الصفحات',
+      modeNup: 'دمج صفحات (N-Up)',
+      modeBooklet: 'ترتيب الكتيب',
+      uploadTitle: 'رفع ملف PDF',
+      loadSample: 'تحميل ملف تجريبي',
+      settingsTitle: 'إعدادات الأبعاد والتخطيط',
+      processBtn: 'معالجة PDF محليًا',
+      downloadBtn: 'تنزيل الملف الناتج',
+      resetBtn: 'إعادة ضبط',
+    },
   },
 };

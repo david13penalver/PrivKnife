@@ -702,5 +702,20 @@ export const it: TranslationSchema = {
       downloadBtn: 'Scarica PDF Risultante',
       resetBtn: 'Cancella Segreti e Ripristina',
     },
+    pdfCropperBooklet: {
+      name: 'Ritaglia Margini, Ridimensiona e Libretti PDF',
+      description:
+        'Ritaglia margini con specchio pari/dispari, uniforma a A4/Letter o crea dispense N-Up e libretti piegati offline.',
+      modeCrop: 'Ritaglia Margini',
+      modeResize: 'Ridimensiona Pagine',
+      modeNup: 'Impaginazione N-Up',
+      modeBooklet: 'Libretto Spillato',
+      uploadTitle: 'Carica Documento PDF',
+      loadSample: 'Carica PDF di Esempio',
+      settingsTitle: 'Impostazioni Geometria',
+      processBtn: 'Elabora PDF',
+      downloadBtn: 'Scarica PDF Risultante',
+      resetBtn: 'Ripristina',
+    },
   },
 };

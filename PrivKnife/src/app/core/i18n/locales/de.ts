@@ -702,5 +702,20 @@ export const de: TranslationSchema = {
       downloadBtn: 'PDF Herunterladen',
       resetBtn: 'Passwörter löschen & Reset',
     },
+    pdfCropperBooklet: {
+      name: 'PDF Randzuschnitt, Skalierung & Broschüren-Tool',
+      description:
+        'Ränder spiegelbildlich beschneiden, auf A4/Letter normieren oder N-Up Handouts und Rückstich-Broschüren lokal erstellen.',
+      modeCrop: 'Ränder Zuschneiden',
+      modeResize: 'Format Anpassen',
+      modeNup: 'N-Up Layout',
+      modeBooklet: 'Broschürendruck',
+      uploadTitle: 'PDF-Dokument laden',
+      loadSample: 'Beispiel-PDF laden',
+      settingsTitle: 'Layout & Geometrie',
+      processBtn: 'PDF Verarbeiten',
+      downloadBtn: 'PDF Herunterladen',
+      resetBtn: 'Zurücksetzen',
+    },
   },
 };

@@ -702,5 +702,20 @@ export const zh: TranslationSchema = {
       downloadBtn: '下载处理后的 PDF',
       resetBtn: '清除密码并重置',
     },
+    pdfCropperBooklet: {
+      name: 'PDF 边距裁剪、尺寸统一与骑马钉小册子排版',
+      description:
+        '本地自动裁去扫描白边、奇偶页镜像裁切、统一缩放至 A4/Letter 或生成多合一与骑马钉印刷小册子。',
+      modeCrop: '裁剪边距',
+      modeResize: '统一纸张尺寸',
+      modeNup: '多合一拼版 (N-Up)',
+      modeBooklet: '骑马钉小册子',
+      uploadTitle: '上传 PDF 文档',
+      loadSample: '加载示例 PDF',
+      settingsTitle: '版面与几何设置',
+      processBtn: '本地处理 PDF',
+      downloadBtn: '下载结果 PDF',
+      resetBtn: '重置',
+    },
   },
 };

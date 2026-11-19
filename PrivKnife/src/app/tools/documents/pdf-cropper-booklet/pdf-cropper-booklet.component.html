@@ -1,0 +1,505 @@
+<div class="l-page">
+  <header class="l-page__header c-header">
+    <div class="c-header__title-group">
+      <h1 class="c-header__title">{{ 'tools.pdfCropperBooklet.name' | translate }}</h1>
+      <p class="c-header__subtitle">{{ 'tools.pdfCropperBooklet.description' | translate }}</p>
+    </div>
+    <div class="c-badge c-badge--privacy">
+      {{ 'common.privacyBadge' | translate }}
+    </div>
+  </header>
+
+  <div class="c-pdf-cropper__tabs g--margin-bottom-4" role="tablist">
+    <button
+      type="button"
+      role="tab"
+      class="c-button"
+      [class.c-button--primary]="mode() === 'crop'"
+      [class.c-button--outline]="mode() !== 'crop'"
+      [attr.aria-selected]="mode() === 'crop'"
+      (click)="setMode('crop')"
+    >
+      {{ 'tools.pdfCropperBooklet.modeCrop' | translate }}
+    </button>
+    <button
+      type="button"
+      role="tab"
+      class="c-button"
+      [class.c-button--primary]="mode() === 'resize'"
+      [class.c-button--outline]="mode() !== 'resize'"
+      [attr.aria-selected]="mode() === 'resize'"
+      (click)="setMode('resize')"
+    >
+      {{ 'tools.pdfCropperBooklet.modeResize' | translate }}
+    </button>
+    <button
+      type="button"
+      role="tab"
+      class="c-button"
+      [class.c-button--primary]="mode() === 'nup'"
+      [class.c-button--outline]="mode() !== 'nup'"
+      [attr.aria-selected]="mode() === 'nup'"
+      (click)="setMode('nup')"
+    >
+      {{ 'tools.pdfCropperBooklet.modeNup' | translate }}
+    </button>
+    <button
+      type="button"
+      role="tab"
+      class="c-button"
+      [class.c-button--primary]="mode() === 'booklet'"
+      [class.c-button--outline]="mode() !== 'booklet'"
+      [attr.aria-selected]="mode() === 'booklet'"
+      (click)="setMode('booklet')"
+    >
+      {{ 'tools.pdfCropperBooklet.modeBooklet' | translate }}
+    </button>
+  </div>
+
+  @if (errorMessage()) {
+    <div class="c-pdf-cropper__alert c-pdf-cropper__alert--error g--margin-bottom-4" role="alert" aria-live="polite">
+      {{ errorMessage() }}
+    </div>
+  }
+
+  @if (largeFileWarning()) {
+    <div class="c-pdf-cropper__alert c-pdf-cropper__alert--warn g--margin-bottom-4">
+      Large file (&gt;100 MB) loaded. Page boxes and impositions run locally in browser memory.
+    </div>
+  }
+
+  <div class="l-columns l-columns--2">
+    <div class="l-columns__area">
+      <app-card [title]="'tools.pdfCropperBooklet.uploadTitle' | translate" class="g--margin-bottom-4">
+        <app-dropzone
+          [title]="'tools.pdfCropperBooklet.uploadTitle' | translate"
+          subtitle="Drop a .pdf file to crop margins, normalize sizes, or build a printable booklet"
+          accept=".pdf,application/pdf"
+          [multiple]="false"
+          [maxSizeMb]="250"
+          (filesSelected)="onFileDropped($event)"
+        />
+        <div class="c-pdf-cropper__row g--margin-top-3">
+          <button
+            type="button"
+            class="c-button c-button--small c-button--outline"
+            (click)="loadSamplePdf()"
+          >
+            {{ 'tools.pdfCropperBooklet.loadSample' | translate }}
+          </button>
+          @if (pdfBytes()) {
+            <span class="c-pdf-cropper__meta">
+              {{ pdfFileName() }} ({{ formattedInputSize() }} • {{ pageCount() }} pages)
+            </span>
+          }
+        </div>
+      </app-card>
+
+      @if (pdfBytes() && mode() === 'crop') {
+        <app-card title="Interactive Crop Preview" class="g--margin-bottom-4">
+          <div class="c-pdf-cropper__row g--margin-bottom-3">
+            <button
+              type="button"
+              class="c-button c-button--small c-button--outline"
+              [disabled]="currentPage() <= 1"
+              (click)="selectPreviewPage(currentPage() - 1)"
+            >
+              Prev
+            </button>
+            <span class="c-pdf-cropper__meta">
+              Page {{ currentPage() }} / {{ pageCount() }} ({{ currentPageWidthPt() | number:'1.0-0' }} × {{ currentPageHeightPt() | number:'1.0-0' }} pt)
+            </span>
+            <button
+              type="button"
+              class="c-button c-button--small c-button--outline"
+              [disabled]="currentPage() >= pageCount()"
+              (click)="selectPreviewPage(currentPage() + 1)"
+            >
+              Next
+            </button>
+          </div>
+
+          <div
+            class="c-pdf-cropper__stage"
+            (pointermove)="onHandlePointerMove($event)"
+            (pointerup)="onHandlePointerUp()"
+          >
+            <canvas #previewCanvas class="c-pdf-cropper__canvas"></canvas>
+            @if (previewAvailable()) {
+              <div
+                class="c-pdf-cropper__marquee"
+                [style.top.%]="cropOverlayPercent().topPct"
+                [style.right.%]="cropOverlayPercent().rightPct"
+                [style.bottom.%]="cropOverlayPercent().bottomPct"
+                [style.left.%]="cropOverlayPercent().leftPct"
+              >
+                <button
+                  type="button"
+                  class="c-pdf-cropper__handle c-pdf-cropper__handle--top"
+                  aria-label="Adjust top crop margin"
+                  (pointerdown)="onHandlePointerDown('top', $event)"
+                  (keydown)="onOverlayKeydown('top', $event)"
+                ></button>
+                <button
+                  type="button"
+                  class="c-pdf-cropper__handle c-pdf-cropper__handle--right"
+                  aria-label="Adjust right crop margin"
+                  (pointerdown)="onHandlePointerDown('right', $event)"
+                  (keydown)="onOverlayKeydown('right', $event)"
+                ></button>
+                <button
+                  type="button"
+                  class="c-pdf-cropper__handle c-pdf-cropper__handle--bottom"
+                  aria-label="Adjust bottom crop margin"
+                  (pointerdown)="onHandlePointerDown('bottom', $event)"
+                  (keydown)="onOverlayKeydown('bottom', $event)"
+                ></button>
+                <button
+                  type="button"
+                  class="c-pdf-cropper__handle c-pdf-cropper__handle--left"
+                  aria-label="Adjust left crop margin"
+                  (pointerdown)="onHandlePointerDown('left', $event)"
+                  (keydown)="onOverlayKeydown('left', $event)"
+                ></button>
+              </div>
+            }
+          </div>
+
+          <p class="c-pdf-cropper__meta g--margin-top-3">
+            Note: PDF CropBox updates visible margins non-destructively. For permanent redaction of sensitive margin text, use the PDF Redaction tool.
+          </p>
+        </app-card>
+      }
+
+      @if (pdfBytes() && (mode() === 'booklet' || mode() === 'nup')) {
+        <app-card title="Sheet Imposition Map Preview" class="g--margin-bottom-4">
+          <div class="c-pdf-cropper__table-wrap">
+            <table class="c-pdf-cropper__table">
+              <thead>
+                <tr>
+                  <th>Sheet</th>
+                  <th>Side</th>
+                  <th>Page Order</th>
+                </tr>
+              </thead>
+              <tbody>
+                @for (entry of (mode() === 'booklet' ? bookletPreviewMap() : nupPreviewMap()); track $index) {
+                  <tr>
+                    <td>{{ entry.sheet }}</td>
+                    <td>{{ entry.side | uppercase }}</td>
+                    <td>[{{ entry.pages.join(' | ') }}]</td>
+                  </tr>
+                }
+              </tbody>
+            </table>
+          </div>
+        </app-card>
+      }
+    </div>
+
+    <div class="l-columns__area">
+      <app-card [title]="'tools.pdfCropperBooklet.settingsTitle' | translate" class="g--margin-bottom-4">
+        @if (mode() === 'crop') {
+          <div class="c-pdf-cropper__row g--margin-bottom-3">
+            <button
+              type="button"
+              class="c-button c-button--small"
+              [class.c-button--primary]="unit() === 'pt'"
+              [class.c-button--outline]="unit() !== 'pt'"
+              (click)="setUnit('pt')"
+            >
+              pt
+            </button>
+            <button
+              type="button"
+              class="c-button c-button--small"
+              [class.c-button--primary]="unit() === 'mm'"
+              [class.c-button--outline]="unit() !== 'mm'"
+              (click)="setUnit('mm')"
+            >
+              mm
+            </button>
+            <button
+              type="button"
+              class="c-button c-button--small"
+              [class.c-button--primary]="unit() === 'in'"
+              [class.c-button--outline]="unit() !== 'in'"
+              (click)="setUnit('in')"
+            >
+              in
+            </button>
+            <button
+              type="button"
+              class="c-button c-button--small c-button--outline"
+              [disabled]="!pdfBytes() || isScanningWhitespace()"
+              (click)="autoTrimWhitespace()"
+            >
+              Auto-Trim Whitespace
+            </button>
+          </div>
+
+          <div class="c-pdf-cropper__grid-2 g--margin-bottom-3">
+            <div class="c-input">
+              <label class="c-input__label" for="crop-top">Top ({{ unit() }})</label>
+              <input
+                id="crop-top"
+                type="number"
+                min="0"
+                step="any"
+                class="c-input__control"
+                [ngModel]="displayInsets().top"
+                (ngModelChange)="setInsetFromDisplay('top', $event)"
+              />
+            </div>
+            <div class="c-input">
+              <label class="c-input__label" for="crop-right">Right ({{ unit() }})</label>
+              <input
+                id="crop-right"
+                type="number"
+                min="0"
+                step="any"
+                class="c-input__control"
+                [ngModel]="displayInsets().right"
+                (ngModelChange)="setInsetFromDisplay('right', $event)"
+              />
+            </div>
+            <div class="c-input">
+              <label class="c-input__label" for="crop-bottom">Bottom ({{ unit() }})</label>
+              <input
+                id="crop-bottom"
+                type="number"
+                min="0"
+                step="any"
+                class="c-input__control"
+                [ngModel]="displayInsets().bottom"
+                (ngModelChange)="setInsetFromDisplay('bottom', $event)"
+              />
+            </div>
+            <div class="c-input">
+              <label class="c-input__label" for="crop-left">Left ({{ unit() }})</label>
+              <input
+                id="crop-left"
+                type="number"
+                min="0"
+                step="any"
+                class="c-input__control"
+                [ngModel]="displayInsets().left"
+                (ngModelChange)="setInsetFromDisplay('left', $event)"
+              />
+            </div>
+          </div>
+
+          @if (hasInvalidCropInsets()) {
+            <div class="c-pdf-cropper__alert c-pdf-cropper__alert--error g--margin-bottom-3">
+              Crop insets exceed current page dimensions (&lt;10 pt remaining).
+            </div>
+          }
+
+          <div class="c-input g--margin-bottom-3">
+            <label class="c-input__label" for="crop-scope">Apply Scope</label>
+            <select
+              id="crop-scope"
+              class="c-input__control"
+              [ngModel]="cropScope()"
+              (ngModelChange)="cropScope.set($event)"
+            >
+              <option value="all">All Pages</option>
+              <option value="odd_even_mirrored">Odd / Even Mirrored Margins (Scanned Books)</option>
+              <option value="current">Current Page Only</option>
+              <option value="range">Custom Page Range</option>
+            </select>
+          </div>
+
+          @if (cropScope() === 'range') {
+            <div class="c-input g--margin-bottom-3">
+              <label class="c-input__label" for="crop-range">Page Range (e.g. 1-3, 5)</label>
+              <input
+                id="crop-range"
+                type="text"
+                class="c-input__control"
+                [ngModel]="pageRange()"
+                (ngModelChange)="pageRange.set($event)"
+              />
+            </div>
+          }
+        } @else if (mode() === 'resize') {
+          <div class="c-pdf-cropper__grid-2 g--margin-bottom-3">
+            <div class="c-input">
+              <label class="c-input__label" for="resize-paper">Target Paper</label>
+              <select
+                id="resize-paper"
+                class="c-input__control"
+                [ngModel]="targetPaper()"
+                (ngModelChange)="targetPaper.set($event)"
+              >
+                <option value="a4">ISO A4 (210 × 297 mm)</option>
+                <option value="letter">US Letter (8.5 × 11 in)</option>
+                <option value="legal">US Legal (8.5 × 14 in)</option>
+                <option value="a5">ISO A5 (148 × 210 mm)</option>
+                <option value="custom">Custom Dimensions (pt)</option>
+              </select>
+            </div>
+            <div class="c-input">
+              <label class="c-input__label" for="resize-orient">Orientation</label>
+              <select
+                id="resize-orient"
+                class="c-input__control"
+                [ngModel]="resizeOrientation()"
+                (ngModelChange)="resizeOrientation.set($event)"
+              >
+                <option value="auto">Auto per Page</option>
+                <option value="portrait">Portrait</option>
+                <option value="landscape">Landscape</option>
+              </select>
+            </div>
+          </div>
+
+          @if (targetPaper() === 'custom') {
+            <div class="c-pdf-cropper__grid-2 g--margin-bottom-3">
+              <div class="c-input">
+                <label class="c-input__label" for="resize-cw">Custom Width (pt)</label>
+                <input
+                  id="resize-cw"
+                  type="number"
+                  min="20"
+                  class="c-input__control"
+                  [ngModel]="customWidthPt()"
+                  (ngModelChange)="customWidthPt.set($event)"
+                />
+              </div>
+              <div class="c-input">
+                <label class="c-input__label" for="resize-ch">Custom Height (pt)</label>
+                <input
+                  id="resize-ch"
+                  type="number"
+                  min="20"
+                  class="c-input__control"
+                  [ngModel]="customHeightPt()"
+                  (ngModelChange)="customHeightPt.set($event)"
+                />
+              </div>
+            </div>
+          }
+
+          <div class="c-pdf-cropper__grid-2 g--margin-bottom-4">
+            <div class="c-input">
+              <label class="c-input__label" for="resize-scale">Fit Mode</label>
+              <select
+                id="resize-scale"
+                class="c-input__control"
+                [ngModel]="scaleMode()"
+                (ngModelChange)="scaleMode.set($event)"
+              >
+                <option value="contain">Contain (Preserve Aspect)</option>
+                <option value="stretch">Stretch to Fill</option>
+                <option value="no_scale">Center Without Scaling</option>
+              </select>
+            </div>
+            <div class="c-input">
+              <label class="c-input__label" for="resize-gutter">Binding Gutter (pt)</label>
+              <input
+                id="resize-gutter"
+                type="number"
+                min="0"
+                class="c-input__control"
+                [ngModel]="gutterMarginPt()"
+                (ngModelChange)="gutterMarginPt.set($event)"
+              />
+            </div>
+          </div>
+        } @else {
+          <div class="c-pdf-cropper__grid-2 g--margin-bottom-3">
+            @if (mode() === 'nup') {
+              <div class="c-input">
+                <label class="c-input__label" for="nup-count">Pages Per Sheet</label>
+                <select
+                  id="nup-count"
+                  class="c-input__control"
+                  [ngModel]="pagesPerSheet()"
+                  (ngModelChange)="setPagesPerSheet($event)"
+                >
+                  <option [ngValue]="2">2-Up</option>
+                  <option [ngValue]="4">4-Up</option>
+                  <option [ngValue]="6">6-Up</option>
+                </select>
+              </div>
+            }
+            <div class="c-input">
+              <label class="c-input__label" for="nup-paper">Sheet Size</label>
+              <select
+                id="nup-paper"
+                class="c-input__control"
+                [ngModel]="nupPaper()"
+                (ngModelChange)="nupPaper.set($event)"
+              >
+                <option value="a4">ISO A4</option>
+                <option value="letter">US Letter</option>
+              </select>
+            </div>
+            <div class="c-input">
+              <label class="c-input__label" for="nup-dir">Binding Direction</label>
+              <select
+                id="nup-dir"
+                class="c-input__control"
+                [ngModel]="readingDirection()"
+                (ngModelChange)="readingDirection.set($event)"
+              >
+                <option value="ltr">Left-to-Right (LTR)</option>
+                <option value="rtl">Right-to-Left (RTL)</option>
+              </select>
+            </div>
+          </div>
+
+          <label class="c-pdf-cropper__check g--margin-bottom-4">
+            <input
+              type="checkbox"
+              [ngModel]="drawCutGuides()"
+              (ngModelChange)="drawCutGuides.set($event)"
+            />
+            Draw Hairline Trim / Fold Guides
+          </label>
+        }
+
+        <div class="c-pdf-cropper__actions">
+          <button
+            type="button"
+            class="c-button c-button--primary"
+            [disabled]="!canProcess()"
+            (click)="processDocument()"
+          >
+            {{ 'tools.pdfCropperBooklet.processBtn' | translate }}
+          </button>
+          <button type="button" class="c-button c-button--outline" (click)="reset()">
+            {{ 'tools.pdfCropperBooklet.resetBtn' | translate }}
+          </button>
+        </div>
+      </app-card>
+
+      @if (isProcessing()) {
+        <app-card class="g--margin-bottom-4">
+          <app-progress-bar
+            [value]="progressPercent()"
+            [label]="progressStage()"
+          />
+        </app-card>
+      }
+
+      @if (lastResult(); as res) {
+        @if (res.success) {
+          <app-card title="Output Ready">
+            <p class="c-pdf-cropper__meta g--margin-bottom-3">
+              {{ res.fileName }} ({{ formattedOutputSize() }} • {{ res.outputPageCount }} sheets)
+            </p>
+            <button
+              type="button"
+              class="c-button c-button--primary"
+              (click)="downloadResult()"
+            >
+              {{ 'tools.pdfCropperBooklet.downloadBtn' | translate }}
+            </button>
+          </app-card>
+        }
+      }
+    </div>
+  </div>
+</div>

@@ -700,6 +700,21 @@ export const en = {
       downloadBtn: 'Download Secured PDF',
       resetBtn: 'Clear Secrets & Reset',
     },
+    pdfCropperBooklet: {
+      name: 'PDF Margin Cropper, Resizer & Booklet Maker',
+      description:
+        'Trim margins with Odd/Even mirror support, standardize mixed page sizes to A4/Letter, or create 2-up/4-up handouts and saddle-stitch booklets locally.',
+      modeCrop: 'Crop Margins',
+      modeResize: 'Resize Pages',
+      modeNup: 'N-Up Handouts',
+      modeBooklet: 'Saddle-Stitch Booklet',
+      uploadTitle: 'Upload PDF Document',
+      loadSample: 'Load Sample PDF',
+      settingsTitle: 'Layout & Geometry Settings',
+      processBtn: 'Process PDF Locally',
+      downloadBtn: 'Download Processed PDF',
+      resetBtn: 'Reset',
+    },
   },
 };
 

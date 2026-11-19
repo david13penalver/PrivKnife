@@ -118,6 +118,20 @@ const CATALOG_TOOLS: CatalogTool[] = [
     icon: '🔐',
   },
   {
+    id: 'pdf-cropper-booklet',
+    i18nKey: 'pdfCropperBooklet',
+    name: 'PDF Margin Cropper, Resizer & N-Up Booklet Maker',
+    category: 'documents',
+    categoryLabel: 'Documents',
+    description:
+      'Auto-trim scanner borders, standardize mixed PDF sizes to A4/Letter, and generate 2-up/4-up or booklet PDFs locally.',
+    keywords: ['crop pdf', 'resize pdf', 'booklet pdf', 'n-up', 'margins'],
+    status: 'ready',
+    route: '/tools/pdf-cropper-booklet',
+    techStack: 'pdf-lib • PDF.js • Web Worker',
+    icon: '✂️',
+  },
+  {
     id: 'pdf-merger-splitter',
     i18nKey: 'pdfMerger',
     name: 'PDF Merger, Splitter & Page Organizer',

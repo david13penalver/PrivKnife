@@ -163,6 +163,26 @@ export const routes: Routes = [
       ),
   },
   {
+    path: 'tools/pdf-cropper-booklet',
+    title: 'PDF Margin Cropper, Resizer & N-Up Booklet Maker — PrivKnife',
+    data: {
+      description:
+        'Auto-trim scanner margins, crop PDF pages with Odd/Even mirror support, standardize to A4/Letter, and generate 2-up/4-up handouts or saddle-stitch booklets locally.',
+      keywords: [
+        'crop pdf',
+        'trim pdf margins',
+        'resize pdf a4 letter',
+        'pdf booklet maker',
+        'n-up pdf',
+      ],
+      url: '/tools/pdf-cropper-booklet',
+    },
+    loadComponent: () =>
+      import('./tools/documents/pdf-cropper-booklet/pdf-cropper-booklet.component').then(
+        (m) => m.PdfCropperBookletComponent
+      ),
+  },
+  {
     path: 'tools/pdf-merger-splitter',
     title: 'PDF Merger, Splitter & Page Organizer — PrivKnife',
     data: {

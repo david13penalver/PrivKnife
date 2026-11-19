@@ -702,5 +702,20 @@ export const fr: TranslationSchema = {
       downloadBtn: 'Télécharger le PDF',
       resetBtn: 'Effacer Secrets & Réinitialiser',
     },
+    pdfCropperBooklet: {
+      name: 'Rogneur de Marges, Redimensionneur & Livret PDF',
+      description:
+        'Rognez les marges (recto/verso miroir), uniformisez au format A4/Lettre ou créez des livrets et mises en page N-Up hors ligne.',
+      modeCrop: 'Rogner les Marges',
+      modeResize: 'Redimensionner',
+      modeNup: 'Grille N-Up',
+      modeBooklet: 'Livret / Cahier',
+      uploadTitle: 'Importer un PDF',
+      loadSample: 'Charger un PDF Exemple',
+      settingsTitle: 'Paramètres de Géométrie',
+      processBtn: 'Traiter le PDF',
+      downloadBtn: 'Télécharger le PDF',
+      resetBtn: 'Réinitialiser',
+    },
   },
 };

@@ -1,0 +1,130 @@
+.c-pdf-cropper {
+  &__tabs,
+  &__row,
+  &__actions {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.75rem;
+  }
+
+  &__grid-2 {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0.75rem;
+
+    @media (max-width: 768px) {
+      grid-template-columns: minmax(0, 1fr);
+    }
+  }
+
+  &__stage {
+    position: relative;
+    display: inline-block;
+    max-width: 100%;
+    border: 1px solid var(--border-subtle, #e2e8f0);
+    border-radius: 8px;
+    overflow: hidden;
+    touch-action: none;
+  }
+
+  &__canvas {
+    display: block;
+    max-width: 100%;
+    height: auto;
+  }
+
+  &__marquee {
+    position: absolute;
+    border: 2px dashed #2563eb;
+    background: rgba(37, 99, 235, 0.08);
+    box-shadow: 0 0 0 9999px rgba(15, 23, 42, 0.35);
+  }
+
+  &__handle {
+    position: absolute;
+    width: 24px;
+    height: 24px;
+    min-width: 24px;
+    min-height: 24px;
+    border-radius: 999px;
+    border: 2px solid #ffffff;
+    background: #2563eb;
+    cursor: pointer;
+
+    &--top {
+      top: -12px;
+      left: 50%;
+      transform: translateX(-50%);
+      cursor: ns-resize;
+    }
+    &--bottom {
+      bottom: -12px;
+      left: 50%;
+      transform: translateX(-50%);
+      cursor: ns-resize;
+    }
+    &--left {
+      left: -12px;
+      top: 50%;
+      transform: translateY(-50%);
+      cursor: ew-resize;
+    }
+    &--right {
+      right: -12px;
+      top: 50%;
+      transform: translateY(-50%);
+      cursor: ew-resize;
+    }
+  }
+
+  &__table-wrap {
+    overflow-x: auto;
+  }
+
+  &__table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.85rem;
+
+    th,
+    td {
+      padding: 0.45rem 0.6rem;
+      border-bottom: 1px solid var(--border-subtle, #e2e8f0);
+      text-align: left;
+    }
+  }
+
+  &__check {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    min-height: 44px;
+    cursor: pointer;
+    font-size: 0.9rem;
+  }
+
+  &__meta {
+    font-size: 0.875rem;
+    color: var(--text-secondary, #64748b);
+    word-break: break-word;
+  }
+
+  &__alert {
+    padding: 0.75rem 1rem;
+    border-radius: 8px;
+    font-size: 0.9rem;
+
+    &--error {
+      background: rgba(220, 38, 38, 0.1);
+      color: #b91c1c;
+      border: 1px solid rgba(220, 38, 38, 0.3);
+    }
+
+    &--warn {
+      background: rgba(217, 119, 6, 0.1);
+      color: #92400e;
+      border: 1px solid rgba(217, 119, 6, 0.3);
+    }
+  }
+}

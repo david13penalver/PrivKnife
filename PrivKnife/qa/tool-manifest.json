@@ -270,6 +270,12 @@
     "source": "PrivKnife/src/app/tools/documents/pdf-password-security"
   },
   {
+    "id": "pdf-cropper-booklet",
+    "route": "/tools/pdf-cropper-booklet",
+    "category": "documents",
+    "source": "PrivKnife/src/app/tools/documents/pdf-cropper-booklet"
+  },
+  {
     "id": "pdf-merger",
     "route": "/tools/pdf-merger-splitter",
     "category": "documents",
