@@ -1014,6 +1014,20 @@ const CATALOG_TOOLS: CatalogTool[] = [
     techStack: 'Native BigInt • Intl Timezone Matrix • O(1) Duration Delta • Batch CSV/JSON',
     icon: '🕒',
   },
+  {
+    id: 'password-passphrase-generator',
+    i18nKey: 'passwordPassphraseGenerator',
+    name: 'Password, Passphrase & API Key Generator',
+    category: 'dev',
+    categoryLabel: 'Dev / Security',
+    description:
+      'Generate unbiased CSPRNG passwords, EFF Diceware passphrases, .env secrets, and local entropy audits.',
+    keywords: ['password', 'diceware', 'api key', 'entropy', 'csprng'],
+    status: 'ready',
+    route: '/tools/password-passphrase-generator',
+    techStack: 'Web Crypto CSPRNG • Rejection Sampling • EFF Diceware',
+    icon: '🔐',
+  },
 ];
 
 @Component({

@@ -33,6 +33,7 @@ import { jwtDebuggerStudioTool } from './dev/jwt-debugger-studio';
 import { encoderDecoderWorkbenchTool } from './dev/encoder-decoder-workbench';
 import { cronExpressionStudioTool } from './dev/cron-expression-studio';
 import { timestampTimezoneConverterTool } from './dev/timestamp-timezone-converter';
+import { passwordPassphraseGeneratorTool } from './dev/password-passphrase-generator';
 import { emailSignatureGeneratorTool } from './dev/email-signature-generator';
 import { cssMeshGradientMakerTool } from './dev/mesh-gradient-maker';
 import { robotsSitemapBuilderTool } from './dev/robots-sitemap-builder';
@@ -151,6 +152,7 @@ export const TOOL_REGISTRY: ToolDefinition[] = [
   encoderDecoderWorkbenchTool,
   cronExpressionStudioTool,
   timestampTimezoneConverterTool,
+  passwordPassphraseGeneratorTool,
 ];
 
 export function getToolById(id: string): ToolDefinition | undefined {
@@ -292,6 +294,7 @@ export const TOOL_I18N_MAP: Record<string, string> = {
   'encoder-decoder-workbench': 'encoderDecoderWorkbench',
   'cron-expression-studio': 'cronExpressionStudio',
   'timestamp-timezone-converter': 'timestampTimezoneConverter',
+  'password-passphrase-generator': 'passwordPassphraseGenerator',
 };
 
 export function getToolI18nKey(id: string): string | undefined {

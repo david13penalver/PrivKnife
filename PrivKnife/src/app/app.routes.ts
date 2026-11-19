@@ -2169,6 +2169,13 @@ export const routes: Routes = [
       ),
   },
   {
+    path: 'tools/password-passphrase-generator',
+    loadComponent: () =>
+      import('./tools/dev/password-passphrase-generator/password-passphrase-generator.component').then(
+        (m) => m.PasswordPassphraseGeneratorComponent
+      ),
+  },
+  {
     path: '**',
     title: 'Page Not Found — PrivKnife',
     data: {

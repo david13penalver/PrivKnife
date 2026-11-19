@@ -276,6 +276,12 @@
     "source": "PrivKnife/src/app/tools/media/passport-biometric-photo"
   },
   {
+    "id": "password-passphrase-generator",
+    "route": "/tools/password-passphrase-generator",
+    "category": "dev",
+    "source": "PrivKnife/src/app/tools/dev/password-passphrase-generator"
+  },
+  {
     "id": "pdf-compressor",
     "route": "/tools/pdf-compressor",
     "category": "documents",
