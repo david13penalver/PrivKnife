@@ -1,0 +1,101 @@
+.c-pdf-compare {
+  &__controls,
+  &__tabs,
+  &__row,
+  &__strip,
+  &__summary-bar {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.75rem;
+  }
+
+  &__summary-bar {
+    justify-content: space-between;
+  }
+
+  &__offset {
+    width: 90px;
+  }
+
+  &__check {
+    display: flex;
+    align-items: center;
+    gap: 0.45rem;
+    min-height: 44px;
+    cursor: pointer;
+    font-size: 0.9rem;
+  }
+
+  &__canvas-wrap,
+  &__curtain {
+    position: relative;
+    overflow: hidden;
+    border: 1px solid var(--border-subtle, #e2e8f0);
+    border-radius: 8px;
+  }
+
+  &__curtain-b {
+    position: absolute;
+    inset: 0 auto 0 0;
+    overflow: hidden;
+    border-right: 2px solid #2563eb;
+  }
+
+  &__canvas {
+    display: block;
+    max-width: 100%;
+    height: auto;
+  }
+
+  &__text-diff {
+    line-height: 1.65;
+    padding: 1rem;
+    border: 1px solid var(--border-subtle, #e2e8f0);
+    border-radius: 8px;
+    word-break: break-word;
+  }
+
+  &__tok {
+    margin-right: 0.35rem;
+
+    &--added {
+      background: rgba(22, 163, 74, 0.16);
+      color: #166534;
+      text-decoration: none;
+      padding: 0.1rem 0.3rem;
+      border-radius: 4px;
+    }
+
+    &--removed {
+      background: rgba(220, 38, 38, 0.16);
+      color: #991b1b;
+      padding: 0.1rem 0.3rem;
+      border-radius: 4px;
+    }
+  }
+
+  &__meta {
+    font-size: 0.875rem;
+    color: var(--text-secondary, #64748b);
+    word-break: break-word;
+  }
+
+  &__alert {
+    padding: 0.75rem 1rem;
+    border-radius: 8px;
+    font-size: 0.9rem;
+
+    &--error {
+      background: rgba(220, 38, 38, 0.1);
+      color: #b91c1c;
+      border: 1px solid rgba(220, 38, 38, 0.3);
+    }
+
+    &--warn {
+      background: rgba(217, 119, 6, 0.1);
+      color: #92400e;
+      border: 1px solid rgba(217, 119, 6, 0.3);
+    }
+  }
+}

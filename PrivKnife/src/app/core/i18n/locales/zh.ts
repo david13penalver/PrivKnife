@@ -732,5 +732,20 @@ export const zh: TranslationSchema = {
       importJsonBtn: '导入 JSON 填表快照',
       resetBtn: '清空隐私数据并重置',
     },
+    pdfVisualCompare: {
+      name: 'PDF 视觉像素叠加与文本差异比对工具',
+      description:
+        '完全在本地内存中对比两份 PDF 的像素差异与逐词语义改写，支持卷帘滑动与差异报告导出。',
+      modeOverlay: '视觉叠影比对',
+      modeSideBySide: '并排双视图',
+      modeCurtain: '卷帘对比滑块',
+      modeTextDiff: '文本语义比对',
+      uploadATitle: '原始 PDF（版本 A）',
+      uploadBTitle: '修订 PDF（版本 B）',
+      loadSample: '加载示例合同对比',
+      compareBtn: '本地执行对比',
+      downloadReportBtn: '导出 PDF 差异报告',
+      resetBtn: '重置',
+    },
   },
 };

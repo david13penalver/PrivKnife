@@ -732,5 +732,20 @@ export const es: TranslationSchema = {
       importJsonBtn: 'Importar JSON',
       resetBtn: 'Borrar Datos y Reiniciar',
     },
+    pdfVisualCompare: {
+      name: 'Comparador Visual y Diferencias de PDF',
+      description:
+        'Detecta diferencias visuales píxel a píxel y cambios de texto entre dos versiones PDF 100% en tu navegador.',
+      modeOverlay: 'Superposición Visual',
+      modeSideBySide: 'Lado a Lado',
+      modeCurtain: 'Cortina Interactiva',
+      modeTextDiff: 'Texto Semántico',
+      uploadATitle: 'PDF Original (Versión A)',
+      uploadBTitle: 'PDF Revisado (Versión B)',
+      loadSample: 'Cargar Contrato de Ejemplo',
+      compareBtn: 'Comparar PDFs Localmente',
+      downloadReportBtn: 'Exportar Informe PDF',
+      resetBtn: 'Restablecer',
+    },
   },
 };

@@ -730,6 +730,21 @@ export const en = {
       importJsonBtn: 'Import JSON Snapshot',
       resetBtn: 'Clear PII & Reset',
     },
+    pdfVisualCompare: {
+      name: 'Visual PDF Comparison & Overlay Diff',
+      description:
+        'Detect visual pixel shifts and semantic word edits between two PDF contracts or blueprints with zero cloud uploads.',
+      modeOverlay: 'Visual Overlay',
+      modeSideBySide: 'Side-by-Side',
+      modeCurtain: 'Curtain Slider',
+      modeTextDiff: 'Text Diff',
+      uploadATitle: 'Original PDF (Version A)',
+      uploadBTitle: 'Revised PDF (Version B)',
+      loadSample: 'Load Sample Contract Diff',
+      compareBtn: 'Compare PDFs Locally',
+      downloadReportBtn: 'Export PDF Diff Report',
+      resetBtn: 'Reset',
+    },
   },
 };
 

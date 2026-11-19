@@ -732,5 +732,20 @@ export const ar: TranslationSchema = {
       importJsonBtn: 'استيراد بيانات JSON',
       resetBtn: 'مسح البيانات وإعادة الضبط',
     },
+    pdfVisualCompare: {
+      name: 'المقارنة البصرية واكتشاف فروقات PDF',
+      description:
+        'اكتشف التعديلات النصية والتغييرات البصرية بين نسختين من ملفات PDF محليًا بالكامل دون رفعها لخوادم.',
+      modeOverlay: 'التطابق البصري',
+      modeSideBySide: 'جنبًا إلى جنب',
+      modeCurtain: 'شريط السحب المقارن',
+      modeTextDiff: 'مقارنة النصوص',
+      uploadATitle: 'ملف PDF الأصلي (A)',
+      uploadBTitle: 'ملف PDF المعدل (B)',
+      loadSample: 'تحميل عقد تجريبي',
+      compareBtn: 'مقارنة محليًا',
+      downloadReportBtn: 'تصدير تقرير PDF',
+      resetBtn: 'إعادة ضبط',
+    },
   },
 };

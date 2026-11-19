@@ -732,5 +732,20 @@ export const ja: TranslationSchema = {
       importJsonBtn: 'JSON を読み込む',
       resetBtn: '入力消去＆リセット',
     },
+    pdfVisualCompare: {
+      name: 'PDF ビジュアル比較・オーバーレイ差分ツール',
+      description:
+        '2つの PDF 間の画像変更・レイアウトずれ・テキスト編集をブラウザ内だけで瞬時に検出・比較します。',
+      modeOverlay: 'オーバーレイ差分',
+      modeSideBySide: '並べて比較',
+      modeCurtain: 'カーテンスライダー',
+      modeTextDiff: 'テキスト差分',
+      uploadATitle: '比較元 PDF (A)',
+      uploadBTitle: '比較先 PDF (B)',
+      loadSample: 'サンプル契約書を読込',
+      compareBtn: 'ローカルで比較実行',
+      downloadReportBtn: 'PDF レポート出力',
+      resetBtn: 'リセット',
+    },
   },
 };

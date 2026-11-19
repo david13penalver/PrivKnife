@@ -282,6 +282,12 @@
     "source": "PrivKnife/src/app/tools/documents/pdf-form-studio"
   },
   {
+    "id": "pdf-visual-compare",
+    "route": "/tools/pdf-visual-compare",
+    "category": "documents",
+    "source": "PrivKnife/src/app/tools/documents/pdf-visual-compare"
+  },
+  {
     "id": "pdf-merger",
     "route": "/tools/pdf-merger-splitter",
     "category": "documents",

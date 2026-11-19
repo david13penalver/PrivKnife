@@ -146,6 +146,20 @@ const CATALOG_TOOLS: CatalogTool[] = [
     icon: '📝',
   },
   {
+    id: 'pdf-visual-compare',
+    i18nKey: 'pdfVisualCompare',
+    name: 'Visual PDF Comparison & Overlay Diff Tool',
+    category: 'documents',
+    categoryLabel: 'Documents',
+    description:
+      'Spot pixel changes, graphics shifts, and word edits between two PDF files 100% locally with overlay and redline views.',
+    keywords: ['compare pdf', 'pdf diff', 'overlay', 'contract compare'],
+    status: 'ready',
+    route: '/tools/pdf-visual-compare',
+    techStack: 'PDF.js • YIQ Pixel Diff • Myers Diff',
+    icon: '🔍',
+  },
+  {
     id: 'pdf-merger-splitter',
     i18nKey: 'pdfMerger',
     name: 'PDF Merger, Splitter & Page Organizer',

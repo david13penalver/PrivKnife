@@ -689,6 +689,14 @@ describe('ToolRegistry (Seam 3: Catalog & Architecture Verification)', () => {
     expect(TOOL_I18N_MAP['pdf-form-studio']).toBe('pdfFormStudio');
   });
 
+  it('should find pdf-visual-compare tool by id', () => {
+    const tool = getToolById('pdf-visual-compare');
+    expect(tool).toBeDefined();
+    expect(tool?.category).toBe('documents');
+    expect(tool?.isFullyClientSide).toBe(true);
+    expect(TOOL_I18N_MAP['pdf-visual-compare']).toBe('pdfVisualCompare');
+  });
+
   describe('Tool Registry Localization (i18n)', () => {
     it('should have an i18n key mapping for every registered tool', () => {
       for (const tool of TOOL_REGISTRY) {

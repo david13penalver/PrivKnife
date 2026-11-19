@@ -203,6 +203,25 @@ export const routes: Routes = [
       ),
   },
   {
+    path: 'tools/pdf-visual-compare',
+    title: 'Visual PDF Comparison & Overlay Diff Tool — PrivKnife',
+    data: {
+      description:
+        'Spot visual pixel shifts and semantic word edits between two PDF contracts or blueprints using YIQ pixel overlay, curtain slider, and word diff 100% locally.',
+      keywords: [
+        'compare pdf',
+        'pdf diff tool',
+        'visual pdf overlay',
+        'contract comparison',
+      ],
+      url: '/tools/pdf-visual-compare',
+    },
+    loadComponent: () =>
+      import('./tools/documents/pdf-visual-compare/pdf-visual-compare.component').then(
+        (m) => m.PdfVisualCompareComponent
+      ),
+  },
+  {
     path: 'tools/pdf-merger-splitter',
     title: 'PDF Merger, Splitter & Page Organizer — PrivKnife',
     data: {
