@@ -1,5 +1,5 @@
 import { Injectable, signal } from '@angular/core';
-import { en, TranslationSchema } from './locales/en';
+import { en } from './locales/en';
 import {
   DEFAULT_LANGUAGE_CODE,
   getLanguageByCode,
@@ -7,7 +7,7 @@ import {
   STORAGE_KEY_LANG,
   SUPPORTED_LANGUAGES,
 } from './languages.config';
-import { LanguageDefinition, TranslationParams } from './types';
+import { LanguageDefinition, TranslationDictionary, TranslationParams } from './types';
 
 @Injectable({
   providedIn: 'root',
@@ -26,6 +26,12 @@ export class I18nService {
   private readonly dictionaryCache = new Map<string, Record<string, any>>([
     ['en', en],
   ]);
+
+  private readonly englishCatalog = signal<TranslationDictionary>({});
+  private readonly englishToolDetails = signal<TranslationDictionary>({});
+  private readonly englishToolRequests = new Map<string, Promise<void>>();
+  private englishCatalogRequest?: Promise<void>;
+  private languageRequest = 0;
 
   constructor() {
     this.initLanguage();
@@ -90,9 +96,11 @@ export class I18nService {
     const code = normalizeLanguageCode(rawCode);
     const targetLangDef = getLanguageByCode(code);
 
+    const request = ++this.languageRequest;
     this.isLoading.set(true);
     try {
       const dictionary = await this.loadDictionary(code);
+      if (request !== this.languageRequest) return;
       this.translations.set(dictionary);
       this.currentLang.set(targetLangDef);
 
@@ -106,7 +114,7 @@ export class I18nService {
 
       this.updateDocumentAttributes(targetLangDef);
     } finally {
-      this.isLoading.set(false);
+      if (request === this.languageRequest) this.isLoading.set(false);
     }
   }
 
@@ -144,12 +152,40 @@ export class I18nService {
         break;
       case 'en':
       default:
-        dict = (await import('./locales/en')).en;
+        dict = en;
         break;
     }
 
     this.dictionaryCache.set(code, dict);
     return dict;
+  }
+
+  /** Load tool card text and the requested English controls before a route renders. */
+  async loadEnglishTools(...scopes: string[]): Promise<void> {
+    const catalog = this.englishCatalogRequest ??= import('./locales/en-tool-catalog')
+      .then(({ enToolCatalog }) => this.englishCatalog.set(enToolCatalog))
+      .catch((error: unknown) => {
+        this.englishCatalogRequest = undefined;
+        throw error;
+      });
+
+    await Promise.all([catalog, ...scopes.map((scope) => this.loadEnglishToolDetails(scope))]);
+  }
+
+  private loadEnglishToolDetails(scope: string): Promise<void> {
+    const pending = this.englishToolRequests.get(scope);
+    if (pending) return pending;
+
+    const request = import('./locales/en-tool-loaders').then(async ({ enToolLoaders }) => {
+      if (!Object.hasOwn(enToolLoaders, scope)) return;
+      const { default: details } = await enToolLoaders[scope as keyof typeof enToolLoaders]();
+      this.englishToolDetails.update((current) => ({ ...current, [scope]: details }));
+    }).catch((error: unknown) => {
+      this.englishToolRequests.delete(scope);
+      throw error;
+    });
+    this.englishToolRequests.set(scope, request);
+    return request;
   }
 
   /**
@@ -174,8 +210,13 @@ export class I18nService {
 
     // Fallback to English if missing or not a string
     if (typeof value !== 'string') {
-      const fallbackDict = this.dictionaryCache.get('en') || en;
-      value = this.resolveKeyPath(fallbackDict, key);
+      if (key.startsWith('tools.')) {
+        const path = key.slice('tools.'.length);
+        value = this.resolveKeyPath(this.englishCatalog(), path) ??
+          this.resolveKeyPath(this.englishToolDetails(), path);
+      } else {
+        value = this.resolveKeyPath(en, key);
+      }
     }
 
     // If still not a string, return the key itself

@@ -56,13 +56,13 @@ it('ships a restrictive CSP with only the explicit DNS-over-HTTPS endpoint excep
 it('keeps the disabled PageSpeed route informational and out of every tool catalog', () => {
   const registry = read('src/app/tools/tool-registry.ts');
   const home = read('src/app/pages/home/home.ts');
-  const routes = read('src/app/app.routes.ts');
+  const routes = read('src/app/tools/tool.routes.ts');
   const engine = read('src/app/tools/dev/web-vitals/engine.ts');
   assert.doesNotMatch(registry, /id:\s*'web-vitals'/);
   assert.doesNotMatch(home, /id:\s*'web-vitals'/);
   assert.match(
     routes,
-    /path: 'tools\/web-vitals'/,
+    /path: 'web-vitals'/,
     'legacy bookmarks retain the explanatory route',
   );
   assert.doesNotMatch(engine, /pagespeedonline|runPageSpeedAudit|buildPageSpeedApiUrl|fetch\s*\(/i);

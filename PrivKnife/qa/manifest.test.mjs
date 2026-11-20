@@ -4,12 +4,12 @@ import fs from 'node:fs';
 import { assertManifest } from './smoke.mjs';
 
 it('keeps the browser manifest in sync with canonical lazy routes', () => {
-  const root = new URL('../src/app/app.routes.ts', import.meta.url);
+  const root = new URL('../src/app/tools/tool.routes.ts', import.meta.url);
   const source = fs.readFileSync(root, 'utf8');
-  const canonical = [...source.matchAll(/path: '(tools\/[^']+)'([\s\S]*?)(?=\n  \},)/g)]
+  const canonical = [...source.matchAll(/path: '([^']+)'([\s\S]*?)(?=\n  \},)/g)]
     .filter((match) => match[0].includes('loadComponent'))
-    .filter((match) => match[1] !== 'tools/web-vitals')
-    .map((match) => `/${match[1]}`)
+    .filter((match) => match[1] !== 'web-vitals')
+    .map((match) => `/tools/${match[1]}`)
     .sort();
   const manifest = JSON.parse(fs.readFileSync(new URL('./tool-manifest.json', import.meta.url), 'utf8'));
   assertManifest(manifest);

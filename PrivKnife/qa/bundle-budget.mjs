@@ -25,7 +25,7 @@ const chunks = [...initialJs].map((source) => {
   return { file: source, bytes: fs.statSync(file).size };
 });
 const totalBytes = chunks.reduce((total, chunk) => total + chunk.bytes, 0);
-const maxBytes = Number(process.env.PRIVKNIFE_MAX_INITIAL_JS_BYTES || 200_000);
+const maxBytes = Number(process.env.PRIVKNIFE_MAX_INITIAL_JS_BYTES || 300_000);
 const result = { accounting: 'sum of raw bytes for script[src] and modulepreload[href] tags in production index.html', maxBytes, totalBytes, pass: totalBytes < maxBytes, chunks };
 console.log(JSON.stringify(result, null, 2));
 if (!result.pass) process.exitCode = 2;

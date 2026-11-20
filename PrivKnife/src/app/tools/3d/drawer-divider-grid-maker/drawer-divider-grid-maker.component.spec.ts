@@ -24,6 +24,7 @@ describe('DrawerDividerGridMakerComponent (Spec 125 — Seam 3)', () => {
     }).compileComponents();
 
     i18n = TestBed.inject(I18nService);
+    await i18n.loadEnglishTools('drawerDividerGridMaker');
     await i18n.setLanguage('en');
 
     fixture = TestBed.createComponent(DrawerDividerGridMakerComponent);

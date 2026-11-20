@@ -30,6 +30,7 @@ describe('Home Component (Presentation & Tool Catalog)', () => {
       providers: [provideRouter([]), I18nService],
     }).compileComponents();
 
+    await TestBed.inject(I18nService).loadEnglishTools();
     fixture = TestBed.createComponent(Home);
     component = fixture.componentInstance;
     fixture.detectChanges();

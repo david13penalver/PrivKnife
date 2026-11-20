@@ -1,0 +1,16 @@
+export default {
+  presetsTitle: '1. Curated Presets',
+  unitsTitle: '2. Grid Units & Bin Height',
+  dividersTitle: '3. Dividers, Scoops & Tabs',
+  viewportTitle: 'Interactive 3D Preview',
+  gridWidth: 'Grid Width (X):',
+  gridDepth: 'Grid Depth (Y):',
+  binHeight: 'Bin Height:',
+  lipStyle: 'Top Stacking Lip Style',
+  xCompartments: 'X Compartments:',
+  yCompartments: 'Y Compartments:',
+  fingerScoop: 'Curved Finger Scoop',
+  labelTab: 'Angled 45° Label Tab',
+  magnetPockets: 'Base Magnet Pockets',
+  screwHoles: 'M3 Counterbore Screw Holes',
+};

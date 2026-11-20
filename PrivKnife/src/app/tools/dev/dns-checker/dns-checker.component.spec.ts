@@ -1,3 +1,4 @@
+import { I18nService } from '../../../core/i18n';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { DnsCheckerComponent } from './dns-checker.component';
@@ -17,6 +18,7 @@ describe('DnsCheckerComponent privacy and request flow', () => {
     } as unknown as Response);
 
     await TestBed.configureTestingModule({ imports: [DnsCheckerComponent] }).compileComponents();
+    await TestBed.inject(I18nService).loadEnglishTools('dnsChecker');
     fixture = TestBed.createComponent(DnsCheckerComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();

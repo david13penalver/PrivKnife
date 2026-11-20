@@ -26,6 +26,7 @@ describe('PdfImageConverterComponent (Seam 3: Angular UI, Privacy & Resource Saf
     }).compileComponents();
 
     i18nService = TestBed.inject(I18nService);
+    await i18nService.loadEnglishTools('pdfImageConverter');
     await i18nService.setLanguage('en');
 
     fixture = TestBed.createComponent(PdfImageConverterComponent);

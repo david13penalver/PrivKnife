@@ -24,6 +24,7 @@ describe('CableCombClipMakerComponent (Spec 130 — Seam 3)', () => {
     }).compileComponents();
 
     i18n = TestBed.inject(I18nService);
+    await i18n.loadEnglishTools('cableCombClipMaker');
     await i18n.setLanguage('en');
 
     fixture = TestBed.createComponent(CableCombClipMakerComponent);

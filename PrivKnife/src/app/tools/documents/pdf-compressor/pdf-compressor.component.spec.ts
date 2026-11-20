@@ -25,6 +25,7 @@ describe('PdfCompressorComponent (Seam 3: Angular UI, Privacy & Resource Safety)
     }).compileComponents();
 
     i18nService = TestBed.inject(I18nService);
+    await i18nService.loadEnglishTools('pdfCompressor');
     await i18nService.setLanguage('en');
 
     fixture = TestBed.createComponent(PdfCompressorComponent);

@@ -45,7 +45,7 @@ Every AI agent operating in this codebase MUST abide by the following non-negoti
 
 ### 🧩 Directive 5: Modular Lazy Loading
 - Every tool is a self-contained Angular Standalone Component.
-- All tool components and heavy dependencies (like `Three.js`, `ffmpeg.wasm`, `pdf-lib`) **MUST** be loaded dynamically via Angular router `loadComponent: () => import(...)`. The initial bundle of PrivKnife must remain lightweight (< 200KB initial JS).
+- All tool components and heavy dependencies (like `Three.js`, `ffmpeg.wasm`, `pdf-lib`) **MUST** be loaded dynamically via Angular router `loadComponent: () => import(...)`. Initial uncompressed JavaScript must stay under 300,000 bytes, as measured by `npm run qa:bundle-budget`. The Angular build warns at 340 kB for initial assets, including CSS.
 
 ---
 

@@ -61,6 +61,34 @@ describe('I18nService', () => {
     expect(download).toBe('Download');
   });
 
+  it('loads English tool controls separately from the shell and catalog', async () => {
+    const title = 'tools.funnelScoopMaker.name';
+    const label = 'tools.funnelScoopMaker.spoutOuterDiameterMm';
+    const otherToolLabel = 'tools.calibrationToleranceSuite.bedWidthMm';
+
+    expect(service.t(title)).toBe(title);
+    await service.loadEnglishTools();
+    expect(service.t(title)).toBe('Vented Funnel & Measuring Scoop Maker');
+    expect(service.t(label)).toBe(label);
+
+    await service.loadEnglishTools('funnelScoopMaker');
+    expect(service.t(label)).toBe('Spout outer diameter');
+    expect(service.t(otherToolLabel)).toBe(otherToolLabel);
+
+    await service.setLanguage('es');
+    expect(service.t(label)).toBe('Diámetro exterior del pico');
+    service.translations.set({ tools: {} });
+    expect(service.t(label)).toBe('Spout outer diameter');
+  });
+
+  it('keeps the most recent language when an older request resolves later', async () => {
+    const older = service.setLanguage('es');
+    await service.setLanguage('en');
+    await older;
+    expect(service.currentLang().code).toBe('en');
+    expect(localStorage.getItem(STORAGE_KEY_LANG)).toBe('en');
+  });
+
   it('should switch language to Spanish and update translations', async () => {
     await service.setLanguage('es');
 
@@ -245,6 +273,7 @@ describe('I18nService', () => {
 
   it('should resolve all 30 Batch 2 tool translations in English and Spanish (Spec 91)', async () => {
     // English assertions
+    await service.loadEnglishTools();
     await service.setLanguage('en');
     expect(service.t('home.ribbonTools')).toContain('59+');
     expect(service.t('home.searchPlaceholder')).toContain('59+');

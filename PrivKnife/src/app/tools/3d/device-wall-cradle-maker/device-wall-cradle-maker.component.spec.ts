@@ -24,6 +24,7 @@ describe('DeviceWallCradleMakerComponent (Spec 129 — Seam 3)', () => {
     }).compileComponents();
 
     i18n = TestBed.inject(I18nService);
+    await i18n.loadEnglishTools('deviceWallCradleMaker');
     await i18n.setLanguage('en');
 
     fixture = TestBed.createComponent(DeviceWallCradleMakerComponent);

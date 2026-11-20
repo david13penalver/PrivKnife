@@ -1,3 +1,4 @@
+import { I18nService } from '../../../core/i18n';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { provideRouter } from '@angular/router';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
@@ -22,6 +23,7 @@ describe('PdfMergerComponent (Seam 2: UI, Actions & Privacy Boundary)', () => {
       providers: [provideRouter([])],
     }).compileComponents();
 
+    await TestBed.inject(I18nService).loadEnglishTools('pdfMerger');
     fixture = TestBed.createComponent(PdfMergerComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();

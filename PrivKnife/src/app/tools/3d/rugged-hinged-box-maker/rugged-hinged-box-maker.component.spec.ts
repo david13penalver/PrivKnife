@@ -24,6 +24,7 @@ describe('RuggedHingedBoxMakerComponent (Spec 124 — Seam 3)', () => {
     }).compileComponents();
 
     i18n = TestBed.inject(I18nService);
+    await i18n.loadEnglishTools('ruggedHingedBoxMaker');
     await i18n.setLanguage('en');
 
     fixture = TestBed.createComponent(RuggedHingedBoxMakerComponent);

@@ -1,0 +1,18 @@
+export default {
+  templatesTitle: '1. Choose a Starting Template',
+  imageTitle: '2. Image Source & Contrast',
+  geometryTitle: '3. 3D Geometry & Wall Dimensions',
+  viewportTitle: 'Interactive 3D Viewport',
+  contrastBoost: 'Contrast Boost:',
+  invertRelief: 'Invert Optical Relief (Negative Mode)',
+  geometryStyle: 'Geometry Style',
+  arcAngle: 'Arc Angle:',
+  width: 'Width:',
+  height: 'Height:',
+  minThickness: 'Min Thickness (Highlights):',
+  maxThickness: 'Max Thickness (Shadows):',
+  borderWidth: 'Border Width:',
+  borderDepth: 'Border Depth:',
+  stabilizingFoot: 'Add Integrated Stabilizing Foot / Standing Lip',
+  backlight: 'Backlight:',
+};

@@ -1,0 +1,15 @@
+export default {
+  uploadTitle: 'Upload PDF Document',
+  loadSample: 'Load Corrupted Sample PDF',
+  modeTitle: 'Repair, Metadata & Archival Modes',
+  tabRepair: 'Repair & Linearize',
+  tabMetadata: 'Metadata & Scrubber',
+  tabPdfa: 'PDF/A-2b Archiver',
+  repairBtn: 'Repair & Linearize PDF',
+  scrubBtn: 'Scrub All Hidden Metadata',
+  applyMetaBtn: 'Save Updated Metadata',
+  pdfaBtn: 'Package PDF/A-2b',
+  outputTitle: 'Health Inspection & Archival Output',
+  downloadBtn: 'Download .pdf',
+  resetBtn: 'Reset',
+};

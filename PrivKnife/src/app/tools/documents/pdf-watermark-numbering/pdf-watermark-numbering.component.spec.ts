@@ -25,6 +25,7 @@ describe('PdfWatermarkNumberingComponent (Seam 3: Angular UI, Privacy & Resource
     }).compileComponents();
 
     i18nService = TestBed.inject(I18nService);
+    await i18nService.loadEnglishTools('pdfWatermarkNumbering');
     await i18nService.setLanguage('en');
 
     fixture = TestBed.createComponent(PdfWatermarkNumberingComponent);

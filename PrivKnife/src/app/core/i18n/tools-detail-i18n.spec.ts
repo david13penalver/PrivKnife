@@ -46,6 +46,7 @@ describe('Tools Detail Pages Localization (Batch 2: Tools 31–60)', () => {
 
     // English
     await i18nService.setLanguage('en');
+    await i18nService.loadEnglishTools('parametricLampDesigner');
     const fixture = TestBed.createComponent(ParametricLampDesignerComponent);
     fixture.detectChanges();
 
@@ -95,6 +96,7 @@ describe('Tools Detail Pages Localization (Batch 2: Tools 31–60)', () => {
     i18nService = TestBed.inject(I18nService);
     await i18nService.setLanguage('es');
 
+    await i18nService.loadEnglishTools('lithophaneMaker');
     const fixture = TestBed.createComponent(LithophaneMakerComponent);
     fixture.detectChanges();
 
@@ -121,6 +123,7 @@ describe('Tools Detail Pages Localization (Batch 2: Tools 31–60)', () => {
     i18nService = TestBed.inject(I18nService);
     await i18nService.setLanguage('es');
 
+    await i18nService.loadEnglishTools('gridfinityBinGenerator');
     const fixture = TestBed.createComponent(GridfinityBinGeneratorComponent);
     fixture.detectChanges();
 
@@ -149,6 +152,7 @@ describe('Tools Detail Pages Localization (Batch 2: Tools 31–60)', () => {
 
     // English
     await i18nService.setLanguage('en');
+    await i18nService.loadEnglishTools('passportBiometricPhoto');
     const fixture = TestBed.createComponent(PassportBiometricPhotoComponent);
     fixture.detectChanges();
 
@@ -187,6 +191,7 @@ describe('Tools Detail Pages Localization (Batch 2: Tools 31–60)', () => {
 
     // English
     await i18nService.setLanguage('en');
+    await i18nService.loadEnglishTools('fileEncryptorVault');
     const fixture = TestBed.createComponent(FileEncryptorVaultComponent);
     fixture.detectChanges();
 
@@ -220,6 +225,7 @@ describe('Tools Detail Pages Localization (Batch 2: Tools 31–60)', () => {
 
     // English
     await i18nService.setLanguage('en');
+    await i18nService.loadEnglishTools('csvVectorChartBuilder');
     const fixture = TestBed.createComponent(CsvVectorChartBuilderComponent);
     fixture.detectChanges();
 
@@ -253,6 +259,7 @@ describe('Tools Detail Pages Localization (Batch 2: Tools 31–60)', () => {
 
     // English
     await i18nService.setLanguage('en');
+    await i18nService.loadEnglishTools('localOcrTextExtractor');
     const fixture = TestBed.createComponent(LocalOcrTextExtractorComponent);
     fixture.detectChanges();
 
@@ -285,6 +292,7 @@ describe('Tools Detail Pages Localization (Batch 2: Tools 31–60)', () => {
     i18nService = TestBed.inject(I18nService);
 
     await i18nService.setLanguage('en');
+    await i18nService.loadEnglishTools('exifStripper');
     const fixture = TestBed.createComponent(ExifStripperComponent);
     fixture.detectChanges();
 
@@ -311,6 +319,7 @@ describe('Tools Detail Pages Localization (Batch 2: Tools 31–60)', () => {
     i18nService = TestBed.inject(I18nService);
 
     await i18nService.setLanguage('en');
+    await i18nService.loadEnglishTools('cryptoHash');
     const fixture = TestBed.createComponent(CryptoHashUuidComponent);
     fixture.detectChanges();
 
@@ -362,6 +371,7 @@ describe('Tools Detail Pages Localization (Batch 2: Tools 31–60)', () => {
       'csvVectorChartBuilder',
     ];
 
+    await i18nService.loadEnglishTools();
     const SUPPORTED_LANG_CODES = ['en', 'es', 'fr', 'de', 'it', 'zh', 'ja', 'ar'] as const;
 
     // Assert that each tool's name and description resolve to non-empty translations in all 8 languages

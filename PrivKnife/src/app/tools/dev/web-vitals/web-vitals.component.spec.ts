@@ -1,3 +1,4 @@
+import { I18nService } from '../../../core/i18n';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { WebVitalsComponent } from './web-vitals.component';
@@ -9,6 +10,7 @@ describe('WebVitalsComponent legacy bookmark route', () => {
   beforeEach(async () => {
     fetchSpy = vi.spyOn(window, 'fetch');
     await TestBed.configureTestingModule({ imports: [WebVitalsComponent] }).compileComponents();
+    await TestBed.inject(I18nService).loadEnglishTools('webVitals');
     fixture = TestBed.createComponent(WebVitalsComponent);
     fixture.detectChanges();
   });

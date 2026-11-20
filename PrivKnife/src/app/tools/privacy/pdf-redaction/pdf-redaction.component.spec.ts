@@ -1,3 +1,4 @@
+import { I18nService } from '../../../core/i18n';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { provideRouter } from '@angular/router';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
@@ -22,6 +23,7 @@ describe('PdfRedactionComponent (Seam 2: UI, Signals, Redactions & Privacy Bound
       providers: [provideRouter([])],
     }).compileComponents();
 
+    await TestBed.inject(I18nService).loadEnglishTools('pdfRedaction');
     fixture = TestBed.createComponent(PdfRedactionComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();

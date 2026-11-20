@@ -1,3 +1,4 @@
+import { I18nService } from '../../../core/i18n';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { provideRouter } from '@angular/router';
 import { describe, expect, it, vi, beforeEach, afterEach } from 'vitest';
@@ -27,6 +28,7 @@ describe('ExifStripperComponent (Seam 2: UI & Privacy Boundary)', () => {
       providers: [provideRouter([])],
     }).compileComponents();
 
+    await TestBed.inject(I18nService).loadEnglishTools('exifStripper');
     fixture = TestBed.createComponent(ExifStripperComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();

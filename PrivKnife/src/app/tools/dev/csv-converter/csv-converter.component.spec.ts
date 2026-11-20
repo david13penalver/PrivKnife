@@ -1,3 +1,4 @@
+import { I18nService } from '../../../core/i18n';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { provideRouter } from '@angular/router';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
@@ -24,6 +25,7 @@ describe('CsvConverterComponent (Seam 2: UI & Privacy Boundary)', () => {
       providers: [provideRouter([])],
     }).compileComponents();
 
+    await TestBed.inject(I18nService).loadEnglishTools('csvConverter');
     fixture = TestBed.createComponent(CsvConverterComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
