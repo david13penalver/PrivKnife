@@ -486,6 +486,12 @@
     "source": "PrivKnife/src/app/tools/documents/table-tent-maker"
   },
   {
+    "id": "threaded-tube-pill-organizer",
+    "route": "/tools/threaded-tube-pill-organizer",
+    "category": "3d",
+    "source": "PrivKnife/src/app/tools/3d/threaded-tube-pill-organizer"
+  },
+  {
     "id": "timestamp-timezone-converter",
     "route": "/tools/timestamp-timezone-converter",
     "category": "dev",

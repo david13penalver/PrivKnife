@@ -2252,6 +2252,12 @@ export const routes: Routes = [
     ),
   },
   {
+    path: 'tools/threaded-tube-pill-organizer',
+    loadComponent: () => import('./tools/3d/threaded-tube-pill-organizer/threaded-tube-pill-organizer.component').then(
+      (m) => m.ThreadedTubePillOrganizerComponent
+    ),
+  },
+  {
     path: '**',
     title: 'Page Not Found — PrivKnife',
     data: {
