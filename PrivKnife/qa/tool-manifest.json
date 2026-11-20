@@ -60,6 +60,12 @@
     "source": "PrivKnife/src/app/tools/3d/cappuccino-stencil-maker"
   },
   {
+    "id": "case-unicode-text-studio",
+    "route": "/tools/case-unicode-text-studio",
+    "category": "dev",
+    "source": "PrivKnife/src/app/tools/dev/case-unicode-text-studio"
+  },
+  {
     "id": "color-palette-extractor",
     "route": "/tools/color-palette-extractor",
     "category": "dev",

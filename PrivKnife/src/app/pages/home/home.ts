@@ -1028,6 +1028,20 @@ const CATALOG_TOOLS: CatalogTool[] = [
     techStack: 'Web Crypto CSPRNG • Rejection Sampling • EFF Diceware',
     icon: '🔐',
   },
+  {
+    id: 'case-unicode-text-studio',
+    i18nKey: 'caseUnicodeTextStudio',
+    name: 'Case, Unicode & Zalgo Text Studio',
+    category: 'dev',
+    categoryLabel: 'Dev / Text',
+    description:
+      'Convert 13 identifier cases, 16 Unicode fonts, Zalgo/De-Zalgo, and 150+ Kaomojis locally.',
+    keywords: ['case converter', 'unicode font', 'zalgo', 'kaomoji', 'slugify'],
+    status: 'ready',
+    route: '/tools/case-unicode-text-studio',
+    techStack: 'Acronym Tokenizer • Hole-Free Unicode Tables • Zalgo Engine',
+    icon: '🔤',
+  },
 ];
 
 @Component({

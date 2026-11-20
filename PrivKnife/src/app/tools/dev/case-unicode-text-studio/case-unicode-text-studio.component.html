@@ -1,0 +1,329 @@
+<div class="c-text-studio l-columns l-columns--1 g--margin-x-auto">
+  <div class="l-columns__area g--margin-bottom-4">
+    <div class="l-extremo c-text-studio__header">
+      <div class="l-extremo__area-izquierda">
+        <h1 class="g--margin-bottom-2">{{ 'tools.caseUnicodeTextStudio.name' | translate }}</h1>
+        <p class="c-text-studio__subtitle">{{ 'tools.caseUnicodeTextStudio.description' | translate }}</p>
+      </div>
+      <div class="l-extremo__area-derecha">
+        <app-badge variant="privacy" [dot]="true">{{ 'common.guaranteedClientSide' | translate }}</app-badge>
+      </div>
+    </div>
+  </div>
+
+  <!-- 4 Studio Tabs -->
+  <div class="l-columns__area g--margin-bottom-4">
+    <div class="c-text-studio__tabs" role="tablist">
+      <button
+        type="button"
+        role="tab"
+        class="c-text-studio__tab"
+        [class.c-text-studio__tab--active]="activeTab() === 'case'"
+        [attr.aria-selected]="activeTab() === 'case'"
+        (click)="activeTab.set('case')">
+        {{ 'tools.caseUnicodeTextStudio.tabCase' | translate }}
+      </button>
+      <button
+        type="button"
+        role="tab"
+        class="c-text-studio__tab"
+        [class.c-text-studio__tab--active]="activeTab() === 'unicode'"
+        [attr.aria-selected]="activeTab() === 'unicode'"
+        (click)="activeTab.set('unicode')">
+        {{ 'tools.caseUnicodeTextStudio.tabUnicode' | translate }}
+      </button>
+      <button
+        type="button"
+        role="tab"
+        class="c-text-studio__tab"
+        [class.c-text-studio__tab--active]="activeTab() === 'zalgo'"
+        [attr.aria-selected]="activeTab() === 'zalgo'"
+        (click)="activeTab.set('zalgo')">
+        {{ 'tools.caseUnicodeTextStudio.tabZalgo' | translate }}
+      </button>
+      <button
+        type="button"
+        role="tab"
+        class="c-text-studio__tab"
+        [class.c-text-studio__tab--active]="activeTab() === 'kaomoji'"
+        [attr.aria-selected]="activeTab() === 'kaomoji'"
+        (click)="activeTab.set('kaomoji')">
+        {{ 'tools.caseUnicodeTextStudio.tabKaomoji' | translate }} ({{ filteredKaomojis().length }})
+      </button>
+    </div>
+  </div>
+
+  <!-- Persistent Input Workspace (Tabs 1-3) -->
+  @if (activeTab() !== 'kaomoji') {
+    <div class="l-columns__area g--margin-bottom-4">
+      <app-card>
+        <div card-header class="l-extremo c-text-studio__row-between">
+          <div class="l-extremo__area-izquierda">
+            <strong>{{ 'tools.caseUnicodeTextStudio.inputTitle' | translate }}</strong>
+          </div>
+          <div class="l-extremo__area-derecha c-text-studio__util-bar">
+            <app-button variant="outline" size="small" (click)="applyQuickUtil('trim')">Trim</app-button>
+            <app-button variant="outline" size="small" (click)="applyQuickUtil('dedup')">Dedup</app-button>
+            <app-button variant="outline" size="small" (click)="applyQuickUtil('sort_asc')">A-Z</app-button>
+            <app-button variant="outline" size="small" (click)="applyQuickUtil('sort_desc')">Z-A</app-button>
+            <app-button variant="outline" size="small" (click)="applyQuickUtil('remove_empty')">
+              {{ 'tools.caseUnicodeTextStudio.noEmptyBtn' | translate }}
+            </app-button>
+            <app-button variant="outline" size="small" (click)="applyQuickUtil('reverse')">
+              {{ 'tools.caseUnicodeTextStudio.reverseBtn' | translate }}
+            </app-button>
+            <app-button variant="outline" size="small" (click)="reset()">
+              {{ 'common.clear' | translate }}
+            </app-button>
+          </div>
+        </div>
+
+        <div card-body>
+          <textarea
+            rows="4"
+            class="c-input c-text-studio__textarea"
+            [placeholder]="'tools.caseUnicodeTextStudio.inputPlaceholder' | translate"
+            [ngModel]="inputText()"
+            (ngModelChange)="inputText.set($event)"></textarea>
+
+          <div class="c-text-studio__stats g--margin-top-3">
+            <span>{{ 'tools.caseUnicodeTextStudio.statChars' | translate }}: <strong>{{ stats().characters }}</strong></span>
+            <span>{{ 'tools.caseUnicodeTextStudio.statCodePoints' | translate }}: <strong>{{ stats().codePoints }}</strong></span>
+            <span>{{ 'tools.caseUnicodeTextStudio.statWords' | translate }}: <strong>{{ stats().words }}</strong></span>
+            <span>{{ 'tools.caseUnicodeTextStudio.statLines' | translate }}: <strong>{{ stats().lines }}</strong></span>
+            <span>{{ 'tools.caseUnicodeTextStudio.statBytes' | translate }}: <strong>{{ stats().utf8Bytes }}</strong></span>
+            <span>{{ 'tools.caseUnicodeTextStudio.statReadMin' | translate }}: <strong>{{ readingTimeMinutes() }}m</strong></span>
+          </div>
+        </div>
+      </app-card>
+    </div>
+  }
+
+  <!-- Tab 1: Case Converter -->
+  @if (activeTab() === 'case') {
+    <div class="l-columns__area">
+      <div class="c-text-studio__options g--margin-bottom-3">
+        <label class="c-text-studio__check">
+          <input
+            type="checkbox"
+            [ngModel]="batchLineByLine()"
+            (ngModelChange)="batchLineByLine.set($event)" />
+          <span>{{ 'tools.caseUnicodeTextStudio.batchModeLabel' | translate }}</span>
+        </label>
+        <label class="c-text-studio__check">
+          <input
+            type="checkbox"
+            [ngModel]="stripDiacriticsForSlug()"
+            (ngModelChange)="stripDiacriticsForSlug.set($event)" />
+          <span>{{ 'tools.caseUnicodeTextStudio.stripDiacriticsLabel' | translate }}</span>
+        </label>
+      </div>
+
+      <div class="c-text-studio__grid">
+        @for (item of caseOutputs(); track item.id) {
+          <app-card>
+            <div card-header class="l-extremo c-text-studio__row-between">
+              <strong class="c-text-studio__card-title">{{ item.label }}</strong>
+              <div class="l-extremo__area-derecha c-text-studio__btn-group">
+                <app-button
+                  variant="secondary"
+                  size="small"
+                  [disabled]="!item.value"
+                  (click)="copyValue(item.value, 'case-' + item.id)">
+                  @if (copiedKey() === 'case-' + item.id) {
+                    {{ 'common.copied' | translate }}
+                  } @else {
+                    {{ 'common.copy' | translate }}
+                  }
+                </app-button>
+                <app-button
+                  variant="outline"
+                  size="small"
+                  [disabled]="!item.value"
+                  (click)="exportTxt(item.value, 'privknife-' + item.id + '.txt')">
+                  .txt
+                </app-button>
+              </div>
+            </div>
+            <div card-body>
+              <pre class="c-text-studio__output">{{ item.value || '—' }}</pre>
+            </div>
+          </app-card>
+        }
+      </div>
+    </div>
+  }
+
+  <!-- Tab 2: Unicode Typography -->
+  @if (activeTab() === 'unicode') {
+    <div class="l-columns__area">
+      <div class="c-text-studio__advisory g--margin-bottom-4" role="note">
+        {{ 'tools.caseUnicodeTextStudio.unicodeA11yNote' | translate }}
+      </div>
+
+      <div class="c-text-studio__grid">
+        @for (item of unicodeOutputs(); track item.id) {
+          <app-card>
+            <div card-header class="l-extremo c-text-studio__row-between">
+              <strong class="c-text-studio__card-title">{{ item.label }}</strong>
+              <div class="l-extremo__area-derecha c-text-studio__btn-group">
+                <app-button
+                  variant="secondary"
+                  size="small"
+                  [disabled]="!item.value"
+                  (click)="copyValue(item.value, 'uni-' + item.id)">
+                  @if (copiedKey() === 'uni-' + item.id) {
+                    {{ 'common.copied' | translate }}
+                  } @else {
+                    {{ 'common.copy' | translate }}
+                  }
+                </app-button>
+                <app-button
+                  variant="outline"
+                  size="small"
+                  [disabled]="!item.value"
+                  (click)="exportTxt(item.value, 'privknife-' + item.id + '.txt')">
+                  .txt
+                </app-button>
+              </div>
+            </div>
+            <div card-body>
+              <pre class="c-text-studio__output c-text-studio__output--unicode">{{ item.value || '—' }}</pre>
+            </div>
+          </app-card>
+        }
+      </div>
+    </div>
+  }
+
+  <!-- Tab 3: Zalgo / De-Zalgo Engine -->
+  @if (activeTab() === 'zalgo') {
+    <div class="l-columns__area">
+      <app-card>
+        <div card-header class="l-extremo c-text-studio__row-between">
+          <strong>{{ 'tools.caseUnicodeTextStudio.zalgoControlsTitle' | translate }}</strong>
+          <div class="l-extremo__area-derecha c-text-studio__btn-group">
+            <app-button variant="outline" size="small" (click)="rerollZalgo()">
+              {{ 'tools.caseUnicodeTextStudio.rerollBtn' | translate }}
+            </app-button>
+            <app-button variant="outline" size="small" (click)="stripDirectInputZalgo()">
+              {{ 'tools.caseUnicodeTextStudio.deZalgoBtn' | translate }}
+            </app-button>
+            <app-button
+              variant="secondary"
+              size="small"
+              [disabled]="!zalgoOutput()"
+              (click)="copyValue(zalgoOutput(), 'zalgo')">
+              @if (copiedKey() === 'zalgo') {
+                {{ 'common.copied' | translate }}
+              } @else {
+                {{ 'common.copy' | translate }}
+              }
+            </app-button>
+            <app-button
+              variant="outline"
+              size="small"
+              [disabled]="!zalgoOutput()"
+              (click)="exportTxt(zalgoOutput(), 'privknife-zalgo.txt')">
+              .txt
+            </app-button>
+          </div>
+        </div>
+
+        <div card-body>
+          <div class="c-text-studio__zalgo-bar g--margin-bottom-4">
+            <label for="zalgo-intensity">
+              {{ 'tools.caseUnicodeTextStudio.intensityLabel' | translate }}: <strong>{{ zalgoIntensity() }}</strong>
+            </label>
+            <input
+              id="zalgo-intensity"
+              type="range"
+              min="1"
+              max="15"
+              step="1"
+              class="c-text-studio__slider"
+              [ngModel]="zalgoIntensity()"
+              (ngModelChange)="setZalgoIntensity($event)" />
+          </div>
+
+          <div class="c-text-studio__options g--margin-bottom-4">
+            <label class="c-text-studio__check">
+              <input type="checkbox" [ngModel]="zalgoUp()" (ngModelChange)="zalgoUp.set($event)" />
+              <span>{{ 'tools.caseUnicodeTextStudio.zalgoUpLabel' | translate }}</span>
+            </label>
+            <label class="c-text-studio__check">
+              <input type="checkbox" [ngModel]="zalgoMid()" (ngModelChange)="zalgoMid.set($event)" />
+              <span>{{ 'tools.caseUnicodeTextStudio.zalgoMidLabel' | translate }}</span>
+            </label>
+            <label class="c-text-studio__check">
+              <input type="checkbox" [ngModel]="zalgoDown()" (ngModelChange)="zalgoDown.set($event)" />
+              <span>{{ 'tools.caseUnicodeTextStudio.zalgoDownLabel' | translate }}</span>
+            </label>
+          </div>
+
+          <div class="c-text-studio__zalgo-box">{{ zalgoOutput() || '—' }}</div>
+        </div>
+      </app-card>
+    </div>
+  }
+
+  <!-- Tab 4: Searchable Kaomoji Library -->
+  @if (activeTab() === 'kaomoji') {
+    <div class="l-columns__area">
+      <app-card>
+        <div card-header class="c-text-studio__kaomoji-filters">
+          <input
+            type="search"
+            class="c-input c-text-studio__search"
+            [placeholder]="'tools.caseUnicodeTextStudio.kaomojiSearchPlaceholder' | translate"
+            [ngModel]="kaomojiQuery()"
+            (ngModelChange)="kaomojiQuery.set($event)" />
+
+          <div class="c-text-studio__chips">
+            <button
+              type="button"
+              class="c-text-studio__chip"
+              [class.c-text-studio__chip--active]="kaomojiCategory() === 'all'"
+              (click)="kaomojiCategory.set('all')">
+              All
+            </button>
+            @for (cat of kaomojiCategories; track cat) {
+              <button
+                type="button"
+                class="c-text-studio__chip"
+                [class.c-text-studio__chip--active]="kaomojiCategory() === cat"
+                (click)="kaomojiCategory.set(cat)">
+                {{ cat }}
+              </button>
+            }
+          </div>
+        </div>
+
+        <div card-body>
+          @if (filteredKaomojis().length === 0) {
+            <p class="c-text-studio__subtitle">{{ 'tools.caseUnicodeTextStudio.noKaomojiFound' | translate }}</p>
+          } @else {
+            <div class="c-text-studio__kaomoji-grid">
+              @for (item of filteredKaomojis(); track item.id) {
+                <button
+                  type="button"
+                  class="c-text-studio__kaomoji-btn"
+                  [class.c-text-studio__kaomoji-btn--copied]="copiedKey() === item.id"
+                  (click)="copyValue(item.emoticon, item.id)">
+                  <span class="c-text-studio__kaomoji-face">{{ item.emoticon }}</span>
+                  <span class="c-text-studio__kaomoji-tag">
+                    @if (copiedKey() === item.id) {
+                      {{ 'common.copied' | translate }}
+                    } @else {
+                      {{ item.tags[0] }}
+                    }
+                  </span>
+                </button>
+              }
+            </div>
+          }
+        </div>
+      </app-card>
+    </div>
+  }
+</div>

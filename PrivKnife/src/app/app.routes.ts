@@ -2176,6 +2176,13 @@ export const routes: Routes = [
       ),
   },
   {
+    path: 'tools/case-unicode-text-studio',
+    loadComponent: () =>
+      import('./tools/dev/case-unicode-text-studio/case-unicode-text-studio.component').then(
+        (m) => m.CaseUnicodeTextStudioComponent
+      ),
+  },
+  {
     path: '**',
     title: 'Page Not Found — PrivKnife',
     data: {
