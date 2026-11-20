@@ -468,6 +468,12 @@
     "source": "PrivKnife/src/app/tools/dev/timestamp-timezone-converter"
   },
   {
+    "id": "tool-bit-holder-maker",
+    "route": "/tools/tool-bit-holder-maker",
+    "category": "3d",
+    "source": "PrivKnife/src/app/tools/3d/tool-bit-holder-maker"
+  },
+  {
     "id": "under-desk-clamp-generator",
     "route": "/tools/under-desk-clamp-generator",
     "category": "3d",

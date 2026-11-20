@@ -2,6 +2,7 @@ import { ToolCategory, ToolDefinition } from '../core/models/tool.model';
 import { batterySdcardCaseMakerTool } from './3d/battery-sdcard-case-maker';
 import { ruggedHingedBoxMakerTool } from './3d/rugged-hinged-box-maker';
 import { drawerDividerGridMakerTool } from './3d/drawer-divider-grid-maker';
+import { toolBitHolderMakerTool } from './3d/tool-bit-holder-maker';
 import { brailleAdaSignGeneratorTool } from './3d/braille-ada-sign-generator';
 import { cappuccinoStencilMakerTool } from './3d/cappuccino-stencil-maker';
 import { hswInsertAdapterTool } from './3d/hsw-insert-adapter';
@@ -163,6 +164,7 @@ export const TOOL_REGISTRY: ToolDefinition[] = [
   batterySdcardCaseMakerTool,
   ruggedHingedBoxMakerTool,
   drawerDividerGridMakerTool,
+  toolBitHolderMakerTool,
 ];
 
 export function getToolById(id: string): ToolDefinition | undefined {
@@ -310,6 +312,7 @@ export const TOOL_I18N_MAP: Record<string, string> = {
   'battery-sdcard-case-maker': 'batterySdcardCaseMaker',
   'rugged-hinged-box-maker': 'ruggedHingedBoxMaker',
   'drawer-divider-grid-maker': 'drawerDividerGridMaker',
+  'tool-bit-holder-maker': 'toolBitHolderMaker',
 };
 
 export function getToolI18nKey(id: string): string | undefined {

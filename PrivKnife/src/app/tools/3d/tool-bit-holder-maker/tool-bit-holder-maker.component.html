@@ -1,0 +1,306 @@
+<div class="l-page">
+  <header class="l-page__header c-header">
+    <div class="c-header__title-group">
+      <h1 class="c-header__title">{{ 'tools.toolBitHolderMaker.name' | translate }}</h1>
+      <p class="c-header__subtitle">{{ 'tools.toolBitHolderMaker.description' | translate }}</p>
+    </div>
+    <app-badge variant="privacy">{{ 'common.privacyBadge' | translate }}</app-badge>
+  </header>
+
+  <div class="l-columns l-columns--2 c-tool-rack__layout">
+    <!-- Controls Panel -->
+    <div class="l-columns__area c-tool-rack__controls-col">
+      <!-- 1. Tool Set Presets & Size List -->
+      <app-card [title]="'tools.toolBitHolderMaker.presetTitle' | translate">
+        <span class="c-input__label">{{ 'common.curatedPresets' | translate }}</span>
+        <div class="c-tool-rack__presets">
+          @for (preset of presets; track preset.id) {
+            <button
+              type="button"
+              class="c-button c-button--small c-tool-rack__preset-btn"
+              [class.c-button--primary]="activePresetId() === preset.id"
+              [class.c-button--outline]="activePresetId() !== preset.id"
+              (click)="applyPreset(preset)"
+            >
+              {{ preset.name }}
+            </button>
+          }
+        </div>
+
+        <div class="c-tool-rack__grid g--margin-top-3">
+          <div class="c-input">
+            <label class="c-input__label" for="formFactorSelect">
+              {{ 'tools.toolBitHolderMaker.formFactorLabel' | translate }}
+            </label>
+            <select
+              id="formFactorSelect"
+              class="c-input__control"
+              [value]="options().formFactor"
+              (change)="onSelectChange('formFactor', $event)"
+            >
+              <option value="stepped_bench">
+                {{ 'tools.toolBitHolderMaker.formStepped' | translate }}
+              </option>
+              <option value="flat_tray">
+                {{ 'tools.toolBitHolderMaker.formFlatTray' | translate }}
+              </option>
+              <option value="skadis_wall">
+                {{ 'tools.toolBitHolderMaker.formSkadis' | translate }}
+              </option>
+            </select>
+          </div>
+
+          <div class="c-input">
+            <label class="c-input__label" for="rackRowsSlider">
+              {{ 'tools.toolBitHolderMaker.rowsLabel' | translate }}:
+              <strong>{{ options().rows }}</strong>
+            </label>
+            <input
+              id="rackRowsSlider"
+              type="range"
+              class="c-input__slider"
+              min="1"
+              max="4"
+              step="1"
+              [value]="options().rows"
+              (input)="onNumberInput('rows', $event)"
+            />
+          </div>
+        </div>
+
+        @if (options().preset === 'hex_bits_quarter') {
+          <div class="c-input g--margin-top-3">
+            <label class="c-input__label" for="hexBitCountSlider">
+              {{ 'tools.toolBitHolderMaker.hexBitCountLabel' | translate }}:
+              <strong>{{ options().hexBitCount }}</strong>
+            </label>
+            <input
+              id="hexBitCountSlider"
+              type="range"
+              class="c-input__slider"
+              min="6"
+              max="40"
+              step="1"
+              [value]="options().hexBitCount"
+              (input)="onNumberInput('hexBitCount', $event)"
+            />
+          </div>
+        }
+
+        <div class="c-input g--margin-top-3">
+          <label class="c-input__label" for="specTextArea">
+            {{ 'tools.toolBitHolderMaker.specListLabel' | translate }}
+            ({{ parsedSlots().length }} {{ 'tools.toolBitHolderMaker.slotsUnit' | translate }})
+          </label>
+          <textarea
+            id="specTextArea"
+            rows="3"
+            class="c-input__control c-tool-rack__textarea"
+            [value]="options().customSpecText"
+            (input)="onSpecTextInput($event)"
+          ></textarea>
+        </div>
+      </app-card>
+
+      <!-- 2. Hole Tolerances, Step Geometry & Retention -->
+      <app-card [title]="'tools.toolBitHolderMaker.geometryTitle' | translate">
+        <div class="c-tool-rack__grid">
+          <div class="c-input">
+            <label class="c-input__label" for="holeTolSlider">
+              {{ 'tools.toolBitHolderMaker.holeToleranceLabel' | translate }}:
+              <strong>+{{ formatFixed(options().holeToleranceMm, 2) }} mm</strong>
+            </label>
+            <input
+              id="holeTolSlider"
+              type="range"
+              class="c-input__slider"
+              min="0.15"
+              max="0.60"
+              step="0.05"
+              [value]="options().holeToleranceMm"
+              (input)="onNumberInput('holeToleranceMm', $event, true)"
+            />
+          </div>
+
+          <div class="c-input">
+            <label class="c-input__label" for="holeDepthSlider">
+              {{ 'tools.toolBitHolderMaker.holeDepthLabel' | translate }}:
+              <strong>{{ options().holeDepthMm }} mm</strong>
+            </label>
+            <input
+              id="holeDepthSlider"
+              type="range"
+              class="c-input__slider"
+              min="10"
+              max="40"
+              step="1"
+              [value]="options().holeDepthMm"
+              (input)="onNumberInput('holeDepthMm', $event)"
+            />
+          </div>
+
+          <div class="c-input">
+            <label class="c-input__label" for="slotSpacingSlider">
+              {{ 'tools.toolBitHolderMaker.slotSpacingLabel' | translate }}:
+              <strong>{{ formatFixed(options().slotSpacingMm, 1) }} mm</strong>
+            </label>
+            <input
+              id="slotSpacingSlider"
+              type="range"
+              class="c-input__slider"
+              min="3.0"
+              max="12.0"
+              step="0.5"
+              [value]="options().slotSpacingMm"
+              (input)="onNumberInput('slotSpacingMm', $event, true)"
+            />
+          </div>
+
+          <div class="c-input">
+            <label class="c-input__label" for="stepRiseSlider">
+              {{ 'tools.toolBitHolderMaker.stepRiseLabel' | translate }}:
+              <strong>{{ options().stepRiseMm }} mm</strong>
+            </label>
+            <input
+              id="stepRiseSlider"
+              type="range"
+              class="c-input__slider"
+              min="0"
+              max="18"
+              step="1"
+              [value]="options().stepRiseMm"
+              (input)="onNumberInput('stepRiseMm', $event)"
+            />
+          </div>
+        </div>
+
+        <label class="c-tool-rack__check g--margin-top-3">
+          <input
+            type="checkbox"
+            [checked]="options().includeBottomMagnets"
+            (change)="onCheckboxChange('includeBottomMagnets', $event)"
+          />
+          <span>{{ 'tools.toolBitHolderMaker.magnetsToggle' | translate }}</span>
+        </label>
+
+        <label class="c-tool-rack__check">
+          <input
+            type="checkbox"
+            [checked]="options().includeEmbossedLabels"
+            (change)="onCheckboxChange('includeEmbossedLabels', $event)"
+          />
+          <span>{{ 'tools.toolBitHolderMaker.labelsToggle' | translate }}</span>
+        </label>
+
+        <div class="c-tool-rack__colors g--margin-top-3">
+          <label class="c-tool-rack__color-item">
+            <span>{{ 'tools.toolBitHolderMaker.bodyColorLabel' | translate }}</span>
+            <input
+              type="color"
+              [value]="options().bodyColorHex"
+              (input)="onColorInput('bodyColorHex', $event)"
+            />
+          </label>
+          <label class="c-tool-rack__color-item">
+            <span>{{ 'tools.toolBitHolderMaker.labelColorLabel' | translate }}</span>
+            <input
+              type="color"
+              [value]="options().labelColorHex"
+              (input)="onColorInput('labelColorHex', $event)"
+            />
+          </label>
+        </div>
+      </app-card>
+    </div>
+
+    <!-- 3D Viewport & Export Panel -->
+    <div class="l-columns__area c-tool-rack__viewport-col">
+      <app-card [title]="'tools.toolBitHolderMaker.viewportTitle' | translate">
+        <div class="c-tool-rack__viewport-hud">
+          <button
+            type="button"
+            class="c-tool-rack__hud-btn"
+            (click)="toggleWireframe()"
+          >
+            {{ (wireframe() ? 'tools.toolBitHolderMaker.solidView' : 'tools.toolBitHolderMaker.wireframeToggle') | translate }}
+          </button>
+          <button
+            type="button"
+            class="c-tool-rack__hud-btn"
+            (click)="resetCamera()"
+          >
+            {{ 'tools.toolBitHolderMaker.resetCamera' | translate }}
+          </button>
+          <button
+            type="button"
+            class="c-tool-rack__hud-btn"
+            (click)="resetDefaults()"
+          >
+            {{ 'common.reset' | translate }}
+          </button>
+        </div>
+
+        <div #viewportContainer class="c-tool-rack__viewport-stage"></div>
+
+        @if (validationError()) {
+          <div class="c-tool-rack__alert" role="alert">
+            {{ validationError() }}
+          </div>
+        }
+
+        @if (metrics(); as m) {
+          @if (m.exceedsStandardBed) {
+            <div class="c-tool-rack__bed-warn">
+              ⚠️ {{ 'tools.toolBitHolderMaker.bedWarning' | translate }}
+            </div>
+          }
+
+          <div class="c-tool-rack__metrics">
+            <div class="c-tool-rack__metric">
+              <span>{{ formatFixed(m.widthMm, 1) }} × {{ formatFixed(m.depthMm, 1) }} × {{ formatFixed(m.heightMm, 1) }} mm</span>
+              <small>{{ m.slotCount }} {{ 'tools.toolBitHolderMaker.slotsUnit' | translate }}</small>
+            </div>
+            <div class="c-tool-rack__metric">
+              <span>~{{ m.estimatedWeightG }} g • {{ formatFixed(m.estimatedPrintTimeHours, 1) }}h</span>
+              <small>{{ m.triangleCount }} tris</small>
+            </div>
+          </div>
+        }
+
+        @if (isExporting()) {
+          <div class="g--margin-top-3">
+            <app-progress-bar
+              [value]="exportProgress()"
+              [label]="'common.processing' | translate"
+            ></app-progress-bar>
+          </div>
+        }
+
+        <div class="c-tool-rack__actions g--margin-top-3">
+          <button
+            type="button"
+            class="c-button c-button--primary"
+            [disabled]="!!validationError() || isExporting()"
+            (click)="export3mf()"
+          >
+            {{ 'tools.toolBitHolderMaker.export3mfLabel' | translate }}
+          </button>
+          <button
+            type="button"
+            class="c-button c-button--secondary"
+            [disabled]="!!validationError() || isExporting()"
+            (click)="exportStl()"
+          >
+            {{ 'tools.toolBitHolderMaker.exportStlLabel' | translate }}
+          </button>
+        </div>
+
+        <p class="c-tool-rack__hint g--margin-top-2">
+          {{ 'tools.toolBitHolderMaker.stlNote' | translate }}
+          •
+          {{ 'tools.toolBitHolderMaker.threeMfNote' | translate }}
+        </p>
+      </app-card>
+    </div>
+  </div>
+</div>

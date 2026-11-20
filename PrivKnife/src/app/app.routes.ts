@@ -2211,6 +2211,13 @@ export const routes: Routes = [
       ),
   },
   {
+    path: 'tools/tool-bit-holder-maker',
+    loadComponent: () =>
+      import('./tools/3d/tool-bit-holder-maker/tool-bit-holder-maker.component').then(
+        (m) => m.ToolBitHolderMakerComponent
+      ),
+  },
+  {
     path: '**',
     title: 'Page Not Found — PrivKnife',
     data: {
