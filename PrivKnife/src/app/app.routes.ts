@@ -2197,6 +2197,13 @@ export const routes: Routes = [
       ),
   },
   {
+    path: 'tools/rugged-hinged-box-maker',
+    loadComponent: () =>
+      import('./tools/3d/rugged-hinged-box-maker/rugged-hinged-box-maker.component').then(
+        (m) => m.RuggedHingedBoxMakerComponent
+      ),
+  },
+  {
     path: '**',
     title: 'Page Not Found — PrivKnife',
     data: {

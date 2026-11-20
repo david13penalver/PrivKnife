@@ -1,0 +1,420 @@
+<div class="l-page">
+  <header class="l-page__header c-header">
+    <div class="c-header__title-group">
+      <h1 class="c-header__title">{{ 'tools.ruggedHingedBoxMaker.name' | translate }}</h1>
+      <p class="c-header__subtitle">{{ 'tools.ruggedHingedBoxMaker.description' | translate }}</p>
+    </div>
+    <app-badge variant="privacy">{{ 'common.privacyBadge' | translate }}</app-badge>
+  </header>
+
+  <div class="l-columns l-columns--2 c-rugged-box__layout">
+    <!-- Controls Area -->
+    <div class="l-columns__area c-rugged-box__controls-col">
+      <!-- 1. Internal Dimensions & Presets -->
+      <app-card [title]="'tools.ruggedHingedBoxMaker.dimensionsTitle' | translate">
+        <div>
+          <span class="c-input__label">{{ 'common.curatedPresets' | translate }}</span>
+          <div class="c-rugged-box__presets">
+            @for (preset of presets; track preset.id) {
+              <button
+                type="button"
+                class="c-button c-button--small c-rugged-box__preset-btn"
+                [class.c-button--primary]="activePresetId() === preset.id"
+                [class.c-button--outline]="activePresetId() !== preset.id"
+                (click)="applyPreset(preset)"
+              >
+                {{ preset.name }}
+              </button>
+            }
+          </div>
+        </div>
+
+        <div class="c-rugged-box__grid g--margin-top-3">
+          <div class="c-input">
+            <label class="c-input__label" for="innerLengthSlider">
+              {{ 'tools.ruggedHingedBoxMaker.innerLengthLabel' | translate }}:
+              <strong>{{ options().innerLengthMm }} mm</strong>
+            </label>
+            <input
+              id="innerLengthSlider"
+              type="range"
+              class="c-input__slider"
+              min="60"
+              max="240"
+              step="1"
+              [value]="options().innerLengthMm"
+              (input)="onNumberInput('innerLengthMm', $event)"
+            />
+          </div>
+
+          <div class="c-input">
+            <label class="c-input__label" for="innerWidthSlider">
+              {{ 'tools.ruggedHingedBoxMaker.innerWidthLabel' | translate }}:
+              <strong>{{ options().innerWidthMm }} mm</strong>
+            </label>
+            <input
+              id="innerWidthSlider"
+              type="range"
+              class="c-input__slider"
+              min="50"
+              max="200"
+              step="1"
+              [value]="options().innerWidthMm"
+              (input)="onNumberInput('innerWidthMm', $event)"
+            />
+          </div>
+
+          <div class="c-input">
+            <label class="c-input__label" for="baseDepthSlider">
+              {{ 'tools.ruggedHingedBoxMaker.baseDepthLabel' | translate }}:
+              <strong>{{ options().baseDepthMm }} mm</strong>
+            </label>
+            <input
+              id="baseDepthSlider"
+              type="range"
+              class="c-input__slider"
+              min="18"
+              max="110"
+              step="1"
+              [value]="options().baseDepthMm"
+              (input)="onNumberInput('baseDepthMm', $event)"
+            />
+          </div>
+
+          <div class="c-input">
+            <label class="c-input__label" for="lidDepthSlider">
+              {{ 'tools.ruggedHingedBoxMaker.lidDepthLabel' | translate }}:
+              <strong>{{ options().lidDepthMm }} mm</strong>
+            </label>
+            <input
+              id="lidDepthSlider"
+              type="range"
+              class="c-input__slider"
+              min="10"
+              max="60"
+              step="1"
+              [value]="options().lidDepthMm"
+              (input)="onNumberInput('lidDepthMm', $event)"
+            />
+          </div>
+
+          <div class="c-input">
+            <label class="c-input__label" for="wallSlider">
+              {{ 'tools.ruggedHingedBoxMaker.wallThicknessLabel' | translate }}:
+              <strong>{{ formatFixed(options().wallThicknessMm, 1) }} mm</strong>
+            </label>
+            <input
+              id="wallSlider"
+              type="range"
+              class="c-input__slider"
+              min="2.0"
+              max="5.0"
+              step="0.2"
+              [value]="options().wallThicknessMm"
+              (input)="onNumberInput('wallThicknessMm', $event, true)"
+            />
+          </div>
+
+          <div class="c-input">
+            <label class="c-input__label" for="cornerRadiusSlider">
+              {{ 'tools.ruggedHingedBoxMaker.cornerRadiusLabel' | translate }}:
+              <strong>{{ formatFixed(options().cornerRadiusMm, 1) }} mm</strong>
+            </label>
+            <input
+              id="cornerRadiusSlider"
+              type="range"
+              class="c-input__slider"
+              min="3"
+              max="14"
+              step="0.5"
+              [value]="options().cornerRadiusMm"
+              (input)="onNumberInput('cornerRadiusMm', $event, true)"
+            />
+          </div>
+        </div>
+      </app-card>
+
+      <!-- 2. Armor Ribs, Hinges & Gasket -->
+      <app-card
+        customClass="g--margin-top-4"
+        [title]="'tools.ruggedHingedBoxMaker.hardwareTitle' | translate"
+      >
+        <div class="c-rugged-box__grid">
+          <div class="c-input">
+            <label class="c-input__label" for="hingeTypeSelect">
+              {{ 'tools.ruggedHingedBoxMaker.hingeTypeLabel' | translate }}
+            </label>
+            <select
+              id="hingeTypeSelect"
+              class="c-input__control"
+              [value]="options().hingeType"
+              (change)="onSelectChange('hingeType', $event)"
+            >
+              <option value="print_in_place">{{ 'tools.ruggedHingedBoxMaker.hingePrintInPlace' | translate }}</option>
+              <option value="m3_screw">{{ 'tools.ruggedHingedBoxMaker.hingeM3Screw' | translate }}</option>
+              <option value="filament_pin">{{ 'tools.ruggedHingedBoxMaker.hingeFilamentPin' | translate }}</option>
+            </select>
+          </div>
+
+          <div class="c-input">
+            <label class="c-input__label" for="latchTypeSelect">
+              {{ 'tools.ruggedHingedBoxMaker.latchTypeLabel' | translate }}
+            </label>
+            <select
+              id="latchTypeSelect"
+              class="c-input__control"
+              [value]="options().latchType"
+              (change)="onSelectChange('latchType', $event)"
+            >
+              <option value="snap_compliant">{{ 'tools.ruggedHingedBoxMaker.latchCompliant' | translate }}</option>
+              <option value="friction_slide">{{ 'tools.ruggedHingedBoxMaker.latchSlide' | translate }}</option>
+            </select>
+          </div>
+
+          <div class="c-input">
+            <label class="c-input__label" for="hingeClearanceSlider">
+              {{ 'tools.ruggedHingedBoxMaker.hingeClearanceLabel' | translate }}:
+              <strong>{{ formatFixed(options().hingeClearanceMm, 2) }} mm</strong>
+            </label>
+            <input
+              id="hingeClearanceSlider"
+              type="range"
+              class="c-input__slider"
+              min="0.25"
+              max="0.50"
+              step="0.05"
+              [value]="options().hingeClearanceMm"
+              (input)="onNumberInput('hingeClearanceMm', $event, true)"
+            />
+          </div>
+
+          <div class="c-input">
+            <label class="c-input__label" for="ribsSlider">
+              {{ 'tools.ruggedHingedBoxMaker.ribsLabel' | translate }}:
+              <strong>{{ options().ribCountPerSide }}</strong>
+            </label>
+            <input
+              id="ribsSlider"
+              type="range"
+              class="c-input__slider"
+              min="0"
+              max="6"
+              step="1"
+              [value]="options().ribCountPerSide"
+              (input)="onNumberInput('ribCountPerSide', $event)"
+            />
+          </div>
+        </div>
+
+        <label class="c-rugged-box__check g--margin-top-3">
+          <input
+            type="checkbox"
+            [checked]="options().includeGasketChannel"
+            (change)="onGasketChange($event)"
+          />
+          <span>{{ 'tools.ruggedHingedBoxMaker.gasketToggle' | translate }}</span>
+        </label>
+      </app-card>
+
+      <!-- 3. Dividers & Multi-Color Nameplate -->
+      <app-card
+        customClass="g--margin-top-4"
+        [title]="'tools.ruggedHingedBoxMaker.dividersTitle' | translate"
+      >
+        <div class="c-input">
+          <label class="c-input__label" for="dividerModeSelect">
+            {{ 'tools.ruggedHingedBoxMaker.dividerModeLabel' | translate }}
+          </label>
+          <select
+            id="dividerModeSelect"
+            class="c-input__control"
+            [value]="options().dividerMode"
+            (change)="onSelectChange('dividerMode', $event)"
+          >
+            <option value="none">{{ 'tools.ruggedHingedBoxMaker.dividerNone' | translate }}</option>
+            <option value="molded_fixed">{{ 'tools.ruggedHingedBoxMaker.dividerMolded' | translate }}</option>
+            <option value="removable_tray">{{ 'tools.ruggedHingedBoxMaker.dividerTray' | translate }}</option>
+          </select>
+        </div>
+
+        @if (options().dividerMode !== 'none') {
+          <div class="c-rugged-box__grid g--margin-top-3">
+            <div class="c-input">
+              <label class="c-input__label" for="dividerColsSlider">
+                {{ 'tools.ruggedHingedBoxMaker.dividerColsLabel' | translate }}:
+                <strong>{{ options().dividerCols }}</strong>
+              </label>
+              <input
+                id="dividerColsSlider"
+                type="range"
+                class="c-input__slider"
+                min="1"
+                max="8"
+                step="1"
+                [value]="options().dividerCols"
+                (input)="onNumberInput('dividerCols', $event)"
+              />
+            </div>
+
+            <div class="c-input">
+              <label class="c-input__label" for="dividerRowsSlider">
+                {{ 'tools.ruggedHingedBoxMaker.dividerRowsLabel' | translate }}:
+                <strong>{{ options().dividerRows }}</strong>
+              </label>
+              <input
+                id="dividerRowsSlider"
+                type="range"
+                class="c-input__slider"
+                min="1"
+                max="6"
+                step="1"
+                [value]="options().dividerRows"
+                (input)="onNumberInput('dividerRows', $event)"
+              />
+            </div>
+          </div>
+        }
+
+        <div class="c-input g--margin-top-3">
+          <label class="c-input__label" for="frontLabelInput">
+            {{ 'tools.ruggedHingedBoxMaker.frontLabelInput' | translate }}
+          </label>
+          <input
+            id="frontLabelInput"
+            type="text"
+            maxlength="20"
+            class="c-input__control"
+            [value]="options().frontLabelText"
+            (input)="onTextInput('frontLabelText', $event)"
+          />
+        </div>
+
+        <div class="c-rugged-box__colors g--margin-top-3">
+          <label class="c-rugged-box__color-item">
+            <span>{{ 'tools.ruggedHingedBoxMaker.bodyColorLabel' | translate }}</span>
+            <input
+              type="color"
+              [value]="options().bodyColorHex"
+              (input)="onTextInput('bodyColorHex', $event)"
+            />
+          </label>
+          <label class="c-rugged-box__color-item">
+            <span>{{ 'tools.ruggedHingedBoxMaker.accentColorLabel' | translate }}</span>
+            <input
+              type="color"
+              [value]="options().accentColorHex"
+              (input)="onTextInput('accentColorHex', $event)"
+            />
+          </label>
+        </div>
+
+        <div card-footer class="c-rugged-box__footer-actions">
+          <button type="button" class="c-button c-button--outline" (click)="reset()">
+            {{ 'common.resetDefaults' | translate }}
+          </button>
+        </div>
+      </app-card>
+    </div>
+
+    <!-- 3D Viewport Area -->
+    <div class="l-columns__area c-rugged-box__viewport-col">
+      <app-card [title]="'tools.ruggedHingedBoxMaker.viewportTitle' | translate">
+        <div class="c-rugged-box__viewport-hud" role="toolbar" aria-label="3D Viewport Actions">
+          <button type="button" class="c-rugged-box__hud-btn" (click)="togglePreviewOpen()">
+            {{ (options().previewOpen ? 'tools.ruggedHingedBoxMaker.previewClosed' : 'tools.ruggedHingedBoxMaker.previewOpen') | translate }}
+          </button>
+          <button type="button" class="c-rugged-box__hud-btn" (click)="resetView()">
+            {{ 'common.resetView' | translate }}
+          </button>
+          <button type="button" class="c-rugged-box__hud-btn" (click)="toggleWireframe()">
+            {{ (wireframe() ? 'tools.ruggedHingedBoxMaker.solidView' : 'tools.ruggedHingedBoxMaker.wireframeToggle') | translate }}
+          </button>
+          <button type="button" class="c-rugged-box__hud-btn" (click)="exportPng()">
+            {{ 'common.exportPng' | translate }}
+          </button>
+        </div>
+
+        <div
+          #viewportContainer
+          class="c-rugged-box__viewport-stage"
+          role="region"
+          aria-label="Interactive 3D Hinged Box Preview"
+        ></div>
+
+        @if (validationError()) {
+          <div class="c-rugged-box__alert" role="alert">
+            {{ validationError() }}
+          </div>
+        }
+
+        @if (metrics(); as m) {
+          @if (m.exceedsStandardBed) {
+            <div class="c-rugged-box__bed-warn" role="status">
+              ⚠️ {{ 'tools.ruggedHingedBoxMaker.bedWarning' | translate }}
+            </div>
+          }
+
+          <div class="c-rugged-box__metrics g--margin-top-3">
+            <div class="c-rugged-box__metric">
+              <span class="c-rugged-box__metric-label">{{ 'common.dimensions' | translate }}</span>
+              <strong class="c-rugged-box__metric-value">
+                {{ formatFixed(m.outerWidthMm, 1) }} × {{ formatFixed(m.outerDepthMm, 1) }} × {{ formatFixed(m.closedHeightMm, 1) }} mm
+              </strong>
+            </div>
+            <div class="c-rugged-box__metric">
+              <span class="c-rugged-box__metric-label">{{ 'tools.ruggedHingedBoxMaker.flatPlateLabel' | translate }}</span>
+              <strong class="c-rugged-box__metric-value">
+                {{ formatFixed(m.flatPlateWidthMm, 1) }} × {{ formatFixed(m.flatPlateDepthMm, 1) }} mm
+              </strong>
+            </div>
+            <div class="c-rugged-box__metric">
+              <span class="c-rugged-box__metric-label">{{ 'common.estWeight' | translate }}</span>
+              <strong class="c-rugged-box__metric-value">
+                {{ formatFixed(m.estimatedWeightG, 1) }} {{ 'common.grams' | translate }}
+              </strong>
+            </div>
+            <div class="c-rugged-box__metric">
+              <span class="c-rugged-box__metric-label">{{ 'common.estPrintTime' | translate }}</span>
+              <strong class="c-rugged-box__metric-value">
+                {{ formatFixed(m.estimatedPrintTimeHours, 1) }} {{ 'common.hours' | translate }}
+              </strong>
+            </div>
+          </div>
+        }
+
+        @if (isExporting()) {
+          <div class="g--margin-top-3">
+            <app-progress-bar
+              [value]="exportProgress()"
+              [label]="'common.processing' | translate"
+            />
+          </div>
+        }
+
+        <div class="c-rugged-box__export-bar g--margin-top-4">
+          <button
+            type="button"
+            class="c-button c-button--primary"
+            [disabled]="!!validationError() || isExporting()"
+            (click)="exportFormat('stl')"
+          >
+            {{ 'common.exportStl' | translate }}
+          </button>
+          <button
+            type="button"
+            class="c-button c-button--secondary"
+            [disabled]="!!validationError() || isExporting()"
+            (click)="exportFormat('3mf')"
+          >
+            {{ 'common.export3mf' | translate }}
+          </button>
+        </div>
+
+        <p class="c-rugged-box__notes g--margin-top-2">
+          {{ 'tools.ruggedHingedBoxMaker.stlNote' | translate }} •
+          {{ 'tools.ruggedHingedBoxMaker.threeMfNote' | translate }}
+        </p>
+      </app-card>
+    </div>
+  </div>
+</div>

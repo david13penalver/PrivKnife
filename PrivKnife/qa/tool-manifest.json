@@ -408,6 +408,12 @@
     "source": "PrivKnife/src/app/tools/dev/robots-sitemap-builder"
   },
   {
+    "id": "rugged-hinged-box-maker",
+    "route": "/tools/rugged-hinged-box-maker",
+    "category": "3d",
+    "source": "PrivKnife/src/app/tools/3d/rugged-hinged-box-maker"
+  },
+  {
     "id": "screenshot-mockup",
     "route": "/tools/screenshot-mockup",
     "category": "media",
