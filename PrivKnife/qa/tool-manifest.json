@@ -258,6 +258,12 @@
     "source": "PrivKnife/src/app/tools/3d/keycap-switch-tester-maker"
   },
   {
+    "id": "knob-dial-handwheel-maker",
+    "route": "/tools/knob-dial-handwheel-maker",
+    "category": "3d",
+    "source": "PrivKnife/src/app/tools/3d/knob-dial-handwheel-maker"
+  },
+  {
     "id": "lithophane-maker",
     "route": "/tools/lithophane-maker",
     "category": "3d",

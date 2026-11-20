@@ -2225,6 +2225,13 @@ export const routes: Routes = [
       ),
   },
   {
+    path: 'tools/knob-dial-handwheel-maker',
+    loadComponent: () =>
+      import('./tools/3d/knob-dial-handwheel-maker/knob-dial-handwheel-maker.component').then(
+        (m) => m.KnobDialHandwheelMakerComponent
+      ),
+  },
+  {
     path: '**',
     title: 'Page Not Found — PrivKnife',
     data: {

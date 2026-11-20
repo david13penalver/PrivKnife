@@ -1,0 +1,413 @@
+<div class="l-page">
+  <header class="l-page__header c-header">
+    <div class="c-header__title-group">
+      <h1 class="c-header__title">{{ 'tools.knobDialHandwheelMaker.name' | translate }}</h1>
+      <p class="c-header__subtitle">{{ 'tools.knobDialHandwheelMaker.description' | translate }}</p>
+    </div>
+    <app-badge variant="privacy">{{ 'common.privacyBadge' | translate }}</app-badge>
+  </header>
+
+  <div class="l-columns l-columns--2 c-knob-maker__layout">
+    <!-- Controls Panel -->
+    <div class="l-columns__area c-knob-maker__controls-col">
+      <!-- 1. Grip Geometry & Body Dimensions -->
+      <app-card [title]="'tools.knobDialHandwheelMaker.gripTitle' | translate">
+        <span class="c-input__label">{{ 'common.curatedPresets' | translate }}</span>
+        <div class="c-knob-maker__presets">
+          @for (preset of presets; track preset.id) {
+            <button
+              type="button"
+              class="c-button c-button--small c-knob-maker__preset-btn"
+              [class.c-button--primary]="activePresetId() === preset.id"
+              [class.c-button--outline]="activePresetId() !== preset.id"
+              (click)="applyPreset(preset)"
+            >
+              {{ preset.name }}
+            </button>
+          }
+        </div>
+
+        <div class="c-input g--margin-top-3">
+          <label class="c-input__label" for="gripStyleSelect">
+            {{ 'tools.knobDialHandwheelMaker.gripStyleLabel' | translate }}
+          </label>
+          <select
+            id="gripStyleSelect"
+            class="c-input__control"
+            [value]="options().gripStyle"
+            (change)="onSelectChange('gripStyle', $event)"
+          >
+            <option value="knurled">{{ 'tools.knobDialHandwheelMaker.styleKnurled' | translate }}</option>
+            <option value="fluted">{{ 'tools.knobDialHandwheelMaker.styleFluted' | translate }}</option>
+            <option value="star_handwheel">{{ 'tools.knobDialHandwheelMaker.styleStar' | translate }}</option>
+            <option value="pointer_wing">{{ 'tools.knobDialHandwheelMaker.stylePointer' | translate }}</option>
+          </select>
+        </div>
+
+        <div class="c-knob-maker__grid g--margin-top-3">
+          <div class="c-input">
+            <label class="c-input__label" for="gripDiaSlider">
+              {{ 'tools.knobDialHandwheelMaker.gripDiameterLabel' | translate }}:
+              <strong>{{ options().gripDiameterMm }} mm</strong>
+            </label>
+            <input
+              id="gripDiaSlider"
+              type="range"
+              class="c-input__slider"
+              min="14"
+              max="90"
+              step="1"
+              [value]="options().gripDiameterMm"
+              (input)="onNumberInput('gripDiameterMm', $event)"
+            />
+          </div>
+
+          <div class="c-input">
+            <label class="c-input__label" for="gripHSlider">
+              {{ 'tools.knobDialHandwheelMaker.gripHeightLabel' | translate }}:
+              <strong>{{ options().gripHeightMm }} mm</strong>
+            </label>
+            <input
+              id="gripHSlider"
+              type="range"
+              class="c-input__slider"
+              min="10"
+              max="45"
+              step="1"
+              [value]="options().gripHeightMm"
+              (input)="onNumberInput('gripHeightMm', $event)"
+            />
+          </div>
+
+          <div class="c-input">
+            <label class="c-input__label" for="neckDiaSlider">
+              {{ 'tools.knobDialHandwheelMaker.neckDiameterLabel' | translate }}:
+              <strong>{{ options().neckDiameterMm }} mm</strong>
+            </label>
+            <input
+              id="neckDiaSlider"
+              type="range"
+              class="c-input__slider"
+              min="10"
+              max="40"
+              step="1"
+              [value]="options().neckDiameterMm"
+              (input)="onNumberInput('neckDiameterMm', $event)"
+            />
+          </div>
+
+          <div class="c-input">
+            <label class="c-input__label" for="neckHSlider">
+              {{ 'tools.knobDialHandwheelMaker.neckHeightLabel' | translate }}:
+              <strong>{{ options().neckHeightMm }} mm</strong>
+            </label>
+            <input
+              id="neckHSlider"
+              type="range"
+              class="c-input__slider"
+              min="0"
+              max="15"
+              step="0.5"
+              [value]="options().neckHeightMm"
+              (input)="onNumberInput('neckHeightMm', $event, true)"
+            />
+          </div>
+
+          <div class="c-input">
+            <label class="c-input__label" for="lobeCountSlider">
+              {{ 'tools.knobDialHandwheelMaker.lobeCountLabel' | translate }}:
+              <strong>{{ options().knurlOrLobeCount }}</strong>
+            </label>
+            <input
+              id="lobeCountSlider"
+              type="range"
+              class="c-input__slider"
+              min="3"
+              max="48"
+              step="1"
+              [value]="options().knurlOrLobeCount"
+              (input)="onNumberInput('knurlOrLobeCount', $event)"
+            />
+          </div>
+
+          <div class="c-input">
+            <label class="c-input__label" for="bevelSlider">
+              {{ 'tools.knobDialHandwheelMaker.topBevelLabel' | translate }}:
+              <strong>{{ formatFixed(options().topBevelMm, 1) }} mm</strong>
+            </label>
+            <input
+              id="bevelSlider"
+              type="range"
+              class="c-input__slider"
+              min="0.4"
+              max="4.0"
+              step="0.2"
+              [value]="options().topBevelMm"
+              (input)="onNumberInput('topBevelMm', $event, true)"
+            />
+          </div>
+        </div>
+      </app-card>
+
+      <!-- 2. Shaft Socket / Captive Fastener & Pointer Indicator -->
+      <app-card [title]="'tools.knobDialHandwheelMaker.driveTitle' | translate">
+        <div class="c-knob-maker__grid">
+          <div class="c-input">
+            <label class="c-input__label" for="driveTypeSelect">
+              {{ 'tools.knobDialHandwheelMaker.driveTypeLabel' | translate }}
+            </label>
+            <select
+              id="driveTypeSelect"
+              class="c-input__control"
+              [value]="options().driveType"
+              (change)="onSelectChange('driveType', $event)"
+            >
+              <option value="d_shaft">{{ 'tools.knobDialHandwheelMaker.driveDShaft' | translate }}</option>
+              <option value="splined">{{ 'tools.knobDialHandwheelMaker.driveSplined' | translate }}</option>
+              <option value="captive_hex_nut">{{ 'tools.knobDialHandwheelMaker.driveHexNut' | translate }}</option>
+              <option value="captive_hex_bolt">{{ 'tools.knobDialHandwheelMaker.driveHexBolt' | translate }}</option>
+              <option value="set_screw_round">{{ 'tools.knobDialHandwheelMaker.driveSetScrew' | translate }}</option>
+            </select>
+          </div>
+
+          @if (options().driveType === 'captive_hex_nut' || options().driveType === 'captive_hex_bolt') {
+            <div class="c-input">
+              <label class="c-input__label" for="hardwarePresetSelect">
+                {{ 'tools.knobDialHandwheelMaker.hardwareStdLabel' | translate }}
+              </label>
+              <select
+                id="hardwarePresetSelect"
+                class="c-input__control"
+                [value]="options().hardwarePreset"
+                (change)="onSelectChange('hardwarePreset', $event)"
+              >
+                @for (hw of hardwareStandards; track hw.id) {
+                  <option [value]="hw.id">{{ hw.label }}</option>
+                }
+              </select>
+            </div>
+          } @else {
+            <div class="c-input">
+              <label class="c-input__label" for="shaftDiaSlider">
+                {{ 'tools.knobDialHandwheelMaker.shaftDiaLabel' | translate }}:
+                <strong>{{ formatFixed(options().shaftDiameterMm, 2) }} mm</strong>
+              </label>
+              <input
+                id="shaftDiaSlider"
+                type="range"
+                class="c-input__slider"
+                min="3.0"
+                max="12.0"
+                step="0.1"
+                [value]="options().shaftDiameterMm"
+                (input)="onNumberInput('shaftDiameterMm', $event, true)"
+              />
+            </div>
+          }
+
+          @if (options().driveType === 'd_shaft') {
+            <div class="c-input">
+              <label class="c-input__label" for="dFlatSlider">
+                {{ 'tools.knobDialHandwheelMaker.dFlatLabel' | translate }}:
+                <strong>{{ formatFixed(options().dFlatThicknessMm, 2) }} mm</strong>
+              </label>
+              <input
+                id="dFlatSlider"
+                type="range"
+                class="c-input__slider"
+                min="2.0"
+                max="10.0"
+                step="0.1"
+                [value]="options().dFlatThicknessMm"
+                (input)="onNumberInput('dFlatThicknessMm', $event, true)"
+              />
+            </div>
+
+            <div class="c-input">
+              <label class="c-input__label" for="flatRotSelect">
+                {{ 'tools.knobDialHandwheelMaker.flatAngleLabel' | translate }}
+              </label>
+              <select
+                id="flatRotSelect"
+                class="c-input__control"
+                [value]="options().flatRotationDeg"
+                (change)="onSelectChange('flatRotationDeg', $event)"
+              >
+                @for (ang of flatAngles; track ang) {
+                  <option [value]="ang">{{ ang }}°</option>
+                }
+              </select>
+            </div>
+          }
+
+          @if (options().driveType === 'splined') {
+            <div class="c-input">
+              <label class="c-input__label" for="splineTeethSlider">
+                {{ 'tools.knobDialHandwheelMaker.splineTeethLabel' | translate }}:
+                <strong>{{ options().splineTeethCount }}T</strong>
+              </label>
+              <input
+                id="splineTeethSlider"
+                type="range"
+                class="c-input__slider"
+                min="12"
+                max="24"
+                step="1"
+                [value]="options().splineTeethCount"
+                (input)="onNumberInput('splineTeethCount', $event)"
+              />
+            </div>
+          }
+
+          <div class="c-input">
+            <label class="c-input__label" for="socketDepthSlider">
+              {{ 'tools.knobDialHandwheelMaker.socketDepthLabel' | translate }}:
+              <strong>{{ options().socketDepthMm }} mm</strong>
+            </label>
+            <input
+              id="socketDepthSlider"
+              type="range"
+              class="c-input__slider"
+              min="6"
+              max="35"
+              step="1"
+              [value]="options().socketDepthMm"
+              (input)="onNumberInput('socketDepthMm', $event)"
+            />
+          </div>
+
+          <div class="c-input">
+            <label class="c-input__label" for="fitTolSlider">
+              {{ 'tools.knobDialHandwheelMaker.fitToleranceLabel' | translate }}:
+              <strong>+{{ formatFixed(options().fitToleranceMm, 2) }} mm</strong>
+            </label>
+            <input
+              id="fitTolSlider"
+              type="range"
+              class="c-input__slider"
+              min="0.10"
+              max="0.45"
+              step="0.05"
+              [value]="options().fitToleranceMm"
+              (input)="onNumberInput('fitToleranceMm', $event, true)"
+            />
+          </div>
+        </div>
+
+        @if (options().driveType === 'captive_hex_nut' || options().driveType === 'captive_hex_bolt') {
+          <label class="c-knob-maker__check g--margin-top-3">
+            <input
+              type="checkbox"
+              [checked]="options().sacrificialBridgeLayer"
+              (change)="onCheckboxChange('sacrificialBridgeLayer', $event)"
+            />
+            <span>{{ 'tools.knobDialHandwheelMaker.bridgeToggle' | translate }}</span>
+          </label>
+        }
+
+        <label class="c-knob-maker__check g--margin-top-2">
+          <input
+            type="checkbox"
+            [checked]="options().includeIndicatorMark"
+            (change)="onCheckboxChange('includeIndicatorMark', $event)"
+          />
+          <span>{{ 'tools.knobDialHandwheelMaker.indicatorToggle' | translate }}</span>
+        </label>
+
+        <div class="c-knob-maker__colors g--margin-top-3">
+          <label class="c-knob-maker__color-item">
+            <span>{{ 'tools.knobDialHandwheelMaker.bodyColorLabel' | translate }}</span>
+            <input
+              type="color"
+              [value]="options().bodyColorHex"
+              (input)="onColorInput('bodyColorHex', $event)"
+            />
+          </label>
+          <label class="c-knob-maker__color-item">
+            <span>{{ 'tools.knobDialHandwheelMaker.indicatorColorLabel' | translate }}</span>
+            <input
+              type="color"
+              [value]="options().indicatorColorHex"
+              (input)="onColorInput('indicatorColorHex', $event)"
+            />
+          </label>
+        </div>
+      </app-card>
+    </div>
+
+    <!-- 3D Viewport & Export Panel -->
+    <div class="l-columns__area c-knob-maker__viewport-col">
+      <app-card [title]="'tools.knobDialHandwheelMaker.viewportTitle' | translate">
+        <div class="c-knob-maker__viewport-hud">
+          <button type="button" class="c-knob-maker__hud-btn" (click)="toggleSectionCutaway()">
+            {{ (options().sectionCutaway ? 'tools.knobDialHandwheelMaker.cutawayOff' : 'tools.knobDialHandwheelMaker.cutawayOn') | translate }}
+          </button>
+          <button type="button" class="c-knob-maker__hud-btn" (click)="toggleWireframe()">
+            {{ (wireframe() ? 'tools.knobDialHandwheelMaker.solidView' : 'tools.knobDialHandwheelMaker.wireframeToggle') | translate }}
+          </button>
+          <button type="button" class="c-knob-maker__hud-btn" (click)="resetCamera()">
+            {{ 'tools.knobDialHandwheelMaker.resetCamera' | translate }}
+          </button>
+          <button type="button" class="c-knob-maker__hud-btn" (click)="resetDefaults()">
+            {{ 'common.reset' | translate }}
+          </button>
+        </div>
+
+        <div #viewportContainer class="c-knob-maker__viewport-stage"></div>
+
+        @if (validationError()) {
+          <div class="c-knob-maker__alert" role="alert">
+            {{ validationError() }}
+          </div>
+        }
+
+        @if (metrics(); as m) {
+          <div class="c-knob-maker__metrics">
+            <div class="c-knob-maker__metric">
+              <span>Ø{{ formatFixed(m.outerDiameterMm, 1) }} × {{ formatFixed(m.totalHeightMm, 1) }} mm</span>
+              <small>{{ 'tools.knobDialHandwheelMaker.hubWallMetric' | translate }}: {{ formatFixed(m.minHubWallMm, 2) }} mm</small>
+            </div>
+            <div class="c-knob-maker__metric">
+              <span>~{{ m.estimatedWeightG }} g • {{ formatFixed(m.estimatedPrintTimeHours, 1) }}h</span>
+              <small>{{ m.triangleCount }} tris</small>
+            </div>
+          </div>
+        }
+
+        @if (isExporting()) {
+          <div class="g--margin-top-3">
+            <app-progress-bar
+              [value]="exportProgress()"
+              [label]="'common.processing' | translate"
+            ></app-progress-bar>
+          </div>
+        }
+
+        <div class="c-knob-maker__actions g--margin-top-3">
+          <button
+            type="button"
+            class="c-button c-button--primary"
+            [disabled]="!!validationError() || isExporting()"
+            (click)="export3mf()"
+          >
+            {{ 'tools.knobDialHandwheelMaker.export3mfLabel' | translate }}
+          </button>
+          <button
+            type="button"
+            class="c-button c-button--secondary"
+            [disabled]="!!validationError() || isExporting()"
+            (click)="exportStl()"
+          >
+            {{ 'tools.knobDialHandwheelMaker.exportStlLabel' | translate }}
+          </button>
+        </div>
+
+        <p class="c-knob-maker__hint g--margin-top-2">
+          {{ 'tools.knobDialHandwheelMaker.stlNote' | translate }}
+          •
+          {{ 'tools.knobDialHandwheelMaker.threeMfNote' | translate }}
+        </p>
+      </app-card>
+    </div>
+  </div>
+</div>

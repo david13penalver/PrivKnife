@@ -4,6 +4,7 @@ import { ruggedHingedBoxMakerTool } from './3d/rugged-hinged-box-maker';
 import { drawerDividerGridMakerTool } from './3d/drawer-divider-grid-maker';
 import { toolBitHolderMakerTool } from './3d/tool-bit-holder-maker';
 import { washerSpacerShimMakerTool } from './3d/washer-spacer-shim-maker';
+import { knobDialHandwheelMakerTool } from './3d/knob-dial-handwheel-maker';
 import { brailleAdaSignGeneratorTool } from './3d/braille-ada-sign-generator';
 import { cappuccinoStencilMakerTool } from './3d/cappuccino-stencil-maker';
 import { hswInsertAdapterTool } from './3d/hsw-insert-adapter';
@@ -167,6 +168,7 @@ export const TOOL_REGISTRY: ToolDefinition[] = [
   drawerDividerGridMakerTool,
   toolBitHolderMakerTool,
   washerSpacerShimMakerTool,
+  knobDialHandwheelMakerTool,
 ];
 
 export function getToolById(id: string): ToolDefinition | undefined {
@@ -316,6 +318,7 @@ export const TOOL_I18N_MAP: Record<string, string> = {
   'drawer-divider-grid-maker': 'drawerDividerGridMaker',
   'tool-bit-holder-maker': 'toolBitHolderMaker',
   'washer-spacer-shim-maker': 'washerSpacerShimMaker',
+  'knob-dial-handwheel-maker': 'knobDialHandwheelMaker',
 };
 
 export function getToolI18nKey(id: string): string | undefined {
