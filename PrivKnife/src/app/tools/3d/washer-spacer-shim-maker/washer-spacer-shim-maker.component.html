@@ -1,0 +1,371 @@
+<div class="l-page">
+  <header class="l-page__header c-header">
+    <div class="c-header__title-group">
+      <h1 class="c-header__title">{{ 'tools.washerSpacerShimMaker.name' | translate }}</h1>
+      <p class="c-header__subtitle">{{ 'tools.washerSpacerShimMaker.description' | translate }}</p>
+    </div>
+    <app-badge variant="privacy">{{ 'common.privacyBadge' | translate }}</app-badge>
+  </header>
+
+  <div class="l-columns l-columns--2 c-hardware-part__layout">
+    <!-- Controls Area -->
+    <div class="l-columns__area c-hardware-part__controls-col">
+      <!-- 1. Part Profile & Metric Bolt Clearances -->
+      <app-card [title]="'tools.washerSpacerShimMaker.profileTitle' | translate">
+        <span class="c-input__label">{{ 'common.curatedPresets' | translate }}</span>
+        <div class="c-hardware-part__presets">
+          @for (preset of presets; track preset.id) {
+            <button
+              type="button"
+              class="c-button c-button--small c-hardware-part__preset-btn"
+              [class.c-button--primary]="activePresetId() === preset.id"
+              [class.c-button--outline]="activePresetId() !== preset.id"
+              (click)="applyPreset(preset)"
+            >
+              {{ preset.name }}
+            </button>
+          }
+        </div>
+
+        <div class="c-input g--margin-top-3">
+          <label class="c-input__label" for="partTypeSelect">
+            {{ 'tools.washerSpacerShimMaker.partTypeLabel' | translate }}
+          </label>
+          <select
+            id="partTypeSelect"
+            class="c-input__control"
+            [value]="options().partType"
+            (change)="onPartTypeChange($event)"
+          >
+            <option value="washer_spacer">{{ 'tools.washerSpacerShimMaker.typeWasher' | translate }}</option>
+            <option value="flanged_bushing">{{ 'tools.washerSpacerShimMaker.typeBushing' | translate }}</option>
+            <option value="hex_standoff">{{ 'tools.washerSpacerShimMaker.typeStandoff' | translate }}</option>
+            <option value="leveling_wedge">{{ 'tools.washerSpacerShimMaker.typeWedge' | translate }}</option>
+            <option value="u_slot_shim">{{ 'tools.washerSpacerShimMaker.typeShim' | translate }}</option>
+          </select>
+        </div>
+
+        @if (options().partType !== 'leveling_wedge') {
+          <div class="g--margin-top-3">
+            <span class="c-input__label">{{ 'tools.washerSpacerShimMaker.fastenerPresetsLabel' | translate }}</span>
+            <div class="c-hardware-part__chips">
+              @for (bolt of boltSpecs; track bolt.id) {
+                <button
+                  type="button"
+                  class="c-button c-button--small"
+                  [class.c-button--primary]="options().boltPreset === bolt.id"
+                  [class.c-button--outline]="options().boltPreset !== bolt.id"
+                  (click)="applyBoltPreset(bolt.id)"
+                >
+                  {{ bolt.label }}
+                </button>
+              }
+            </div>
+          </div>
+        }
+      </app-card>
+
+      <!-- 2. Caliper Dimensions & Build Plate Array -->
+      <app-card [title]="'tools.washerSpacerShimMaker.dimensionsTitle' | translate">
+        <div class="c-hardware-part__grid">
+          <div class="c-input">
+            <label class="c-input__label" for="odSlider">
+              {{ (options().partType === 'leveling_wedge' || options().partType === 'u_slot_shim' ? 'tools.washerSpacerShimMaker.widthMmLabel' : 'tools.washerSpacerShimMaker.outerDiameterLabel') | translate }}:
+              <strong>{{ formatFixed(options().outerDiameterMm, 1) }} mm</strong>
+            </label>
+            <input
+              id="odSlider"
+              type="range"
+              class="c-input__slider"
+              min="6"
+              max="120"
+              step="0.5"
+              [value]="options().outerDiameterMm"
+              (input)="onNumberInput('outerDiameterMm', $event, true)"
+            />
+          </div>
+
+          <div class="c-input">
+            <label class="c-input__label" for="idSlider">
+              {{ (options().partType === 'u_slot_shim' ? 'tools.washerSpacerShimMaker.slotWidthLabel' : 'tools.washerSpacerShimMaker.innerDiameterLabel') | translate }}:
+              <strong>{{ formatFixed(options().innerDiameterMm, 1) }} mm</strong>
+            </label>
+            <input
+              id="idSlider"
+              type="range"
+              class="c-input__slider"
+              min="1.8"
+              max="90"
+              step="0.1"
+              [value]="options().innerDiameterMm"
+              (input)="onNumberInput('innerDiameterMm', $event, true)"
+            />
+          </div>
+
+          <div class="c-input">
+            <label class="c-input__label" for="heightSlider">
+              {{ 'tools.washerSpacerShimMaker.heightLabel' | translate }}:
+              <strong>{{ formatFixed(options().heightMm, 1) }} mm</strong>
+            </label>
+            <input
+              id="heightSlider"
+              type="range"
+              class="c-input__slider"
+              min="0.4"
+              max="80"
+              step="0.2"
+              [value]="options().heightMm"
+              (input)="onNumberInput('heightMm', $event, true)"
+            />
+          </div>
+
+          @if (options().partType === 'flanged_bushing') {
+            <div class="c-input">
+              <label class="c-input__label" for="flangeOdSlider">
+                {{ 'tools.washerSpacerShimMaker.flangeOdLabel' | translate }}:
+                <strong>{{ formatFixed(options().flangeDiameterMm, 1) }} mm</strong>
+              </label>
+              <input
+                id="flangeOdSlider"
+                type="range"
+                class="c-input__slider"
+                min="8"
+                max="140"
+                step="0.5"
+                [value]="options().flangeDiameterMm"
+                (input)="onNumberInput('flangeDiameterMm', $event, true)"
+              />
+            </div>
+
+            <div class="c-input">
+              <label class="c-input__label" for="flangeHeightSlider">
+                {{ 'tools.washerSpacerShimMaker.flangeHeightLabel' | translate }}:
+                <strong>{{ formatFixed(options().flangeHeightMm, 1) }} mm</strong>
+              </label>
+              <input
+                id="flangeHeightSlider"
+                type="range"
+                class="c-input__slider"
+                min="0.8"
+                max="20"
+                step="0.2"
+                [value]="options().flangeHeightMm"
+                (input)="onNumberInput('flangeHeightMm', $event, true)"
+              />
+            </div>
+          }
+
+          @if (options().partType === 'leveling_wedge' || options().partType === 'u_slot_shim') {
+            <div class="c-input">
+              <label class="c-input__label" for="lengthSlider">
+                {{ 'tools.washerSpacerShimMaker.lengthLabel' | translate }}:
+                <strong>{{ formatFixed(options().wedgeLengthMm, 1) }} mm</strong>
+              </label>
+              <input
+                id="lengthSlider"
+                type="range"
+                class="c-input__slider"
+                min="25"
+                max="150"
+                step="1"
+                [value]="options().wedgeLengthMm"
+                (input)="onNumberInput('wedgeLengthMm', $event, true)"
+              />
+            </div>
+          }
+
+          @if (options().partType === 'leveling_wedge') {
+            <div class="c-input">
+              <label class="c-input__label" for="minTipHeightSlider">
+                {{ 'tools.washerSpacerShimMaker.wedgeMinHeightLabel' | translate }}:
+                <strong>{{ formatFixed(options().wedgeMinHeightMm, 1) }} mm</strong>
+              </label>
+              <input
+                id="minTipHeightSlider"
+                type="range"
+                class="c-input__slider"
+                min="0.4"
+                max="10"
+                step="0.2"
+                [value]="options().wedgeMinHeightMm"
+                (input)="onNumberInput('wedgeMinHeightMm', $event, true)"
+              />
+            </div>
+          } @else {
+            <div class="c-input">
+              <label class="c-input__label" for="chamferSlider">
+                {{ 'tools.washerSpacerShimMaker.chamferLabel' | translate }}:
+                <strong>{{ formatFixed(options().chamferMm, 2) }} mm</strong>
+              </label>
+              <input
+                id="chamferSlider"
+                type="range"
+                class="c-input__slider"
+                min="0"
+                max="3.0"
+                step="0.1"
+                [value]="options().chamferMm"
+                (input)="onNumberInput('chamferMm', $event, true)"
+              />
+            </div>
+          }
+
+          <div class="c-input">
+            <label class="c-input__label" for="tolSlider">
+              {{ 'tools.washerSpacerShimMaker.toleranceLabel' | translate }}:
+              <strong>+{{ formatFixed(options().holeToleranceMm, 2) }} mm</strong>
+            </label>
+            <input
+              id="tolSlider"
+              type="range"
+              class="c-input__slider"
+              min="0"
+              max="0.50"
+              step="0.05"
+              [value]="options().holeToleranceMm"
+              (input)="onNumberInput('holeToleranceMm', $event, true)"
+            />
+          </div>
+
+          <div class="c-input">
+            <label class="c-input__label" for="qtySlider">
+              {{ 'tools.washerSpacerShimMaker.quantityLabel' | translate }}:
+              <strong>×{{ options().quantity }}</strong>
+            </label>
+            <input
+              id="qtySlider"
+              type="range"
+              class="c-input__slider"
+              min="1"
+              max="24"
+              step="1"
+              [value]="options().quantity"
+              (input)="onNumberInput('quantity', $event)"
+            />
+          </div>
+        </div>
+
+        @if (options().partType === 'leveling_wedge') {
+          <label class="c-hardware-part__check g--margin-top-3">
+            <input
+              type="checkbox"
+              [checked]="options().includeWedgeRibs"
+              (change)="onCheckboxChange('includeWedgeRibs', $event)"
+            />
+            <span>{{ 'tools.washerSpacerShimMaker.wedgeRibsToggle' | translate }}</span>
+          </label>
+          <label class="c-hardware-part__check">
+            <input
+              type="checkbox"
+              [checked]="options().includeScrewSlot"
+              (change)="onCheckboxChange('includeScrewSlot', $event)"
+            />
+            <span>{{ 'tools.washerSpacerShimMaker.screwSlotToggle' | translate }}</span>
+          </label>
+        }
+
+        <label class="c-hardware-part__check g--margin-top-2">
+          <input
+            type="checkbox"
+            [checked]="options().includeBrimTabs"
+            (change)="onCheckboxChange('includeBrimTabs', $event)"
+          />
+          <span>{{ 'tools.washerSpacerShimMaker.brimTabsToggle' | translate }}</span>
+        </label>
+
+        <div class="c-hardware-part__color g--margin-top-2">
+          <span>{{ 'tools.washerSpacerShimMaker.colorLabel' | translate }}</span>
+          <input
+            type="color"
+            [value]="options().partColorHex"
+            (input)="onColorInput($event)"
+          />
+        </div>
+      </app-card>
+    </div>
+
+    <!-- 3D Viewport & Export Panel -->
+    <div class="l-columns__area c-hardware-part__viewport-col">
+      <app-card [title]="'tools.washerSpacerShimMaker.viewportTitle' | translate">
+        <div class="c-hardware-part__viewport-hud">
+          <button type="button" class="c-hardware-part__hud-btn" (click)="toggleWireframe()">
+            {{ (wireframe() ? 'tools.washerSpacerShimMaker.solidView' : 'tools.washerSpacerShimMaker.wireframeToggle') | translate }}
+          </button>
+          <button type="button" class="c-hardware-part__hud-btn" (click)="resetCamera()">
+            {{ 'tools.washerSpacerShimMaker.resetCamera' | translate }}
+          </button>
+          <button type="button" class="c-hardware-part__hud-btn" (click)="resetDefaults()">
+            {{ 'common.reset' | translate }}
+          </button>
+        </div>
+
+        <div #viewportContainer class="c-hardware-part__viewport-stage"></div>
+
+        @if (validationError()) {
+          <div class="c-hardware-part__alert" role="alert">
+            {{ validationError() }}
+          </div>
+        }
+
+        @if (metrics(); as m) {
+          @if (m.highAspectWarning) {
+            <div class="c-hardware-part__stability-warn">
+              ⚠️ {{ 'tools.washerSpacerShimMaker.stabilityWarning' | translate }}
+            </div>
+          }
+
+          @if (m.exceedsStandardBed) {
+            <div class="c-hardware-part__bed-warn">
+              ⚠️ {{ 'tools.washerSpacerShimMaker.bedWarning' | translate }}
+            </div>
+          }
+
+          <div class="c-hardware-part__metrics">
+            <div class="c-hardware-part__metric">
+              <span>{{ formatFixed(m.widthMm, 1) }} × {{ formatFixed(m.depthMm, 1) }} × {{ formatFixed(m.heightMm, 1) }} mm</span>
+              <small>{{ 'tools.washerSpacerShimMaker.wallThicknessMetric' | translate }}: {{ formatFixed(m.radialWallMm, 2) }} mm</small>
+            </div>
+            <div class="c-hardware-part__metric">
+              <span>~{{ m.estimatedWeightG }} g • {{ formatFixed(m.estimatedPrintTimeHours, 1) }}h</span>
+              <small>×{{ options().quantity }} • {{ m.triangleCount }} tris</small>
+            </div>
+          </div>
+        }
+
+        @if (isExporting()) {
+          <div class="g--margin-top-3">
+            <app-progress-bar
+              [value]="exportProgress()"
+              [label]="'common.processing' | translate"
+            ></app-progress-bar>
+          </div>
+        }
+
+        <div class="c-hardware-part__actions g--margin-top-3">
+          <button
+            type="button"
+            class="c-button c-button--primary"
+            [disabled]="!!validationError() || isExporting()"
+            (click)="export3mf()"
+          >
+            {{ 'tools.washerSpacerShimMaker.export3mfLabel' | translate }}
+          </button>
+          <button
+            type="button"
+            class="c-button c-button--secondary"
+            [disabled]="!!validationError() || isExporting()"
+            (click)="exportStl()"
+          >
+            {{ 'tools.washerSpacerShimMaker.exportStlLabel' | translate }}
+          </button>
+        </div>
+
+        <p class="c-hardware-part__hint g--margin-top-2">
+          {{ 'tools.washerSpacerShimMaker.stlNote' | translate }}
+          •
+          {{ 'tools.washerSpacerShimMaker.threeMfNote' | translate }}
+        </p>
+      </app-card>
+    </div>
+  </div>
+</div>

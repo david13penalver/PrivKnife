@@ -490,5 +490,11 @@
     "route": "/tools/video-to-gif",
     "category": "audio-video",
     "source": "PrivKnife/src/app/tools/audio-video/video-gif-trimmer"
+  },
+  {
+    "id": "washer-spacer-shim-maker",
+    "route": "/tools/washer-spacer-shim-maker",
+    "category": "3d",
+    "source": "PrivKnife/src/app/tools/3d/washer-spacer-shim-maker"
   }
 ]

@@ -2218,6 +2218,13 @@ export const routes: Routes = [
       ),
   },
   {
+    path: 'tools/washer-spacer-shim-maker',
+    loadComponent: () =>
+      import('./tools/3d/washer-spacer-shim-maker/washer-spacer-shim-maker.component').then(
+        (m) => m.WasherSpacerShimMakerComponent
+      ),
+  },
+  {
     path: '**',
     title: 'Page Not Found — PrivKnife',
     data: {

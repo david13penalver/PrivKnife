@@ -837,6 +837,15 @@ describe('ToolRegistry (Seam 3: Catalog & Architecture Verification)', () => {
     expect(TOOL_I18N_MAP['tool-bit-holder-maker']).toBe('toolBitHolderMaker');
   });
 
+  it('should find washer-spacer-shim-maker tool by id', () => {
+    const tool = getToolById('washer-spacer-shim-maker');
+    expect(tool).toBeDefined();
+    expect(tool?.category).toBe('3d');
+    expect(tool?.isFullyClientSide).toBe(true);
+    expect(typeof tool?.loadComponent).toBe('function');
+    expect(TOOL_I18N_MAP['washer-spacer-shim-maker']).toBe('washerSpacerShimMaker');
+  });
+
   describe('Tool Registry Localization (i18n)', () => {
     it('should have an i18n key mapping for every registered tool', () => {
       for (const tool of TOOL_REGISTRY) {
