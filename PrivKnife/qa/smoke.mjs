@@ -4,7 +4,7 @@ import path from 'node:path';
 import { pathToFileURL } from 'node:url';
 import puppeteer from 'puppeteer-core';
 
-export function assertManifest(manifest, expectedCount = 88) {
+export function assertManifest(manifest, expectedCount = 89) {
   if (manifest.length !== expectedCount) throw new Error(`Tool manifest has ${manifest.length} entries; expected ${expectedCount}`);
   const ids = new Set();
   const routes = new Set();
@@ -115,7 +115,13 @@ if (isMain) {
       if (clickText) {
         const buttons = await page.$$('button');
         let found = false;
-        for (const button of buttons) if ((await button.evaluate((el) => el.innerText)).includes(clickText)) { await button.click(); found = true; break; }
+        for (const button of buttons) {
+          if (!(await button.evaluate((el) => el.innerText)).includes(clickText)) continue;
+          await page.waitForFunction((element) => element.isConnected && !element.disabled, { timeout: 15000 }, button);
+          await button.click();
+          found = true;
+          break;
+        }
         if (!found) result.pageErrors.push(`Export button not found: ${clickText}`);
         else {
           const deadline = Date.now() + 30000; let files = [];

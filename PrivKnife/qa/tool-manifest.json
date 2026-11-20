@@ -258,6 +258,12 @@
     "source": "PrivKnife/src/app/tools/documents/invoice-maker"
   },
   {
+    "id": "jar-bottle-rack-maker",
+    "route": "/tools/jar-bottle-rack-maker",
+    "category": "3d",
+    "source": "PrivKnife/src/app/tools/3d/jar-bottle-rack-maker"
+  },
+  {
     "id": "json-sql-formatter",
     "route": "/tools/json-sql-formatter",
     "category": "dev",

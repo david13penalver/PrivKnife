@@ -2258,6 +2258,12 @@ export const routes: Routes = [
     ),
   },
   {
+    path: 'tools/jar-bottle-rack-maker',
+    loadComponent: () => import('./tools/3d/jar-bottle-rack-maker/jar-bottle-rack-maker.component').then(
+      (m) => m.JarBottleRackMakerComponent
+    ),
+  },
+  {
     path: '**',
     title: 'Page Not Found — PrivKnife',
     data: {

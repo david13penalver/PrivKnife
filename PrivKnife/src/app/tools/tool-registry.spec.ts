@@ -885,6 +885,12 @@ describe('ToolRegistry (Seam 3: Catalog & Architecture Verification)', () => {
     expect(TOOL_I18N_MAP['threaded-tube-pill-organizer']).toBe('threadedTubePillOrganizer');
   });
 
+  it('registers jar-bottle-rack-maker as a lazy, localized 3D tool', () => {
+    expect(getToolById('jar-bottle-rack-maker')).toMatchObject({ category: '3d', isFullyClientSide: true });
+    expect(typeof getToolById('jar-bottle-rack-maker')?.loadComponent).toBe('function');
+    expect(TOOL_I18N_MAP['jar-bottle-rack-maker']).toBe('jarBottleRackMaker');
+  });
+
   describe('Tool Registry Localization (i18n)', () => {
     it('should have an i18n key mapping for every registered tool', () => {
       for (const tool of TOOL_REGISTRY) {
