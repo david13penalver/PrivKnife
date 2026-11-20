@@ -864,6 +864,15 @@ describe('ToolRegistry (Seam 3: Catalog & Architecture Verification)', () => {
     expect(TOOL_I18N_MAP['device-wall-cradle-maker']).toBe('deviceWallCradleMaker');
   });
 
+  it('should find cable-comb-clip-maker tool by id', () => {
+    const tool = getToolById('cable-comb-clip-maker');
+    expect(tool).toBeDefined();
+    expect(tool?.category).toBe('3d');
+    expect(tool?.isFullyClientSide).toBe(true);
+    expect(typeof tool?.loadComponent).toBe('function');
+    expect(TOOL_I18N_MAP['cable-comb-clip-maker']).toBe('cableCombClipMaker');
+  });
+
   describe('Tool Registry Localization (i18n)', () => {
     it('should have an i18n key mapping for every registered tool', () => {
       for (const tool of TOOL_REGISTRY) {

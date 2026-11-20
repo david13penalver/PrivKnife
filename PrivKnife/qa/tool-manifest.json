@@ -60,6 +60,12 @@
     "source": "PrivKnife/src/app/tools/3d/braille-ada-sign-generator"
   },
   {
+    "id": "cable-comb-clip-maker",
+    "route": "/tools/cable-comb-clip-maker",
+    "category": "3d",
+    "source": "PrivKnife/src/app/tools/3d/cable-comb-clip-maker"
+  },
+  {
     "id": "calendar-linker",
     "route": "/tools/calendar-linker",
     "category": "dev",

@@ -2239,6 +2239,13 @@ export const routes: Routes = [
       ),
   },
   {
+    path: 'tools/cable-comb-clip-maker',
+    loadComponent: () =>
+      import('./tools/3d/cable-comb-clip-maker/cable-comb-clip-maker.component').then(
+        (m) => m.CableCombClipMakerComponent
+      ),
+  },
+  {
     path: '**',
     title: 'Page Not Found — PrivKnife',
     data: {
