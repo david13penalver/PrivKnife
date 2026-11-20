@@ -1,0 +1,301 @@
+<div class="l-page">
+  <header class="l-page__header c-header">
+    <div class="c-header__title-group">
+      <h1 class="c-header__title">{{ 'tools.deviceWallCradleMaker.name' | translate }}</h1>
+      <p class="c-header__subtitle">{{ 'tools.deviceWallCradleMaker.description' | translate }}</p>
+    </div>
+    <app-badge variant="privacy">{{ 'common.privacyBadge' | translate }}</app-badge>
+  </header>
+
+  <div class="l-columns l-columns--2 c-device-cradle__layout">
+    <!-- Controls Area -->
+    <div class="l-columns__area c-device-cradle__controls-col">
+      <!-- 1. Bracket Architecture & Device Calipers -->
+      <app-card [title]="'tools.deviceWallCradleMaker.architectureTitle' | translate">
+        <span class="c-input__label">{{ 'common.curatedPresets' | translate }}</span>
+        <div class="c-device-cradle__presets">
+          @for (preset of presets; track preset.id) {
+            <button
+              type="button"
+              class="c-button c-button--small c-device-cradle__preset-btn"
+              [class.c-button--primary]="activePresetId() === preset.id"
+              [class.c-button--outline]="activePresetId() !== preset.id"
+              (click)="applyPreset(preset)"
+            >
+              {{ preset.name }}
+            </button>
+          }
+        </div>
+
+        <div class="c-device-cradle__grid g--margin-top-3">
+          <div class="c-input">
+            <label class="c-input__label" for="cradleStyleSelect">
+              {{ 'tools.deviceWallCradleMaker.styleLabel' | translate }}
+            </label>
+            <select
+              id="cradleStyleSelect"
+              class="c-input__control"
+              [value]="options().cradleStyle"
+              (change)="onSelectChange('cradleStyle', $event)"
+            >
+              <option value="u_wrap_cradle">{{ 'tools.deviceWallCradleMaker.styleUWrap' | translate }}</option>
+              <option value="slide_rails_pair">{{ 'tools.deviceWallCradleMaker.styleRails' | translate }}</option>
+              <option value="remote_pocket">{{ 'tools.deviceWallCradleMaker.stylePocket' | translate }}</option>
+            </select>
+          </div>
+
+          <div class="c-input">
+            <label class="c-input__label" for="flangePlaceSelect">
+              {{ 'tools.deviceWallCradleMaker.flangePlaceLabel' | translate }}
+            </label>
+            <select
+              id="flangePlaceSelect"
+              class="c-input__control"
+              [value]="options().mountFlangePlacement"
+              (change)="onSelectChange('mountFlangePlacement', $event)"
+            >
+              <option value="external_ears">{{ 'tools.deviceWallCradleMaker.placeExternal' | translate }}</option>
+              <option value="internal_floor">{{ 'tools.deviceWallCradleMaker.placeInternal' | translate }}</option>
+              <option value="adhesive_flat">{{ 'tools.deviceWallCradleMaker.placeAdhesive' | translate }}</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="c-device-cradle__grid g--margin-top-3">
+          <div class="c-input">
+            <label class="c-input__label" for="devWidthSlider">
+              {{ 'tools.deviceWallCradleMaker.deviceWidthLabel' | translate }}:
+              <strong>{{ options().deviceWidthMm }} mm</strong>
+            </label>
+            <input
+              id="devWidthSlider"
+              type="range"
+              class="c-input__slider"
+              min="30"
+              max="280"
+              step="1"
+              [value]="options().deviceWidthMm"
+              (input)="onNumberInput('deviceWidthMm', $event)"
+            />
+          </div>
+
+          <div class="c-input">
+            <label class="c-input__label" for="devThickSlider">
+              {{ 'tools.deviceWallCradleMaker.deviceThicknessLabel' | translate }}:
+              <strong>{{ options().deviceThicknessMm }} mm</strong>
+            </label>
+            <input
+              id="devThickSlider"
+              type="range"
+              class="c-input__slider"
+              min="14"
+              max="90"
+              step="1"
+              [value]="options().deviceThicknessMm"
+              (input)="onNumberInput('deviceThicknessMm', $event)"
+            />
+          </div>
+
+          <div class="c-input">
+            <label class="c-input__label" for="mountSpanSlider">
+              {{ 'tools.deviceWallCradleMaker.mountSpanLabel' | translate }}:
+              <strong>{{ options().mountSpanMm }} mm</strong>
+            </label>
+            <input
+              id="mountSpanSlider"
+              type="range"
+              class="c-input__slider"
+              min="25"
+              max="180"
+              step="1"
+              [value]="options().mountSpanMm"
+              (input)="onNumberInput('mountSpanMm', $event)"
+            />
+          </div>
+
+          <div class="c-input">
+            <label class="c-input__label" for="wallThickSlider">
+              {{ 'tools.deviceWallCradleMaker.wallThicknessLabel' | translate }}:
+              <strong>{{ formatFixed(options().wallThicknessMm, 1) }} mm</strong>
+            </label>
+            <input
+              id="wallThickSlider"
+              type="range"
+              class="c-input__slider"
+              min="2.8"
+              max="6.0"
+              step="0.2"
+              [value]="options().wallThicknessMm"
+              (input)="onNumberInput('wallThicknessMm', $event, true)"
+            />
+          </div>
+        </div>
+      </app-card>
+
+      <!-- 2. Cooling Vents, Fit Clearance & Wood Screws -->
+      <app-card [title]="'tools.deviceWallCradleMaker.hardwareTitle' | translate">
+        <div class="c-device-cradle__grid">
+          <div class="c-input">
+            <label class="c-input__label" for="fitClearSlider">
+              {{ 'tools.deviceWallCradleMaker.fitClearanceLabel' | translate }}:
+              <strong>+{{ formatFixed(options().fitClearanceMm, 1) }} mm</strong>
+            </label>
+            <input
+              id="fitClearSlider"
+              type="range"
+              class="c-input__slider"
+              min="0.4"
+              max="2.0"
+              step="0.1"
+              [value]="options().fitClearanceMm"
+              (input)="onNumberInput('fitClearanceMm', $event, true)"
+            />
+          </div>
+
+          <div class="c-input">
+            <label class="c-input__label" for="screwDiaSlider">
+              {{ 'tools.deviceWallCradleMaker.screwDiaLabel' | translate }}:
+              <strong>Ø{{ formatFixed(options().screwDiameterMm, 1) }} mm</strong>
+            </label>
+            <input
+              id="screwDiaSlider"
+              type="range"
+              class="c-input__slider"
+              min="3.2"
+              max="5.5"
+              step="0.1"
+              [value]="options().screwDiameterMm"
+              (input)="onNumberInput('screwDiameterMm', $event, true)"
+            />
+          </div>
+
+          @if (options().cradleStyle === 'slide_rails_pair') {
+            <div class="c-input">
+              <label class="c-input__label" for="shelfWidthSlider">
+                {{ 'tools.deviceWallCradleMaker.railShelfLabel' | translate }}:
+                <strong>{{ options().railShelfWidthMm }} mm</strong>
+              </label>
+              <input
+                id="shelfWidthSlider"
+                type="range"
+                class="c-input__slider"
+                min="10"
+                max="28"
+                step="1"
+                [value]="options().railShelfWidthMm"
+                (input)="onNumberInput('railShelfWidthMm', $event)"
+              />
+            </div>
+          }
+        </div>
+
+        <label class="c-device-cradle__check g--margin-top-3">
+          <input
+            type="checkbox"
+            [checked]="options().includeThermalVents"
+            (change)="onCheckboxChange('includeThermalVents', $event)"
+          />
+          <span>{{ 'tools.deviceWallCradleMaker.ventsToggle' | translate }}</span>
+        </label>
+
+        @if (options().cradleStyle !== 'remote_pocket') {
+          <label class="c-device-cradle__check">
+            <input
+              type="checkbox"
+              [checked]="options().includeBackstop"
+              (change)="onCheckboxChange('includeBackstop', $event)"
+            />
+            <span>{{ 'tools.deviceWallCradleMaker.backstopToggle' | translate }}</span>
+          </label>
+        }
+
+        <div class="c-device-cradle__color g--margin-top-2">
+          <span>{{ 'tools.deviceWallCradleMaker.colorLabel' | translate }}</span>
+          <input
+            type="color"
+            [value]="options().filamentColorHex"
+            (input)="onColorInput($event)"
+          />
+        </div>
+      </app-card>
+    </div>
+
+    <!-- 3D Viewport & Export Panel -->
+    <div class="l-columns__area c-device-cradle__viewport-col">
+      <app-card [title]="'tools.deviceWallCradleMaker.viewportTitle' | translate">
+        <div class="c-device-cradle__viewport-hud">
+          <button type="button" class="c-device-cradle__hud-btn" (click)="toggleWireframe()">
+            {{ (wireframe() ? 'tools.deviceWallCradleMaker.solidView' : 'tools.deviceWallCradleMaker.wireframeToggle') | translate }}
+          </button>
+          <button type="button" class="c-device-cradle__hud-btn" (click)="resetCamera()">
+            {{ 'tools.deviceWallCradleMaker.resetCamera' | translate }}
+          </button>
+          <button type="button" class="c-device-cradle__hud-btn" (click)="resetDefaults()">
+            {{ 'common.reset' | translate }}
+          </button>
+        </div>
+
+        <div #viewportContainer class="c-device-cradle__viewport-stage"></div>
+
+        @if (validationError()) {
+          <div class="c-device-cradle__alert" role="alert">
+            {{ validationError() }}
+          </div>
+        }
+
+        @if (metrics(); as m) {
+          @if (m.exceedsStandardBed) {
+            <div class="c-device-cradle__bed-warn">
+              ⚠️ {{ 'tools.deviceWallCradleMaker.bedWarning' | translate }}
+            </div>
+          }
+
+          <div class="c-device-cradle__metrics">
+            <div class="c-device-cradle__metric">
+              <span>{{ formatFixed(m.innerOpeningWidthMm, 1) }} × {{ formatFixed(m.innerOpeningHeightMm, 1) }} mm</span>
+              <small>{{ 'tools.deviceWallCradleMaker.innerSlotMetric' | translate }} ({{ m.partCount }}p)</small>
+            </div>
+            <div class="c-device-cradle__metric">
+              <span>~{{ m.estimatedWeightG }} g • {{ formatFixed(m.estimatedPrintTimeHours, 1) }}h</span>
+              <small>{{ formatFixed(m.widthMm, 0) }} × {{ formatFixed(m.depthMm, 0) }} × {{ formatFixed(m.heightMm, 0) }} mm</small>
+            </div>
+          </div>
+        }
+
+        @if (isExporting()) {
+          <div class="g--margin-top-3">
+            <app-progress-bar
+              [value]="exportProgress()"
+              [label]="'common.processing' | translate"
+            ></app-progress-bar>
+          </div>
+        }
+
+        <div class="c-device-cradle__actions g--margin-top-3">
+          <button
+            type="button"
+            class="c-button c-button--primary"
+            [disabled]="!!validationError() || isExporting()"
+            (click)="export3mf()"
+          >
+            {{ 'tools.deviceWallCradleMaker.export3mfLabel' | translate }}
+          </button>
+          <button
+            type="button"
+            class="c-button c-button--secondary"
+            [disabled]="!!validationError() || isExporting()"
+            (click)="exportStl()"
+          >
+            {{ 'tools.deviceWallCradleMaker.exportStlLabel' | translate }}
+          </button>
+        </div>
+
+        <p class="c-device-cradle__hint g--margin-top-2">
+          {{ 'tools.deviceWallCradleMaker.stlNote' | translate }}
+          •
+          {{ 'tools.deviceWallCradleMaker.threeMfNote' | translate }}
+        </p>
+      </app-card>
+    </div>
+  </div>
+</div>

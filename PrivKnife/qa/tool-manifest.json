@@ -126,6 +126,12 @@
     "source": "PrivKnife/src/app/tools/3d/desk-wedge-nameplate"
   },
   {
+    "id": "device-wall-cradle-maker",
+    "route": "/tools/device-wall-cradle-maker",
+    "category": "3d",
+    "source": "PrivKnife/src/app/tools/3d/device-wall-cradle-maker"
+  },
+  {
     "id": "diff-checker",
     "route": "/tools/diff-checker",
     "category": "dev",

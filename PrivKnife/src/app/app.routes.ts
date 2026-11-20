@@ -2232,6 +2232,13 @@ export const routes: Routes = [
       ),
   },
   {
+    path: 'tools/device-wall-cradle-maker',
+    loadComponent: () =>
+      import('./tools/3d/device-wall-cradle-maker/device-wall-cradle-maker.component').then(
+        (m) => m.DeviceWallCradleMakerComponent
+      ),
+  },
+  {
     path: '**',
     title: 'Page Not Found — PrivKnife',
     data: {
