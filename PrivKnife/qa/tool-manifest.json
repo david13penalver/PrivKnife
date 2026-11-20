@@ -72,6 +72,12 @@
     "source": "PrivKnife/src/app/tools/dev/calendar-linker"
   },
   {
+    "id": "calibration-tolerance-suite",
+    "route": "/tools/calibration-tolerance-suite",
+    "category": "3d",
+    "source": "PrivKnife/src/app/tools/3d/calibration-tolerance-suite"
+  },
+  {
     "id": "cappuccino-stencil-maker",
     "route": "/tools/cappuccino-stencil-maker",
     "category": "3d",

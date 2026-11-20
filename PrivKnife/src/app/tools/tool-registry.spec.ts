@@ -891,6 +891,12 @@ describe('ToolRegistry (Seam 3: Catalog & Architecture Verification)', () => {
     expect(TOOL_I18N_MAP['jar-bottle-rack-maker']).toBe('jarBottleRackMaker');
   });
 
+  it('registers calibration-tolerance-suite as a lazy, localized 3D tool', () => {
+    expect(getToolById('calibration-tolerance-suite')).toMatchObject({ category: '3d', isFullyClientSide: true });
+    expect(typeof getToolById('calibration-tolerance-suite')?.loadComponent).toBe('function');
+    expect(TOOL_I18N_MAP['calibration-tolerance-suite']).toBe('calibrationToleranceSuite');
+  });
+
   describe('Tool Registry Localization (i18n)', () => {
     it('should have an i18n key mapping for every registered tool', () => {
       for (const tool of TOOL_REGISTRY) {

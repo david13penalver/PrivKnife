@@ -9,6 +9,7 @@ import { deviceWallCradleMakerTool } from './3d/device-wall-cradle-maker';
 import { funnelScoopMakerTool } from './3d/funnel-scoop-maker';
 import { threadedTubePillOrganizerTool } from './3d/threaded-tube-pill-organizer';
 import { jarBottleRackMakerTool } from './3d/jar-bottle-rack-maker';
+import { calibrationToleranceSuiteTool } from './3d/calibration-tolerance-suite';
 import { cableCombClipMakerTool } from './3d/cable-comb-clip-maker';
 import { brailleAdaSignGeneratorTool } from './3d/braille-ada-sign-generator';
 import { cappuccinoStencilMakerTool } from './3d/cappuccino-stencil-maker';
@@ -178,6 +179,7 @@ export const TOOL_REGISTRY: ToolDefinition[] = [
   funnelScoopMakerTool,
   threadedTubePillOrganizerTool,
   jarBottleRackMakerTool,
+  calibrationToleranceSuiteTool,
   cableCombClipMakerTool,
 ];
 
@@ -333,6 +335,7 @@ export const TOOL_I18N_MAP: Record<string, string> = {
   'funnel-scoop-maker': 'funnelScoopMaker',
   'threaded-tube-pill-organizer': 'threadedTubePillOrganizer',
   'jar-bottle-rack-maker': 'jarBottleRackMaker',
+  'calibration-tolerance-suite': 'calibrationToleranceSuite',
   'cable-comb-clip-maker': 'cableCombClipMaker',
 };
 

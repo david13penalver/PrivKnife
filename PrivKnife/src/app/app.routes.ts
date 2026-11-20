@@ -2264,6 +2264,12 @@ export const routes: Routes = [
     ),
   },
   {
+    path: 'tools/calibration-tolerance-suite',
+    loadComponent: () => import('./tools/3d/calibration-tolerance-suite/calibration-tolerance-suite.component').then(
+      (m) => m.CalibrationToleranceSuiteComponent
+    ),
+  },
+  {
     path: '**',
     title: 'Page Not Found — PrivKnife',
     data: {
