@@ -48,6 +48,12 @@
     "source": "PrivKnife/src/app/tools/media/batch-compressor"
   },
   {
+    "id": "battery-sdcard-case-maker",
+    "route": "/tools/battery-sdcard-case-maker",
+    "category": "3d",
+    "source": "PrivKnife/src/app/tools/3d/battery-sdcard-case-maker"
+  },
+  {
     "id": "braille-ada-sign-generator",
     "route": "/tools/braille-ada-sign-generator",
     "category": "3d",

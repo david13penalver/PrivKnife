@@ -1,4 +1,5 @@
 import { ToolCategory, ToolDefinition } from '../core/models/tool.model';
+import { batterySdcardCaseMakerTool } from './3d/battery-sdcard-case-maker';
 import { brailleAdaSignGeneratorTool } from './3d/braille-ada-sign-generator';
 import { cappuccinoStencilMakerTool } from './3d/cappuccino-stencil-maker';
 import { hswInsertAdapterTool } from './3d/hsw-insert-adapter';
@@ -157,6 +158,7 @@ export const TOOL_REGISTRY: ToolDefinition[] = [
   passwordPassphraseGeneratorTool,
   caseUnicodeTextStudioTool,
   asciiArtQrStudioTool,
+  batterySdcardCaseMakerTool,
 ];
 
 export function getToolById(id: string): ToolDefinition | undefined {
@@ -301,6 +303,7 @@ export const TOOL_I18N_MAP: Record<string, string> = {
   'password-passphrase-generator': 'passwordPassphraseGenerator',
   'case-unicode-text-studio': 'caseUnicodeTextStudio',
   'ascii-art-qr-studio': 'asciiArtQrStudio',
+  'battery-sdcard-case-maker': 'batterySdcardCaseMaker',
 };
 
 export function getToolI18nKey(id: string): string | undefined {

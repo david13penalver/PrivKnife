@@ -1,0 +1,473 @@
+<div class="l-page">
+  <header class="l-page__header c-header">
+    <div class="c-header__title-group">
+      <h1 class="c-header__title">{{ 'tools.batterySdcardCaseMaker.name' | translate }}</h1>
+      <p class="c-header__subtitle">{{ 'tools.batterySdcardCaseMaker.description' | translate }}</p>
+    </div>
+    <app-badge variant="privacy">{{ 'common.privacyBadge' | translate }}</app-badge>
+  </header>
+
+  <div class="l-columns l-columns--2 c-battery-case__layout">
+    <!-- Controls Area -->
+    <div class="l-columns__area c-battery-case__controls-col">
+      <!-- 1. Mode & Presets -->
+      <app-card [title]="'tools.batterySdcardCaseMaker.modeTitle' | translate">
+        <div class="c-battery-case__mode-tabs" role="tablist">
+          <button
+            type="button"
+            role="tab"
+            data-testid="mode-battery-dispenser"
+            class="c-button c-battery-case__mode-btn"
+            [class.c-button--primary]="options().mode === 'battery_dispenser'"
+            [class.c-button--outline]="options().mode !== 'battery_dispenser'"
+            [attr.aria-selected]="options().mode === 'battery_dispenser'"
+            (click)="setMode('battery_dispenser')"
+          >
+            🔋 {{ 'tools.batterySdcardCaseMaker.modeDispenser' | translate }}
+          </button>
+          <button
+            type="button"
+            role="tab"
+            data-testid="mode-memory-card-case"
+            class="c-button c-battery-case__mode-btn"
+            [class.c-button--primary]="options().mode === 'memory_card_case'"
+            [class.c-button--outline]="options().mode !== 'memory_card_case'"
+            [attr.aria-selected]="options().mode === 'memory_card_case'"
+            (click)="setMode('memory_card_case')"
+          >
+            💾 {{ 'tools.batterySdcardCaseMaker.modeCardCase' | translate }}
+          </button>
+        </div>
+
+        <div class="g--margin-top-3">
+          <span class="c-input__label">{{ 'common.curatedPresets' | translate }}</span>
+          <div class="c-battery-case__presets">
+            @for (preset of presets; track preset.id) {
+              <button
+                type="button"
+                class="c-button c-button--small c-battery-case__preset-btn"
+                [class.c-button--primary]="activePresetId() === preset.id"
+                [class.c-button--outline]="activePresetId() !== preset.id"
+                (click)="applyPreset(preset)"
+              >
+                {{ preset.name }}
+              </button>
+            }
+          </div>
+        </div>
+      </app-card>
+
+      <!-- 2. Mode-Specific Configuration -->
+      @if (options().mode === 'battery_dispenser') {
+        <app-card
+          customClass="g--margin-top-4"
+          [title]="'tools.batterySdcardCaseMaker.dispenserConfigTitle' | translate"
+        >
+          <div class="c-input">
+            <label class="c-input__label" for="cellPresetSelect">
+              {{ 'tools.batterySdcardCaseMaker.cellPresetLabel' | translate }}
+            </label>
+            <select
+              id="cellPresetSelect"
+              class="c-input__control"
+              [value]="options().cellPreset"
+              (change)="onSelectChange('cellPreset', $event)"
+            >
+              @for (cell of cellSpecs; track cell.id) {
+                <option [value]="cell.id">{{ cell.label }}</option>
+              }
+            </select>
+          </div>
+
+          <div class="c-battery-case__grid g--margin-top-3">
+            <div class="c-input">
+              <label class="c-input__label" for="stackCountSlider">
+                {{ 'tools.batterySdcardCaseMaker.stackCountLabel' | translate }}:
+                <strong>{{ options().stackCount }}x</strong>
+              </label>
+              <input
+                id="stackCountSlider"
+                type="range"
+                class="c-input__slider"
+                min="4"
+                max="24"
+                step="1"
+                [value]="options().stackCount"
+                (input)="onNumberInput('stackCount', $event)"
+              />
+            </div>
+
+            <div class="c-input">
+              <label class="c-input__label" for="rampAngleSlider">
+                {{ 'tools.batterySdcardCaseMaker.rampAngleLabel' | translate }}:
+                <strong>{{ options().rampAngleDeg }}°</strong>
+              </label>
+              <input
+                id="rampAngleSlider"
+                type="range"
+                class="c-input__slider"
+                min="12"
+                max="30"
+                step="1"
+                [value]="options().rampAngleDeg"
+                (input)="onNumberInput('rampAngleDeg', $event)"
+              />
+            </div>
+          </div>
+
+          <div class="c-input g--margin-top-3">
+            <label class="c-input__label" for="mountStyleSelect">
+              {{ 'tools.batterySdcardCaseMaker.mountStyleLabel' | translate }}
+            </label>
+            <select
+              id="mountStyleSelect"
+              class="c-input__control"
+              [value]="options().mountStyle"
+              (change)="onSelectChange('mountStyle', $event)"
+            >
+              <option value="desk">{{ 'tools.batterySdcardCaseMaker.mountDesk' | translate }}</option>
+              <option value="wall_keyhole">{{ 'tools.batterySdcardCaseMaker.mountWall' | translate }}</option>
+              <option value="skadis">{{ 'tools.batterySdcardCaseMaker.mountSkadis' | translate }}</option>
+              <option value="magnetic">{{ 'tools.batterySdcardCaseMaker.mountMagnetic' | translate }}</option>
+            </select>
+          </div>
+
+          <label class="c-battery-case__check g--margin-top-3">
+            <input
+              type="checkbox"
+              [checked]="options().includeViewSlot"
+              (change)="onCheckboxChange('includeViewSlot', $event)"
+            />
+            <span>{{ 'tools.batterySdcardCaseMaker.viewSlotLabel' | translate }}</span>
+          </label>
+        </app-card>
+      } @else {
+        <app-card
+          customClass="g--margin-top-4"
+          [title]="'tools.batterySdcardCaseMaker.caseConfigTitle' | translate"
+        >
+          <div class="c-input">
+            <label class="c-input__label" for="caseStyleSelect">
+              {{ 'tools.batterySdcardCaseMaker.caseStyleLabel' | translate }}
+            </label>
+            <select
+              id="caseStyleSelect"
+              class="c-input__control"
+              [value]="options().cardCaseStyle"
+              (change)="onSelectChange('cardCaseStyle', $event)"
+            >
+              <option value="sliding_dovetail">{{ 'tools.batterySdcardCaseMaker.styleDovetail' | translate }}</option>
+              <option value="snap_clamshell">{{ 'tools.batterySdcardCaseMaker.styleClamshell' | translate }}</option>
+              <option value="open_tray">{{ 'tools.batterySdcardCaseMaker.styleOpenTray' | translate }}</option>
+            </select>
+          </div>
+
+          <div class="c-battery-case__grid g--margin-top-3">
+            <div class="c-input">
+              <label class="c-input__label" for="sdSlotsSlider">
+                {{ 'tools.batterySdcardCaseMaker.sdSlotsLabel' | translate }}:
+                <strong>{{ options().sdSlots }}</strong>
+              </label>
+              <input
+                id="sdSlotsSlider"
+                data-testid="sd-slots-slider"
+                type="range"
+                class="c-input__slider"
+                min="0"
+                max="16"
+                step="1"
+                [value]="options().sdSlots"
+                (input)="onNumberInput('sdSlots', $event)"
+              />
+            </div>
+
+            <div class="c-input">
+              <label class="c-input__label" for="microSdSlotsSlider">
+                {{ 'tools.batterySdcardCaseMaker.microSdSlotsLabel' | translate }}:
+                <strong>{{ options().microSdSlots }}</strong>
+              </label>
+              <input
+                id="microSdSlotsSlider"
+                type="range"
+                class="c-input__slider"
+                min="0"
+                max="24"
+                step="1"
+                [value]="options().microSdSlots"
+                (input)="onNumberInput('microSdSlots', $event)"
+              />
+            </div>
+
+            <div class="c-input">
+              <label class="c-input__label" for="cfExpressSlotsSlider">
+                {{ 'tools.batterySdcardCaseMaker.cfExpressSlotsLabel' | translate }}:
+                <strong>{{ options().cfExpressSlots }}</strong>
+              </label>
+              <input
+                id="cfExpressSlotsSlider"
+                type="range"
+                class="c-input__slider"
+                min="0"
+                max="8"
+                step="1"
+                [value]="options().cfExpressSlots"
+                (input)="onNumberInput('cfExpressSlots', $event)"
+              />
+            </div>
+
+            <div class="c-input">
+              <label class="c-input__label" for="switchCartSlotsSlider">
+                {{ 'tools.batterySdcardCaseMaker.switchCartSlotsLabel' | translate }}:
+                <strong>{{ options().switchCartSlots }}</strong>
+              </label>
+              <input
+                id="switchCartSlotsSlider"
+                type="range"
+                class="c-input__slider"
+                min="0"
+                max="12"
+                step="1"
+                [value]="options().switchCartSlots"
+                (input)="onNumberInput('switchCartSlots', $event)"
+              />
+            </div>
+
+            <div class="c-input">
+              <label class="c-input__label" for="usbASlotsSlider">
+                {{ 'tools.batterySdcardCaseMaker.usbASlotsLabel' | translate }}:
+                <strong>{{ options().usbASlots }}</strong>
+              </label>
+              <input
+                id="usbASlotsSlider"
+                type="range"
+                class="c-input__slider"
+                min="0"
+                max="8"
+                step="1"
+                [value]="options().usbASlots"
+                (input)="onNumberInput('usbASlots', $event)"
+              />
+            </div>
+
+            <div class="c-input">
+              <label class="c-input__label" for="usbCSlotsSlider">
+                {{ 'tools.batterySdcardCaseMaker.usbCSlotsLabel' | translate }}:
+                <strong>{{ options().usbCSlots }}</strong>
+              </label>
+              <input
+                id="usbCSlotsSlider"
+                type="range"
+                class="c-input__slider"
+                min="0"
+                max="8"
+                step="1"
+                [value]="options().usbCSlots"
+                (input)="onNumberInput('usbCSlots', $event)"
+              />
+            </div>
+          </div>
+        </app-card>
+      }
+
+      <!-- 3. Fabrication Tolerances & 3MF Dual-Color Label -->
+      <app-card
+        customClass="g--margin-top-4"
+        [title]="'tools.batterySdcardCaseMaker.fabricationTitle' | translate"
+      >
+        <div class="c-battery-case__grid">
+          <div class="c-input">
+            <label class="c-input__label" for="wallThicknessSlider">
+              {{ 'tools.batterySdcardCaseMaker.wallThicknessLabel' | translate }}:
+              <strong>{{ formatFixed(options().wallThicknessMm, 1) }} mm</strong>
+            </label>
+            <input
+              id="wallThicknessSlider"
+              type="range"
+              class="c-input__slider"
+              min="1.4"
+              max="4.0"
+              step="0.2"
+              [value]="options().wallThicknessMm"
+              (input)="onNumberInput('wallThicknessMm', $event, true)"
+            />
+          </div>
+
+          <div class="c-input">
+            <label class="c-input__label" for="fitToleranceSlider">
+              {{ 'tools.batterySdcardCaseMaker.fitToleranceLabel' | translate }}:
+              <strong>{{ formatFixed(options().fitToleranceMm, 2) }} mm</strong>
+            </label>
+            <input
+              id="fitToleranceSlider"
+              type="range"
+              class="c-input__slider"
+              min="0.15"
+              max="0.60"
+              step="0.05"
+              [value]="options().fitToleranceMm"
+              (input)="onNumberInput('fitToleranceMm', $event, true)"
+            />
+          </div>
+        </div>
+
+        <label class="c-battery-case__check g--margin-top-3">
+          <input
+            type="checkbox"
+            [checked]="options().includeEmbossedLabel"
+            (change)="onCheckboxChange('includeEmbossedLabel', $event)"
+          />
+          <span>{{ 'tools.batterySdcardCaseMaker.embossedLabelToggle' | translate }}</span>
+        </label>
+
+        @if (options().includeEmbossedLabel) {
+          <div class="c-input g--margin-top-2">
+            <label class="c-input__label" for="embossedLabelInput">
+              {{ 'tools.batterySdcardCaseMaker.labelTextLabel' | translate }}
+            </label>
+            <input
+              id="embossedLabelInput"
+              type="text"
+              maxlength="18"
+              class="c-input__control"
+              [value]="options().labelText"
+              (input)="onTextInput('labelText', $event)"
+            />
+          </div>
+        }
+
+        <div class="c-battery-case__colors g--margin-top-3">
+          <label class="c-battery-case__color-item">
+            <span>{{ 'tools.batterySdcardCaseMaker.bodyColorLabel' | translate }}</span>
+            <input
+              type="color"
+              [value]="options().bodyColorHex"
+              (input)="onTextInput('bodyColorHex', $event)"
+            />
+          </label>
+          <label class="c-battery-case__color-item">
+            <span>{{ 'tools.batterySdcardCaseMaker.accentColorLabel' | translate }}</span>
+            <input
+              type="color"
+              [value]="options().accentColorHex"
+              (input)="onTextInput('accentColorHex', $event)"
+            />
+          </label>
+        </div>
+
+        <div card-footer class="c-battery-case__footer-actions">
+          <button type="button" class="c-button c-button--outline" (click)="reset()">
+            {{ 'common.resetDefaults' | translate }}
+          </button>
+        </div>
+      </app-card>
+    </div>
+
+    <!-- 3D Viewport & Telemetry Area -->
+    <div class="l-columns__area c-battery-case__viewport-col">
+      <app-card [title]="'tools.batterySdcardCaseMaker.viewportTitle' | translate">
+        <div class="c-battery-case__viewport-hud" role="toolbar" aria-label="3D Viewport Actions">
+          <button
+            type="button"
+            class="c-battery-case__hud-btn"
+            (click)="resetView()"
+          >
+            {{ 'common.resetView' | translate }}
+          </button>
+          <button
+            type="button"
+            class="c-battery-case__hud-btn"
+            (click)="toggleWireframe()"
+          >
+            {{ (wireframe() ? 'tools.batterySdcardCaseMaker.solidView' : 'tools.batterySdcardCaseMaker.wireframeToggle') | translate }}
+          </button>
+          <button
+            type="button"
+            class="c-battery-case__hud-btn"
+            (click)="exportPng()"
+          >
+            {{ 'common.exportPng' | translate }}
+          </button>
+        </div>
+
+        <div
+          #viewportContainer
+          class="c-battery-case__viewport-stage"
+          role="region"
+          aria-label="Interactive 3D Fabrication Preview"
+        ></div>
+
+        @if (validationError()) {
+          <div class="c-battery-case__alert" role="alert">
+            {{ validationError() }}
+          </div>
+        }
+
+        @if (metrics(); as m) {
+          @if (m.exceedsStandardBed) {
+            <div class="c-battery-case__bed-warn" role="status">
+              ⚠️ {{ 'tools.batterySdcardCaseMaker.bedWarning' | translate }}
+            </div>
+          }
+
+          <div class="c-battery-case__metrics g--margin-top-3">
+            <div class="c-battery-case__metric">
+              <span class="c-battery-case__metric-label">{{ 'common.dimensions' | translate }}</span>
+              <strong class="c-battery-case__metric-value">
+                {{ formatFixed(m.widthMm, 1) }} × {{ formatFixed(m.depthMm, 1) }} × {{ formatFixed(m.heightMm, 1) }} mm
+              </strong>
+            </div>
+            <div class="c-battery-case__metric">
+              <span class="c-battery-case__metric-label">{{ 'common.triangles' | translate }}</span>
+              <strong class="c-battery-case__metric-value">{{ m.triangleCount }}</strong>
+            </div>
+            <div class="c-battery-case__metric">
+              <span class="c-battery-case__metric-label">{{ 'common.estWeight' | translate }}</span>
+              <strong class="c-battery-case__metric-value">
+                {{ formatFixed(m.estimatedWeightG, 1) }} {{ 'common.grams' | translate }}
+              </strong>
+            </div>
+            <div class="c-battery-case__metric">
+              <span class="c-battery-case__metric-label">{{ 'common.estPrintTime' | translate }}</span>
+              <strong class="c-battery-case__metric-value">
+                {{ formatFixed(m.estimatedPrintTimeHours, 1) }} {{ 'common.hours' | translate }}
+              </strong>
+            </div>
+          </div>
+        }
+
+        @if (isExporting()) {
+          <div class="g--margin-top-3">
+            <app-progress-bar
+              [value]="exportProgress()"
+              [label]="'common.processing' | translate"
+            />
+          </div>
+        }
+
+        <div class="c-battery-case__export-bar g--margin-top-4">
+          <button
+            type="button"
+            class="c-button c-button--primary"
+            [disabled]="!!validationError() || isExporting()"
+            (click)="exportFormat('stl')"
+          >
+            {{ 'common.exportStl' | translate }}
+          </button>
+          <button
+            type="button"
+            class="c-button c-button--secondary"
+            [disabled]="!!validationError() || isExporting()"
+            (click)="exportFormat('3mf')"
+          >
+            {{ 'common.export3mf' | translate }}
+          </button>
+        </div>
+
+        <p class="c-battery-case__notes g--margin-top-2">
+          {{ 'tools.batterySdcardCaseMaker.stlNote' | translate }} •
+          {{ 'tools.batterySdcardCaseMaker.threeMfNote' | translate }}
+        </p>
+      </app-card>
+    </div>
+  </div>
+</div>

@@ -2190,6 +2190,13 @@ export const routes: Routes = [
       ),
   },
   {
+    path: 'tools/battery-sdcard-case-maker',
+    loadComponent: () =>
+      import('./tools/3d/battery-sdcard-case-maker/battery-sdcard-case-maker.component').then(
+        (m) => m.BatterySdcardCaseMakerComponent
+      ),
+  },
+  {
     path: '**',
     title: 'Page Not Found — PrivKnife',
     data: {
