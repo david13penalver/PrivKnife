@@ -2246,6 +2246,12 @@ export const routes: Routes = [
       ),
   },
   {
+    path: 'tools/funnel-scoop-maker',
+    loadComponent: () => import('./tools/3d/funnel-scoop-maker/funnel-scoop-maker.component').then(
+      (m) => m.FunnelScoopMakerComponent
+    ),
+  },
+  {
     path: '**',
     title: 'Page Not Found — PrivKnife',
     data: {

@@ -122,18 +122,28 @@ it('keeps worker, object URL, and Three.js teardown paired in tool source', () =
   const objectUrlLeaks = source.filter(
     ([, text]) => text.includes('URL.createObjectURL') && !text.includes('URL.revokeObjectURL'),
   );
+  const workshop = fs.readFileSync(path.join(toolRoot, '3d/shared/workshop.ts'), 'utf8');
+  const workerLifecycleSource = (text) =>
+    text.includes("import { MeshWorkshop } from '../shared/workshop'") &&
+    /worker:\s*\(\)\s*=>\s*new Worker\(/.test(text) &&
+    text.includes('imports: [MeshWorkshop]')
+      ? workshop
+      : text;
   const workerLeaks = source.filter(
-    ([, text]) => text.includes('new Worker') && !text.includes('terminate('),
+    ([, text]) => text.includes('new Worker') && !workerLifecycleSource(text).includes('terminate('),
   );
   const workerErrorLeaks = source.filter(
-    ([, text]) =>
-      text.includes('new Worker') &&
-      !(/\.onerror\s*=/.test(text) || /addEventListener\s*\(\s*['"]error['"]/.test(text)),
+    ([, text]) => {
+      const owner = workerLifecycleSource(text);
+      return text.includes('new Worker') &&
+        !(/\.onerror\s*=/.test(owner) || /addEventListener\s*\(\s*['"]error['"]/.test(owner));
+    },
   );
   const rendererLeaks = source.filter(
-    ([, text]) =>
+    ([file, text]) =>
       text.includes('new THREE.WebGLRenderer') &&
-      (!text.includes('ngOnDestroy') || !text.includes('.dispose(')),
+      (!text.includes('.dispose(') || !(text.includes('ngOnDestroy') ||
+        (file.endsWith('/3d/shared/mesh-viewport.ts') && workshop.includes('this.viewport?.dispose()')))),
   );
   const unsanitizedTrustedMarkup = source.filter(
     ([, text]) =>

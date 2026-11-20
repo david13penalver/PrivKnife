@@ -6,6 +6,7 @@ import { toolBitHolderMakerTool } from './3d/tool-bit-holder-maker';
 import { washerSpacerShimMakerTool } from './3d/washer-spacer-shim-maker';
 import { knobDialHandwheelMakerTool } from './3d/knob-dial-handwheel-maker';
 import { deviceWallCradleMakerTool } from './3d/device-wall-cradle-maker';
+import { funnelScoopMakerTool } from './3d/funnel-scoop-maker';
 import { cableCombClipMakerTool } from './3d/cable-comb-clip-maker';
 import { brailleAdaSignGeneratorTool } from './3d/braille-ada-sign-generator';
 import { cappuccinoStencilMakerTool } from './3d/cappuccino-stencil-maker';
@@ -172,6 +173,7 @@ export const TOOL_REGISTRY: ToolDefinition[] = [
   washerSpacerShimMakerTool,
   knobDialHandwheelMakerTool,
   deviceWallCradleMakerTool,
+  funnelScoopMakerTool,
   cableCombClipMakerTool,
 ];
 
@@ -324,6 +326,7 @@ export const TOOL_I18N_MAP: Record<string, string> = {
   'washer-spacer-shim-maker': 'washerSpacerShimMaker',
   'knob-dial-handwheel-maker': 'knobDialHandwheelMaker',
   'device-wall-cradle-maker': 'deviceWallCradleMaker',
+  'funnel-scoop-maker': 'funnelScoopMaker',
   'cable-comb-clip-maker': 'cableCombClipMaker',
 };
 

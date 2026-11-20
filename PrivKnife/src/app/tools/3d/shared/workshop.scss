@@ -1,0 +1,71 @@
+.c-mesh-workshop {
+  max-inline-size: 72rem;
+  margin-inline: auto;
+  padding: clamp(1rem, 3vw, 2.5rem);
+
+  &__header {
+    display: grid;
+    justify-items: start;
+    gap: 0.65rem;
+    margin-block-end: 2rem;
+
+    p { max-inline-size: 66ch; }
+  }
+
+  &__layout {
+    gap: clamp(1.5rem, 4vw, 3rem);
+    align-items: start;
+  }
+
+  &__fields {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 12rem), 1fr));
+    gap: 0.85rem 1rem;
+    margin-block: 1rem;
+  }
+
+  &__presets, &__actions {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.5rem;
+    margin-block: 0.75rem;
+  }
+
+  &__viewport {
+    position: relative;
+    overflow: hidden;
+    block-size: clamp(17rem, 48vw, 30rem);
+    margin-block-start: 0.75rem;
+    border: 1px solid var(--color-border);
+    border-radius: 0.75rem;
+    background: var(--color-surface);
+
+    ::ng-deep canvas {
+      display: block;
+      inline-size: 100%;
+      block-size: 100%;
+    }
+  }
+
+  &__checkbox {
+    inline-size: 1.35rem;
+    block-size: 1.35rem;
+  }
+
+  &__note {
+    margin-block: 0.75rem;
+    padding: 0.75rem;
+    border-inline-start: 0.18rem solid var(--color-primary);
+  }
+
+  &__metrics {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 10rem), 1fr));
+    gap: 0.75rem;
+    margin-block: 1rem;
+
+    dt { font-size: 0.875rem; }
+    dd { margin-inline-start: 0; font-variant-numeric: tabular-nums; }
+  }
+}

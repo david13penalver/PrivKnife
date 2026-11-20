@@ -216,6 +216,12 @@
     "source": "PrivKnife/src/app/tools/dev/font-subsetter-converter"
   },
   {
+    "id": "funnel-scoop-maker",
+    "route": "/tools/funnel-scoop-maker",
+    "category": "3d",
+    "source": "PrivKnife/src/app/tools/3d/funnel-scoop-maker"
+  },
+  {
     "id": "geometric-plant-pot",
     "route": "/tools/geometric-plant-pot",
     "category": "3d",

@@ -873,6 +873,12 @@ describe('ToolRegistry (Seam 3: Catalog & Architecture Verification)', () => {
     expect(TOOL_I18N_MAP['cable-comb-clip-maker']).toBe('cableCombClipMaker');
   });
 
+  it('registers funnel-scoop-maker as a lazy, localized 3D tool', () => {
+    expect(getToolById('funnel-scoop-maker')).toMatchObject({ category: '3d', isFullyClientSide: true });
+    expect(typeof getToolById('funnel-scoop-maker')?.loadComponent).toBe('function');
+    expect(TOOL_I18N_MAP['funnel-scoop-maker']).toBe('funnelScoopMaker');
+  });
+
   describe('Tool Registry Localization (i18n)', () => {
     it('should have an i18n key mapping for every registered tool', () => {
       for (const tool of TOOL_REGISTRY) {

@@ -1,0 +1,126 @@
+<section class="c-mesh-workshop">
+  <header class="c-mesh-workshop__header">
+    <h1>{{ key('name') | translate }}</h1>
+    <p>{{ key('description') | translate }}</p>
+    <app-badge variant="privacy">{{ 'common.privacyBadge' | translate }}</app-badge>
+  </header>
+
+  <div class="l-columns l-columns--2 c-mesh-workshop__layout">
+    <div class="l-columns__area">
+      <h2>{{ 'common.settings' | translate }}</h2>
+
+      <div class="c-mesh-workshop__presets" [attr.aria-label]="'common.curatedPresets' | translate">
+        @for (preset of definition().presets; track preset.label) {
+          <app-button variant="outline" size="small" (clicked)="applyPreset(preset)">
+            {{ preset.label | translate }}
+          </app-button>
+        }
+      </div>
+
+      <div class="c-mesh-workshop__fields">
+        @for (field of fields(); track field.key) {
+          <div class="c-input">
+            <label class="c-input__label" [for]="'mesh-' + field.key">
+              {{ key(field.label ?? field.key) | translate }}
+              @if (field.type === 'number' && field.unit) { ({{ field.unit }}) }
+            </label>
+            @switch (field.type) {
+              @case ('select') {
+                <select class="c-input__control" [id]="'mesh-' + field.key" [formControl]="form.controls[field.key]">
+                  @for (item of field.choices; track $index) {
+                    @let option = choice(item);
+                    <option [ngValue]="option.value">{{ option.label | translate }}</option>
+                  }
+                </select>
+              }
+              @case ('number') {
+                <input class="c-input__control c-input--number" type="number" [id]="'mesh-' + field.key"
+                  [formControl]="form.controls[field.key]" [min]="field.min" [max]="field.max" [step]="field.step">
+                @if (field.slider) {
+                  <input class="c-input__slider" type="range" [attr.aria-label]="key(field.label ?? field.key) | translate"
+                    [formControl]="form.controls[field.key]" [min]="field.min" [max]="field.max" [step]="field.step">
+                }
+              }
+              @case ('checkbox') {
+                <input class="c-input__control c-mesh-workshop__checkbox" type="checkbox"
+                  [id]="'mesh-' + field.key" [formControl]="form.controls[field.key]">
+              }
+              @case ('color') {
+                <input class="c-input__control" type="color" [id]="'mesh-' + field.key" [formControl]="form.controls[field.key]">
+              }
+              @case ('text') {
+                <input class="c-input__control" type="text" [id]="'mesh-' + field.key"
+                  [formControl]="form.controls[field.key]" [maxlength]="field.maxLength">
+              }
+            }
+          </div>
+        }
+      </div>
+
+      @if (definition().advisory) {
+        <p class="c-mesh-workshop__note">{{ key('advisory') | translate }}</p>
+      }
+      <app-button variant="outline" (clicked)="reset()">{{ 'common.reset' | translate }}</app-button>
+    </div>
+
+    <div class="l-columns__area">
+      <h2>{{ 'common.interactivePreview' | translate }}</h2>
+      <div class="c-mesh-workshop__viewport" #viewport [attr.aria-label]="key('name') | translate">
+        @if (noWebgl()) {
+          <p class="c-mesh-workshop__note">{{ key('previewUnavailable') | translate }}</p>
+        }
+      </div>
+      <div class="c-mesh-workshop__actions">
+        <button class="c-button c-button--outline c-button--small" type="button" [disabled]="noWebgl()"
+          [attr.aria-pressed]="wireframe()" (click)="toggleWireframe()">{{ key('wireframe') | translate }}</button>
+        <app-button variant="outline" size="small" [disabled]="noWebgl()" (clicked)="resetView()">
+          {{ 'common.resetView' | translate }}
+        </app-button>
+      </div>
+
+      @if (error(); as message) {
+        <p role="alert">{{ key(message) | translate }}</p>
+      }
+      @if (pending()) {
+        <app-progress-bar [value]="progress()" [label]="'common.processing' | translate" />
+      }
+      @if (metrics()) {
+        <dl class="c-mesh-workshop__metrics">
+          <div>
+            <dt>{{ 'common.dimensions' | translate }}</dt>
+            <dd>{{ displayMetric('widthMm', 1) }} × {{ displayMetric('depthMm', 1) }} × {{ displayMetric('heightMm', 2) }} mm</dd>
+          </div>
+          <div>
+            <dt>{{ 'common.estWeight' | translate }}</dt>
+            <dd>{{ displayMetric('estimatedWeightG', 1) }} g</dd>
+          </div>
+          @for (metric of definition().metrics; track metric.key) {
+            @if (visible(metric.modes)) {
+              @if (metric.warning) {
+                @if (metrics()?.[metric.key]) {
+                  <div class="c-mesh-workshop__note"><dt>{{ key(metric.key) | translate }}</dt><dd></dd></div>
+                }
+              } @else {
+                <div>
+                  <dt>{{ key(metric.key) | translate }}</dt>
+                  <dd>{{ displayMetric(metric.key, metric.digits ?? 2) }} {{ metric.unit }}</dd>
+                </div>
+              }
+            }
+          }
+        </dl>
+      }
+      <div class="c-mesh-workshop__actions">
+        <app-button [disabled]="!metrics() || !!pending()" (clicked)="download('stl')">
+          {{ 'common.download' | translate }} STL
+        </app-button>
+        <app-button variant="secondary" [disabled]="!metrics() || !!pending()" (clicked)="download('3mf')">
+          {{ 'common.download' | translate }} 3MF
+        </app-button>
+        @if (fileSize()) {
+          <output>{{ (fileSize() / 1024).toFixed(1) }} KiB</output>
+        }
+      </div>
+    </div>
+  </div>
+</section>
