@@ -238,7 +238,7 @@ gantt
 | **119** | [119 - Unix Epoch, ISO-8601 & Multi-Timezone Timestamp Converter](119%20-%20Unix%20Epoch%2C%20ISO-8601%20%26%20Multi-Timezone%20Timestamp%20Converter/spec.md) | Dev / Data | Exact `BigInt` s/ms/μs/ns conversions, TZ matrix, deltas, Discord tags, batch `.csv` | Native `BigInt`, `Intl.DateTimeFormat`, `Intl.RelativeTimeFormat` | [x] |
 | **120** | [120 - Cryptographic Password, Passphrase & API Key Generator](120%20-%20Cryptographic%20Password%2C%20Passphrase%20%26%20API%20Key%20Generator/spec.md) | Dev / Security | Unbiased passwords, EFF Diceware passphrases, `.env` API keys, entropy audit | Native `crypto.getRandomValues` (rejection sampling), local EFF wordlist | [x] |
 | **121** | [121 - String Case, Text Transform & Unicode Typography Studio](121%20-%20String%20Case%2C%20Text%20Transform%20%26%20Unicode%20Typography%20Studio/spec.md) | Dev / Text | 13 identifier cases (batch), 14 hole-free Unicode styles, Zalgo, 150+ Kaomojis | Pure TS Acronym Tokenizer, Unicode Codepoint Tables, Diacritic Engine | [x] |
-| **122** | [122 - ASCII Art Banner, Image-to-ASCII & 2D QR-Barcode Studio](122%20-%20ASCII%20Art%20Banner%2C%20Image-to-ASCII%20%26%202D%20QR-Barcode%20Studio/spec.md) | Dev / Media | CLI ASCII banners, Braille/ASCII image art, static SVG/PNG QR & 1D barcodes | `qrcode`, `jsbarcode`, bundled ASCII fonts, Canvas Luminance/Braille engine | [ ] |
+| **122** | [122 - ASCII Art Banner, Image-to-ASCII & 2D QR-Barcode Studio](122%20-%20ASCII%20Art%20Banner%2C%20Image-to-ASCII%20%26%202D%20QR-Barcode%20Studio/spec.md) | Dev / Media | CLI ASCII banners, Braille/ASCII image art, static SVG/PNG QR & 1D barcodes | `qrcode`, `jsbarcode`, bundled ASCII fonts, Canvas Luminance/Braille engine | [x] |
 
 ---
 

@@ -2183,6 +2183,13 @@ export const routes: Routes = [
       ),
   },
   {
+    path: 'tools/ascii-art-qr-studio',
+    loadComponent: () =>
+      import('./tools/dev/ascii-art-qr-studio/ascii-art-qr-studio.component').then(
+        (m) => m.AsciiArtQrStudioComponent
+      ),
+  },
+  {
     path: '**',
     title: 'Page Not Found — PrivKnife',
     data: {

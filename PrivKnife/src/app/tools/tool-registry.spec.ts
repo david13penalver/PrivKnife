@@ -793,6 +793,14 @@ describe('ToolRegistry (Seam 3: Catalog & Architecture Verification)', () => {
     expect(TOOL_I18N_MAP['case-unicode-text-studio']).toBe('caseUnicodeTextStudio');
   });
 
+  it('should find ascii-art-qr-studio tool by id', () => {
+    const tool = getToolById('ascii-art-qr-studio');
+    expect(tool).toBeDefined();
+    expect(tool?.category).toBe('dev');
+    expect(tool?.isFullyClientSide).toBe(true);
+    expect(TOOL_I18N_MAP['ascii-art-qr-studio']).toBe('asciiArtQrStudio');
+  });
+
   describe('Tool Registry Localization (i18n)', () => {
     it('should have an i18n key mapping for every registered tool', () => {
       for (const tool of TOOL_REGISTRY) {

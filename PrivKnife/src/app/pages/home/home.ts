@@ -1042,6 +1042,20 @@ const CATALOG_TOOLS: CatalogTool[] = [
     techStack: 'Acronym Tokenizer • Hole-Free Unicode Tables • Zalgo Engine',
     icon: '🔤',
   },
+  {
+    id: 'ascii-art-qr-studio',
+    i18nKey: 'asciiArtQrStudio',
+    name: 'ASCII Art, Braille & QR/Barcode Studio',
+    category: 'dev',
+    categoryLabel: 'Dev / Media',
+    description:
+      'Render 6-font ASCII banners, Unicode Braille image art, static QR codes, and 1D barcodes locally.',
+    keywords: ['ascii art', 'braille', 'qr code', 'wifi qr', 'barcode'],
+    status: 'ready',
+    route: '/tools/ascii-art-qr-studio',
+    techStack: 'qrcode • JsBarcode • Bundled ASCII Fonts • Canvas Braille',
+    icon: '📱',
+  },
 ];
 
 @Component({

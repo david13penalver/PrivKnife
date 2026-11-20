@@ -1,0 +1,509 @@
+<div class="c-ascii-qr l-columns l-columns--1 g--margin-x-auto">
+  <div class="l-columns__area g--margin-bottom-4">
+    <div class="l-extremo c-ascii-qr__header">
+      <div class="l-extremo__area-izquierda">
+        <h1 class="g--margin-bottom-2">{{ 'tools.asciiArtQrStudio.name' | translate }}</h1>
+        <p class="c-ascii-qr__subtitle">{{ 'tools.asciiArtQrStudio.description' | translate }}</p>
+      </div>
+      <div class="l-extremo__area-derecha">
+        <app-badge variant="privacy" [dot]="true">{{ 'common.guaranteedClientSide' | translate }}</app-badge>
+      </div>
+    </div>
+  </div>
+
+  <!-- 4 Studio Tabs -->
+  <div class="l-columns__area g--margin-bottom-4">
+    <div class="c-ascii-qr__tabs" role="tablist">
+      <button
+        type="button"
+        role="tab"
+        class="c-ascii-qr__tab"
+        [class.c-ascii-qr__tab--active]="activeTab() === 'ascii_banner'"
+        [attr.aria-selected]="activeTab() === 'ascii_banner'"
+        (click)="activeTab.set('ascii_banner')">
+        {{ 'tools.asciiArtQrStudio.tabBanner' | translate }}
+      </button>
+      <button
+        type="button"
+        role="tab"
+        class="c-ascii-qr__tab"
+        [class.c-ascii-qr__tab--active]="activeTab() === 'image_ascii'"
+        [attr.aria-selected]="activeTab() === 'image_ascii'"
+        (click)="activeTab.set('image_ascii')">
+        {{ 'tools.asciiArtQrStudio.tabImage' | translate }}
+      </button>
+      <button
+        type="button"
+        role="tab"
+        class="c-ascii-qr__tab"
+        [class.c-ascii-qr__tab--active]="activeTab() === 'qr_studio'"
+        [attr.aria-selected]="activeTab() === 'qr_studio'"
+        (click)="activeTab.set('qr_studio')">
+        {{ 'tools.asciiArtQrStudio.tabQr' | translate }}
+      </button>
+      <button
+        type="button"
+        role="tab"
+        class="c-ascii-qr__tab"
+        [class.c-ascii-qr__tab--active]="activeTab() === 'barcode_1d'"
+        [attr.aria-selected]="activeTab() === 'barcode_1d'"
+        (click)="activeTab.set('barcode_1d')">
+        {{ 'tools.asciiArtQrStudio.tabBarcode' | translate }}
+      </button>
+    </div>
+  </div>
+
+  <!-- Tab 1: ASCII Banner Text Generator -->
+  @if (activeTab() === 'ascii_banner') {
+    <div class="l-columns__area">
+      <div class="c-ascii-qr__split">
+        <app-card>
+          <div card-header><strong>{{ 'tools.asciiArtQrStudio.bannerConfigTitle' | translate }}</strong></div>
+          <div card-body class="c-ascii-qr__stack">
+            <label class="c-ascii-qr__field">
+              <span>{{ 'tools.asciiArtQrStudio.bannerTextLabel' | translate }}</span>
+              <textarea
+                rows="3"
+                class="c-input c-ascii-qr__mono"
+                [ngModel]="bannerText()"
+                (ngModelChange)="bannerText.set($event)"></textarea>
+            </label>
+
+            <label class="c-ascii-qr__field">
+              <span>{{ 'tools.asciiArtQrStudio.fontLabel' | translate }}</span>
+              <select
+                class="c-input"
+                [ngModel]="bannerFont()"
+                (ngModelChange)="setBannerFont($event)">
+                @for (f of bannerFonts; track f) {
+                  <option [value]="f">{{ f }}</option>
+                }
+              </select>
+            </label>
+
+            <label class="c-ascii-qr__field">
+              <span>{{ 'tools.asciiArtQrStudio.spacingLabel' | translate }}: <strong>{{ bannerSpacing() }}</strong></span>
+              <input
+                type="range"
+                min="0"
+                max="3"
+                step="1"
+                [ngModel]="bannerSpacing()"
+                (ngModelChange)="setBannerSpacing($event)" />
+            </label>
+
+            <label class="c-ascii-qr__field">
+              <span>{{ 'tools.asciiArtQrStudio.wrapperLabel' | translate }}</span>
+              <select
+                class="c-input"
+                [ngModel]="bannerWrapper()"
+                (ngModelChange)="setBannerWrapper($event)">
+                @for (w of commentWrappers; track w) {
+                  <option [value]="w">{{ w }}</option>
+                }
+              </select>
+            </label>
+          </div>
+        </app-card>
+
+        <app-card>
+          <div card-header class="l-extremo c-ascii-qr__row-between">
+            <strong>{{ 'common.preview' | translate }}</strong>
+            <div class="c-ascii-qr__btn-group">
+              <app-button
+                variant="secondary"
+                size="small"
+                [disabled]="!bannerOutput()"
+                (click)="copyText(bannerOutput(), 'banner')">
+                @if (copiedKey() === 'banner') {
+                  {{ 'common.copied' | translate }}
+                } @else {
+                  {{ 'common.copy' | translate }}
+                }
+              </app-button>
+              <app-button
+                variant="outline"
+                size="small"
+                [disabled]="!bannerOutput()"
+                (click)="exportTextFile(bannerOutput(), 'privknife-banner.txt')">
+                .txt
+              </app-button>
+            </div>
+          </div>
+          <div card-body>
+            <pre class="c-ascii-qr__pre">{{ bannerOutput() || '—' }}</pre>
+          </div>
+        </app-card>
+      </div>
+    </div>
+  }
+
+  <!-- Tab 2: Image to ASCII & Braille -->
+  @if (activeTab() === 'image_ascii') {
+    <div class="l-columns__area">
+      <div class="c-ascii-qr__split">
+        <app-card>
+          <div card-header><strong>{{ 'tools.asciiArtQrStudio.imageConfigTitle' | translate }}</strong></div>
+          <div card-body class="c-ascii-qr__stack">
+            <label class="c-ascii-qr__field">
+              <span>{{ 'tools.asciiArtQrStudio.chooseImageLabel' | translate }}</span>
+              <input
+                type="file"
+                accept="image/*"
+                class="c-input"
+                (change)="onImageFileSelected($event)" />
+            </label>
+
+            <label class="c-ascii-qr__field">
+              <span>{{ 'tools.asciiArtQrStudio.rampModeLabel' | translate }}</span>
+              <select
+                class="c-input"
+                [ngModel]="imageMode()"
+                (ngModelChange)="setImageMode($event)">
+                <option value="braille">Unicode Braille (2x4)</option>
+                <option value="ramp_dense">Standard Dense</option>
+                <option value="ramp_simple">Minimalist</option>
+                <option value="blocks">Blocks (░▒▓█)</option>
+              </select>
+            </label>
+
+            <label class="c-ascii-qr__field">
+              <span>{{ 'tools.asciiArtQrStudio.columnsLabel' | translate }}: <strong>{{ imageColumns() }}</strong></span>
+              <input
+                type="range"
+                min="30"
+                max="160"
+                step="2"
+                [ngModel]="imageColumns()"
+                (ngModelChange)="setImageColumns($event)" />
+            </label>
+
+            <label class="c-ascii-qr__field">
+              <span>{{ 'tools.asciiArtQrStudio.contrastLabel' | translate }}: <strong>{{ imageContrast() }}</strong></span>
+              <input
+                type="range"
+                min="0.5"
+                max="2"
+                step="0.1"
+                [ngModel]="imageContrast()"
+                (ngModelChange)="setImageContrast($event)" />
+            </label>
+
+            <label class="c-ascii-qr__check">
+              <input
+                type="checkbox"
+                [ngModel]="imageInvert()"
+                (ngModelChange)="imageInvert.set($event)" />
+              <span>{{ 'tools.asciiArtQrStudio.invertLabel' | translate }}</span>
+            </label>
+
+            <label class="c-ascii-qr__check">
+              <input
+                type="checkbox"
+                [ngModel]="imageDitherBraille()"
+                (ngModelChange)="imageDitherBraille.set($event)" />
+              <span>{{ 'tools.asciiArtQrStudio.ditherLabel' | translate }}</span>
+            </label>
+          </div>
+        </app-card>
+
+        <app-card>
+          <div card-header class="l-extremo c-ascii-qr__row-between">
+            <strong>{{ imageName() || ('common.preview' | translate) }}</strong>
+            <div class="c-ascii-qr__btn-group">
+              <app-button
+                variant="secondary"
+                size="small"
+                [disabled]="!imageAsciiOutput()"
+                (click)="copyText(imageAsciiOutput(), 'image-ascii')">
+                @if (copiedKey() === 'image-ascii') {
+                  {{ 'common.copied' | translate }}
+                } @else {
+                  {{ 'common.copy' | translate }}
+                }
+              </app-button>
+              <app-button
+                variant="outline"
+                size="small"
+                [disabled]="!imageAsciiOutput()"
+                (click)="exportTextFile(imageAsciiOutput(), 'privknife-image-ascii.txt')">
+                .txt
+              </app-button>
+              <app-button variant="outline" size="small" (click)="reset()">
+                {{ 'common.reset' | translate }}
+              </app-button>
+            </div>
+          </div>
+          <div card-body>
+            @if (!imageAsciiOutput()) {
+              <p class="c-ascii-qr__subtitle">{{ 'tools.asciiArtQrStudio.imageEmptyHint' | translate }}</p>
+            } @else {
+              <pre class="c-ascii-qr__pre c-ascii-qr__pre--tight">{{ imageAsciiOutput() }}</pre>
+            }
+          </div>
+        </app-card>
+      </div>
+    </div>
+  }
+
+  <!-- Tab 3: Static 2D QR Studio -->
+  @if (activeTab() === 'qr_studio') {
+    <div class="l-columns__area">
+      <div class="c-ascii-qr__split">
+        <app-card>
+          <div card-header><strong>{{ 'tools.asciiArtQrStudio.qrConfigTitle' | translate }}</strong></div>
+          <div card-body class="c-ascii-qr__stack">
+            <label class="c-ascii-qr__field">
+              <span>{{ 'tools.asciiArtQrStudio.payloadTypeLabel' | translate }}</span>
+              <select
+                class="c-input"
+                [ngModel]="qrPayloadType()"
+                (ngModelChange)="setQrPayloadType($event)">
+                <option value="text_url">URL / Text</option>
+                <option value="wifi">Wi-Fi (Local)</option>
+                <option value="vcard">vCard Contact</option>
+                <option value="email">Email</option>
+                <option value="sms">SMS</option>
+                <option value="geo">Geo Coordinates</option>
+              </select>
+            </label>
+
+            @switch (qrPayloadType()) {
+              @case ('wifi') {
+                <label class="c-ascii-qr__field">
+                  <span>SSID</span>
+                  <input type="text" class="c-input" [ngModel]="wifiSsid()" (ngModelChange)="wifiSsid.set($event)" />
+                </label>
+                <label class="c-ascii-qr__field">
+                  <span>Password</span>
+                  <input type="text" class="c-input c-ascii-qr__mono" [ngModel]="wifiPassword()" (ngModelChange)="wifiPassword.set($event)" />
+                </label>
+                <label class="c-ascii-qr__field">
+                  <span>Security</span>
+                  <select class="c-input" [ngModel]="wifiEncryption()" (ngModelChange)="setWifiEncryption($event)">
+                    <option value="WPA">WPA/WPA2/WPA3</option>
+                    <option value="WEP">WEP</option>
+                    <option value="nopass">None</option>
+                  </select>
+                </label>
+              }
+              @case ('vcard') {
+                <label class="c-ascii-qr__field">
+                  <span>Full Name</span>
+                  <input type="text" class="c-input" [ngModel]="vcardFullName()" (ngModelChange)="vcardFullName.set($event)" />
+                </label>
+                <label class="c-ascii-qr__field">
+                  <span>Phone</span>
+                  <input type="text" class="c-input" [ngModel]="vcardPhone()" (ngModelChange)="vcardPhone.set($event)" />
+                </label>
+                <label class="c-ascii-qr__field">
+                  <span>Email</span>
+                  <input type="email" class="c-input" [ngModel]="vcardEmail()" (ngModelChange)="vcardEmail.set($event)" />
+                </label>
+                <label class="c-ascii-qr__field">
+                  <span>Organization</span>
+                  <input type="text" class="c-input" [ngModel]="vcardOrg()" (ngModelChange)="vcardOrg.set($event)" />
+                </label>
+              }
+              @case ('email') {
+                <label class="c-ascii-qr__field">
+                  <span>To</span>
+                  <input type="email" class="c-input" [ngModel]="emailTo()" (ngModelChange)="emailTo.set($event)" />
+                </label>
+                <label class="c-ascii-qr__field">
+                  <span>Subject</span>
+                  <input type="text" class="c-input" [ngModel]="emailSubject()" (ngModelChange)="emailSubject.set($event)" />
+                </label>
+                <label class="c-ascii-qr__field">
+                  <span>Body</span>
+                  <input type="text" class="c-input" [ngModel]="emailBody()" (ngModelChange)="emailBody.set($event)" />
+                </label>
+              }
+              @case ('sms') {
+                <label class="c-ascii-qr__field">
+                  <span>Phone</span>
+                  <input type="text" class="c-input" [ngModel]="smsPhone()" (ngModelChange)="smsPhone.set($event)" />
+                </label>
+                <label class="c-ascii-qr__field">
+                  <span>Message</span>
+                  <input type="text" class="c-input" [ngModel]="smsMessage()" (ngModelChange)="smsMessage.set($event)" />
+                </label>
+              }
+              @case ('geo') {
+                <label class="c-ascii-qr__field">
+                  <span>Latitude</span>
+                  <input type="text" class="c-input" [ngModel]="geoLat()" (ngModelChange)="geoLat.set($event)" />
+                </label>
+                <label class="c-ascii-qr__field">
+                  <span>Longitude</span>
+                  <input type="text" class="c-input" [ngModel]="geoLng()" (ngModelChange)="geoLng.set($event)" />
+                </label>
+              }
+              @default {
+                <label class="c-ascii-qr__field">
+                  <span>Payload</span>
+                  <textarea rows="3" class="c-input c-ascii-qr__mono" [ngModel]="qrRawText()" (ngModelChange)="qrRawText.set($event)"></textarea>
+                </label>
+              }
+            }
+
+            <div class="c-ascii-qr__inline-grid">
+              <label class="c-ascii-qr__field">
+                <span>EC ({{ qrResult().effectiveErrorCorrection }})</span>
+                <select class="c-input" [ngModel]="qrErrorCorrection()" (ngModelChange)="setQrErrorCorrection($event)">
+                  <option value="L">L (7%)</option>
+                  <option value="M">M (15%)</option>
+                  <option value="Q">Q (25%)</option>
+                  <option value="H">H (30%)</option>
+                </select>
+              </label>
+
+              <label class="c-ascii-qr__field">
+                <span>{{ 'tools.asciiArtQrStudio.moduleStyleLabel' | translate }}</span>
+                <select class="c-input" [ngModel]="qrModuleStyle()" (ngModelChange)="setQrModuleStyle($event)">
+                  <option value="square">Square</option>
+                  <option value="rounded">Rounded</option>
+                  <option value="dots">Dots</option>
+                </select>
+              </label>
+
+              <label class="c-ascii-qr__field">
+                <span>FG</span>
+                <input type="color" class="c-input" [ngModel]="qrForeground()" (ngModelChange)="qrForeground.set($event)" />
+              </label>
+
+              <label class="c-ascii-qr__field">
+                <span>BG</span>
+                <input type="color" class="c-input" [ngModel]="qrBackground()" (ngModelChange)="qrBackground.set($event)" />
+              </label>
+            </div>
+
+            <label class="c-ascii-qr__field">
+              <span>{{ 'tools.asciiArtQrStudio.logoLabel' | translate }}</span>
+              <input type="file" accept="image/*" class="c-input" (change)="onQrLogoSelected($event)" />
+            </label>
+          </div>
+        </app-card>
+
+        <app-card>
+          <div card-header class="l-extremo c-ascii-qr__row-between">
+            <strong>{{ 'common.preview' | translate }} ({{ qrResult().moduleCount }}x{{ qrResult().moduleCount }})</strong>
+            <div class="c-ascii-qr__btn-group">
+              <app-button
+                variant="secondary"
+                size="small"
+                [disabled]="!qrResult().success"
+                (click)="copyText(qrResult().svg, 'qr-svg')">
+                @if (copiedKey() === 'qr-svg') {
+                  {{ 'common.copied' | translate }}
+                } @else {
+                  SVG
+                }
+              </app-button>
+              <app-button
+                variant="outline"
+                size="small"
+                [disabled]="!qrResult().success"
+                (click)="exportSvgFile(qrResult().svg, 'privknife-qr.svg')">
+                .svg
+              </app-button>
+              <app-button
+                variant="primary"
+                size="small"
+                [disabled]="!qrResult().success"
+                (click)="exportSvgAsPng(qrResult().svg, qrExportSize(), 'privknife-qr.png')">
+                .png
+              </app-button>
+            </div>
+          </div>
+
+          <div card-body class="c-ascii-qr__center-col">
+            @if (!qrResult().contrast.isScannable) {
+              <div class="c-ascii-qr__warn" role="alert">
+                {{ 'tools.asciiArtQrStudio.contrastWarn' | translate }} ({{ qrResult().contrast.ratio }}:1)
+              </div>
+            }
+
+            @if (qrResult().error) {
+              <div class="c-ascii-qr__warn" role="alert">{{ qrResult().error }}</div>
+            } @else if (qrPreviewDataUri()) {
+              <img [src]="qrPreviewDataUri()" alt="QR Code Preview" class="c-ascii-qr__svg-img" />
+              <code class="c-ascii-qr__payload">{{ qrResult().payload }}</code>
+            }
+          </div>
+        </app-card>
+      </div>
+    </div>
+  }
+
+  <!-- Tab 4: 1D Barcode Studio -->
+  @if (activeTab() === 'barcode_1d') {
+    <div class="l-columns__area">
+      <div class="c-ascii-qr__split">
+        <app-card>
+          <div card-header><strong>{{ 'tools.asciiArtQrStudio.barcodeConfigTitle' | translate }}</strong></div>
+          <div card-body class="c-ascii-qr__stack">
+            <label class="c-ascii-qr__field">
+              <span>{{ 'tools.asciiArtQrStudio.barcodeFormatLabel' | translate }}</span>
+              <select
+                class="c-input"
+                [ngModel]="barcodeFormat()"
+                (ngModelChange)="setBarcodeFormat($event)">
+                @for (fmt of barcodeFormats; track fmt) {
+                  <option [value]="fmt">{{ fmt }}</option>
+                }
+              </select>
+            </label>
+
+            <label class="c-ascii-qr__field">
+              <span>{{ 'tools.asciiArtQrStudio.barcodeValueLabel' | translate }}</span>
+              <input
+                type="text"
+                class="c-input c-ascii-qr__mono"
+                [ngModel]="barcodeValue()"
+                (ngModelChange)="barcodeValue.set($event)" />
+            </label>
+
+            <label class="c-ascii-qr__check">
+              <input
+                type="checkbox"
+                [ngModel]="barcodeDisplayValue()"
+                (ngModelChange)="barcodeDisplayValue.set($event)" />
+              <span>{{ 'tools.asciiArtQrStudio.showTextLabel' | translate }}</span>
+            </label>
+          </div>
+        </app-card>
+
+        <app-card>
+          <div card-header class="l-extremo c-ascii-qr__row-between">
+            <strong>{{ 'common.preview' | translate }}</strong>
+            <div class="c-ascii-qr__btn-group">
+              <app-button
+                variant="outline"
+                size="small"
+                [disabled]="!barcodeResult().success"
+                (click)="exportSvgFile(barcodeResult().svg, 'privknife-barcode.svg')">
+                .svg
+              </app-button>
+              <app-button
+                variant="primary"
+                size="small"
+                [disabled]="!barcodeResult().success"
+                (click)="exportSvgAsPng(barcodeResult().svg, 1200, 'privknife-barcode.png')">
+                .png
+              </app-button>
+            </div>
+          </div>
+
+          <div card-body class="c-ascii-qr__center-col">
+            @if (barcodeResult().error) {
+              <div class="c-ascii-qr__warn" role="alert">{{ barcodeResult().error }}</div>
+            } @else if (barcodePreviewDataUri()) {
+              <img [src]="barcodePreviewDataUri()" alt="1D Barcode Preview" class="c-ascii-qr__barcode-img" />
+            }
+          </div>
+        </app-card>
+      </div>
+    </div>
+  }
+</div>

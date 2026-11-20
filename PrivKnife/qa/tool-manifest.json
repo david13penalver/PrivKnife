@@ -6,6 +6,12 @@
     "source": "PrivKnife/src/app/tools/3d/qr-stand-keychain"
   },
   {
+    "id": "ascii-art-qr-studio",
+    "route": "/tools/ascii-art-qr-studio",
+    "category": "dev",
+    "source": "PrivKnife/src/app/tools/dev/ascii-art-qr-studio"
+  },
+  {
     "id": "bpm-tap-detector",
     "route": "/tools/audio-bpm-detector",
     "category": "audio-video",
