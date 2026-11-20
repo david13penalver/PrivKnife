@@ -2204,6 +2204,13 @@ export const routes: Routes = [
       ),
   },
   {
+    path: 'tools/drawer-divider-grid-maker',
+    loadComponent: () =>
+      import('./tools/3d/drawer-divider-grid-maker/drawer-divider-grid-maker.component').then(
+        (m) => m.DrawerDividerGridMakerComponent
+      ),
+  },
+  {
     path: '**',
     title: 'Page Not Found — PrivKnife',
     data: {

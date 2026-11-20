@@ -819,6 +819,15 @@ describe('ToolRegistry (Seam 3: Catalog & Architecture Verification)', () => {
     expect(TOOL_I18N_MAP['rugged-hinged-box-maker']).toBe('ruggedHingedBoxMaker');
   });
 
+  it('should find drawer-divider-grid-maker tool by id', () => {
+    const tool = getToolById('drawer-divider-grid-maker');
+    expect(tool).toBeDefined();
+    expect(tool?.category).toBe('3d');
+    expect(tool?.isFullyClientSide).toBe(true);
+    expect(typeof tool?.loadComponent).toBe('function');
+    expect(TOOL_I18N_MAP['drawer-divider-grid-maker']).toBe('drawerDividerGridMaker');
+  });
+
   describe('Tool Registry Localization (i18n)', () => {
     it('should have an i18n key mapping for every registered tool', () => {
       for (const tool of TOOL_REGISTRY) {

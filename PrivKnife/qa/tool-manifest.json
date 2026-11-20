@@ -138,6 +138,12 @@
     "source": "PrivKnife/src/app/tools/dev/dns-checker"
   },
   {
+    "id": "drawer-divider-grid-maker",
+    "route": "/tools/drawer-divider-grid-maker",
+    "category": "3d",
+    "source": "PrivKnife/src/app/tools/3d/drawer-divider-grid-maker"
+  },
+  {
     "id": "electronics-box-enclosure",
     "route": "/tools/electronics-box-enclosure",
     "category": "3d",

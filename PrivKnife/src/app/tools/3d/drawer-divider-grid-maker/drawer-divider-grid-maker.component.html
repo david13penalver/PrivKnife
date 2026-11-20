@@ -1,0 +1,376 @@
+<div class="l-page">
+  <header class="l-page__header c-header">
+    <div class="c-header__title-group">
+      <h1 class="c-header__title">{{ 'tools.drawerDividerGridMaker.name' | translate }}</h1>
+      <p class="c-header__subtitle">{{ 'tools.drawerDividerGridMaker.description' | translate }}</p>
+    </div>
+    <app-badge variant="privacy">{{ 'common.privacyBadge' | translate }}</app-badge>
+  </header>
+
+  <div class="l-columns l-columns--2 c-drawer-grid__layout">
+    <!-- Controls Area -->
+    <div class="l-columns__area c-drawer-grid__controls-col">
+      <!-- 1. Wall-to-Wall Caliper Inputs & Presets -->
+      <app-card [title]="'tools.drawerDividerGridMaker.caliperTitle' | translate">
+        <div>
+          <span class="c-input__label">{{ 'common.curatedPresets' | translate }}</span>
+          <div class="c-drawer-grid__presets">
+            @for (preset of presets; track preset.id) {
+              <button
+                type="button"
+                class="c-button c-button--small c-drawer-grid__preset-btn"
+                [class.c-button--primary]="activePresetId() === preset.id"
+                [class.c-button--outline]="activePresetId() !== preset.id"
+                (click)="applyPreset(preset)"
+              >
+                {{ preset.name }}
+              </button>
+            }
+          </div>
+        </div>
+
+        <div class="c-drawer-grid__grid g--margin-top-3">
+          <div class="c-input">
+            <label class="c-input__label" for="drawerWidthSlider">
+              {{ 'tools.drawerDividerGridMaker.drawerWidthLabel' | translate }}:
+              <strong>{{ options().drawerWidthMm }} mm</strong>
+            </label>
+            <input
+              id="drawerWidthSlider"
+              type="range"
+              class="c-input__slider"
+              min="80"
+              max="900"
+              step="1"
+              [value]="options().drawerWidthMm"
+              (input)="onNumberInput('drawerWidthMm', $event)"
+            />
+          </div>
+
+          <div class="c-input">
+            <label class="c-input__label" for="drawerDepthSlider">
+              {{ 'tools.drawerDividerGridMaker.drawerDepthLabel' | translate }}:
+              <strong>{{ options().drawerDepthMm }} mm</strong>
+            </label>
+            <input
+              id="drawerDepthSlider"
+              type="range"
+              class="c-input__slider"
+              min="80"
+              max="700"
+              step="1"
+              [value]="options().drawerDepthMm"
+              (input)="onNumberInput('drawerDepthMm', $event)"
+            />
+          </div>
+
+          <div class="c-input">
+            <label class="c-input__label" for="dividerHeightSlider">
+              {{ 'tools.drawerDividerGridMaker.dividerHeightLabel' | translate }}:
+              <strong>{{ options().dividerHeightMm }} mm</strong>
+            </label>
+            <input
+              id="dividerHeightSlider"
+              type="range"
+              class="c-input__slider"
+              min="20"
+              max="140"
+              step="1"
+              [value]="options().dividerHeightMm"
+              (input)="onNumberInput('dividerHeightMm', $event)"
+            />
+          </div>
+
+          <div class="c-input">
+            <label class="c-input__label" for="bladeThickSlider">
+              {{ 'tools.drawerDividerGridMaker.bladeThicknessLabel' | translate }}:
+              <strong>{{ formatFixed(options().bladeThicknessMm, 1) }} mm</strong>
+            </label>
+            <input
+              id="bladeThickSlider"
+              type="range"
+              class="c-input__slider"
+              min="2.4"
+              max="5.0"
+              step="0.2"
+              [value]="options().bladeThicknessMm"
+              (input)="onNumberInput('bladeThicknessMm', $event, true)"
+            />
+          </div>
+        </div>
+      </app-card>
+
+      <!-- 2. Columns, Rows & Asymmetric Split Ratios -->
+      <app-card
+        customClass="g--margin-top-4"
+        [title]="'tools.drawerDividerGridMaker.ratiosTitle' | translate"
+      >
+        <div class="c-drawer-grid__grid">
+          <div class="c-input">
+            <label class="c-input__label" for="colCountSlider">
+              {{ 'tools.drawerDividerGridMaker.colCountLabel' | translate }}:
+              <strong>{{ options().colCount }}</strong>
+            </label>
+            <input
+              id="colCountSlider"
+              type="range"
+              class="c-input__slider"
+              min="1"
+              max="10"
+              step="1"
+              [value]="options().colCount"
+              (input)="onNumberInput('colCount', $event)"
+            />
+          </div>
+
+          <div class="c-input">
+            <label class="c-input__label" for="rowCountSlider">
+              {{ 'tools.drawerDividerGridMaker.rowCountLabel' | translate }}:
+              <strong>{{ options().rowCount }}</strong>
+            </label>
+            <input
+              id="rowCountSlider"
+              type="range"
+              class="c-input__slider"
+              min="1"
+              max="10"
+              step="1"
+              [value]="options().rowCount"
+              (input)="onNumberInput('rowCount', $event)"
+            />
+          </div>
+        </div>
+
+        <div class="c-drawer-grid__grid g--margin-top-3">
+          <div class="c-input">
+            <label class="c-input__label" for="colRatiosInput">
+              {{ 'tools.drawerDividerGridMaker.colRatiosLabel' | translate }}
+            </label>
+            <input
+              id="colRatiosInput"
+              type="text"
+              class="c-input__control"
+              placeholder="e.g. 25, 50, 25"
+              [value]="options().customColRatios"
+              (input)="onTextInput('customColRatios', $event)"
+            />
+          </div>
+
+          <div class="c-input">
+            <label class="c-input__label" for="rowRatiosInput">
+              {{ 'tools.drawerDividerGridMaker.rowRatiosLabel' | translate }}
+            </label>
+            <input
+              id="rowRatiosInput"
+              type="text"
+              class="c-input__control"
+              placeholder="e.g. 1, 2"
+              [value]="options().customRowRatios"
+              (input)="onTextInput('customRowRatios', $event)"
+            />
+          </div>
+        </div>
+      </app-card>
+
+      <!-- 3. Bed Size Splitting, Tolerances & Feet -->
+      <app-card
+        customClass="g--margin-top-4"
+        [title]="'tools.drawerDividerGridMaker.bedSplitTitle' | translate"
+      >
+        <div class="c-input">
+          <label class="c-input__label" for="printerBedSelect">
+            {{ 'tools.drawerDividerGridMaker.printerBedLabel' | translate }}
+          </label>
+          <select
+            id="printerBedSelect"
+            class="c-input__control"
+            [value]="options().printerBedMm"
+            (change)="onBedSelect($event)"
+          >
+            @for (bed of bedPresets; track bed.sizeMm) {
+              <option [value]="bed.sizeMm">{{ bed.label }}</option>
+            }
+          </select>
+        </div>
+
+        <div class="c-drawer-grid__grid g--margin-top-3">
+          <div class="c-input">
+            <label class="c-input__label" for="edgeClearSlider">
+              {{ 'tools.drawerDividerGridMaker.edgeClearanceLabel' | translate }}:
+              <strong>{{ formatFixed(options().edgeClearanceMm, 1) }} mm</strong>
+            </label>
+            <input
+              id="edgeClearSlider"
+              type="range"
+              class="c-input__slider"
+              min="0.5"
+              max="3.0"
+              step="0.25"
+              [value]="options().edgeClearanceMm"
+              (input)="onNumberInput('edgeClearanceMm', $event, true)"
+            />
+          </div>
+
+          <div class="c-input">
+            <label class="c-input__label" for="notchClearSlider">
+              {{ 'tools.drawerDividerGridMaker.notchClearanceLabel' | translate }}:
+              <strong>{{ formatFixed(options().notchClearanceMm, 2) }} mm</strong>
+            </label>
+            <input
+              id="notchClearSlider"
+              type="range"
+              class="c-input__slider"
+              min="0.15"
+              max="0.40"
+              step="0.05"
+              [value]="options().notchClearanceMm"
+              (input)="onNumberInput('notchClearanceMm', $event, true)"
+            />
+          </div>
+        </div>
+
+        <label class="c-drawer-grid__check g--margin-top-3">
+          <input
+            type="checkbox"
+            [checked]="options().includeBaseFeet"
+            (change)="onCheckboxChange('includeBaseFeet', $event)"
+          />
+          <span>{{ 'tools.drawerDividerGridMaker.baseFeetToggle' | translate }}</span>
+        </label>
+
+        <label class="c-drawer-grid__check">
+          <input
+            type="checkbox"
+            [checked]="options().includePieceLabels"
+            (change)="onCheckboxChange('includePieceLabels', $event)"
+          />
+          <span>{{ 'tools.drawerDividerGridMaker.pieceLabelsToggle' | translate }}</span>
+        </label>
+
+        <div class="c-drawer-grid__colors g--margin-top-2">
+          <label class="c-drawer-grid__color-item">
+            <span>{{ 'tools.drawerDividerGridMaker.filamentColorLabel' | translate }}</span>
+            <input
+              type="color"
+              [value]="options().filamentColorHex"
+              (input)="onTextInput('filamentColorHex', $event)"
+            />
+          </label>
+        </div>
+
+        <div card-footer class="c-drawer-grid__footer-actions">
+          <button type="button" class="c-button c-button--outline" (click)="reset()">
+            {{ 'common.resetDefaults' | translate }}
+          </button>
+        </div>
+      </app-card>
+    </div>
+
+    <!-- 3D Viewport Area -->
+    <div class="l-columns__area c-drawer-grid__viewport-col">
+      <app-card [title]="'tools.drawerDividerGridMaker.viewportTitle' | translate">
+        <div class="c-drawer-grid__viewport-hud" role="toolbar" aria-label="3D Viewport Actions">
+          <button type="button" class="c-drawer-grid__hud-btn" (click)="toggleViewMode()">
+            {{ (options().viewMode === 'assembled' ? 'tools.drawerDividerGridMaker.viewFlatPlates' : 'tools.drawerDividerGridMaker.viewAssembled') | translate }}
+          </button>
+          <button type="button" class="c-drawer-grid__hud-btn" (click)="resetView()">
+            {{ 'common.resetView' | translate }}
+          </button>
+          <button type="button" class="c-drawer-grid__hud-btn" (click)="toggleWireframe()">
+            {{ (wireframe() ? 'tools.drawerDividerGridMaker.solidView' : 'tools.drawerDividerGridMaker.wireframeToggle') | translate }}
+          </button>
+          <button type="button" class="c-drawer-grid__hud-btn" (click)="exportPng()">
+            {{ 'common.exportPng' | translate }}
+          </button>
+        </div>
+
+        <div
+          #viewportContainer
+          class="c-drawer-grid__viewport-stage"
+          role="region"
+          aria-label="Interactive 3D Drawer Divider Preview"
+        ></div>
+
+        @if (validationError()) {
+          <div class="c-drawer-grid__alert" role="alert">
+            {{ validationError() }}
+          </div>
+        }
+
+        @if (metrics(); as m) {
+          <div class="c-drawer-grid__summary g--margin-top-3" role="status">
+            🧩 {{ m.totalSlatsCount }} {{ 'tools.drawerDividerGridMaker.slatsUnit' | translate }} •
+            {{ m.dovetailSplitCount }} {{ 'tools.drawerDividerGridMaker.splitsUnit' | translate }} •
+            {{ m.buildPlateCount }} {{ 'tools.drawerDividerGridMaker.platesUnit' | translate }}
+          </div>
+
+          <div class="c-drawer-grid__metrics g--margin-top-2">
+            <div class="c-drawer-grid__metric">
+              <span class="c-drawer-grid__metric-label">{{ 'tools.drawerDividerGridMaker.usableFitLabel' | translate }}</span>
+              <strong class="c-drawer-grid__metric-value">
+                {{ formatFixed(m.usableWidthMm, 1) }} × {{ formatFixed(m.usableDepthMm, 1) }} mm
+              </strong>
+            </div>
+            <div class="c-drawer-grid__metric">
+              <span class="c-drawer-grid__metric-label">{{ 'common.triangles' | translate }}</span>
+              <strong class="c-drawer-grid__metric-value">{{ m.triangleCount }}</strong>
+            </div>
+            <div class="c-drawer-grid__metric">
+              <span class="c-drawer-grid__metric-label">{{ 'common.estWeight' | translate }}</span>
+              <strong class="c-drawer-grid__metric-value">
+                {{ formatFixed(m.estimatedWeightG, 1) }} {{ 'common.grams' | translate }}
+              </strong>
+            </div>
+            <div class="c-drawer-grid__metric">
+              <span class="c-drawer-grid__metric-label">{{ 'common.estPrintTime' | translate }}</span>
+              <strong class="c-drawer-grid__metric-value">
+                {{ formatFixed(m.estimatedPrintTimeHours, 1) }} {{ 'common.hours' | translate }}
+              </strong>
+            </div>
+          </div>
+        }
+
+        @if (isExporting()) {
+          <div class="g--margin-top-3">
+            <app-progress-bar
+              [value]="exportProgress()"
+              [label]="'common.processing' | translate"
+            />
+          </div>
+        }
+
+        <div class="c-drawer-grid__export-bar g--margin-top-4">
+          <button
+            type="button"
+            class="c-button c-button--primary"
+            [disabled]="!!validationError() || isExporting()"
+            (click)="exportFormat('stl')"
+          >
+            {{ 'common.exportStl' | translate }}
+          </button>
+          <button
+            type="button"
+            class="c-button c-button--secondary"
+            [disabled]="!!validationError() || isExporting()"
+            (click)="exportFormat('3mf')"
+          >
+            {{ 'common.export3mf' | translate }}
+          </button>
+          <button
+            type="button"
+            class="c-button c-button--outline"
+            [disabled]="!!validationError() || isExporting()"
+            (click)="exportFormat('zip')"
+          >
+            {{ 'tools.drawerDividerGridMaker.exportZipLabel' | translate }}
+          </button>
+        </div>
+
+        <p class="c-drawer-grid__notes g--margin-top-2">
+          {{ 'tools.drawerDividerGridMaker.stlNote' | translate }} •
+          {{ 'tools.drawerDividerGridMaker.threeMfNote' | translate }}
+        </p>
+      </app-card>
+    </div>
+  </div>
+</div>
