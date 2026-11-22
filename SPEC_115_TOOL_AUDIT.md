@@ -4,6 +4,8 @@
 
 **Scope.** This report uses commit `d60ab96b72b18774c97a79fa6db18264fcfeb25d`. Specs 01–29, 31–60 and 103–115 account for 72 tool routes. One of these, Web Vitals (29), intentionally displays a retirement notice. Spec 00 covers the platform, 30 and 91 cover localization, the second 31 and 32 folders cover QA and mobile remediation, 61–90 revisit prior tools, and 92–102 set cross-tool acceptance criteria. Counting these as new tools would duplicate results. The snapshot ends at the regex debugger.
 
+Follow the [remediation roadmap and numbered specifications](specs/SPEC_115_REMEDIATION_ROADMAP.md) to address and verify the findings below.
+
 ## Findings and acceptance tests
 
 **Critical · Redacted text survives export when rendering fails (05).** I generated a one-page 200 × 200 pt PDF containing the synthetic word `AUDITMARK`, covered the entire page and requested raster flattening. With no DOM renderer available, the production engine returned a PDF. An independent text reader recovered the word. The same fallback runs on rendering exceptions, and disabling flattening selects the overlay writer directly. The flattening test checks byte count, page count, title and author. It never checks the allegedly removed text. Block sanitized export on rendering failure and verify both a successful export and a forced render failure through the UI. Test that the successful file contains no covered text, annotations or source objects carrying the fixture. [Engine](PrivKnife/src/app/tools/privacy/pdf-redaction/engine.ts) · [Export control](PrivKnife/src/app/tools/privacy/pdf-redaction/pdf-redaction.component.ts)
