@@ -34,6 +34,61 @@
                 "input": "public"
               },
               {
+                "glob": "worker.min.js",
+                "input": "node_modules/tesseract.js/dist",
+                "output": "/assets/ocr"
+              },
+              {
+                "glob": "tesseract-core-lstm.wasm.js",
+                "input": "node_modules/tesseract.js-core",
+                "output": "/assets/ocr"
+              },
+              {
+                "glob": "**/*",
+                "input": "node_modules/pdfjs-dist/standard_fonts",
+                "output": "/assets/pdf/standard-fonts"
+              },
+              {
+                "glob": "**/*",
+                "input": "node_modules/pdfjs-dist/wasm",
+                "output": "/assets/pdf/wasm"
+              },
+              {
+                "glob": "eng.traineddata.gz",
+                "input": "node_modules/@tesseract.js-data/eng/4.0.0_best_int",
+                "output": "/assets/ocr/lang"
+              },
+              {
+                "glob": "spa.traineddata.gz",
+                "input": "node_modules/@tesseract.js-data/spa/4.0.0_best_int",
+                "output": "/assets/ocr/lang"
+              },
+              {
+                "glob": "fra.traineddata.gz",
+                "input": "node_modules/@tesseract.js-data/fra/4.0.0_best_int",
+                "output": "/assets/ocr/lang"
+              },
+              {
+                "glob": "deu.traineddata.gz",
+                "input": "node_modules/@tesseract.js-data/deu/4.0.0_best_int",
+                "output": "/assets/ocr/lang"
+              },
+              {
+                "glob": "ita.traineddata.gz",
+                "input": "node_modules/@tesseract.js-data/ita/4.0.0_best_int",
+                "output": "/assets/ocr/lang"
+              },
+              {
+                "glob": "por.traineddata.gz",
+                "input": "node_modules/@tesseract.js-data/por/4.0.0_best_int",
+                "output": "/assets/ocr/lang"
+              },
+              {
+                "glob": "encoder.wasm",
+                "input": "node_modules/woff2-encode-wasm/dist",
+                "output": "/assets/woff2"
+              },
+              {
                 "glob": "qpdf.wasm",
                 "input": "node_modules/@neslinesli93/qpdf-wasm/dist",
                 "output": "/assets/wasm"

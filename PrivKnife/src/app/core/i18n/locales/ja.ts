@@ -527,6 +527,13 @@ export const ja: TranslationSchema = {
       docLang: 'ドキュメント言語',
       extractText: 'テキストを抽出',
       downloadTxt: 'TXTとしてダウンロード',
+      pickDocument: "文書をドロップするかファイルを選択",
+      sampleReceipt: "サンプル領収書を読み込む",
+      complete: "テキストの抽出が完了しました。",
+      decodeError: "文書を開けません。ファイルを確認して再試行してください。",
+      noText: "読み取れる文字が見つかりません。より鮮明な画像をお試しください。",
+      workerError: "テキストを抽出できませんでした。再試行してください。",
+      emptyPreview: "画像または PDF をアップロードして文字を抽出します。",
     },
     fileEncryptorVault: {
       name: 'ゼロナレッジ型 ファイル暗号化保管庫',

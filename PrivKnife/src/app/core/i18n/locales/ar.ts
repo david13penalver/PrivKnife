@@ -527,6 +527,13 @@ export const ar: TranslationSchema = {
       docLang: 'لغة المستند',
       extractText: 'استخراج النص',
       downloadTxt: 'تنزيل كملف نصي TXT',
+      pickDocument: "أفلت مستندًا أو اختر ملفًا",
+      sampleReceipt: "تحميل إيصال نموذجي",
+      complete: "اكتمل استخراج النص.",
+      decodeError: "تعذّر فتح المستند. تحقق من الملف وحاول مجددًا.",
+      noText: "لم يتم العثور على نص مقروء. جرّب صورة أوضح.",
+      workerError: "تعذّر إكمال استخراج النص. حاول مجددًا.",
+      emptyPreview: "حمّل صورة أو ملف PDF لاستخراج النص.",
     },
     fileEncryptorVault: {
       name: 'خزنة الملفات المشفرة ومستودع الأمان معدوم المعرفة',

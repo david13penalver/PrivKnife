@@ -13,14 +13,12 @@ import { Button } from '../../../components/button/button';
 import { Card } from '../../../components/card/card';
 import { Dropzone } from '../../../components/dropzone/dropzone';
 import {
-  burnRedactions,
-  flattenPdfPages,
   loadPdfForRedaction,
   renderPagePreview,
-  sanitizePdf,
 } from './engine';
 import {
   PageRedaction,
+  RedactionWorkerResponse,
   RedactionBox,
   RedactionColor,
   RedactionDocument,
@@ -49,7 +47,7 @@ import {
       <!-- Error Alert -->
       @if (errorMessage()) {
         <div class="l-columns__area g--margin-bottom-4">
-          <div class="g--padding-3" style="background-color: var(--color-danger-subtle, #fee2e2); border: 1px solid var(--color-danger); border-radius: var(--radius-sm); color: var(--color-danger);">
+          <div role="alert" class="g--padding-3" style="background-color: var(--color-danger-subtle, #fee2e2); border: 1px solid var(--color-danger); border-radius: var(--radius-sm); color: var(--color-danger);">
             <strong>Error:</strong> {{ errorMessage() }}
           </div>
         </div>
@@ -184,16 +182,7 @@ import {
             <div
               class="g--margin-bottom-3"
               style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 8px; font-size: 0.875rem;">
-              <label style="display: inline-flex; align-items: center; gap: 8px; cursor: pointer; user-select: none;">
-                <input
-                  type="checkbox"
-                  [checked]="flattenRaster()"
-                  (change)="toggleFlattenRaster()"
-                  style="cursor: pointer;" />
-                <span>
-                  <strong>Raster Flattening</strong> (Re-encodes pages to permanently destroy underlying text stream)
-                </span>
-              </label>
+              <span>Export renders each page with the redactions applied.</span>
 
               @if (isRenderingPreview()) {
                 <span style="color: var(--color-text-muted); font-size: 0.8125rem;">
@@ -208,10 +197,10 @@ import {
               
               <div
                 #canvasContainer
-                style="position: relative; background: #ffffff; box-shadow: 0 4px 16px rgba(0,0,0,0.12); cursor: crosshair; display: inline-block; overflow: hidden;"
+                style="position: relative; background: #ffffff; box-shadow: 0 4px 16px rgba(0,0,0,0.12); cursor: crosshair; touch-action: none; display: inline-block; overflow: hidden;"
                 [style.width.px]="currentPageDimensions().displayWidth"
                 [style.height.px]="currentPageDimensions().displayHeight"
-                (mousedown)="onMouseDown($event)">
+                (pointerdown)="onPointerDown($event)">
                 
                 <!-- Rendered PDF Page Preview Image (if available) -->
                 @if (currentPagePreview()) {
@@ -250,9 +239,9 @@ import {
                   <div
                     style="position: absolute; border-radius: 1px; pointer-events: none; z-index: 5;"
                     [style.left.px]="box.x * displayScale()"
-                    [style.top.px]="(currentPageDimensions().pdfHeight - box.y - box.height) * displayScale()"
+                    [style.top.px]="(currentPageDimensions().pdfHeight - box.y - box.height) * verticalScale()"
                     [style.width.px]="box.width * displayScale()"
-                    [style.height.px]="box.height * displayScale()"
+                    [style.height.px]="box.height * verticalScale()"
                     [style.background]="box.color === 'white' ? '#ffffff' : '#000000'"
                     [style.border]="box.color === 'white' ? '1px dashed #cbd5e1' : 'none'">
                   </div>
@@ -262,7 +251,7 @@ import {
 
             <!-- Instructions Bar -->
             <div class="g--margin-top-4 g--text-center" style="font-size: 0.8125rem; color: var(--color-text-muted);">
-              💡 Redaction boxes permanently burn opaque vector shapes directly into the output document and permanently purge PDF metadata tags.
+              Redaction boxes are applied to the page pixels. The export contains newly rendered pages and strips source metadata.
             </div>
           </app-card>
         </div>
@@ -272,7 +261,7 @@ import {
       <div class="l-columns__area g--margin-top-6">
         <app-card title="Zero-Server Permanent Redaction Guarantee">
           <p style="color: var(--color-text-muted); font-size: 0.9375rem; line-height: 1.6;">
-            Typical online PDF editors upload your sensitive files to cloud servers where redactions are sometimes only cosmetic highlights that can easily be removed. PrivKnife burns true opaque vector rectangles into the document content stream and purges author, title, and generator metadata entirely in your browser using <strong>pdf-lib</strong>.
+            Typical online PDF editors upload your sensitive files to cloud servers where redactions are sometimes only cosmetic highlights that can easily be removed. PrivKnife applies the boxes to rendered pages and builds a new PDF locally.
           </p>
         </app-card>
       </div>
@@ -289,16 +278,17 @@ export class PdfRedactionComponent implements OnDestroy {
   readonly redactionsByPage = signal<Map<number, RedactionBox[]>>(new Map());
   readonly activeTool = signal<RedactionColor>('black');
   readonly zoomLevel = signal<number>(1.0);
-  readonly flattenRaster = signal<boolean>(true);
   readonly isProcessing = signal<boolean>(false);
   readonly isRenderingPreview = signal<boolean>(false);
-  readonly currentPagePreview = signal<string | null>(null);
+  private readonly preview = signal<Awaited<ReturnType<typeof renderPagePreview>>>(undefined);
+  readonly currentPagePreview = computed(() => this.preview()?.url ?? null);
   readonly activeDragBox = signal<{ x: number; y: number; width: number; height: number } | null>(null);
 
   private activeBlobUrls: string[] = [];
-  private isDrawing = false;
-  private startX = 0;
-  private startY = 0;
+  private cancelExport?: () => void;
+  private cancelSelection?: () => void;
+  private previewRequest = 0;
+  private documentRequest = 0;
 
   readonly currentPageRedactions = computed<RedactionBox[]>(() => {
     const pageIdx = this.currentPageIndex();
@@ -321,7 +311,7 @@ export class PdfRedactionComponent implements OnDestroy {
     if (!doc || !doc.pages[idx]) {
       return { pdfWidth: 600, pdfHeight: 800, displayWidth: 500 * zoom, displayHeight: 666 * zoom };
     }
-    const page = doc.pages[idx];
+    const page = this.preview() ?? doc.pages[idx];
     const maxDisplayWidth = 560 * zoom;
     const scale = Math.min(zoom * 1.5, maxDisplayWidth / page.width);
     return {
@@ -330,6 +320,11 @@ export class PdfRedactionComponent implements OnDestroy {
       displayWidth: Math.round(page.width * scale),
       displayHeight: Math.round(page.height * scale),
     };
+  });
+
+  readonly verticalScale = computed(() => {
+    const dims = this.currentPageDimensions();
+    return dims.displayHeight / dims.pdfHeight;
   });
 
   readonly displayScale = computed(() => {
@@ -344,30 +339,34 @@ export class PdfRedactionComponent implements OnDestroy {
   }
 
   async onFileDropped(file: File): Promise<void> {
+    const request = ++this.documentRequest;
+    this.cancelExport?.();
+    this.cancelSelection?.();
+    this.previewRequest++;
+    this.preview.set(undefined);
+    this.loadedDocument.set(null);
     this.isProcessing.set(true);
     this.errorMessage.set(null);
     try {
       const buffer = await file.arrayBuffer();
       const doc = await loadPdfForRedaction(buffer, file.name);
+      if (request !== this.documentRequest) return;
       this.loadedDocument.set(doc);
       this.currentPageIndex.set(0);
       this.redactionsByPage.set(new Map());
       this.zoomLevel.set(1.0);
       await this.loadActivePagePreview();
-    } catch (err: any) {
-      this.errorMessage.set(err?.message || 'The selected file is not a valid PDF or is corrupted.');
-      this.loadedDocument.set(null);
+    } catch (error: unknown) {
+      if (request === this.documentRequest) {
+        this.errorMessage.set(error instanceof Error ? error.message : 'The selected file is not a valid PDF.');
+      }
     } finally {
-      this.isProcessing.set(false);
+      if (request === this.documentRequest) this.isProcessing.set(false);
     }
   }
 
   setActiveTool(tool: RedactionColor): void {
     this.activeTool.set(tool);
-  }
-
-  toggleFlattenRaster(): void {
-    this.flattenRaster.update((v) => !v);
   }
 
   zoomIn(): void {
@@ -389,17 +388,20 @@ export class PdfRedactionComponent implements OnDestroy {
   private async loadActivePagePreview(): Promise<void> {
     const doc = this.loadedDocument();
     if (!doc) {
-      this.currentPagePreview.set(null);
+      this.preview.set(undefined);
       return;
     }
+    this.cancelSelection?.();
+    const request = ++this.previewRequest;
+    this.preview.set(undefined);
     this.isRenderingPreview.set(true);
     try {
       const preview = await renderPagePreview(doc.buffer, this.currentPageIndex(), 700);
-      this.currentPagePreview.set(preview || null);
+      if (request === this.previewRequest) this.preview.set(preview);
     } catch {
-      this.currentPagePreview.set(null);
+      if (request === this.previewRequest) this.preview.set(undefined);
     } finally {
-      this.isRenderingPreview.set(false);
+      if (request === this.previewRequest) this.isRenderingPreview.set(false);
     }
   }
 
@@ -435,91 +437,79 @@ export class PdfRedactionComponent implements OnDestroy {
   }
 
   resetDocument(): void {
+    this.cancelExport?.();
+    this.cancelSelection?.();
+    this.previewRequest++;
+    this.documentRequest++;
+    this.isProcessing.set(false);
+    this.isRenderingPreview.set(false);
     this.loadedDocument.set(null);
     this.errorMessage.set(null);
     this.currentPageIndex.set(0);
     this.redactionsByPage.set(new Map());
-    this.currentPagePreview.set(null);
+    this.preview.set(undefined);
     this.zoomLevel.set(1.0);
     this.activeDragBox.set(null);
     this.cleanBlobUrls();
   }
 
-  onMouseDown(event: MouseEvent): void {
+  onPointerDown(event: PointerEvent): void {
     const container = this.canvasContainer()?.nativeElement;
-    if (!container) return;
+    if (!container || !this.currentPagePreview() || !event.isPrimary || event.button !== 0) return;
 
+    this.cancelSelection?.();
     const rect = container.getBoundingClientRect();
-    this.isDrawing = true;
-    this.startX = event.clientX - rect.left;
-    this.startY = event.clientY - rect.top;
-
-    const onMouseMove = (moveEvent: MouseEvent) => {
-      if (!this.isDrawing) return;
-      const currentX = moveEvent.clientX - rect.left;
-      const currentY = moveEvent.clientY - rect.top;
-
-      const minX = Math.max(0, Math.min(this.startX, currentX));
-      const maxX = Math.min(rect.width, Math.max(this.startX, currentX));
-      const minY = Math.max(0, Math.min(this.startY, currentY));
-      const maxY = Math.min(rect.height, Math.max(this.startY, currentY));
-
-      this.activeDragBox.set({
-        x: minX,
-        y: minY,
-        width: maxX - minX,
-        height: maxY - minY,
+    const { clientX: startX, clientY: startY, pointerId } = event;
+    const bounds = ({ clientX, clientY }: PointerEvent) => {
+      const clamp = (value: number, max: number) => Math.min(max, Math.max(0, value));
+      const x = clamp(Math.min(startX, clientX) - rect.left, rect.width);
+      const y = clamp(Math.min(startY, clientY) - rect.top, rect.height);
+      return {
+        x, y,
+        width: clamp(Math.max(startX, clientX) - rect.left, rect.width) - x,
+        height: clamp(Math.max(startY, clientY) - rect.top, rect.height) - y,
+      };
+    };
+    const move = (moveEvent: PointerEvent) => {
+      if (moveEvent.pointerId === pointerId) this.activeDragBox.set(bounds(moveEvent));
+    };
+    const finish = () => {
+      this.activeDragBox.set(null);
+      window.removeEventListener('pointermove', move);
+      window.removeEventListener('pointerup', commit);
+      window.removeEventListener('pointercancel', abort);
+      this.cancelSelection = undefined;
+    };
+    const commit = (upEvent: PointerEvent) => {
+      if (upEvent.pointerId !== pointerId) return;
+      const box = bounds(upEvent);
+      finish();
+      if (box.width <= 5 || box.height <= 5) return;
+      const { pdfWidth, pdfHeight } = this.currentPageDimensions();
+      const xScale = pdfWidth / rect.width;
+      const yScale = pdfHeight / rect.height;
+      this.addRedactionBox({
+        x: box.x * xScale,
+        y: pdfHeight - (box.y + box.height) * yScale,
+        width: box.width * xScale,
+        height: box.height * yScale,
+        color: this.activeTool(),
       });
     };
-
-    const onMouseUp = (upEvent: MouseEvent) => {
-      if (!this.isDrawing) return;
-      this.isDrawing = false;
-      this.activeDragBox.set(null);
-      window.removeEventListener('mousemove', onMouseMove);
-      window.removeEventListener('mouseup', onMouseUp);
-
-      const endX = upEvent.clientX - rect.left;
-      const endY = upEvent.clientY - rect.top;
-
-      const scale = this.displayScale();
-      const dims = this.currentPageDimensions();
-
-      const minX = Math.max(0, Math.min(this.startX, endX));
-      const maxX = Math.min(dims.displayWidth, Math.max(this.startX, endX));
-      const minY = Math.max(0, Math.min(this.startY, endY));
-      const maxY = Math.min(dims.displayHeight, Math.max(this.startY, endY));
-
-      const w = maxX - minX;
-      const h = maxY - minY;
-
-      // Only add if box has a minimum size
-      if (w > 5 && h > 5) {
-        // Convert canvas coordinates to PDF coordinates
-        // Canvas (0, 0) is top-left, PDF (0, 0) is bottom-left
-        const pdfX = minX / scale;
-        const pdfY = (dims.displayHeight - maxY) / scale;
-        const pdfW = w / scale;
-        const pdfH = h / scale;
-
-        this.addRedactionBox({
-          x: pdfX,
-          y: pdfY,
-          width: pdfW,
-          height: pdfH,
-          color: this.activeTool() === 'white' ? 'white' : 'black',
-        });
-      }
+    const abort = (cancelEvent: PointerEvent) => {
+      if (cancelEvent.pointerId === pointerId) finish();
     };
-
-    window.addEventListener('mousemove', onMouseMove);
-    window.addEventListener('mouseup', onMouseUp);
+    this.cancelSelection = finish;
+    window.addEventListener('pointermove', move);
+    window.addEventListener('pointerup', commit);
+    window.addEventListener('pointercancel', abort);
   }
 
   async downloadSanitizedPdf(): Promise<void> {
     const doc = this.loadedDocument();
-    if (!doc) return;
+    if (!doc || this.isProcessing()) return;
 
+    this.errorMessage.set(null);
     this.isProcessing.set(true);
     try {
       const pageRedactions: PageRedaction[] = [];
@@ -531,12 +521,9 @@ export class PdfRedactionComponent implements OnDestroy {
         });
       }
 
-      const sanitizedBytes = await sanitizePdf(doc.buffer, pageRedactions, {
-        stripMetadata: true,
-        flattenRaster: this.flattenRaster(),
-      });
-
-      const blob = new Blob([sanitizedBytes as BlobPart], { type: 'application/pdf' });
+      const sanitizedBytes = await this.renderExport(doc.buffer, pageRedactions);
+      if (!sanitizedBytes || this.loadedDocument() !== doc) return;
+      const blob = new Blob([sanitizedBytes], { type: 'application/pdf' });
       const url = URL.createObjectURL(blob);
       this.activeBlobUrls.push(url);
 
@@ -553,12 +540,55 @@ export class PdfRedactionComponent implements OnDestroy {
       if (idx !== -1) {
         this.activeBlobUrls.splice(idx, 1);
       }
+    } catch {
+      if (this.loadedDocument() === doc) {
+        this.errorMessage.set('PDF rendering failed. No redacted PDF was created.');
+      }
     } finally {
-      this.isProcessing.set(false);
+      if (this.loadedDocument() === doc) this.isProcessing.set(false);
     }
   }
 
+  private renderExport(source: ArrayBuffer, redactions: PageRedaction[]): Promise<Uint8Array<ArrayBuffer> | undefined> {
+    return new Promise((resolve, reject) => {
+      const worker = new Worker(new URL('./worker.ts', import.meta.url), { type: 'module' });
+      const finish = () => {
+        worker.terminate();
+        this.cancelExport = undefined;
+      };
+      const fail = () => {
+        finish();
+        reject(new Error('PDF rendering failed.'));
+      };
+      this.cancelExport = () => {
+        finish();
+        this.isProcessing.set(false);
+        resolve(undefined);
+      };
+      worker.onmessage = ({ data }: MessageEvent<RedactionWorkerResponse>) => {
+        if ('error' in data) {
+          fail();
+          return;
+        }
+        finish();
+        resolve(data.bytes);
+      };
+      worker.onerror = fail;
+      worker.onmessageerror = fail;
+      try {
+        const buffer = source.slice(0);
+        worker.postMessage({ buffer, redactions }, [buffer]);
+      } catch {
+        fail();
+      }
+    });
+  }
+
   ngOnDestroy(): void {
+    this.cancelExport?.();
+    this.cancelSelection?.();
+    this.previewRequest++;
+    this.documentRequest++;
     this.cleanBlobUrls();
   }
 

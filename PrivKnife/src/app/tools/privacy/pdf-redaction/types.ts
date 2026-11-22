@@ -34,3 +34,10 @@ export interface SanitizationOptions {
   stripMetadata?: boolean;
   flattenRaster?: boolean;
 }
+
+export type RedactionWorkerRequest = {
+  buffer: ArrayBuffer;
+  redactions: PageRedaction[];
+};
+
+export type RedactionWorkerResponse = { bytes: Uint8Array<ArrayBuffer> } | { error: string };

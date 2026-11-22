@@ -7,9 +7,7 @@
         {{ 'tools.localOcrTextExtractor.description' | translate }}
       </p>
     </div>
-    <div class="c-badge c-badge--privacy">
-      {{ 'common.privacyBadge' | translate }}
-    </div>
+    <app-badge variant="privacy">{{ 'common.privacyBadge' | translate }}</app-badge>
   </header>
 
   <!-- Main Columns Layout -->
@@ -21,40 +19,20 @@
       </div>
 
       <div class="c-card__body">
-        <!-- Dropzone -->
-        <div
-          class="c-dropzone g--margin-bottom-4"
-          (dragover)="$event.preventDefault()"
-          (drop)="onFileDrop($event)"
-          (click)="fileInput.click()"
-        >
-          <input
-            #fileInput
-            type="file"
-            class="c-dropzone__input"
-            accept="image/png,image/jpeg,image/webp,application/pdf"
-            (change)="onFileInputChange($event)"
-          />
-          <div class="c-dropzone__content">
-            <span class="c-dropzone__icon">📄</span>
-            <p class="c-dropzone__text">
-              @if (selectedFile()) {
-                Selected: <strong>{{ selectedFile()?.name }}</strong> ({{ formatBytes(selectedFile()?.size || 0) }})
-              } @else {
-                Drop scanned document or image here, or <strong>browse</strong>
-              }
-            </p>
-            <div class="c-ocr__sample-row" (click)="$event.stopPropagation()">
-              <button
-                type="button"
-                class="c-button c-button--outline c-button--small"
-                (click)="loadSampleReceipt()"
-              >
-                Load Sample Receipt
-              </button>
-            </div>
-            <span class="c-dropzone__hint">Supports PDF, PNG, JPG, WebP • 100% Local Sandbox</span>
-          </div>
+        <app-dropzone
+          accept="image/png,image/jpeg,image/webp,application/pdf"
+          [title]="'tools.localOcrTextExtractor.pickDocument' | translate"
+          [subtitle]="'PDF, PNG, JPEG, WebP'"
+          (filesSelected)="onFilesSelected($event)"
+          (rejected)="rejectFile()"
+        />
+        @if (selectedFile(); as file) {
+          <p class="c-ocr__filename" role="status">{{ file.name }} ({{ formatBytes(file.size) }})</p>
+        }
+        <div class="c-ocr__sample-row">
+          <app-button variant="outline" (clicked)="loadSampleReceipt()">
+            {{ 'tools.localOcrTextExtractor.sampleReceipt' | translate }}
+          </app-button>
         </div>
 
         <!-- Language Selector -->
@@ -128,7 +106,7 @@
 
         <!-- Binarization Threshold Slider -->
         <div class="c-input g--margin-bottom-4">
-          <label class="c-input__label">
+          <label class="c-input__label" for="binarizeThresholdRange">
             Binarize Threshold: <strong>{{ binarizeThreshold() }}</strong>
           </label>
           <input
@@ -210,26 +188,13 @@
         </div>
       </div>
 
-      <div class="c-card__footer l-extremo">
-        <div class="l-extremo__area-izquierda">
-          <button
-            type="button"
-            class="c-button c-button--outline"
-            (click)="resetToDefaults()"
-          >
-            Reset
-          </button>
-        </div>
-        <div class="l-extremo__area-derecha">
-          <button
-            type="button"
-            class="c-button c-button--primary"
-            [disabled]="isProcessing() || !selectedFile()"
-            (click)="extractText()"
-          >
-            {{ isProcessing() ? 'Extracting Text...' : 'Start OCR Extraction' }}
-          </button>
-        </div>
+      <div class="c-card__footer c-ocr__actions">
+        <app-button variant="outline" (clicked)="resetToDefaults()">
+          {{ 'common.reset' | translate }}
+        </app-button>
+        <app-button [disabled]="!selectedFile()" [loading]="isProcessing()" (clicked)="extractText()">
+          {{ 'tools.localOcrTextExtractor.extractText' | translate }}
+        </app-button>
       </div>
     </section>
 
@@ -237,7 +202,7 @@
     <section class="l-columns__area c-card">
       <div class="c-card__header l-extremo">
         <div class="l-extremo__area-izquierda">
-          <h2 class="c-card__title">Extracted Text & Output</h2>
+          <h2 class="c-card__title">{{ 'tools.localOcrTextExtractor.resultsTitle' | translate }}</h2>
         </div>
         <div class="l-extremo__area-derecha">
           @if (previewText()) {
@@ -246,24 +211,32 @@
               class="c-button c-button--outline c-button--small"
               (click)="copyToClipboard()"
             >
-              {{ copySuccess() ? '✓ Copied!' : 'Copy Text' }}
+              {{ (copySuccess() ? 'common.copied' : 'common.copy') | translate }}
             </button>
           }
         </div>
       </div>
 
       <div class="c-card__body">
+        <div aria-live="polite" aria-atomic="true">
+          @if (isProcessing()) {
+            <p>{{ 'common.processing' | translate }}</p>
+          } @else if (extractedResult()) {
+            <p>{{ 'tools.localOcrTextExtractor.complete' | translate }}</p>
+          }
+        </div>
         @if (isProcessing()) {
-          <div class="c-progress g--margin-bottom-4">
-            <div class="c-progress__bar" style="width: 100%"></div>
-            <small class="g--text-small g--margin-top-2">Processing document with local client OCR engine...</small>
-          </div>
+          <app-progress-bar [value]="progress()" [label]="'tools.localOcrTextExtractor.extractText' | translate" />
+        }
+        @if (selectionError() || jobError()) {
+          <p role="alert">{{ ('tools.localOcrTextExtractor.' + (selectionError() ? 'decodeError' : jobError())) | translate }}</p>
         }
 
         @if (previewText()) {
           <div class="c-ocr__preview">
             <textarea
               readonly
+              [attr.aria-label]="'tools.localOcrTextExtractor.resultsTitle' | translate"
               class="c-ocr__textarea"
               [value]="previewText()"
             ></textarea>
@@ -272,42 +245,28 @@
           <!-- Metadata badge bar -->
           <div class="c-ocr__result-meta g--margin-top-4">
             <div class="c-badge c-badge--success">
-              ✓ Recognition Completed ({{ formatBytes(extractedResult()?.fileSize || 0) }})
+              {{ formatBytes(extractedResult()?.fileSize || 0) }}
             </div>
             <p class="g--margin-top-2 g--text-small">
               Pages: <strong>{{ extractedResult()?.metadata?.pageCount || 1 }}</strong> |
               Words: <strong>{{ extractedResult()?.metadata?.wordCount || 0 }}</strong> |
               Characters: <strong>{{ extractedResult()?.metadata?.characterCount || 0 }}</strong> |
-              Confidence: <strong>{{ extractedResult()?.metadata?.averageConfidence || 95 }}%</strong>
+              Confidence: <strong>{{ extractedResult()?.metadata?.averageConfidence || 0 }}%</strong>
             </p>
           </div>
         } @else {
           <div class="c-ocr__empty">
             <span class="c-ocr__empty-icon">📄</span>
-            <strong>No document processed</strong>
-            <small>Upload an image or scanned PDF to extract text</small>
-            <button
-              type="button"
-              class="c-button c-button--primary c-button--small g--margin-top-4"
-              (click)="loadSampleReceipt()"
-            >
-              Load Sample Receipt
-            </button>
+            <strong>{{ 'tools.localOcrTextExtractor.emptyPreview' | translate }}</strong>
           </div>
         }
       </div>
 
-      <div class="c-card__footer l-extremo">
-        <div class="l-extremo__area-derecha">
-          <button
-            type="button"
-            class="c-button c-button--primary"
-            [disabled]="!extractedResult()"
-            (click)="downloadDeliverable()"
-          >
-            Download {{ exportFormat().toUpperCase() }} Deliverable
-          </button>
-        </div>
+      <div class="c-card__footer c-ocr__actions">
+        <app-button [disabled]="!extractedResult()" (clicked)="downloadDeliverable()">
+          {{ 'common.download' | translate }}
+          @if (extractedResult()?.metadata?.format; as format) { {{ format.toUpperCase() }} }
+        </app-button>
       </div>
     </section>
   </div>

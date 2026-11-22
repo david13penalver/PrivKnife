@@ -527,6 +527,13 @@ export const de: TranslationSchema = {
       docLang: 'Dokumentsprache',
       extractText: 'Text extrahieren',
       downloadTxt: 'Als TXT herunterladen',
+      pickDocument: "Dokument ablegen oder Datei auswählen",
+      sampleReceipt: "Beispielbeleg laden",
+      complete: "Texterkennung abgeschlossen.",
+      decodeError: "Das Dokument konnte nicht geöffnet werden. Prüfe die Datei und versuche es erneut.",
+      noText: "Kein lesbarer Text gefunden. Verwende ein schärferes Bild.",
+      workerError: "Die Texterkennung ist fehlgeschlagen. Versuche es erneut.",
+      emptyPreview: "Lade ein Bild oder PDF zur Texterkennung hoch.",
     },
     fileEncryptorVault: {
       name: 'Zero-Knowledge-Dateiverschlüsselung & Datensafe',

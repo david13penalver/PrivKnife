@@ -33,18 +33,15 @@ addEventListener('message', async (event: MessageEvent<LocalOcrWorkerRequest>) =
       postMessage({
         type: 'progress',
         id,
-        progress: 25,
+        progress: 5,
       } as LocalOcrWorkerResponse);
 
-      const source = fileBuffer ? new Blob([fileBuffer]) : new Blob();
+      if (!fileBuffer?.byteLength) throw new Error('decodeError');
+      const source = new Blob([fileBuffer]);
 
-      postMessage({
-        type: 'progress',
-        id,
-        progress: 60,
-      } as LocalOcrWorkerResponse);
-
-      const result = await processLocalOcr(source, options, originalFileName);
+      const result = await processLocalOcr(source, options, originalFileName, (progress) => {
+        postMessage({ type: 'progress', id, progress } satisfies LocalOcrWorkerResponse);
+      });
 
       postMessage({
         type: 'ocr',

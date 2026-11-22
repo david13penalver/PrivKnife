@@ -1,3 +1,5 @@
+import { processLocalOcr } from './engine';
+import type { LocalOcrWorkerRequest, LocalOcrWorkerResponse } from './types';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 import { stubClipboard } from '../../../core/testing/clipboard-mock';
@@ -7,6 +9,16 @@ import {
   createSyntheticPdfFile,
 } from './test-fixtures';
 
+class WorkerDouble {
+  onmessage: ((event: { data: LocalOcrWorkerResponse }) => void) | null = null;
+  postMessage(message: LocalOcrWorkerRequest): void {
+    void processLocalOcr('UNIQUE WORKER TEXT', message.options, message.originalFileName).then((result) => {
+      this.onmessage?.({ data: { type: 'ocr', success: true, result } });
+    });
+  }
+  terminate = vi.fn();
+}
+
 describe('LocalOcrTextExtractorComponent (Seam 2 & 4)', () => {
   let clipboardCleanup: (() => void) | undefined;
   let component: LocalOcrTextExtractorComponent;
@@ -15,6 +27,7 @@ describe('LocalOcrTextExtractorComponent (Seam 2 & 4)', () => {
   let xhrSpy: ReturnType<typeof vi.spyOn>;
 
   beforeEach(async () => {
+    vi.stubGlobal('Worker', WorkerDouble);
     fetchSpy = vi.spyOn(window, 'fetch');
     xhrSpy = vi.spyOn(XMLHttpRequest.prototype, 'open');
 
@@ -33,6 +46,7 @@ describe('LocalOcrTextExtractorComponent (Seam 2 & 4)', () => {
     fetchSpy.mockRestore();
     xhrSpy.mockRestore();
     fixture.destroy();
+    vi.unstubAllGlobals();
   });
 
   describe('Initialization & Reactive State', () => {
@@ -123,6 +137,9 @@ describe('LocalOcrTextExtractorComponent (Seam 2 & 4)', () => {
     });
 
     it('should load sample receipt when loadSampleReceipt is called', async () => {
+      const canvas = { canvas: {}, fillStyle: '', font: '', fillText: vi.fn(), fillRect: vi.fn() };
+      vi.spyOn(HTMLCanvasElement.prototype, 'getContext').mockReturnValueOnce(canvas as unknown as CanvasRenderingContext2D);
+      vi.spyOn(HTMLCanvasElement.prototype, 'toBlob').mockImplementationOnce((done) => done(new Blob([new Uint8Array([1])], { type: 'image/png' })));
       await component.loadSampleReceipt();
 
       expect(component.selectedFile()).toBeTruthy();
@@ -145,9 +162,46 @@ describe('LocalOcrTextExtractorComponent (Seam 2 & 4)', () => {
 
       expect(component.extractedResult()).toBeTruthy();
       expect(component.extractedResult()?.success).toBe(true);
-      expect(component.previewText().length).toBeGreaterThan(0);
+      expect(component.previewText()).toBe('UNIQUE WORKER TEXT');
       expect(component.extractedResult()?.metadata?.pageCount).toBeGreaterThanOrEqual(1);
     });
+  });
+
+  it('cancels a replaced job, ignores stale messages, and retries after a worker error', async () => {
+    const workers: ControlledWorker[] = [];
+    class ControlledWorker {
+      onmessage: ((event: { data: LocalOcrWorkerResponse }) => void) | null = null;
+      onerror: (() => void) | null = null;
+      postMessage = vi.fn();
+      terminate = vi.fn();
+      constructor() { workers.push(this); }
+    }
+    vi.stubGlobal('Worker', ControlledWorker);
+    const firstFile = createSyntheticImageFile('first.png');
+    await component.handleFileSelected(firstFile);
+    const first = component.extractText();
+    await vi.waitFor(() => expect(workers).toHaveLength(1));
+    const stale = workers[0].onmessage!;
+    stale({ data: { type: 'progress', progress: 45 } });
+    expect(component.progress()).toBe(45);
+
+    await component.handleFileSelected(createSyntheticImageFile('second.png'));
+    await first;
+    expect(workers[0].terminate).toHaveBeenCalledOnce();
+    stale({ data: { type: 'ocr', success: false, error: 'noText' } });
+    expect(component.jobError()).toBeNull();
+
+    const second = component.extractText();
+    await vi.waitFor(() => expect(workers).toHaveLength(2));
+    workers[1].onerror?.();
+    await second;
+    expect(component.jobError()).toBe('workerError');
+
+    const retry = component.extractText();
+    await vi.waitFor(() => expect(workers).toHaveLength(3));
+    fixture.destroy();
+    await retry;
+    expect(workers[2].terminate).toHaveBeenCalledOnce();
   });
 
   describe('Export & Download Action', () => {

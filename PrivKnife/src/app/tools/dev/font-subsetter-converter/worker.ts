@@ -1,11 +1,14 @@
 /// <reference lib="webworker" />
 import { processFontSubset } from './engine';
+import { createWoff2Encoder } from './woff2-codec';
 import { FontSubsetWorkerRequest, FontSubsetWorkerResponse } from './types';
 
-addEventListener('message', (event: MessageEvent<FontSubsetWorkerRequest>) => {
+const encodeWoff2 = createWoff2Encoder(() => fetch('/assets/woff2/encoder.wasm'));
+
+addEventListener('message', async (event: MessageEvent<FontSubsetWorkerRequest>) => {
   const { id, buffer, options } = event.data;
   try {
-    const result = processFontSubset(buffer, options);
+    const result = await processFontSubset(buffer, options, encodeWoff2);
     postMessage({ id, result } satisfies FontSubsetWorkerResponse);
   } catch (err: unknown) {
     const errorMsg = err instanceof Error ? err.message : String(err);

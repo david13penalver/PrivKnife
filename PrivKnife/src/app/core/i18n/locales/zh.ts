@@ -527,6 +527,13 @@ export const zh: TranslationSchema = {
       docLang: '文档识别语言',
       extractText: '开始识别提取文字',
       downloadTxt: '下载纯文本文件 (.txt)',
+      pickDocument: "拖放文档或选择文件",
+      sampleReceipt: "载入示例收据",
+      complete: "文字提取已完成。",
+      decodeError: "无法打开文档，请检查文件后重试。",
+      noText: "未找到可读文字，请尝试更清晰的图片。",
+      workerError: "文字提取失败，请重试。",
+      emptyPreview: "上传图片或 PDF 以提取文字。",
     },
     fileEncryptorVault: {
       name: '零知识客户端文件加密器与隐私保险库',

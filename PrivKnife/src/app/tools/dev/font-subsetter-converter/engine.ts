@@ -1,4 +1,5 @@
 import pako from 'pako';
+import { buildUnicodeCmap, retainCompositeComponents, selectUnicodeGlyphs } from './unicode-cmap';
 import {
   FontMetadata,
   FontOutputFormat,
@@ -280,40 +281,8 @@ export function extractSfntTables(buffer: ArrayBuffer): SfntTableEntry[] {
     return tables;
   }
 
-  // WOFF 2.0 handling
   if (magic === 0x774f4632) {
-    // If it was generated with our compressed stream format, unpack
-    const numTables = view.getUint16(12);
-    const headerSize = 48;
-    // Check if compressed data exists
-    const totalCompSize = view.getUint32(20);
-    if (headerSize + totalCompSize <= buffer.byteLength) {
-      try {
-        const decompressed = pako.inflate(rawBytes.subarray(headerSize, headerSize + totalCompSize));
-        // Parse directory from decompressed stream
-        const dView = new DataView(decompressed.buffer, decompressed.byteOffset, decompressed.byteLength);
-        let dOff = 0;
-        const tempMeta: Array<{ tag: string; length: number; checkSum: number }> = [];
-        for (let i = 0; i < numTables; i++) {
-          let tag = '';
-          for (let c = 0; c < 4; c++) {
-            tag += String.fromCharCode(dView.getUint8(dOff + c));
-          }
-          const length = dView.getUint32(dOff + 4);
-          const checkSum = dView.getUint32(dOff + 8);
-          dOff += 12;
-          tempMeta.push({ tag, length, checkSum });
-        }
-        for (const meta of tempMeta) {
-          const tData = decompressed.slice(dOff, dOff + meta.length);
-          dOff += (meta.length + 3) & ~3;
-          tables.push({ tag: meta.tag, checkSum: meta.checkSum, offset: 0, length: meta.length, data: tData });
-        }
-        return tables;
-      } catch {
-        // Fallback
-      }
-    }
+    throw new Error('Decode WOFF2 before reading its SFNT tables.');
   }
 
   // Raw SFNT (TrueType / OpenType)
@@ -368,111 +337,51 @@ function rebuildSfntTrueType(
   const locaTbl = filteredTables.find((t) => t.tag === 'loca');
   const glyfTbl = filteredTables.find((t) => t.tag === 'glyf');
   const cmapTbl = filteredTables.find((t) => t.tag === 'cmap');
-  const hmtxTbl = filteredTables.find((t) => t.tag === 'hmtx');
+  const maxp = maxpTbl && new DataView(maxpTbl.data.buffer, maxpTbl.data.byteOffset, maxpTbl.data.byteLength);
+  const totalGlyphCount = maxp?.getUint16(4) ?? 0;
+  if (!cmapTbl || !totalGlyphCount) throw new Error('The font is missing its glyph directory.');
+  const mapping = selectUnicodeGlyphs(cmapTbl.data, characterSet);
+  for (const [codePoint, glyph] of mapping) {
+    if (glyph >= totalGlyphCount) mapping.delete(codePoint);
+  }
+  if (!mapping.size) throw new Error('The font has no characters in the requested subset.');
+  const subsetCmap = buildUnicodeCmap(mapping);
+  const replacements = new Map<string, Uint8Array>([['cmap', subsetCmap]]);
+  const retained = new Set([0, ...mapping.values()]);
 
-  let totalGlyphCount = 192;
-  let retainedGlyphCount = characterSet.size;
+  // Keep original glyph IDs so metric, kerning, layout and composite references remain valid.
+  const canPrune = !existingTables.some(({ tag }) =>
+    ['fvar', 'COLR', 'SVG ', 'CBDT', 'sbix', 'MATH'].includes(tag) ||
+    (!options.dropLayoutFeatures && ['GSUB', 'GPOS', 'GDEF', 'JSTF', 'BASE'].includes(tag)));
+  if (locaTbl && glyfTbl && headTbl && canPrune) {
+    const head = new DataView(headTbl.data.buffer, headTbl.data.byteOffset, headTbl.data.byteLength);
+    const short = head.getInt16(50) === 0;
+    const original = new DataView(locaTbl.data.buffer, locaTbl.data.byteOffset, locaTbl.data.byteLength);
+    const offsets = Array.from({ length: totalGlyphCount + 1 }, (_, index) =>
+      short ? original.getUint16(index * 2) * 2 : original.getUint32(index * 4));
+    retainCompositeComponents(retained, offsets, glyfTbl.data);
 
-  if (maxpTbl && maxpTbl.data.length >= 6) {
-    const maxpView = new DataView(maxpTbl.data.buffer, maxpTbl.data.byteOffset, maxpTbl.data.byteLength);
-    totalGlyphCount = maxpView.getUint16(4, false);
+    const newLoca = new Uint8Array(locaTbl.data.length);
+    const loca = new DataView(newLoca.buffer);
+    const newGlyf = new Uint8Array(glyfTbl.data.length);
+    let position = 0;
+    for (let gid = 0; gid <= totalGlyphCount; gid++) {
+      if (short) loca.setUint16(gid * 2, position / 2);
+      else loca.setUint32(gid * 4, position);
+      if (gid < totalGlyphCount && retained.has(gid)) {
+        const data = glyfTbl.data.subarray(offsets[gid], offsets[gid + 1]);
+        newGlyf.set(data, position);
+        position += data.length;
+      }
+    }
+    replacements.set('glyf', newGlyf.subarray(0, position));
+    replacements.set('loca', newLoca);
   }
 
-  // Real cmap & glyf & loca subsetting when valid font tables are present
-  if (locaTbl && glyfTbl && cmapTbl && headTbl && maxpTbl) {
-    const headView = new DataView(headTbl.data.buffer, headTbl.data.byteOffset, headTbl.data.byteLength);
-    const isShortLoca = headView.getInt16(50, false) === 0;
-
-    const locaView = new DataView(locaTbl.data.buffer, locaTbl.data.byteOffset, locaTbl.data.byteLength);
-    const glyfBytes = glyfTbl.data;
-
-    // Read original glyph offsets from loca
-    const origOffsets: number[] = [];
-    for (let g = 0; g <= totalGlyphCount; g++) {
-      const off = isShortLoca ? locaView.getUint16(g * 2, false) * 2 : locaView.getUint32(g * 4, false);
-      origOffsets.push(off);
-    }
-
-    // Determine which glyph IDs are needed: glyph 0 (.notdef) + codepoints in characterSet
-    // Map codepoint to original GID via cmap format 4 if present
-    const retainedGids = new Set<number>([0]);
-    const cmapView = new DataView(cmapTbl.data.buffer, cmapTbl.data.byteOffset, cmapTbl.data.byteLength);
-
-    for (const cp of characterSet) {
-      // In synthetic and standard TrueType, GID for ASCII is cp - 31 (for 0x0020..0x00DF)
-      let gid = cp - 31;
-      if (gid >= 1 && gid < totalGlyphCount) {
-        retainedGids.add(gid);
-      }
-    }
-
-    const sortedGids = Array.from(retainedGids).sort((a, b) => a - b);
-    retainedGlyphCount = sortedGids.length;
-
-    // Build new subsetted glyf & loca tables
-    const newGlyfChunks: Uint8Array[] = [];
-    const newLocaOffsets: number[] = [0];
-    let currentGlyfOffset = 0;
-
-    for (const gid of sortedGids) {
-      const start = origOffsets[gid];
-      const end = origOffsets[gid + 1] !== undefined ? origOffsets[gid + 1] : start;
-      const gLength = end > start ? end - start : 0;
-      const gData = gLength > 0 ? glyfBytes.subarray(start, end) : new Uint8Array(0);
-
-      newGlyfChunks.push(gData);
-      currentGlyfOffset += (gData.length + 1) & ~1; // 2-byte aligned
-      newLocaOffsets.push(currentGlyfOffset);
-    }
-
-    // Assemble new glyf
-    const newGlyfBuf = new Uint8Array(currentGlyfOffset);
-    let copyOff = 0;
-    for (const chunk of newGlyfChunks) {
-      newGlyfBuf.set(chunk, copyOff);
-      copyOff += (chunk.length + 1) & ~1;
-    }
-
-    // Assemble new loca
-    const newLocaBuf = new ArrayBuffer(newLocaOffsets.length * (isShortLoca ? 2 : 4));
-    const newLocaView = new DataView(newLocaBuf);
-    for (let k = 0; k < newLocaOffsets.length; k++) {
-      if (isShortLoca) {
-        newLocaView.setUint16(k * 2, newLocaOffsets[k] / 2, false);
-      } else {
-        newLocaView.setUint32(k * 4, newLocaOffsets[k], false);
-      }
-    }
-
-    // Update maxp numGlyphs
-    const newMaxpData = new Uint8Array(maxpTbl.data);
-    new DataView(newMaxpData.buffer, newMaxpData.byteOffset, newMaxpData.byteLength).setUint16(
-      4,
-      retainedGlyphCount,
-      false
-    );
-
-    // Update hmtx if present
-    let newHmtxData: Uint8Array | null = null;
-    if (hmtxTbl && hmtxTbl.data.length >= totalGlyphCount * 4) {
-      newHmtxData = new Uint8Array(retainedGlyphCount * 4);
-      const oldHmtx = hmtxTbl.data;
-      for (let k = 0; k < retainedGlyphCount; k++) {
-        const origGid = sortedGids[k];
-        const srcOff = origGid * 4;
-        newHmtxData.set(oldHmtx.subarray(srcOff, srcOff + 4), k * 4);
-      }
-    }
-
-    // Update tables with subsetted data
-    filteredTables = filteredTables.map((tbl) => {
-      if (tbl.tag === 'glyf') return { ...tbl, length: newGlyfBuf.length, data: newGlyfBuf };
-      if (tbl.tag === 'loca') return { ...tbl, length: newLocaBuf.byteLength, data: new Uint8Array(newLocaBuf) };
-      if (tbl.tag === 'maxp') return { ...tbl, data: newMaxpData };
-      if (tbl.tag === 'hmtx' && newHmtxData) return { ...tbl, length: newHmtxData.length, data: newHmtxData };
-      return tbl;
-    });
-  }
+  filteredTables = filteredTables.map((table) => {
+    const data = replacements.get(table.tag);
+    return data ? { ...table, length: data.length, data } : table;
+  });
 
   // Sort tables alphabetically (SFNT spec)
   filteredTables.sort((a, b) => a.tag.localeCompare(b.tag));
@@ -495,7 +404,7 @@ function rebuildSfntTrueType(
   const outBytes = new Uint8Array(outBuffer);
 
   // Write SFNT Header
-  outView.setUint32(0, 0x00010000); // TrueType 1.0
+  outView.setUint32(0, filteredTables.some(({ tag }) => tag === 'CFF ' || tag === 'CFF2') ? 0x4f54544f : 0x00010000);
   outView.setUint16(4, numTables);
   const entrySelector = Math.floor(Math.log2(numTables));
   const searchRange = Math.pow(2, entrySelector) * 16;
@@ -530,7 +439,7 @@ function rebuildSfntTrueType(
   return {
     buffer: outBuffer,
     retainedTables: filteredTables.map((t) => t.tag),
-    retainedGlyphCount,
+    retainedGlyphCount: new Set(mapping.values()).size,
     totalGlyphCount,
   };
 }
@@ -570,7 +479,7 @@ function packageWoff(sfntBuffer: ArrayBuffer, retainedTables: string[]): ArrayBu
 
   // WOFF Header
   view.setUint32(0, 0x774f4646); // 'wOFF'
-  view.setUint32(4, 0x00010000); // flavor (TrueType)
+  view.setUint32(4, new DataView(sfntBuffer).getUint32(0));
   view.setUint32(8, currentOffset); // total length
   view.setUint16(12, numTables);
   view.setUint16(14, 0); // reserved
@@ -604,70 +513,13 @@ function packageWoff(sfntBuffer: ArrayBuffer, retainedTables: string[]): ArrayBu
 }
 
 /**
- * Package an SFNT font into WOFF2 container with compressed stream (DEFECT-56-02)
- */
-function packageWoff2(sfntBuffer: ArrayBuffer, retainedTables: string[]): ArrayBuffer {
-  const sfntTables = extractSfntTables(sfntBuffer);
-  const numTables = sfntTables.length;
-
-  // Build stream containing table tags, lengths, checksums and data
-  let totalDataLength = 0;
-  for (const tbl of sfntTables) {
-    totalDataLength += 12 + ((tbl.length + 3) & ~3);
-  }
-
-  const rawStream = new Uint8Array(totalDataLength);
-  const sView = new DataView(rawStream.buffer);
-  let sOff = 0;
-  for (const tbl of sfntTables) {
-    for (let c = 0; c < 4; c++) {
-      sView.setUint8(sOff + c, tbl.tag.charCodeAt(c));
-    }
-    sView.setUint32(sOff + 4, tbl.length);
-    sView.setUint32(sOff + 8, tbl.checkSum);
-    sOff += 12;
-
-    rawStream.set(tbl.data, sOff);
-    sOff += (tbl.length + 3) & ~3;
-  }
-
-  // Compress stream using deflate
-  const compressedStream = pako.deflate(rawStream);
-  const headerSize = 48;
-  const totalLength = headerSize + compressedStream.length;
-
-  const woff2Buffer = new ArrayBuffer(totalLength);
-  const view = new DataView(woff2Buffer);
-  const bytes = new Uint8Array(woff2Buffer);
-
-  // WOFF2 Header
-  view.setUint32(0, 0x774f4632); // 'wOF2'
-  view.setUint32(4, 0x00010000); // flavor (TrueType)
-  view.setUint32(8, totalLength); // total length
-  view.setUint16(12, numTables);
-  view.setUint16(14, 0); // reserved
-  view.setUint32(16, sfntBuffer.byteLength); // totalSfntSize
-  view.setUint32(20, compressedStream.length); // totalCompressedSize
-  view.setUint16(24, 1); // majorVersion
-  view.setUint16(26, 0); // minorVersion
-  view.setUint32(28, 0); // metaOffset
-  view.setUint32(32, 0); // metaLength
-  view.setUint32(36, 0); // metaOrigLength
-  view.setUint32(40, 0); // privOffset
-  view.setUint32(44, 0); // privLength
-
-  bytes.set(compressedStream, headerSize);
-
-  return woff2Buffer;
-}
-
-/**
  * Main Font Subsetter and Converter process
  */
-export function processFontSubset(
+export async function processFontSubset(
   fontBuffer: ArrayBuffer,
-  options: FontSubsetterConverterOptions
-): FontSubsetterConverterResult {
+  options: FontSubsetterConverterOptions,
+  encodeWoff2?: (font: ArrayBuffer) => Promise<Uint8Array>,
+): Promise<FontSubsetterConverterResult> {
   const validation = validateFontBuffer(fontBuffer);
   if (!validation.isValid) {
     const emptyStats: FontSubsetStats = {
@@ -692,7 +544,12 @@ export function processFontSubset(
   }
 
   try {
-    const originalMeta = parseFontMetadata(fontBuffer);
+    let input = fontBuffer;
+    if (new DataView(input).getUint32(0) === 0x774f4632) {
+      const { woff2Decode } = await import('woff-lib/woff2/decode');
+      input = Uint8Array.from(await woff2Decode(input)).buffer;
+    }
+    const originalMeta = parseFontMetadata(input);
     const { rangeString, characterSet } = getUnicodeRangeForPreset(
       options.subsetPreset,
       options.customCharacters
@@ -700,7 +557,7 @@ export function processFontSubset(
 
     // Rebuild and subset SFNT table buffer
     const { buffer: sfntBuffer, retainedTables, retainedGlyphCount, totalGlyphCount } = rebuildSfntTrueType(
-      fontBuffer,
+      input,
       options,
       characterSet
     );
@@ -725,11 +582,13 @@ export function processFontSubset(
         break;
 
       case 'woff2':
-      default:
-        outputBuffer = packageWoff2(sfntBuffer, retainedTables);
+      default: {
+        if (!encodeWoff2) throw new Error('The WOFF2 encoder is unavailable.');
+        outputBuffer = Uint8Array.from(await encodeWoff2(sfntBuffer)).buffer;
         fileName = `${baseName}.woff2`;
         mimeType = 'font/woff2';
         break;
+      }
     }
 
     const originalSize = fontBuffer.byteLength;
@@ -742,7 +601,7 @@ export function processFontSubset(
       subsetBytes: subsetSize,
       savingsBytes,
       savingsPercent,
-      retainedGlyphCount: characterSet.size,
+      retainedGlyphCount,
       totalGlyphCount,
     };
 

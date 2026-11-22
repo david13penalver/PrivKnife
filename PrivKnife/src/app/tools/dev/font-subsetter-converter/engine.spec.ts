@@ -1,15 +1,19 @@
+import { encodeTestWoff2 } from '../../../../../qa/woff2-test-encoder';
 import { describe, it, expect } from 'vitest';
 import {
   parseFontMetadata,
   validateFontBuffer,
   getUnicodeRangeForPreset,
   generateFontFaceCss,
-  processFontSubset,
+  processFontSubset as runFontSubset,
 } from './engine';
 import {
   DEFAULT_FONT_OPTIONS,
   createSyntheticTrueTypeFont,
 } from './test-fixtures';
+
+const processFontSubset = (font: ArrayBuffer, options: Parameters<typeof runFontSubset>[1]) =>
+  runFontSubset(font, options, encodeTestWoff2);
 
 describe('FontSubsetEngine (engine.ts) - Seam 1', () => {
   describe('validateFontBuffer', () => {
@@ -96,9 +100,9 @@ describe('FontSubsetEngine (engine.ts) - Seam 1', () => {
   });
 
   describe('processFontSubset', () => {
-    it('should process font buffer and strip layout features when requested', () => {
+    it('should process font buffer and strip layout features when requested', async () => {
       const fontBuffer = createSyntheticTrueTypeFont(true, true);
-      const result = processFontSubset(fontBuffer, {
+      const result = await processFontSubset(fontBuffer, {
         ...DEFAULT_FONT_OPTIONS,
         dropLayoutFeatures: true,
         keepKerningTables: false,
@@ -116,9 +120,9 @@ describe('FontSubsetEngine (engine.ts) - Seam 1', () => {
       expect(result.metadata?.tables).not.toContain('kern');
     });
 
-    it('should preserve kerning tables when keepKerningTables is true', () => {
+    it('should preserve kerning tables when keepKerningTables is true', async () => {
       const fontBuffer = createSyntheticTrueTypeFont(true, true);
-      const result = processFontSubset(fontBuffer, {
+      const result = await processFontSubset(fontBuffer, {
         ...DEFAULT_FONT_OPTIONS,
         dropLayoutFeatures: false,
         keepKerningTables: true,
@@ -129,17 +133,17 @@ describe('FontSubsetEngine (engine.ts) - Seam 1', () => {
       expect(result.metadata?.tables).toContain('GSUB');
     });
 
-    it('should support outputting woff and ttf formats', () => {
+    it('should support outputting woff and ttf formats', async () => {
       const fontBuffer = createSyntheticTrueTypeFont();
 
-      const woffRes = processFontSubset(fontBuffer, {
+      const woffRes = await processFontSubset(fontBuffer, {
         ...DEFAULT_FONT_OPTIONS,
         outputFormat: 'woff',
       });
       expect(woffRes.fileName).toContain('.woff');
       expect(woffRes.mimeType).toBe('font/woff');
 
-      const ttfRes = processFontSubset(fontBuffer, {
+      const ttfRes = await processFontSubset(fontBuffer, {
         ...DEFAULT_FONT_OPTIONS,
         outputFormat: 'ttf',
       });
@@ -147,37 +151,37 @@ describe('FontSubsetEngine (engine.ts) - Seam 1', () => {
       expect(ttfRes.mimeType).toBe('font/ttf');
     });
 
-    it('should handle corrupt or invalid buffer gracefully', () => {
-      const result = processFontSubset(new ArrayBuffer(10), DEFAULT_FONT_OPTIONS);
+    it('should handle corrupt or invalid buffer gracefully', async () => {
+      const result = await processFontSubset(new ArrayBuffer(10), DEFAULT_FONT_OPTIONS);
 
       expect(result.success).toBe(false);
       expect(result.error).toBeDefined();
       expect(result.fileSize).toBe(0);
     });
 
-    it('should produce strictly smaller output as characterSet shrinks (DEFECT-56-01)', () => {
+    it('should produce strictly smaller output as characterSet shrinks (DEFECT-56-01)', async () => {
       const fontBuffer = createSyntheticTrueTypeFont(false, false);
 
-      const customRes = processFontSubset(fontBuffer, {
+      const customRes = await processFontSubset(fontBuffer, {
         ...DEFAULT_FONT_OPTIONS,
         subsetPreset: 'custom_characters',
         customCharacters: 'ABC',
         outputFormat: 'ttf',
       });
 
-      const numPunctRes = processFontSubset(fontBuffer, {
+      const numPunctRes = await processFontSubset(fontBuffer, {
         ...DEFAULT_FONT_OPTIONS,
         subsetPreset: 'numbers_punctuation_only',
         outputFormat: 'ttf',
       });
 
-      const basicLatinRes = processFontSubset(fontBuffer, {
+      const basicLatinRes = await processFontSubset(fontBuffer, {
         ...DEFAULT_FONT_OPTIONS,
         subsetPreset: 'basic_latin_ascii',
         outputFormat: 'ttf',
       });
 
-      const latinSuppRes = processFontSubset(fontBuffer, {
+      const latinSuppRes = await processFontSubset(fontBuffer, {
         ...DEFAULT_FONT_OPTIONS,
         subsetPreset: 'latin_supplement',
         outputFormat: 'ttf',
@@ -189,17 +193,27 @@ describe('FontSubsetEngine (engine.ts) - Seam 1', () => {
       expect(customRes.stats.retainedGlyphCount).toBeLessThan(numPunctRes.stats.retainedGlyphCount);
     });
 
-    it('should compress WOFF and WOFF2 outputs to be smaller than raw TTF even when layout tables are kept (DEFECT-56-02)', () => {
+    it('reopens a WOFF2 export and preserves the requested Unicode glyphs', async () => {
+      const options = { ...DEFAULT_FONT_OPTIONS, subsetPreset: 'custom_characters', customCharacters: 'ALP' } as const;
+      const compressed = await processFontSubset(createSyntheticTrueTypeFont(), options);
+      expect(compressed.success).toBe(true);
+      const reopened = await processFontSubset(await compressed.blob.arrayBuffer(), { ...options, outputFormat: 'ttf' });
+      expect(reopened.success).toBe(true);
+      expect(reopened.stats.retainedGlyphCount).toBe(3);
+      expect(reopened.unicodeRange).toBe(compressed.unicodeRange);
+    });
+
+    it('should compress WOFF and WOFF2 outputs to be smaller than raw TTF even when layout tables are kept (DEFECT-56-02)', async () => {
       const fontBuffer = createSyntheticTrueTypeFont(true, true);
 
-      const woff2Res = processFontSubset(fontBuffer, {
+      const woff2Res = await processFontSubset(fontBuffer, {
         ...DEFAULT_FONT_OPTIONS,
         outputFormat: 'woff2',
         dropLayoutFeatures: false,
         keepKerningTables: true,
       });
 
-      const woffRes = processFontSubset(fontBuffer, {
+      const woffRes = await processFontSubset(fontBuffer, {
         ...DEFAULT_FONT_OPTIONS,
         outputFormat: 'woff',
         dropLayoutFeatures: false,
@@ -210,17 +224,17 @@ describe('FontSubsetEngine (engine.ts) - Seam 1', () => {
       expect(woffRes.fileSize).toBeLessThan(fontBuffer.byteLength);
     });
 
-    it('should unpack WOFF 1.0 input buffer without corrupting numTables (DEFECT-56-03)', () => {
+    it('should unpack WOFF 1.0 input buffer without corrupting numTables (DEFECT-56-03)', async () => {
       const fontBuffer = createSyntheticTrueTypeFont(true, true);
-      const woffOutput = processFontSubset(fontBuffer, {
+      const woffOutput = await processFontSubset(fontBuffer, {
         ...DEFAULT_FONT_OPTIONS,
         outputFormat: 'woff',
       });
 
       const woffArrayBuffer = new Uint8Array(woffOutput.blob.size);
       // Create an ArrayBuffer from the output blob
-      return woffOutput.blob.arrayBuffer().then((buf) => {
-        const roundTripRes = processFontSubset(buf, {
+      return woffOutput.blob.arrayBuffer().then(async (buf) => {
+        const roundTripRes = await processFontSubset(buf, {
           ...DEFAULT_FONT_OPTIONS,
           outputFormat: 'ttf',
         });

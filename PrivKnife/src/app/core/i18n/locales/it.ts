@@ -527,6 +527,13 @@ export const it: TranslationSchema = {
       docLang: 'Lingua del Documento',
       extractText: 'Estrai Testo',
       downloadTxt: 'Scarica come TXT',
+      pickDocument: "Trascina un documento o scegli un file",
+      sampleReceipt: "Carica una ricevuta di esempio",
+      complete: "Estrazione del testo completata.",
+      decodeError: "Impossibile aprire il documento. Verifica il file e riprova.",
+      noText: "Nessun testo leggibile. Prova un’immagine più nitida.",
+      workerError: "Estrazione del testo non riuscita. Riprova.",
+      emptyPreview: "Carica un’immagine o un PDF per estrarre il testo.",
     },
     fileEncryptorVault: {
       name: 'Cifratore di File e Cassaforte Privata Zero-Knowledge',

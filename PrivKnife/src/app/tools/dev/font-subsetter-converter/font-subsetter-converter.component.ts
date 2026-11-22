@@ -10,7 +10,6 @@ import {
   FontSubsetterConverterOptions,
   FontSubsetterConverterResult,
 } from './types';
-import { processFontSubset } from './engine';
 import { createSyntheticTrueTypeFont } from './test-fixtures';
 
 @Component({
@@ -24,6 +23,7 @@ export class FontSubsetterConverterComponent implements OnDestroy {
   private activeObjectUrls = new Set<string>();
   private worker: Worker | null = null;
   private requestId = 0;
+  private previewFont?: FontFace;
 
   // State Signals
   readonly fontBuffer = signal<ArrayBuffer | null>(null);
@@ -45,12 +45,12 @@ export class FontSubsetterConverterComponent implements OnDestroy {
 
   private triggerSubset() {
     this.workerError.set(null);
+    this.result.set(null);
+    this.releasePreviewFont();
+    this.worker?.terminate();
+    this.worker = null;
     const buffer = this.fontBuffer();
-    if (!buffer) {
-      this.result.set(null);
-      this.previewFontFamily.set('inherit');
-      return;
-    }
+    if (!buffer) return;
 
     const options: FontSubsetterConverterOptions = {
       subsetPreset: this.subsetPreset(),
@@ -63,36 +63,24 @@ export class FontSubsetterConverterComponent implements OnDestroy {
 
     if (typeof Worker !== 'undefined') {
       try {
-        if (!this.worker) {
-          this.worker = new Worker(new URL('./worker.ts', import.meta.url), {
-            type: 'module',
-          });
-          this.worker.onmessage = (event: MessageEvent<FontSubsetWorkerResponse>) => {
-            if (event.data.id === this.requestId) {
-              this.applyResult(event.data.result);
-            }
-          };
-          this.worker.onerror = (event: ErrorEvent) => {
-            event.preventDefault();
-            const failedWorker = this.worker;
-            if (!failedWorker) return;
-            failedWorker.onmessage = null;
-            failedWorker.onerror = null;
-            failedWorker.terminate();
-            this.worker = null;
-            this.workerError.set(
-              event.message || 'Font subsetting worker failed. Please try again.',
-            );
-            this.previewFontFamily.set('inherit');
-          };
-        }
-
+        const worker = new Worker(new URL('./worker.ts', import.meta.url), { type: 'module' });
+        this.worker = worker;
         const id = ++this.requestId;
-        this.worker.postMessage({
-          id,
-          buffer,
-          options,
-        } satisfies FontSubsetWorkerRequest);
+        worker.onmessage = ({ data }: MessageEvent<FontSubsetWorkerResponse>) => {
+          if (this.worker !== worker || data.id !== id) return;
+          worker.terminate();
+          this.worker = null;
+          this.applyResult(data.result);
+        };
+        worker.onerror = (event: ErrorEvent) => {
+          event.preventDefault();
+          if (this.worker !== worker) return;
+          worker.terminate();
+          this.worker = null;
+          this.workerError.set(event.message || 'Font subsetting worker failed. Please try again.');
+        };
+        const copied = buffer.slice(0);
+        worker.postMessage({ id, buffer: copied, options } satisfies FontSubsetWorkerRequest, [copied]);
         return;
       } catch {
         this.worker?.terminate();
@@ -103,9 +91,7 @@ export class FontSubsetterConverterComponent implements OnDestroy {
       }
     }
 
-    // Synchronous execution in test or non-worker environment
-    const res = processFontSubset(buffer, options);
-    this.applyResult(res);
+    this.workerError.set('Font export requires browser worker support.');
   }
 
   private applyResult(res: FontSubsetterConverterResult) {
@@ -123,10 +109,13 @@ export class FontSubsetterConverterComponent implements OnDestroy {
           fontFace
             .load()
             .then((loaded) => {
+              if (this.result() !== res) return;
+              this.previewFont = loaded;
               document.fonts.add(loaded);
               this.previewFontFamily.set(`"${familyName}", sans-serif`);
             })
             .catch(() => {
+              if (this.result() !== res) return;
               this.previewFontFamily.set(`"${this.fontFamilyName() || 'CustomFont'}", sans-serif`);
             });
         });
@@ -282,7 +271,17 @@ export class FontSubsetterConverterComponent implements OnDestroy {
     this.triggerSubset();
   }
 
+  private releasePreviewFont(): void {
+    this.previewFontFamily.set('inherit');
+    if (this.previewFont) {
+      document.fonts.delete(this.previewFont);
+      this.previewFont = undefined;
+    }
+  }
+
   ngOnDestroy() {
+    this.result.set(null);
+    this.releasePreviewFont();
     if (this.worker) {
       this.worker.terminate();
       this.worker = null;

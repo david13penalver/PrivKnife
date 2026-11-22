@@ -13,9 +13,9 @@ export const DEFAULT_FONT_OPTIONS: FontSubsetterConverterOptions = {
  * Creates a synthetic minimal SFNT TrueType font buffer for testing
  */
 export function createSyntheticTrueTypeFont(includeKerning = true, includeLayout = true): ArrayBuffer {
-  // 192 glyphs (glyph 0 is .notdef, glyphs 1..191 map to 0x0020..0x00DF)
+  // 192 glyphs (glyph 0 is .notdef, glyphs 1..191 map to 0x0020..0x00DE)
   const numGlyphs = 192;
-  const glyphSize = 28;
+  const glyphSize = 34;
 
   // 1. head table (54 bytes)
   const headBuf = new ArrayBuffer(54);
@@ -80,15 +80,10 @@ export function createSyntheticTrueTypeFont(includeKerning = true, includeLayout
     for (let p = 0; p < 4; p++) {
       glyfView.setUint8(off + 14 + p, 0x01);
     }
-    glyfView.setUint8(off + 18, 50);
-    glyfView.setUint8(off + 19, 200);
-    glyfView.setUint8(off + 20, 0);
-    glyfView.setUint8(off + 21, 200);
-    glyfView.setUint8(off + 22, 0);
-    glyfView.setUint8(off + 23, 200);
-    glyfView.setUint8(off + 24, 0);
-    glyfView.setUint8(off + 25, 200);
-    glyfView.setUint16(off + 26, 0);
+    // Four on-curve points. The flags above select signed 16-bit deltas.
+    [50, 400, 0, -400, 0, 0, 700, 0].forEach((delta, index) => {
+      glyfView.setInt16(off + 18 + index * 2, delta);
+    });
   }
 
   // 5. loca table (short format: (numGlyphs + 1) * 2 bytes)
@@ -107,7 +102,7 @@ export function createSyntheticTrueTypeFont(includeKerning = true, includeLayout
     hmtxView.setInt16(g * 4 + 2, 50);
   }
 
-  // 7. cmap table (Format 4 mapping 0x0020..0x00DF to gid 1..191, and 0xFFFF to 0)
+  // 7. cmap table (Format 4 mapping 0x0020..0x00DE to gid 1..191, and 0xFFFF to 0)
   const cmapSubtableLen = 32;
   const cmapTotalLen = 12 + cmapSubtableLen;
   const cmapBuf = new ArrayBuffer(cmapTotalLen);
@@ -126,7 +121,7 @@ export function createSyntheticTrueTypeFont(includeKerning = true, includeLayout
   cmapView.setUint16(subOff + 8, 4);
   cmapView.setUint16(subOff + 10, 1);
   cmapView.setUint16(subOff + 12, 0);
-  cmapView.setUint16(subOff + 14, 0x00DF);
+  cmapView.setUint16(subOff + 14, 0x00DE);
   cmapView.setUint16(subOff + 16, 0xFFFF);
   cmapView.setUint16(subOff + 18, 0);
   cmapView.setUint16(subOff + 20, 0x0020);

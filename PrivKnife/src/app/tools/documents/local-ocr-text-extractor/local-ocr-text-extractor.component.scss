@@ -63,6 +63,16 @@
 }
 
 .c-ocr {
+  &__filename {
+    overflow-wrap: anywhere;
+  }
+
+  &__actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+  }
+
   &__sample-row {
     margin-top: 0.5rem;
     display: flex;
@@ -162,4 +172,8 @@
   &-label {
     user-select: none;
   }
+}
+
+:host ::ng-deep :is(app-button button, .c-button-group button, .c-card__header button) {
+  min-block-size: 44px;
 }

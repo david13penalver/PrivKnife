@@ -1,22 +1,22 @@
 import { TranslatePipe } from '../../../core/i18n';
-import { Component, OnDestroy, signal } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { ChangeDetectionStrategy, Component, OnDestroy, computed, inject, signal } from '@angular/core';
+import { Badge, Button, Dropzone, ProgressBar } from '../../../components';
 import { FormsModule } from '@angular/forms';
 import {
   ExportOcrFormat,
   LocalOcrTextExtractorOptions,
-  LocalOcrTextExtractorResult,
-  LocalOcrWorkerRequest,
-  LocalOcrWorkerResponse,
   OcrLanguage,
   PageSegmentationMode,
 } from './types';
-import { createSampleReceiptImageBlob, processLocalOcr } from './engine';
+import { createSampleReceiptImageBlob } from './sample';
+import { OcrJob } from './ocr-job';
 
 @Component({
   selector: 'app-local-ocr-text-extractor',
   standalone: true,
-  imports: [CommonModule, FormsModule, TranslatePipe],
+  imports: [Badge, Button, Dropzone, FormsModule, ProgressBar, TranslatePipe],
+  providers: [OcrJob],
+  changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: './local-ocr-text-extractor.component.html',
   styleUrls: ['./local-ocr-text-extractor.component.scss'],
 })
@@ -37,24 +37,20 @@ export class LocalOcrTextExtractorComponent implements OnDestroy {
     isPdf: boolean;
   } | null>(null);
 
-  readonly isProcessing = signal<boolean>(false);
-  readonly extractedResult = signal<LocalOcrTextExtractorResult | null>(null);
-  readonly previewText = signal<string>('');
-  readonly copySuccess = signal<boolean>(false);
-
-  private createdBlobUrls: string[] = [];
-  private worker: Worker | null = null;
+  private readonly job = inject(OcrJob);
+  readonly isProcessing = this.job.busy.asReadonly();
+  readonly progress = this.job.progress.asReadonly();
+  readonly jobError = this.job.error.asReadonly();
+  readonly extractedResult = this.job.result.asReadonly();
+  readonly previewText = computed(() => this.extractedResult()?.extractedText ?? '');
+  readonly copySuccess = signal(false);
+  readonly selectionError = signal(false);
+  private selection = 0;
+  private copyTimer?: ReturnType<typeof setTimeout>;
 
   ngOnDestroy(): void {
-    if (this.worker) {
-      try {
-        this.worker.terminate();
-      } catch {
-        // ignore
-      }
-      this.worker = null;
-    }
-    this.cleanUpUrls();
+    this.selection++;
+    clearTimeout(this.copyTimer);
   }
 
   setLanguage(lang: OcrLanguage): void {
@@ -78,7 +74,8 @@ export class LocalOcrTextExtractorComponent implements OnDestroy {
   }
 
   setBinarizeThreshold(val: number | string): void {
-    const num = Math.max(0, Math.min(255, Number(val) || 128));
+    const parsed = Number(val);
+    const num = Number.isFinite(parsed) ? Math.max(0, Math.min(255, parsed)) : 128;
     this.binarizeThreshold.set(num);
   }
 
@@ -93,9 +90,10 @@ export class LocalOcrTextExtractorComponent implements OnDestroy {
       fileName.toLowerCase().endsWith('.pdf') ||
       ('type' in file && file.type === 'application/pdf');
 
-    // Reset stale extracted state on re-upload (DEFECT-47-03)
-    this.extractedResult.set(null);
-    this.previewText.set('');
+    this.selection++;
+    this.job.clear();
+    this.selectionError.set(false);
+    this.copySuccess.set(false);
 
     this.selectedFile.set({
       name: fileName,
@@ -106,102 +104,43 @@ export class LocalOcrTextExtractorComponent implements OnDestroy {
   }
 
   async loadSampleReceipt(): Promise<void> {
-    const sampleBlob = await createSampleReceiptImageBlob();
-    await this.handleFileSelected(sampleBlob, 'sample-invoice.png');
-  }
-
-  onFileInputChange(event: Event): void {
-    const input = event.target as HTMLInputElement;
-    if (input.files && input.files.length > 0) {
-      this.handleFileSelected(input.files[0]);
+    const selection = ++this.selection;
+    this.job.clear();
+    this.selectedFile.set(null);
+    this.selectionError.set(false);
+    try {
+      const sample = await createSampleReceiptImageBlob();
+      if (selection === this.selection) await this.handleFileSelected(sample, 'sample-invoice.png');
+    } catch {
+      if (selection === this.selection) this.selectionError.set(true);
     }
   }
 
-  onFileDrop(event: DragEvent): void {
-    event.preventDefault();
-    if (event.dataTransfer?.files && event.dataTransfer.files.length > 0) {
-      this.handleFileSelected(event.dataTransfer.files[0]);
-    }
+  onFilesSelected(files: File[]): void {
+    if (files[0]) void this.handleFileSelected(files[0]);
+  }
+
+  rejectFile(): void {
+    this.selection++;
+    this.job.clear();
+    this.selectedFile.set(null);
+    this.selectionError.set(true);
   }
 
   async extractText(): Promise<void> {
     const item = this.selectedFile();
-    if (!item) return;
+    if (!item || this.isProcessing()) return;
 
-    this.isProcessing.set(true);
-
-    try {
-      const options: LocalOcrTextExtractorOptions = {
-        ocrLanguage: this.ocrLanguage(),
-        pageSegmentationMode: this.pageSegmentationMode(),
-        cleanIrregularLinebreaks: this.cleanIrregularLinebreaks(),
-        preserveTableSpacing: this.preserveTableSpacing(),
-        exportFormat: this.exportFormat(),
-        binarizeThreshold: this.binarizeThreshold(),
-        enhanceContrast: this.enhanceContrast(),
-      };
-
-      let result: LocalOcrTextExtractorResult;
-
-      // Offload to web worker if available
-      if (typeof Worker !== 'undefined') {
-        try {
-          const buffer = await item.file.arrayBuffer();
-          result = await this.extractWithWorker(buffer, options, item.name);
-        } catch {
-          result = await processLocalOcr(item.file, options, item.name);
-        }
-      } else {
-        result = await processLocalOcr(item.file, options, item.name);
-      }
-
-      this.extractedResult.set(result);
-      this.previewText.set(result.extractedText);
-    } finally {
-      this.isProcessing.set(false);
-    }
-  }
-
-  private extractWithWorker(
-    fileBuffer: ArrayBuffer,
-    options: LocalOcrTextExtractorOptions,
-    originalFileName: string
-  ): Promise<LocalOcrTextExtractorResult> {
-    return new Promise((resolve, reject) => {
-      try {
-        const worker = new Worker(new URL('./worker', import.meta.url), {
-          type: 'module',
-        });
-        this.worker = worker;
-
-        worker.onmessage = (event: MessageEvent<LocalOcrWorkerResponse>) => {
-          if (event.data.type === 'ocr') {
-            worker.terminate();
-            if (this.worker === worker) this.worker = null;
-            if (event.data.success && event.data.result) {
-              resolve(event.data.result);
-            } else {
-              reject(new Error(event.data.error || 'Worker OCR failed'));
-            }
-          }
-        };
-
-        worker.onerror = (err) => {
-          worker.terminate();
-          if (this.worker === worker) this.worker = null;
-          reject(err);
-        };
-
-        worker.postMessage({
-          type: 'ocr',
-          fileBuffer,
-          options,
-          originalFileName,
-        } as LocalOcrWorkerRequest);
-      } catch (err) {
-        reject(err);
-      }
-    });
+    const options: LocalOcrTextExtractorOptions = {
+      ocrLanguage: this.ocrLanguage(),
+      pageSegmentationMode: this.pageSegmentationMode(),
+      cleanIrregularLinebreaks: this.cleanIrregularLinebreaks(),
+      preserveTableSpacing: this.preserveTableSpacing(),
+      exportFormat: this.exportFormat(),
+      binarizeThreshold: this.binarizeThreshold(),
+      enhanceContrast: this.enhanceContrast(),
+    };
+    await this.job.run(item.file, item.name, options);
   }
 
   async copyToClipboard(): Promise<void> {
@@ -213,7 +152,8 @@ export class LocalOcrTextExtractorComponent implements OnDestroy {
         await navigator.clipboard.writeText(text);
       }
       this.copySuccess.set(true);
-      setTimeout(() => this.copySuccess.set(false), 2000);
+      clearTimeout(this.copyTimer);
+      this.copyTimer = setTimeout(() => this.copySuccess.set(false), 2000);
     } catch {
       // Fallback
     }
@@ -224,22 +164,20 @@ export class LocalOcrTextExtractorComponent implements OnDestroy {
     if (!result) return;
 
     const downloadUrl = URL.createObjectURL(result.blob);
-    this.createdBlobUrls.push(downloadUrl);
-
-    const a = document.createElement('a');
-    a.href = downloadUrl;
-    a.download = result.fileName;
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-
-    setTimeout(() => {
+    try {
+      const link = document.createElement('a');
+      link.href = downloadUrl;
+      link.download = result.fileName;
+      link.click();
+    } finally {
       URL.revokeObjectURL(downloadUrl);
-    }, 100);
+    }
   }
 
   resetToDefaults(): void {
-    this.cleanUpUrls();
+    this.selection++;
+    this.job.clear();
+    this.selectionError.set(false);
     this.ocrLanguage.set('eng');
     this.pageSegmentationMode.set('auto');
     this.cleanIrregularLinebreaks.set(true);
@@ -248,8 +186,6 @@ export class LocalOcrTextExtractorComponent implements OnDestroy {
     this.binarizeThreshold.set(128);
     this.enhanceContrast.set(true);
     this.selectedFile.set(null);
-    this.extractedResult.set(null);
-    this.previewText.set('');
     this.copySuccess.set(false);
   }
 
@@ -259,16 +195,5 @@ export class LocalOcrTextExtractorComponent implements OnDestroy {
     const sizes = ['B', 'KB', 'MB', 'GB'];
     const i = Math.floor(Math.log(bytes) / Math.log(k));
     return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
-  }
-
-  private cleanUpUrls(): void {
-    for (const url of this.createdBlobUrls) {
-      try {
-        URL.revokeObjectURL(url);
-      } catch {
-        // ignore errors
-      }
-    }
-    this.createdBlobUrls = [];
   }
 }

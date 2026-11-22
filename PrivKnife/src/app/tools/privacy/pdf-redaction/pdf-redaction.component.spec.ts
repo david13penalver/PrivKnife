@@ -129,7 +129,7 @@ describe('PdfRedactionComponent (Seam 2: UI, Signals, Redactions & Privacy Bound
     expect(component.totalRedactionCount()).toBe(0);
   });
 
-  it('should download sanitized PDF and revoke object URL immediately', async () => {
+  it('blocks download and reports an error when raster rendering is unavailable', async () => {
     const buffer = await createSensitiveTestPdfBuffer();
     const mockFile = new File([buffer], 'tax-form.pdf', { type: 'application/pdf' });
     await component.onFileDropped(mockFile);
@@ -138,8 +138,9 @@ describe('PdfRedactionComponent (Seam 2: UI, Signals, Redactions & Privacy Bound
 
     await component.downloadSanitizedPdf();
 
-    expect(createObjectURLSpy).toHaveBeenCalled();
-    expect(revokeObjectURLSpy).toHaveBeenCalled();
+    expect(createObjectURLSpy).not.toHaveBeenCalled();
+    expect(revokeObjectURLSpy).not.toHaveBeenCalled();
+    expect(component.errorMessage()).toBeTruthy();
   });
 
   it('should adjust zoom levels within boundaries', () => {
@@ -150,14 +151,6 @@ describe('PdfRedactionComponent (Seam 2: UI, Signals, Redactions & Privacy Bound
     expect(component.zoomLevel()).toBe(1.5);
     component.zoomOut();
     expect(component.zoomLevel()).toBe(1.25);
-  });
-
-  it('should toggle raster flattening mode', () => {
-    expect(component.flattenRaster()).toBe(true);
-    component.toggleFlattenRaster();
-    expect(component.flattenRaster()).toBe(false);
-    component.toggleFlattenRaster();
-    expect(component.flattenRaster()).toBe(true);
   });
 
   it('should navigate between document pages safely', async () => {

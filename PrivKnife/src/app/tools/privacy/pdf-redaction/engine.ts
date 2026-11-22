@@ -1,5 +1,6 @@
-import { PDFDocument, rgb } from 'pdf-lib';
+import { PDFDocument } from 'pdf-lib';
 import * as pdfjsLib from 'pdfjs-dist';
+import { openOffscreenPdf } from '../../../core/pdf/offscreen-pdf';
 import {
   PageRedaction,
   RedactionDocument,
@@ -26,7 +27,10 @@ export async function loadPdfForRedaction(
   const pages: RedactionPageInfo[] = [];
   for (let i = 0; i < pageCount; i++) {
     const page = pdfDoc.getPage(i);
-    const { width, height } = page.getSize();
+    const crop = page.getCropBox();
+    const rotated = Math.abs(page.getRotation().angle % 180) === 90;
+    const width = rotated ? crop.height : crop.width;
+    const height = rotated ? crop.width : crop.height;
     pages.push({
       pageIndex: i,
       displayNumber: i + 1,
@@ -52,17 +56,17 @@ export async function renderPagePreview(
   buffer: ArrayBuffer,
   pageIndex: number,
   targetWidth = 600
-): Promise<string | undefined> {
+): Promise<{ url: string; width: number; height: number } | undefined> {
   if (typeof document === 'undefined') {
     return undefined;
   }
 
-  try {
-    const loadingTask = pdfjsLib.getDocument({
-      data: new Uint8Array(buffer),
+  const loadingTask = pdfjsLib.getDocument({
+      data: new Uint8Array(buffer.slice(0)),
       useWorkerFetch: false,
       useSystemFonts: true,
     });
+  try {
     const pdfDoc = await loadingTask.promise;
     if (pageIndex < 0 || pageIndex >= pdfDoc.numPages) {
       return undefined;
@@ -87,62 +91,15 @@ export async function renderPagePreview(
       viewport,
     }).promise;
 
-    return canvas.toDataURL('image/png') || canvas.toDataURL('image/jpeg', 0.9);
+    const url = canvas.toDataURL('image/png');
+    return url.startsWith('data:image/png,') || url.startsWith('data:image/png;')
+      ? { url, width: unscaledViewport.width, height: unscaledViewport.height }
+      : undefined;
   } catch {
     return undefined;
+  } finally {
+    await loadingTask.destroy();
   }
-}
-
-/**
- * Permanently burn redaction boxes into the PDF page vectors and strip sensitive metadata.
- */
-export async function burnRedactions(
-  buffer: ArrayBuffer,
-  redactions: PageRedaction[],
-  options?: SanitizationOptions
-): Promise<Uint8Array> {
-  const pdfDoc = await PDFDocument.load(buffer, { ignoreEncryption: true });
-
-  const redactionsByPage = new Map<number, PageRedaction>();
-  for (const r of redactions) {
-    redactionsByPage.set(r.pageIndex, r);
-  }
-
-  const pageCount = pdfDoc.getPageCount();
-  for (let i = 0; i < pageCount; i++) {
-    const pageRedaction = redactionsByPage.get(i);
-    if (!pageRedaction || pageRedaction.boxes.length === 0) {
-      continue;
-    }
-
-    const page = pdfDoc.getPage(i);
-    for (const box of pageRedaction.boxes) {
-      const color =
-        box.color === 'white' ? rgb(1, 1, 1) : rgb(0, 0, 0);
-
-      // Draw permanent opaque rectangle over the confidential content
-      page.drawRectangle({
-        x: box.x,
-        y: box.y,
-        width: box.width,
-        height: box.height,
-        color,
-        opacity: 1.0,
-      });
-    }
-  }
-
-  // Strip metadata if requested (default: true)
-  if (options?.stripMetadata !== false) {
-    pdfDoc.setTitle('');
-    pdfDoc.setAuthor('');
-    pdfDoc.setSubject('');
-    pdfDoc.setKeywords([]);
-    pdfDoc.setProducer('');
-    pdfDoc.setCreator('');
-  }
-
-  return pdfDoc.save();
 }
 
 /**
@@ -154,111 +111,87 @@ export async function flattenPdfPages(
   redactions: PageRedaction[],
   options?: SanitizationOptions
 ): Promise<Uint8Array> {
-  // If canvas 2D rendering is not available (e.g. headless Node test environment), fallback to vector burning
-  if (typeof document === 'undefined') {
-    return burnRedactions(buffer, redactions, options);
-  }
-
-  const redactionsByPage = new Map<number, PageRedaction>();
-  for (const r of redactions) {
-    redactionsByPage.set(r.pageIndex, r);
-  }
-
+  const task = openOffscreenPdf(buffer);
   try {
-    const loadingTask = pdfjsLib.getDocument({
-      data: new Uint8Array(buffer),
-      useWorkerFetch: false,
-      useSystemFonts: true,
-    });
-    const pdfjsDoc = await loadingTask.promise;
-    const pageCount = pdfjsDoc.numPages;
-
-    const newPdfDoc = await PDFDocument.create();
-
-    for (let i = 0; i < pageCount; i++) {
-      const page = await pdfjsDoc.getPage(i + 1);
-      const unscaledViewport = page.getViewport({ scale: 1 });
-
-      // Render at 2.0x scale (~150-300 DPI) for crisp high-density rasterization
-      const scale = 2.0;
-      const viewport = page.getViewport({ scale });
-
-      const canvas = document.createElement('canvas');
-      canvas.width = Math.max(1, Math.floor(viewport.width));
-      canvas.height = Math.max(1, Math.floor(viewport.height));
-
-      const ctx = canvas.getContext('2d');
-      if (!ctx) {
-        return burnRedactions(buffer, redactions, options);
+    const source = await task.promise;
+    const output = await PDFDocument.create();
+    const boxesByPage = new Map<number, PageRedaction['boxes']>();
+    for (const { pageIndex, boxes } of redactions) {
+      if (!Number.isInteger(pageIndex) || pageIndex < 0 || pageIndex >= source.numPages) {
+        throw new Error('A redaction refers to a page outside the document.');
       }
+      const pageBoxes = boxesByPage.get(pageIndex) ?? [];
+      pageBoxes.push(...boxes);
+      boxesByPage.set(pageIndex, pageBoxes);
+    }
 
-      ctx.fillStyle = '#ffffff';
-      ctx.fillRect(0, 0, canvas.width, canvas.height);
+    for (let index = 0; index < source.numPages; index++) {
+      const page = await source.getPage(index + 1);
+      const native = page.getViewport({ scale: 1 });
+      const viewport = page.getViewport({ scale: 2 });
+      const width = Math.ceil(viewport.width);
+      const height = Math.ceil(viewport.height);
+      if (width * height > 32_000_000) throw new Error('The rendered PDF page is too large.');
+      const canvas = new OffscreenCanvas(width, height);
+      const context = canvas.getContext('2d');
+      if (!context) throw new Error('PDF canvas rendering is unavailable.');
 
-      await page.render({
-        canvas,
-        canvasContext: ctx,
-        viewport,
-      }).promise;
-
-      // Burn redaction boxes directly onto the pixel canvas
-      const pageRedaction = redactionsByPage.get(i);
-      if (pageRedaction) {
-        for (const box of pageRedaction.boxes) {
-          const canvasX = box.x * scale;
-          const canvasY = (unscaledViewport.height - box.y - box.height) * scale;
-          const canvasW = box.width * scale;
-          const canvasH = box.height * scale;
-
-          ctx.fillStyle = box.color === 'white' ? '#ffffff' : '#000000';
-          ctx.fillRect(canvasX, canvasY, canvasW, canvasH);
+      try {
+        await page.render({
+          canvas: null,
+          canvasContext: context as unknown as CanvasRenderingContext2D,
+          viewport,
+          annotationMode: pdfjsLib.AnnotationMode.DISABLE,
+          background: '#ffffff',
+        }).promise;
+        for (const box of boxesByPage.get(index) ?? []) {
+          if (![box.x, box.y, box.width, box.height].every(Number.isFinite) ||
+              box.width <= 0 || box.height <= 0 ||
+              (box.color !== 'black' && box.color !== 'white')) {
+            throw new Error('A redaction has invalid bounds.');
+          }
+          const left = Math.floor(box.x * viewport.scale);
+          const right = Math.ceil((box.x + box.width) * viewport.scale);
+          const top = Math.floor((native.height - box.y - box.height) * viewport.scale);
+          const bottom = Math.ceil((native.height - box.y) * viewport.scale);
+          context.fillStyle = box.color === 'white' ? '#ffffff' : '#000000';
+          context.fillRect(left, top, right - left, bottom - top);
         }
+        const raster = await canvas.convertToBlob({ type: 'image/png' });
+        const image = await output.embedPng(await raster.arrayBuffer());
+        output.addPage([native.width, native.height]).drawImage(image, {
+          x: 0,
+          y: 0,
+          width: native.width,
+          height: native.height,
+        });
+      } finally {
+        canvas.width = canvas.height = 0;
+        page.cleanup();
       }
-
-      const dataUrl = canvas.toDataURL('image/jpeg', 0.92);
-      const base64Data = dataUrl.split(',')[1];
-      const binaryString = atob(base64Data);
-      const imageBytes = new Uint8Array(binaryString.length);
-      for (let k = 0; k < binaryString.length; k++) {
-        imageBytes[k] = binaryString.charCodeAt(k);
-      }
-
-      const embeddedImg = await newPdfDoc.embedJpg(imageBytes);
-      const newPage = newPdfDoc.addPage([unscaledViewport.width, unscaledViewport.height]);
-      newPage.drawImage(embeddedImg, {
-        x: 0,
-        y: 0,
-        width: unscaledViewport.width,
-        height: unscaledViewport.height,
-      });
     }
 
     if (options?.stripMetadata !== false) {
-      newPdfDoc.setTitle('');
-      newPdfDoc.setAuthor('');
-      newPdfDoc.setSubject('');
-      newPdfDoc.setKeywords([]);
-      newPdfDoc.setProducer('');
-      newPdfDoc.setCreator('');
+      output.setTitle('');
+      output.setAuthor('');
+      output.setSubject('');
+      output.setKeywords([]);
+      output.setProducer('');
+      output.setCreator('');
     }
-
-    return await newPdfDoc.save();
-  } catch {
-    return burnRedactions(buffer, redactions, options);
+    return await output.save();
+  } finally {
+    await task.destroy();
   }
 }
 
-/**
- * Sanitize PDF by burning redactions and stripping metadata.
- * Uses flattening if requested (default: true).
- */
 export async function sanitizePdf(
   buffer: ArrayBuffer,
   redactions: PageRedaction[],
-  options?: SanitizationOptions
+  options?: SanitizationOptions,
 ): Promise<Uint8Array> {
-  if (options?.flattenRaster !== false) {
-    return flattenPdfPages(buffer, redactions, options);
+  if (options?.flattenRaster === false) {
+    throw new Error('Sanitized PDF export requires raster flattening.');
   }
-  return burnRedactions(buffer, redactions, options);
+  return flattenPdfPages(buffer, redactions, options);
 }
